@@ -4,8 +4,19 @@ import { ollamaFromEnv, type ChatMessage } from '../../../src/llm/ollama';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: Request) {
   const llm = ollamaFromEnv();
+  // ?test=1 makes one tiny model call, to check the key and model from a browser.
+  if (llm && new URL(req.url).searchParams.get('test')) {
+    const t0 = Date.now();
+    try {
+      const reply = await llm.chat([{ role: 'user', content: 'Reply with the single word OK.' }]);
+      return Response.json({ available: true, model: llm.model, test: 'ok', ms: Date.now() - t0, reply: reply.slice(0, 40) });
+    } catch (e) {
+      console.error(`[llm] test failed model=${llm.model}: ${(e as Error).message}`);
+      return Response.json({ available: true, model: llm.model, test: 'failed', ms: Date.now() - t0, error: (e as Error).message.slice(0, 300) });
+    }
+  }
   return Response.json({ available: !!llm, model: llm?.model ?? null });
 }
 
