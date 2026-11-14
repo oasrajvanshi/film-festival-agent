@@ -17,7 +17,7 @@ export const TABS = {
   Venues: { gid: 2, header: ['Venue ID', 'Name', 'Capacity', 'Address'] },
   'Travel times': { gid: 3, header: ['From \\ To (minutes)'] },
   Films: { gid: 4, header: ['Film ID', 'Title', 'Director', 'Runtime (min)', 'Section', 'Featured filmmaker IDs'] },
-  People: { gid: 5, header: ['Person ID', 'Name', 'Role', 'Email', 'Channels', 'Staff role', 'Crowd opt-in'] },
+  People: { gid: 5, header: ['Person ID', 'Name', 'Role', 'Email', 'Channels', 'Staff role', 'Crowd opt-in', 'Phone'] },
   Passes: { gid: 6, header: ['Person ID', 'Pass type', 'Valid days'] },
   Tickets: { gid: 7, header: ['Ticket ID', 'Person ID', 'Event ID'] },
   'Saved events': { gid: 8, header: ['Person ID', 'Event ID'] },
@@ -41,7 +41,7 @@ export function festivalToTables(f: Festival): Tables {
     Venues: [[...TABS.Venues.header], ...f.venues.map(v => [v.id, v.name, String(v.capacity), v.address])],
     'Travel times': [[TABS['Travel times'].header[0], ...venueIds], ...venueIds.map(a => [a, ...venueIds.map(b => String(f.travel[a][b]))])],
     Films: [[...TABS.Films.header], ...f.films.map(x => [x.id, x.title, x.director, String(x.runtimeMin), x.section, x.filmmakerIds.join(', ')])],
-    People: [[...TABS.People.header], ...f.people.map(p => [p.id, p.name, p.role, p.email, p.channels.join(', '), p.staffRole ?? '', p.crowdOptIn ? 'TRUE' : 'FALSE'])],
+    People: [[...TABS.People.header], ...f.people.map(p => [p.id, p.name, p.role, p.email, p.channels.join(', '), p.staffRole ?? '', p.crowdOptIn ? 'TRUE' : 'FALSE', p.phone ?? ''])],
     Passes: [[...TABS.Passes.header], ...f.passes.map(p => [p.personId, p.type, p.validDays.join(' ')])],
     Tickets: [[...TABS.Tickets.header], ...f.tickets.map(t => [t.id, t.personId, t.eventId])],
     'Saved events': [[...TABS['Saved events'].header], ...f.bookings.map(b => [b.personId, b.eventId])],
@@ -136,7 +136,7 @@ export function tablesToFestival(t: Partial<Tables>): LoadResult {
     if (!ROLES.includes(role)) err('People', i, `Role must be one of ${ROLES.join(', ')} (got "${r.Role}")`);
     const channels = list(r.Channels).filter((c): c is Channel => CHANNELS.includes(c as Channel));
     return {
-      id: r['Person ID'], name: r.Name, role, email: r.Email, channels: channels.length ? channels : ['email' as Channel],
+      id: r['Person ID'], name: r.Name, role, email: r.Email, phone: r.Phone || undefined, channels: channels.length ? channels : ['email' as Channel],
       staffRole: r['Staff role'] || undefined, crowdOptIn: /^(true|yes|y|1)$/i.test(r['Crowd opt-in']),
     };
   });

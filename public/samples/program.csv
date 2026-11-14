@@ -1,0 +1,70 @@
+Session Code,Event,Date,Showtime,Ends,Theatre,Category,In-Person Guests,Admission,Status
+S051,Press screening: Borrowed Season,"Thu, Apr 15",8:00 AM,9:48 AM,Riverside Studio,Screening,,Press only,Confirmed
+S064,"Industry Market, Day 1","Thu, Apr 15",9:00 AM,10:45 AM,Pier 9 Hall,Market,,Industry only,Confirmed
+S001,Salt Houses,"Thu, Apr 15",10:00 AM,11:30 AM,Harbor Theater,Screening,Luca Hollis,Public,Confirmed
+S028,Last Rooms,"Thu, Apr 15",10:00 AM,11:36 AM,Canal Street Cinema,Screening,,Public,Confirmed
+S045,Wild Weather,"Thu, Apr 15",10:00 AM,11:31 AM,Riverside Studio,Screening,,Public,Confirmed
+S054,Financing the Independent Feature,"Thu, Apr 15",11:00 AM,12:00 PM,Pier 9 Hall,Panel,Hiro Abara; Mira Jessop; Nico Thibault,Public,Confirmed
+S002,Q&A: Salt Houses,"Thu, Apr 15",11:30 AM,11:50 AM,Harbor Theater,Q&A,Luca Hollis,Public,Confirmed
+S013,Open Gods,"Thu, Apr 15",12:30 PM,2:12 PM,Harbor Theater,Screening,Femi Hollis,Public,Confirmed
+S034,Silver Water,"Thu, Apr 15",12:30 PM,2:17 PM,Canal Street Cinema,Screening,,Public,Confirmed
+S055,Documentary Ethics Now,"Thu, Apr 15",1:30 PM,2:30 PM,Pier 9 Hall,Panel,Nico Thibault; Yara Hollis; Luca Pell,Public,Confirmed
+S014,Q&A: Open Gods,"Thu, Apr 15",2:12 PM,2:32 PM,Harbor Theater,Q&A,Femi Hollis,Public,Confirmed
+S003,Wild Tide,"Thu, Apr 15",3:00 PM,4:17 PM,Riverside Studio,Screening,Sami Whitlock,Public,Confirmed
+S023,Late Country,"Thu, Apr 15",3:00 PM,4:41 PM,Harbor Theater,Screening,,Public,Confirmed
+S040,Quiet Animals,"Thu, Apr 15",3:00 PM,4:29 PM,Canal Street Cinema,Screening,,Public,Confirmed
+S056,Selling at Markets,"Thu, Apr 15",4:00 PM,5:00 PM,Pier 9 Hall,Panel,Luca Pell; Luca Hollis; Pavel Kettering,Public,Confirmed
+S004,Q&A: Wild Tide,"Thu, Apr 15",4:17 PM,4:37 PM,Riverside Studio,Q&A,Sami Whitlock,Public,Confirmed
+S015,Last Gods,"Thu, Apr 15",5:30 PM,6:57 PM,Riverside Studio,Screening,Elif Galloway,Public,Confirmed
+S029,Last Light,"Thu, Apr 15",5:30 PM,6:53 PM,Harbor Theater,Screening,,Public,Confirmed
+S046,Bright Weather,"Thu, Apr 15",5:30 PM,7:10 PM,Canal Street Cinema,Screening,,Public,Confirmed
+S057,Writing for Small Budgets,"Thu, Apr 15",6:30 PM,7:30 PM,Pier 9 Hall,Panel,Sami Whitlock; Pavel Kettering; Luca Abara,Public,Confirmed
+S016,Q&A: Last Gods,"Thu, Apr 15",6:57 PM,7:17 PM,Riverside Studio,Q&A,Elif Galloway,Public,Confirmed
+S024,Last Harbor,"Thu, Apr 15",8:00 PM,9:21 PM,Riverside Studio,Screening,,Public,Confirmed
+S035,Paper Bridges,"Thu, Apr 15",8:00 PM,9:23 PM,Harbor Theater,Screening,,Public,Confirmed
+S065,"Filmmaker Reception, Day 1","Thu, Apr 15",8:00 PM,10:00 PM,Pier 9 Hall,Activity,,Vip only,Confirmed
+S052,Press screening: Open Gods,"Fri, Apr 16",8:00 AM,9:42 AM,Riverside Studio,Screening,,Press only,Confirmed
+S066,"Industry Market, Day 2","Fri, Apr 16",9:00 AM,10:45 AM,Pier 9 Hall,Market,,Industry only,Confirmed
+S005,Borrowed Tide,"Fri, Apr 16",10:00 AM,11:42 AM,Canal Street Cinema,Screening,Pavel Kettering,Public,Confirmed
+S030,Late Letters,"Fri, Apr 16",10:00 AM,11:36 AM,Riverside Studio,Screening,,Public,Confirmed
+S041,Paper Animals,"Fri, Apr 16",10:00 AM,11:35 AM,Harbor Theater,Screening,,Public,Confirmed
+S058,Distribution After Streaming,"Fri, Apr 16",11:00 AM,12:00 PM,Pier 9 Hall,Panel,Luca Abara; Greta Okafor; Jonah Quarles,Public,Confirmed
+S006,Q&A: Borrowed Tide,"Fri, Apr 16",11:42 AM,12:02 PM,Canal Street Cinema,Q&A,Pavel Kettering,Public,Confirmed
+S017,Lost Animals,"Fri, Apr 16",12:30 PM,2:20 PM,Canal Street Cinema,Screening,Mira Hollis,Public,Confirmed
+S036,Last Fields,"Fri, Apr 16",12:30 PM,2:00 PM,Riverside Studio,Screening,,Public,Confirmed
+S047,Small Weather,"Fri, Apr 16",12:30 PM,1:47 PM,Harbor Theater,Screening,,Public,Confirmed
+S059,Festival Strategy 101,"Fri, Apr 16",1:30 PM,2:30 PM,Pier 9 Hall,Panel,Jonah Quarles; Femi Hollis; Elif Galloway,Public,Confirmed
+S018,Q&A: Lost Animals,"Fri, Apr 16",2:20 PM,2:40 PM,Canal Street Cinema,Q&A,Mira Hollis,Public,Confirmed
+S025,Salt Bridges,"Fri, Apr 16",3:00 PM,4:35 PM,Canal Street Cinema,Screening,,Public,Confirmed
+S042,Iron Country,"Fri, Apr 16",3:00 PM,4:48 PM,Riverside Studio,Screening,,Public,Confirmed
+S060,Sound on a Shoestring,"Fri, Apr 16",4:00 PM,5:00 PM,Pier 9 Hall,Panel,Elif Galloway; Mira Hollis; Xavi Quarles,Public,Confirmed
+S007,Borrowed Season,"Fri, Apr 16",5:30 PM,7:18 PM,Harbor Theater,Screening,Luca Abara,Public,Confirmed
+S031,Hollow Water,"Fri, Apr 16",5:30 PM,7:13 PM,Canal Street Cinema,Screening,,Public,Confirmed
+S048,Night Bridges,"Fri, Apr 16",5:30 PM,6:54 PM,Riverside Studio,Screening,,Public,Confirmed
+S061,The Producer's Toolkit,"Fri, Apr 16",6:30 PM,7:30 PM,Pier 9 Hall,Panel,Xavi Quarles; Hiro Abara; Mira Jessop,Public,Confirmed
+S008,Q&A: Borrowed Season,"Fri, Apr 16",7:18 PM,7:38 PM,Harbor Theater,Q&A,Luca Abara,Public,Confirmed
+S019,Far Rooms,"Fri, Apr 16",8:00 PM,9:27 PM,Harbor Theater,Screening,Xavi Quarles,Public,Confirmed
+S037,Northern Signal,"Fri, Apr 16",8:00 PM,9:48 PM,Canal Street Cinema,Screening,,Public,Confirmed
+S067,"Filmmaker Reception, Day 2","Fri, Apr 16",8:00 PM,10:00 PM,Pier 9 Hall,Activity,,Vip only,Confirmed
+S020,Q&A: Far Rooms,"Fri, Apr 16",9:27 PM,9:47 PM,Harbor Theater,Q&A,Xavi Quarles,Public,Confirmed
+S053,Press screening: Far Rooms,"Sat, Apr 17",8:00 AM,9:27 AM,Riverside Studio,Screening,,Press only,Confirmed
+S068,"Industry Market, Day 3","Sat, Apr 17",9:00 AM,10:45 AM,Pier 9 Hall,Market,,Industry only,Confirmed
+S009,Quiet Gods,"Sat, Apr 17",10:00 AM,11:16 AM,Riverside Studio,Screening,Greta Okafor,Public,Confirmed
+S026,Silver Gods,"Sat, Apr 17",10:00 AM,11:42 AM,Harbor Theater,Screening,,Public,Confirmed
+S043,Hollow Harbor,"Sat, Apr 17",10:00 AM,11:47 AM,Canal Street Cinema,Screening,,Public,Confirmed
+S062,Archival Rights Explained,"Sat, Apr 17",11:00 AM,12:00 PM,Pier 9 Hall,Panel,Mira Jessop; Nico Thibault; Yara Hollis,Public,Confirmed
+S010,Q&A: Quiet Gods,"Sat, Apr 17",11:16 AM,11:36 AM,Riverside Studio,Q&A,Greta Okafor,Public,Confirmed
+S021,Last Orchard,"Sat, Apr 17",12:30 PM,2:04 PM,Riverside Studio,Screening,,Public,Confirmed
+S032,Open Bridges,"Sat, Apr 17",12:30 PM,2:03 PM,Harbor Theater,Screening,,Public,Confirmed
+S049,Wild Shore,"Sat, Apr 17",12:30 PM,2:16 PM,Canal Street Cinema,Screening,,Public,Confirmed
+S063,"First Features, First Mistakes","Sat, Apr 17",1:30 PM,2:30 PM,Pier 9 Hall,Panel,Yara Hollis; Luca Pell; Luca Hollis,Public,Confirmed
+S027,Second Country,"Sat, Apr 17",3:00 PM,4:39 PM,Riverside Studio,Screening,,Public,Confirmed
+S038,Hollow Season,"Sat, Apr 17",3:00 PM,4:23 PM,Harbor Theater,Screening,,Public,Confirmed
+S011,Bright Kingdom,"Sat, Apr 17",5:30 PM,7:00 PM,Canal Street Cinema,Screening,Jonah Quarles,Public,Confirmed
+S033,Borrowed Water,"Sat, Apr 17",5:30 PM,6:56 PM,Riverside Studio,Screening,,Public,Confirmed
+S044,Late Tide,"Sat, Apr 17",5:30 PM,7:10 PM,Harbor Theater,Screening,,Public,Confirmed
+S012,Q&A: Bright Kingdom,"Sat, Apr 17",7:00 PM,7:20 PM,Canal Street Cinema,Q&A,Jonah Quarles,Public,Confirmed
+S022,Low Tide,"Sat, Apr 17",8:00 PM,9:29 PM,Canal Street Cinema,Screening,,Public,Confirmed
+S039,Second Kingdom,"Sat, Apr 17",8:00 PM,9:38 PM,Riverside Studio,Screening,,Public,Confirmed
+S050,Silver Rooms,"Sat, Apr 17",8:00 PM,9:31 PM,Harbor Theater,Screening,,Public,Confirmed
+S069,"Filmmaker Reception, Day 3","Sat, Apr 17",8:00 PM,10:00 PM,Pier 9 Hall,Activity,,Vip only,Confirmed
