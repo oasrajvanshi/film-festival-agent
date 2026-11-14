@@ -1,0 +1,3 @@
+Person ID,Day,Mode,Flight,From,Arrival,Pickup,Buffer (min),Remote OK,Phone,Assistant name,Assistant email,Assistant phone
+p-073,1,flight,DL2207,pl-airport,14:20,14:35,15,yes,+1 207 555 0173,Mara Quist,mara.quist@example.test,+1 207 555 0174
+p-078,1,car,,pl-hotel,,16:30,,no,+1 207 555 0178,,,

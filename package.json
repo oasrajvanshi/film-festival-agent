@@ -9,7 +9,11 @@
     "typecheck": "tsc",
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "ops": "tsx scripts/ops.ts",
+    "ops:llm": "tsx scripts/ops.ts all --llm",
+    "ops:sync": "tsx scripts/ops-sync.ts",
+    "test:backend": "vitest run tests/backend"
   },
   "keywords": [],
   "author": "",

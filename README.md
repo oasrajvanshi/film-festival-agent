@@ -6,6 +6,18 @@ Group Blue · Oas, Sienna, David, Henry
 
 Film festival schedule changes are relayed by hand across emails, sheets and chats, so updates arrive late or reach the wrong people. Volunteers work from outdated briefs, guests get double-booked, and staff spend the day relaying information. The Film Festival Agent tracks the schedule, notifies and gives recommendation to everyone affected. It flags clashes and checks access, with staff approving anything sent publicly.
 
+## Operations backend: snow and a late key guest
+
+`src/backend` is the agent backend for the two scenarios we test: snow, and a key guest arriving late. It reads the team's mock sheet (Harbor Lights), routes each event to a weather desk or a talent desk agent, and lets a local Ollama model (`qwen3:8b`) drive tool calls while rules compute every option and a person approves anything public.
+
+```
+ollama pull qwen3:8b
+npm run ops -- snow --llm
+npm run ops -- guest-late --llm
+```
+
+Details: [docs/backend.md](docs/backend.md). What the scenarios need from the sheet: [docs/data-contract.md](docs/data-contract.md).
+
 ## What it does
 
 | Pain point (proposal) | What the agent does | Human stays in charge of |

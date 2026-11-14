@@ -1,0 +1,1094 @@
+<title>Harbor Lights Ops Agent</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@700&display=swap">
+<style>
+:root { --bg: #F4F4F1; --ink: #18181B; --muted: #55555C; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #141416; --ink: #EDEDF0; --muted: #B4B4BC; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #141416; --ink: #EDEDF0; --muted: #B4B4BC; color-scheme: dark }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif; }
+p { margin: 0; }
+.page { max-width: 1640px; margin: 0 auto; padding-block: 32px 48px; display: grid; gap: 28px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.page > header h1 { font-size: clamp(28px, 4vw, 40px); line-height: 1.1; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+.page > header p { color: var(--muted); font-size: 16px; margin-top: 6px; }
+.stage { overflow-x: auto; border-radius: 22px; }
+.bd { --z: 1; zoom: var(--z); position: relative; width: 1600px; background: #F1F1EE; border-radius: 22px; overflow: hidden; color: #18181B; }
+.bt { position: absolute; left: 24px; top: 22px; font-size: 26px; line-height: 32px; font-weight: 600; }
+.ic { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.lane { position: absolute; border-radius: 22px; background: #fff; }
+.ln { position: absolute; display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: #C2410C; }
+.lns { font-weight: 500; color: #55555C; }
+.wires { position: absolute; left: 0; top: 0; overflow: visible; }
+.nd { position: absolute; display: flex; flex-direction: column; gap: 8px; padding: 13px 14px; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1.5px #CFCFC8; }
+.nd.data { background: #E9E9E4; box-shadow: none; gap: 14px; padding: 16px; }
+.nd.hu { background: #FFF6F0; box-shadow: inset 0 0 0 1.5px #E9A27A; }
+.nd.out { background: #FAFAF7; box-shadow: none; outline: 1.5px dashed #8A8A91; outline-offset: -1.5px; }
+.nh { display: flex; align-items: center; gap: 8px; }
+.nb { width: 22px; height: 22px; border-radius: 999px; background: #D9730D; color: #fff; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.nt { font-size: 15.5px; line-height: 21px; font-weight: 700; }
+.nx { font-size: 13.5px; line-height: 18px; color: #55555C; }
+.who { margin-left: auto; display: inline-flex; color: #9A3412; }
+.chs { display: flex; flex-wrap: wrap; gap: 5px; margin-top: auto; }
+.ch { display: inline-flex; align-items: center; gap: 5px; height: 23px; padding: 0 7px; border-radius: 7px; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+.ch.ml { background: #EEE9FB; color: #4C2A9E; }
+.ch.tl { background: #EEF3FE; color: #2563EB; font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 11.5px; font-weight: 700; }
+.ch.sv { background: #fff; color: #3F3F46; box-shadow: inset 0 0 0 1px #CFCFC8; }
+.ch.rl { background: #EFEFEB; color: #55555C; }
+.ch.op { background: #fff; color: #9A3412; box-shadow: inset 0 0 0 1px #E9A27A; }
+.sl { display: flex; flex-direction: column; gap: 14px; }
+.si { display: flex; gap: 10px; align-items: flex-start; font-size: 14.5px; line-height: 19px; }
+.si svg { color: #3F3F46; margin-top: 1px; }
+.si b { display: block; font-weight: 600; }
+.src { display: block; font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 12px; font-weight: 700; color: #2563EB; margin-top: 2px; }
+.hub { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px 12px; border-radius: 20px; background: #1C1B1F; color: #fff; text-align: center; }
+.hub svg { color: #F4874B; }
+.ht { font-size: 16px; line-height: 22px; font-weight: 700; }
+.hx { font-size: 13.5px; line-height: 21px; color: #C9C9CF; }
+.dm { position: absolute; width: 74px; height: 74px; transform: rotate(45deg); border-radius: 12px; background: #fff; box-shadow: inset 0 0 0 1.5px #55555C; }
+.dmb { position: absolute; }
+.dmt { position: absolute; width: 96px; height: 44px; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 13px; line-height: 16px; font-weight: 700; color: #2563EB; }
+.pl { position: absolute; display: flex; align-items: center; justify-content: center; text-align: center; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1.5px #3F3F46; font-size: 13.5px; line-height: 17px; font-weight: 600; }
+.pl.stop { color: #B54A3F; box-shadow: inset 0 0 0 1.5px #B54A3F; border-radius: 14px; }
+.pl.link { color: #C2410C; background: #FFF6F0; box-shadow: inset 0 0 0 1.5px #E9A27A; }
+.al { position: absolute; font-size: 13px; line-height: 17px; font-weight: 700; color: #2563EB; background: #fff; padding: 0 4px; border-radius: 4px; white-space: nowrap; }
+.al.loop { color: #D9730D; } .al.stop { color: #B54A3F; }
+.leg { position: absolute; left: 24px; top: 70px; right: 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; font-size: 13.5px; color: #3F3F46; }
+.leg > span { display: inline-flex; align-items: center; gap: 7px; }
+.lg { display: inline-block; width: 18px; height: 14px; border-radius: 4px; }
+.lg.data { background: #E2E2DD; } .lg.step { background: #fff; box-shadow: inset 0 0 0 1.5px #B9B9B2; }
+.lg.dia { width: 12px; height: 12px; transform: rotate(45deg); border-radius: 2px; background: #fff; box-shadow: inset 0 0 0 1.5px #55555C; margin: 0 3px; }
+.lg.hu { background: #FFF6F0; box-shadow: inset 0 0 0 1.5px #E9A27A; } .lg.out { background: #FAFAF7; outline: 1.5px dashed #8A8A91; outline-offset: -1.5px; }
+.lw { display: inline-block; width: 24px; height: 0; border-top: 2px solid; }
+</style>
+<div class="page">
+  <header><h1>Harbor Lights Ops Agent</h1><p>Agent architecture for the two scenarios we test.</p></header>
+  <div class="stage"><div class="bd" id="snow" style="height:900px"><p class="bt">Scenario 1 · Snow</p><div class="leg"><span><i class="lg data"></i>Outside source</span><span><i class="lg step"></i>Agent step</span><span><i class="lg dia"></i>Decision</span><span><i class="lg hu"></i>A person decides</span><span><i class="lg out"></i>Gets a message</span><span class="ch ml"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 3v3M14 3v3M10 18v3M14 18v3M3 10h3M3 14h3M18 10h3M18 14h3"/></svg>AI model</span><span class="ch tl">agent tool</span><span class="ch sv"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0zM12 16.5V21"/></svg>Service</span><span class="ch rl">Rules</span><span><i class="lw" style="border-color:#2563EB;border-top-style:dotted"></i>Feeds</span><span><i class="lw" style="border-color:#D9730D;border-top-style:dashed"></i>Loop, timer</span><span><i class="lw" style="border-color:#B54A3F;border-top-style:dashed"></i>Stops</span></div><div class="lane" style="left:440px;top:130px;width:1136px;height:480px"></div><p class="ln" style="left:460px;top:144px"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 14.2A4.5 4.5 0 0 1 21 19"/></svg>Ops dashboard <span class="lns">· manager and staff</span></p><div class="lane" style="left:440px;top:630px;width:1136px;height:240px"></div><p class="ln" style="left:460px;top:644px"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 18h2"/></svg>Attendee app</p><svg class="wires" width="1600" height="900" viewBox="0 0 1600 900" aria-hidden="true"><defs><marker id="ah-snow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 z" fill="#18181B"/></marker><marker id="ahb-snow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 z" fill="#2563EB"/></marker><marker id="aho-snow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 z" fill="#D9730D"/></marker><marker id="ahr-snow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 z" fill="#B54A3F"/></marker></defs><path d="M274 370 L296 370" fill="none" stroke="#2563EB" stroke-width="1.5" stroke-dasharray="3 4" stroke-linejoin="round" marker-end="url(#ahb-snow)"/><path d="M274 750 L296 750" fill="none" stroke="#2563EB" stroke-width="1.5" stroke-dasharray="3 4" stroke-linejoin="round" marker-end="url(#ahb-snow)"/><path d="M416 320 L460 320" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-snow)"/><path d="M628 320 L660 320" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-snow)"/><path d="M922 320 L948 320" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-snow)"/><path d="M1000 372 L1000 434" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-snow)"/><path d="M1052 320 L1080 320 L1080 214 L1098 214" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-snow)"/><path d="M1080 320 L1098 320" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-snow)"/><path d="M1080 320 L1080 426 L1098 426" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-snow)"/><path d="M1338 214 L1370 214" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-snow)"/><path d="M1338 320 L1370 320" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-snow)"/><path d="M1338 426 L1370 426" fill="none" stroke="#B54A3F" stroke-width="1.5" stroke-dasharray="4 4" stroke-linejoin="round" marker-end="url(#ahr-snow)"/><path d="M1218 472 L1218 712" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-snow)"/><path d="M791 412 L791 478" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-snow)"/><path d="M1000 472 L1000 575 L416 575" fill="none" stroke="#D9730D" stroke-width="1.6" stroke-dasharray="6 4" stroke-linejoin="round" marker-end="url(#aho-snow)"/><path d="M660 760 L416 760" fill="none" stroke="#D9730D" stroke-width="1.6" stroke-dasharray="6 4" stroke-linejoin="round" marker-end="url(#aho-snow)"/></svg><div class="nd " style="left:460px;top:268px;width:168px;height:104px"><div class="nh"><span class="nb">1</span><span class="nt">Sort the event</span></div><div class="chs"><span class="ch rl">Router: rules</span></div></div><div class="nd data" style="left:24px;top:130px;width:250px;height:480px"><p class="nt">Outside sources</p><div class="sl"><div class="si"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-9 6 6 0 0 1 11.4 1.5A3.8 3.8 0 0 1 17.5 18z"/></svg><span><b>Weather forecast</b><span class="src">Open-Meteo API</span></span></div><div class="si"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="13" rx="3"/><path d="M5 11h14M8 20v-3M16 20v-3"/></svg><span><b>Shuttle delays</b><span class="src">Shuttle GPS feed</span></span></div><div class="si"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span><b>Schedule, people, shifts</b><span class="src">Google Sheet</span></span></div><div class="si"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span><b>Re-check timers</b><span class="src">Backend scheduler</span></span></div></div></div><div class="nd data" style="left:24px;top:630px;width:250px;height:240px"><p class="nt">From the app</p><div class="sl"><div class="si"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8a2 2 0 0 0 0 4v4h16v-4a2 2 0 0 0 0-4V5H4z"/><path d="M14 5v11"/></svg><span><b>Saved plans, tickets</b><span class="src">Attendee app</span></span></div></div></div><div class="hub" style="left:296px;top:130px;width:120px;height:740px"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="2.8"/><path d="M5 6v12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8V6M5 12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8"/></svg><p class="ht">Live festival picture</p><p class="hx">conditions<br>decisions<br>timers</p></div><div class="nd " style="left:660px;top:228px;width:262px;height:184px"><div class="nh"><span class="nb">2</span><span class="nt">Weather desk</span></div><div class="chs"><span class="ch ml"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 3v3M14 3v3M10 18v3M14 18v3M3 10h3M3 14h3M18 10h3M18 14h3"/></svg>qwen3:8b</span><span class="ch tl">get_forecast</span><span class="ch tl">get_shuttle_status</span><span class="ch tl">list_sessions</span><span class="ch tl">plan_weather_options</span><span class="ch tl">submit_decision</span></div></div><div class="dm" style="left:963px;top:283px"></div><span class="nb dmb" style="left:989px;top:246px">3</span><p class="dmt" style="left:952px;top:298px">Over 2 in<br>of snow?</p><div class="pl " style="left:945px;top:434px;width:110px;height:38px">Watch only</div><div class="nd " style="left:1098px;top:168px;width:240px;height:92px"><div class="nh"><span class="nb">4</span><span class="nt">Door and driver briefs</span></div><div class="chs"><span class="ch rl">runs on its own</span></div></div><div class="nd hu" style="left:1098px;top:274px;width:240px;height:92px"><div class="nh"><span class="nb">4</span><span class="nt">Extra bus?</span><span class="who"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg></span></div><p class="nx">Operations decides</p><div class="chs"><span class="ch sv"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0zM12 16.5V21"/></svg>Ops dashboard</span></div></div><div class="nd hu" style="left:1098px;top:380px;width:240px;height:92px"><div class="nh"><span class="nb">4</span><span class="nt">Weather notice</span><span class="who"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg></span></div><p class="nx">Comms decides</p><div class="chs"><span class="ch sv"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0zM12 16.5V21"/></svg>Ops dashboard</span></div></div><div class="nd out" style="left:1370px;top:168px;width:190px;height:92px"><div class="nh"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 14.2A4.5 4.5 0 0 1 21 19"/></svg><span class="nt">Volunteers</span></div><div class="chs"><span class="ch sv"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0zM12 16.5V21"/></svg>Email</span><span class="ch sv"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0zM12 16.5V21"/></svg>Push</span></div></div><div class="nd out" style="left:1370px;top:274px;width:190px;height:92px"><div class="nh"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="4" width="14" height="13" rx="3"/><path d="M5 11h14M8 20v-3M16 20v-3"/></svg><span class="nt">Shuttle vendor</span></div><div class="chs"><span class="ch sv"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0zM12 16.5V21"/></svg>Email</span></div></div><div class="pl stop" style="left:1370px;top:400px;width:190px;height:52px">No answer:<br>safe default</div><div class="pl link" style="left:660px;top:478px;width:262px;height:40px">Re-check guests on the road → Scenario 2</div><div class="nd " style="left:1098px;top:712px;width:240px;height:96px"><div class="nh"><span class="nt">Notice on their phone</span></div><div class="chs"><span class="ch sv"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0zM12 16.5V21"/></svg>Push</span><span class="ch sv"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0zM12 16.5V21"/></svg>SMS</span></div></div><div class="nd " style="left:660px;top:712px;width:262px;height:96px"><div class="nh"><span class="nt">Saved plans</span></div><p class="nx">who moves between venues</p></div><span class="al main" style="left:1008px;top:390px">no</span><span class="al main" style="left:1053px;top:292px">yes</span><span class="al main" style="left:1226px;top:560px">approve</span><span class="al loop" style="left:700px;top:556px">re-check timer</span><span class="al loop" style="left:450px;top:738px">plans give shuttle riders</span></div></div><div class="stage"><div class="bd" id="late" style="height:900px"><p class="bt">Scenario 2 · A key guest is late</p><div class="leg"><span><i class="lg data"></i>Outside source</span><span><i class="lg step"></i>Agent step</span><span><i class="lg dia"></i>Decision</span><span><i class="lg hu"></i>A person decides</span><span><i class="lg out"></i>Gets a message</span><span class="ch ml"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 3v3M14 3v3M10 18v3M14 18v3M3 10h3M3 14h3M18 10h3M18 14h3"/></svg>AI model</span><span class="ch tl">agent tool</span><span class="ch sv"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0zM12 16.5V21"/></svg>Service</span><span class="ch rl">Rules</span><span><i class="lw" style="border-color:#2563EB;border-top-style:dotted"></i>Feeds</span><span><i class="lw" style="border-color:#D9730D;border-top-style:dashed"></i>Loop, timer</span><span><i class="lw" style="border-color:#B54A3F;border-top-style:dashed"></i>Stops</span></div><div class="lane" style="left:440px;top:130px;width:1136px;height:480px"></div><p class="ln" style="left:460px;top:144px"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 14.2A4.5 4.5 0 0 1 21 19"/></svg>Ops dashboard <span class="lns">· manager and staff</span></p><div class="lane" style="left:440px;top:630px;width:1136px;height:240px"></div><p class="ln" style="left:460px;top:644px"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2.5"/><path d="M11 18h2"/></svg>Attendee app</p><svg class="wires" width="1600" height="900" viewBox="0 0 1600 900" aria-hidden="true"><defs><marker id="ah-late" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 z" fill="#18181B"/></marker><marker id="ahb-late" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 z" fill="#2563EB"/></marker><marker id="aho-late" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 z" fill="#D9730D"/></marker><marker id="ahr-late" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L9 5 L1 9 z" fill="#B54A3F"/></marker></defs><path d="M274 370 L296 370" fill="none" stroke="#2563EB" stroke-width="1.5" stroke-dasharray="3 4" stroke-linejoin="round" marker-end="url(#ahb-late)"/><path d="M274 750 L296 750" fill="none" stroke="#2563EB" stroke-width="1.5" stroke-dasharray="3 4" stroke-linejoin="round" marker-end="url(#ahb-late)"/><path d="M416 320 L460 320" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-late)"/><path d="M630 320 L650 320" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-late)"/><path d="M754 320 L790 320" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-late)"/><path d="M702 372 L702 448" fill="none" stroke="#B54A3F" stroke-width="1.5" stroke-dasharray="4 4" stroke-linejoin="round" marker-end="url(#ahr-late)"/><path d="M1020 213 L1020 189 L830 189 L830 213" fill="none" stroke="#D9730D" stroke-width="1.6" stroke-dasharray="6 4" stroke-linejoin="round" marker-end="url(#aho-late)"/><path d="M1052 320 L1074 320" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-late)"/><path d="M1126 268 L1126 196" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-late)"/><path d="M1178 320 L1210 320" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-late)"/><path d="M1380 320 L1398 320" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-late)"/><path d="M1388 320 L1388 203 L1398 203" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-late)"/><path d="M1388 320 L1388 437 L1398 437" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-late)"/><path d="M1335 418 L1335 526 L1398 526" fill="none" stroke="#B54A3F" stroke-width="1.5" stroke-dasharray="4 4" stroke-linejoin="round" marker-end="url(#ahr-late)"/><path d="M1255 418 L1255 712" fill="none" stroke="#18181B" stroke-width="1.7" stroke-linejoin="round" marker-end="url(#ah-late)"/><path d="M790 760 L416 760" fill="none" stroke="#D9730D" stroke-width="1.6" stroke-dasharray="6 4" stroke-linejoin="round" marker-end="url(#aho-late)"/></svg><div class="nd " style="left:460px;top:260px;width:170px;height:120px"><div class="nh"><span class="nb">1</span><span class="nt">Sort the event</span></div><div class="chs"><span class="ch rl">Router</span><span class="ch ml"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 3v3M14 3v3M10 18v3M14 18v3M3 10h3M3 14h3M18 10h3M18 14h3"/></svg>qwen3:8b</span></div></div><div class="nd data" style="left:24px;top:130px;width:250px;height:480px"><p class="nt">Outside sources</p><div class="sl"><div class="si"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 13.5l7-1.5 4-7.5 2 .5-2 7.5 5.5 1.5 1.5-2 1.5.5-1 4-1.5.5-6-1-3 6-2-.5 1-6-6-1z"/></svg><span><b>Flight status</b><span class="src">FlightAware API</span></span></div><div class="si"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="M4 7l8 6 8-6"/></svg><span><b>Guest or assistant email</b><span class="src">Gmail API</span></span></div><div class="si"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 17H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 5 5z"/></svg><span><b>Guest SMS</b><span class="src">Twilio</span></span></div><div class="si"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V5a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v15M3 20h18"/><circle cx="15" cy="12.5" r="0.9"/></svg><span><b>Check-ins</b><span class="src">QR door scans</span></span></div><div class="si"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span><b>Call sheet, guest list</b><span class="src">Google Sheet</span></span></div><div class="si"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a4.5 4.5 0 0 1-.6-9 6 6 0 0 1 11.4 1.5A3.8 3.8 0 0 1 17.5 18z"/></svg><span><b>Snow travel time</b><span class="src">Scenario 1</span></span></div></div></div><div class="nd data" style="left:24px;top:630px;width:250px;height:240px"><p class="nt">From the app</p><div class="sl"><div class="si"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8a2 2 0 0 0 0 4v4h16v-4a2 2 0 0 0 0-4V5H4z"/><path d="M14 5v11"/></svg><span><b>Saved plans, tickets</b><span class="src">Attendee app</span></span></div></div></div><div class="hub" style="left:296px;top:130px;width:120px;height:740px"><svg class="ic" width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="6" rx="7" ry="2.8"/><path d="M5 6v12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8V6M5 12c0 1.5 3.1 2.8 7 2.8s7-1.3 7-2.8"/></svg><p class="ht">Live festival picture</p><p class="hx">conditions<br>decisions<br>timers</p></div><div class="dm" style="left:665px;top:283px"></div><span class="nb dmb" style="left:691px;top:246px">2</span><p class="dmt" style="left:654px;top:298px">Sender on<br>the sheet?</p><div class="nd hu" style="left:622px;top:448px;width:160px;height:70px"><div class="nh"><span class="nt">A person reads it</span><span class="who"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg></span></div></div><div class="nd " style="left:790px;top:213px;width:262px;height:214px"><div class="nh"><span class="nb">3</span><span class="nt">Talent desk</span></div><div class="chs"><span class="ch ml"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M10 3v3M14 3v3M10 18v3M14 18v3M3 10h3M3 14h3M18 10h3M18 14h3"/></svg>qwen3:8b</span><span class="ch tl">get_guest</span><span class="ch tl">get_flight_status</span><span class="ch tl">estimate_guest_eta</span><span class="ch tl">find_backups</span><span class="ch tl">check_delay_impact</span><span class="ch tl">plan_guest_options</span></div></div><div class="dm" style="left:1089px;top:283px"></div><span class="nb dmb" style="left:1115px;top:246px">4</span><p class="dmt" style="left:1078px;top:298px">Makes the<br>call?</p><div class="pl " style="left:1076px;top:160px;width:100px;height:36px">No action</div><div class="nd hu" style="left:1210px;top:222px;width:170px;height:196px"><div class="nh"><span class="nb">5</span><span class="nt">Guest relations decides</span><span class="who"><svg class="ic" width="17" height="17" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg></span></div><div class="chs"><span class="ch op">brief a backup</span><span class="ch op">start with backup</span><span class="ch op">delay</span><span class="ch op">video</span></div></div><div class="nd out" style="left:1398px;top:157px;width:168px;height:92px"><div class="nh"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg><span class="nt">Backup speaker</span></div><div class="chs"><span class="ch sv"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0zM12 16.5V21"/></svg>SMS</span></div></div><div class="nd out" style="left:1398px;top:274px;width:168px;height:92px"><div class="nh"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg><span class="nt">Guest, assistant</span></div><div class="chs"><span class="ch sv"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0zM12 16.5V21"/></svg>Email</span></div></div><div class="nd out" style="left:1398px;top:391px;width:168px;height:92px"><div class="nh"><svg class="ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.6"/><path d="M15.5 14.2A4.5 4.5 0 0 1 21 19"/></svg><span class="nt">House managers</span></div><div class="chs"><span class="ch sv"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0zM12 16.5V21"/></svg>Slack</span></div></div><div class="pl stop" style="left:1398px;top:500px;width:168px;height:52px">No answer:<br>page Operations</div><div class="nd " style="left:1210px;top:712px;width:170px;height:96px"><div class="nh"><span class="nt">Plan update</span></div><div class="chs"><span class="ch sv"><svg class="ic" width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3v5M15 3v5M6.5 8h11v3a5.5 5.5 0 0 1-11 0zM12 16.5V21"/></svg>Push</span></div></div><div class="nd " style="left:790px;top:712px;width:262px;height:96px"><div class="nh"><span class="nt">Saved plans</span></div><p class="nx">who would wait</p></div><span class="al main" style="left:760px;top:300px">yes</span><span class="al stop" style="left:710px;top:390px">no</span><span class="al loop" style="left:850px;top:167px">bad tool call: retry</span><span class="al main" style="left:1134px;top:220px">on time</span><span class="al main" style="left:1176px;top:296px">late</span><span class="al main" style="left:1263px;top:600px">only if delayed</span><span class="al loop" style="left:450px;top:738px">plans show who would wait</span></div></div>
+</div>
+<script>
+(function(){
+  function fit(){ document.querySelectorAll('.stage').forEach(function(s){
+    var z = Math.max(0.5, Math.min(1, s.clientWidth / 1600));
+    s.firstElementChild.style.setProperty('--z', z); }); }
+  window.addEventListener('resize', fit); fit();
+})();
+</script>
+<script>
+/**
+ * live-editor.js — Universal in-page live editor (drop-in, zero-dependency).
+ *
+ * DESIGN CONTRACT (non-negotiable):
+ *   1. ZERO LAYOUT IMPACT. The editor never participates in page layout.
+ *      - All UI is `position: fixed` inside a single container.
+ *      - Edit affordances use `outline` (NOT border) + `outline-offset`,
+ *        so no box is ever resized and nothing reflows.
+ *      - Styles live in a <style> tag scoped by the `.lve-` prefix and are
+ *        only ever applied to elements the editor owns, plus `[data-lve]`
+ *        outlines that are outline-only.
+ *      - `contenteditable` is applied ONLY while edit mode is ON, and removed
+ *        on exit, so the delivered page is byte-identical when never toggled.
+ *   2. INTERACTIONS FROZEN WHILE EDITING. Entering edit or comment mode suspends
+ *      the page's own click behaviour so you can click into text without firing
+ *      the app.
+ *      - Capture-phase guards on document stop activation events before they
+ *        reach page handlers (click, dblclick, auxclick, submit, dragstart,
+ *        Enter/Space on interactive elements).
+ *      - Down-events are only `stopPropagation()`, never `preventDefault()`, so
+ *        caret placement, text selection and native scrolling all still work.
+ *      - Media that swallows its own events (iframe/video/canvas/embed/object)
+ *        gets `pointer-events: none` — a paint-only property, so still no reflow.
+ *      - Escape hatches: `data-lve-allow` keeps an element interactive, and
+ *        holding Alt/Option passes a single click through to the page.
+ *   3. HIDEABLE. The toggle button can be hidden entirely:
+ *      - `?edit=0` in the URL, or `data-lve-hidden` on <html>/<body>, or
+ *        localStorage `lve:hidden=1`, or calling `LiveEditor.hideButton()`.
+ *      - Even hidden, the keyboard shortcut still works (see below), so the
+ *        page can ship visually clean and stay editable for the owner.
+ *      - `LiveEditor.destroy()` removes every trace from the DOM.
+ *   4. NEVER IN PRINT / EXPORT. `@media print` hides all editor UI.
+ *
+ * SHORTCUTS
+ *   Cmd/Ctrl + E   toggle edit mode (works even when the button is hidden)
+ *   Cmd/Ctrl + K   toggle comment mode
+ *   Cmd/Ctrl + Alt + E   toggle edit mode  (use this one: Cmd/Ctrl+E is often
+ *                        taken by an extension or the browser itself)
+ *   Cmd/Ctrl + S   save to localStorage (while editing)
+ *   Esc            leave whichever mode is on
+ *
+ * WHAT IS EDITABLE  (v1.2 — discovery, not a tag whitelist)
+ *   ⚠ v1.1 matched a fixed list of tags (h1-h6, p, li, a, button, td, …), so a
+ *   great deal of real page text was silently NOT editable: text in a bare
+ *   <div> or <span>, in <b>/<em>/<small>/<time>/<code>, in a <figcaption>'s
+ *   sibling label, in <caption>/<legend>/<option>, and every word inside an
+ *   <svg> — which on a diagram-heavy page is most of the words on the page.
+ *
+ *   v1.2 walks the DOM instead. An element is editable when it holds at least
+ *   one DIRECT child text node that is not whitespace. The walk stops
+ *   descending once it marks something, so a paragraph with inline <b>/<em>
+ *   inside it is edited as one field rather than three, and a wrapper whose
+ *   text all lives in children is never itself made editable.
+ *
+ *   SVG text is handled separately, because `contenteditable` on an SVG node is
+ *   unreliable across browsers: clicking an <svg> <text> or <tspan> opens a
+ *   one-line overlay input positioned over it, and committing writes the string
+ *   back. Same persistence, same export.
+ *
+ *   Opt out anywhere with `data-lve-skip` (also applies to descendants).
+ *   Force something in with `data-lve`.
+ *
+ * COMMENTS  (v1.2)
+ *   A second mode. Click anything to attach a note to it; a numbered pin marks
+ *   it. Pins are fixed-position and re-anchored on scroll and resize, so they
+ *   work on transformed and horizontally-scrolled layouts. Comments are stored
+ *   beside the edits and never touch the page's own DOM.
+ *   "Copy all" puts every comment on the clipboard as markdown — page, the text
+ *   that was commented on, and the note — which is the form you hand back to
+ *   whoever is making the changes.
+ *
+ * PERSISTENCE
+ *   Edits are keyed by a stable structural path and stored in localStorage
+ *   under `lve:<pathname>`; comments under `lve:c:<pathname>`. Restored
+ *   automatically on load ONLY when the page still matches the one the
+ *   snapshot was taken from — a snapshot carries a stamp of that page, and a
+ *   rebuilt page holds the snapshot back instead of letting it overwrite the
+ *   rebuild. `LiveEditor.restoreSaved()` applies a held one, `reset()` discards it. "Export HTML" downloads a clean copy with all editor
+ *   artifacts stripped and any comments embedded as one inert JSON block.
+ *
+ * USAGE
+ *   <script src="live-editor.js" defer><\/script>
+ *   // or inline the file contents in a <script> tag before </body>
+ */
+(function () {
+  'use strict';
+  if (window.LiveEditor) return;                 // idempotent
+  if (typeof document === 'undefined') return;
+
+  var FORCE = '[data-lve]';
+  var SKIP = '[data-lve-skip]';
+  var ALLOW = '[data-lve-allow]';
+  // never walk into these: no user-visible text, or text we must not touch
+  var OPAQUE = { SCRIPT: 1, STYLE: 1, NOSCRIPT: 1, TEMPLATE: 1, HEAD: 1, TITLE: 1,
+                 IFRAME: 1, CANVAS: 1, VIDEO: 1, AUDIO: 1, OBJECT: 1, EMBED: 1,
+                 SELECT: 1, TEXTAREA: 1, INPUT: 1, IMG: 1, SVG: 0 };
+  // elements whose Enter/Space activation must be suppressed while editing
+  var INTERACTIVE = 'a[href],button,summary,input,select,textarea,[role="button"],[role="link"],[role="tab"],[onclick],[tabindex]';
+  var KEY = 'lve:' + (location.pathname || '/');
+  var CKEY = 'lve:c:' + (location.pathname || '/');
+  var HIDE_KEY = 'lve:hidden';
+
+  var state = { on: false, commenting: false, nodes: [], svg: [], booted: false, hidden: false,
+                src: '', stale: null, base: {} };
+  var comments = [];                              // {id, path, quote, text, t}
+  var el = {};                                    // editor-owned DOM
+
+  /* ---------- storage helpers (never throw) ---------- */
+  function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+  function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+
+  /* ---------- the source stamp ----------
+     ⚠⚠ THE FAULT THIS EXISTS FOR, AND IT IS THE WORST ONE THIS EDITOR CAN HAVE.
+     A saved snapshot is keyed by STRUCTURAL POSITION, not by content, so it
+     lands cleanly on a page that has since been REBUILT and paints the old
+     words over the new ones.  On a deck generated from a build script this is
+     invisible: the file on disk is current, the screen is not, and a hard
+     reload does not help, because localStorage survives one.  Measured cost,
+     2026-08-29: a founder reviewed a page against text that had been rewritten
+     twice, and neither of us could see why the file "had not changed".
+
+     So every snapshot now carries a stamp of the page it was taken from, and a
+     snapshot whose stamp does not match the page in front of it is NEVER
+     applied on its own.  A snapshot with no stamp is a snapshot from before
+     this rule and is treated the same way. */
+  /* ⚠ THE PAGE AS DELIVERED, kept so an edit can be diffed against it.
+     Founder, 2026-08-29: "为什么我自己用 liveeditor 做的调整没有被考虑进去，每次你修改
+     都会被完全覆盖掉消失不见."  Her edits lived in localStorage and nowhere else, so a
+     rebuild from source wiped them and nobody could see what had been lost.  With
+     a baseline captured at boot, `LiveEditor.edits()` can say exactly what she
+     changed, and `exportEdits()` puts it in a file the build picks up. */
+  function baseOf(f) {
+    var b = {}, i;
+    for (i = 0; i < f.html.length; i++) b[pathOf(f.html[i])] = f.html[i].innerHTML;
+    for (i = 0; i < f.svg.length; i++) b['@svg:' + pathOf(f.svg[i])] = f.svg[i].textContent;
+    return b;
+  }
+
+  function editsNow() {
+    /* ⚠ A HELD SNAPSHOT IS STILL AN EDIT.  When the page has been rebuilt, the
+       snapshot is held rather than applied, so the DOM shows the NEW source and
+       a diff against the DOM reports nothing — which would have made
+       `exportEdits()` silently return zero on exactly the load where her work
+       most needs rescuing.  So a held snapshot is diffed against the baseline
+       too, and marked, so whoever folds it in knows it came from an older
+       build. */
+    if (state.stale && state.stale.d) {
+      var held = [], k2, n2;
+      for (k2 in state.stale.d) {
+        if (!Object.prototype.hasOwnProperty.call(state.stale.d, k2)) continue;
+        if (state.base[k2] === undefined || state.base[k2] === state.stale.d[k2]) continue;
+        n2 = byPath(k2.indexOf('@svg:') === 0 ? k2.slice(5) : k2);
+        held.push({ path: k2, was: state.base[k2], now: state.stale.d[k2],
+                    page: n2 ? pageOf(n2) : '?', held: true });
+      }
+      if (held.length) return held;
+    }
+    var f = collect(), out = [], i, p, cur;
+    for (i = 0; i < f.html.length; i++) {
+      p = pathOf(f.html[i]); cur = f.html[i].innerHTML;
+      if (state.base[p] !== undefined && state.base[p] !== cur)
+        out.push({ path: p, was: state.base[p], now: cur, page: pageOf(f.html[i]) });
+    }
+    for (i = 0; i < f.svg.length; i++) {
+      p = '@svg:' + pathOf(f.svg[i]); cur = f.svg[i].textContent;
+      if (state.base[p] !== undefined && state.base[p] !== cur)
+        out.push({ path: p, was: state.base[p], now: cur, page: pageOf(f.svg[i]) });
+    }
+    return out;
+  }
+
+  function pageOf(n) {
+    var s = n.closest ? n.closest('[data-no]') : null;
+    if (!s && n.ownerSVGElement) s = n.ownerSVGElement.closest('[data-no]');
+    return s ? s.getAttribute('data-no') : '?';
+  }
+
+  function strip(h) { var d = document.createElement('div'); d.innerHTML = h; return (d.textContent || '').replace(/\s+/g, ' ').trim(); }
+
+  function editsMarkdown() {
+    var e = editsNow(), i, out = ['# Live-editor changes', ''];
+    var b = document.querySelector('meta[name="vlge-build"]');
+    out.push('build `' + (b ? b.content : 'unknown') + '` · ' + e.length + ' edit' + (e.length === 1 ? '' : 's'));
+    out.push('');
+    for (i = 0; i < e.length; i++) {
+      out.push((i + 1) + '. **' + e[i].page + '**');
+      out.push('   - was: ' + strip(e[i].was));
+      out.push('   - now: ' + strip(e[i].now));
+    }
+    return out.join('\n');
+  }
+
+  function exportEdits() {
+    var e = editsNow();
+    if (!e.length) { flash('No edits to export'); return 0; }
+    var b = document.querySelector('meta[name="vlge-build"]');
+    var blob = new Blob([JSON.stringify({
+      url: location.href, build: b ? b.content : null, t: Date.now(), edits: e
+    }, null, 1)], { type: 'application/json' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'vlge-edits-' + (b ? b.content : 'x') + '.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    try { navigator.clipboard.writeText(editsMarkdown()); } catch (err) {}
+    flash('Exported ' + e.length + ' edit' + (e.length === 1 ? '' : 's') + ' to your downloads', true);
+    return e.length;
+  }
+
+  function stampOf(f) {
+    var s = '', i, h = 2166136261;
+    for (i = 0; i < f.html.length; i++) s += f.html[i].innerHTML;
+    for (i = 0; i < f.svg.length; i++) s += f.svg[i].textContent;
+    for (i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return h.toString(16) + '.' + s.length.toString(36);
+  }
+
+  /* ---------- stable structural path (survives re-render) ---------- */
+  function tagOf(n) {
+    return (n.tagName || '').toLowerCase() || (n.nodeName || '').toLowerCase();
+  }
+  function pathOf(node) {
+    var parts = [], n = node;
+    while (n && n.nodeType === 1 && n !== document.body) {
+      var p = n.parentNode;
+      if (!p) break;
+      var i = 0, sib = p.firstElementChild;
+      while (sib && sib !== n) { if (tagOf(sib) === tagOf(n)) i++; sib = sib.nextElementSibling; }
+      parts.unshift(tagOf(n) + '[' + i + ']');
+      n = p;
+    }
+    return parts.join('>');
+  }
+  function byPath(path) {
+    if (!path) return null;
+    var parts = path.split('>'), n = document.body;
+    for (var i = 0; i < parts.length && n; i++) {
+      var m = /^(.+)\[(\d+)\]$/.exec(parts[i]); if (!m) return null;
+      var want = m[1], idx = +m[2], seen = 0, kid = n.firstElementChild, found = null;
+      while (kid) {
+        if (tagOf(kid) === want) { if (seen === idx) { found = kid; break; } seen++; }
+        kid = kid.nextElementSibling;
+      }
+      n = found;
+    }
+    return n;
+  }
+
+  /* ---------- collect editable nodes ----------
+   * ⚠ THE WHOLE POINT OF v1.2.  A tag whitelist misses most of a real page:
+   * a caption in a <span>, a label in a bare <div>, a figure in <b>, and every
+   * word inside an <svg>.  This walks instead, and the rule is one line:
+   *
+   *     an element is a field when it holds direct, non-whitespace text.
+   *
+   * The walk does not descend past a field, so `<p>Agent data. <b>Noah</b>
+   * generates…</p>` is ONE field and not three, which is also what makes the
+   * inline markup survive an edit.
+   */
+  function hasDirectText(n) {
+    for (var c = n.firstChild; c; c = c.nextSibling) {
+      if (c.nodeType === 3 && c.nodeValue && c.nodeValue.trim()) return true;
+    }
+    return false;
+  }
+  function isOurs(n) { return !!(el.root && el.root.contains && el.root.contains(n)); }
+
+  function collect() {
+    var out = [], svg = [];
+    (function walk(n, inSvg) {
+      for (var c = n.firstElementChild; c; c = c.nextElementSibling) {
+        var tag = (c.tagName || '').toUpperCase();
+        if (OPAQUE[tag]) continue;
+        if (isOurs(c)) continue;
+        if (c.hasAttribute && c.hasAttribute('data-lve-skip')) continue;
+        var svgHere = inSvg || tag === 'SVG';
+        if (svgHere) {
+          // SVG: only <text>/<tspan> carry glyphs, and they get the overlay path
+          var t = (c.tagName || '').toLowerCase();
+          if ((t === 'text' || t === 'tspan') && hasDirectText(c)) { svg.push(c); continue; }
+          walk(c, true);
+          continue;
+        }
+        if (hasDirectText(c) || (c.matches && c.matches(FORCE))) { out.push(c); continue; }
+        walk(c, false);
+      }
+    })(document.body, false);
+    return { html: out, svg: svg };
+  }
+
+  /* ---------- persistence ---------- */
+  function fieldValue(n) { return n.innerHTML; }
+
+  function save(quiet) {
+    var data = {}, i;
+    for (i = 0; i < state.nodes.length; i++) data[pathOf(state.nodes[i])] = fieldValue(state.nodes[i]);
+    for (i = 0; i < state.svg.length; i++) data['@svg:' + pathOf(state.svg[i])] = state.svg[i].textContent;
+    var payload = { t: Date.now(), s: state.src, d: data };
+    lsSet(KEY, JSON.stringify(payload));
+    if (API._onSave) API._onSave(payload, quiet);
+    else if (!quiet) flash('Saved');
+  }
+
+  function restore() {
+    var raw = lsGet(KEY); if (!raw) return 0;
+    var parsed; try { parsed = JSON.parse(raw); } catch (e) { return 0; }
+    var d = parsed && parsed.d; if (!d) return 0;
+    // ⚠ the page has been rebuilt since this snapshot was taken.  Applying it
+    // would hide the rebuild.  Hold it and say so; `LiveEditor.restoreSaved()`
+    // applies it anyway, `LiveEditor.reset()` throws it away.
+    if (parsed.s !== state.src) { state.stale = parsed; return -1; }
+    return applyEdits(d);
+  }
+
+  /* the apply half of restore(), reachable on its own so a payload that came
+     from the server can be applied by the same code that applies a local one */
+  function applyEdits(d) {
+    var hit = 0;
+    for (var k in d) {
+      if (!Object.prototype.hasOwnProperty.call(d, k)) continue;
+      var isSvg = k.indexOf('@svg:') === 0;
+      var node = byPath(isSvg ? k.slice(5) : k);
+      if (!node) continue;
+      if (isSvg) { if (node.textContent !== d[k]) { node.textContent = d[k]; hit++; } }
+      else if (node.innerHTML !== d[k]) { node.innerHTML = d[k]; hit++; }
+    }
+    return hit;
+  }
+
+  function reset() {
+    lsDel(KEY); lsDel(CKEY);
+    flash('Cleared — reloading');
+    setTimeout(function () { location.reload(); }, 420);
+  }
+
+  /* ---------- comments ---------- */
+  function loadComments() {
+    var raw = lsGet(CKEY); if (!raw) return;
+    try { var p = JSON.parse(raw); if (p && p.c && p.c.length) comments = p.c; } catch (e) {}
+  }
+  function saveComments() {
+    lsSet(CKEY, JSON.stringify({ t: Date.now(), c: comments }));
+    if (API._onComments) API._onComments(comments);
+  }
+
+  function quoteOf(n) {
+    var s = (n.textContent || '').replace(/\s+/g, ' ').trim();
+    return s.length > 90 ? s.slice(0, 88) + '…' : s;
+  }
+  function pageLabel(n) {
+    // the nearest thing that names where we are: a slide/section id or heading
+    var s = n.closest && n.closest('[data-no],[data-title],section,article,[id]');
+    if (!s) return '';
+    return s.getAttribute('data-no') || s.getAttribute('data-title') || s.id || '';
+  }
+
+  function addComment(node, text) {
+    comments.push({ id: 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+                    path: pathOf(node), quote: quoteOf(node), where: pageLabel(node),
+                    text: text, t: Date.now() });
+    saveComments(); renderPins(); renderPanel();
+  }
+  function removeComment(id) {
+    comments = comments.filter(function (c) { return c.id !== id; });
+    saveComments(); renderPins(); renderPanel();
+  }
+
+  /* pins: fixed-position, re-anchored on scroll/resize, so they hold on
+     transformed and horizontally-scrolled layouts */
+  var pinRaf = null;
+  function renderPins() {
+    if (!el.pins) return;
+    el.pins.innerHTML = '';
+    if (!comments.length || (!state.commenting && !state.panelOpen)) return;
+    for (var i = 0; i < comments.length; i++) {
+      var c = comments[i], n = byPath(c.path);
+      if (!n || !n.getBoundingClientRect) continue;
+      var r = n.getBoundingClientRect();
+      if (!r.width && !r.height) continue;
+      if (r.bottom < -40 || r.top > innerHeight + 40 || r.right < -40 || r.left > innerWidth + 40) continue;
+      var pin = document.createElement('button');
+      pin.type = 'button'; pin.className = 'lve-pin'; pin.textContent = String(i + 1);
+      pin.title = c.text;
+      pin.style.left = Math.round(r.left - 9) + 'px';
+      pin.style.top = Math.round(r.top - 9) + 'px';
+      pin.setAttribute('data-id', c.id);
+      el.pins.appendChild(pin);
+    }
+  }
+  function schedulePins() {
+    if (pinRaf) return;
+    pinRaf = requestAnimationFrame(function () { pinRaf = null; renderPins(); });
+  }
+
+  function renderPanel() {
+    if (!el.panel) return;
+    var head = '<div class="lve-ph"><b>Comments</b><span>' + comments.length + '</span>' +
+      '<button type="button" data-act="copy">Copy all</button>' +
+      '<button type="button" data-act="clear">Clear</button>' +
+      '<button type="button" data-act="close">Close</button></div>';
+    var body = '';
+    if (!comments.length) {
+      body = '<p class="lve-empty">Comment mode is on. Click any text to leave a note.</p>';
+    } else {
+      for (var i = 0; i < comments.length; i++) {
+        var c = comments[i];
+        body += '<div class="lve-ci"><i>' + (i + 1) + '</i><div>' +
+          (c.where ? '<em>' + esc(c.where) + '</em>' : '') +
+          '<q>' + esc(c.quote) + '</q><p>' + esc(c.text) + '</p></div>' +
+          '<button type="button" data-del="' + c.id + '" title="Delete">&times;</button></div>';
+      }
+    }
+    el.panel.innerHTML = head + '<div class="lve-pb">' + body + '</div>';
+  }
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (m) {
+      return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[m];
+    });
+  }
+
+  function commentsMarkdown() {
+    var lines = ['# Comments · ' + (document.title || location.pathname), ''];
+    for (var i = 0; i < comments.length; i++) {
+      var c = comments[i];
+      lines.push((i + 1) + '. ' + (c.where ? '**' + c.where + '** · ' : '') + '“' + c.quote + '”');
+      lines.push('   → ' + c.text);
+      lines.push('');
+    }
+    return lines.join('\n');
+  }
+  function copyComments() {
+    var txt = commentsMarkdown();
+    var done = function () { flash('Copied ' + comments.length + ' comment' + (comments.length > 1 ? 's' : '')); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(txt).then(done, function () { fallbackCopy(txt, done); });
+    } else fallbackCopy(txt, done);
+  }
+  function fallbackCopy(txt, done) {
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.setAttribute('data-lve-artifact', '');
+    ta.style.cssText = 'position:fixed;left:-9999px;top:0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { flash('Copy failed'); }
+    ta.remove();
+  }
+
+  /* the note composer, anchored to what was clicked */
+  function openComposer(node) {
+    closeComposer();
+    var r = node.getBoundingClientRect();
+    var box = document.createElement('div');
+    box.className = 'lve-comp';
+    box.innerHTML = '<q>' + esc(quoteOf(node)) + '</q>' +
+      '<textarea rows="3" placeholder="What should change here?"></textarea>' +
+      '<div><button type="button" data-act="ok">Add</button>' +
+      '<button type="button" data-act="cancel">Cancel</button></div>';
+    var left = Math.min(Math.max(8, r.left), innerWidth - 300);
+    var top = Math.min(Math.max(8, r.bottom + 8), innerHeight - 172);
+    box.style.left = Math.round(left) + 'px';
+    box.style.top = Math.round(top) + 'px';
+    el.root.appendChild(box);
+    el.comp = box;
+    var ta = box.querySelector('textarea'); ta.focus();
+    box.addEventListener('click', function (e) {
+      var a = e.target.getAttribute && e.target.getAttribute('data-act');
+      if (a === 'ok') { if (ta.value.trim()) addComment(node, ta.value.trim()); closeComposer(); }
+      if (a === 'cancel') closeComposer();
+    });
+    ta.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { closeComposer(); }
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+        if (ta.value.trim()) addComment(node, ta.value.trim());
+        closeComposer();
+      }
+    });
+  }
+  function closeComposer() { if (el.comp) { el.comp.remove(); el.comp = null; } }
+
+  /* ---------- SVG text: an overlay input, because contenteditable on an SVG
+     node is not reliable across browsers ---------- */
+  function openSvgInput(node) {
+    closeSvgInput();
+    var r = node.getBoundingClientRect(), cs = getComputedStyle(node);
+    var inp = document.createElement('input');
+    inp.className = 'lve-svgin';
+    inp.value = node.textContent;
+    inp.style.left = Math.round(r.left - 6) + 'px';
+    inp.style.top = Math.round(r.top - 4) + 'px';
+    inp.style.minWidth = Math.round(Math.max(70, r.width + 26)) + 'px';
+    inp.style.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + '/1.2 ' + cs.fontFamily;
+    el.root.appendChild(inp);
+    el.svgin = inp; inp.focus(); inp.select();
+    function commit() { if (node.textContent !== inp.value) { node.textContent = inp.value; save(true); } closeSvgInput(); }
+    inp.addEventListener('blur', commit);
+    inp.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); commit(); }
+      if (e.key === 'Escape') { e.preventDefault(); closeSvgInput(); }
+    });
+  }
+  function closeSvgInput() { if (el.svgin) { var i = el.svgin; el.svgin = null; i.remove(); } }
+
+  /* ---------- export clean HTML ---------- */
+  function exportHTML() {
+    var clone = document.documentElement.cloneNode(true);
+    var kill = clone.querySelectorAll('.lve-root,#lve-style,[data-lve-artifact]');
+    for (var i = 0; i < kill.length; i++) kill[i].parentNode.removeChild(kill[i]);
+    var eds = clone.querySelectorAll('[contenteditable]');
+    for (var j = 0; j < eds.length; j++) {
+      eds[j].removeAttribute('contenteditable');
+      eds[j].removeAttribute('spellcheck');
+    }
+    var body = clone.querySelector('body');
+    if (body) {
+      body.classList.remove('lve-editing', 'lve-commenting');
+      if (comments.length) {
+        // inert: a JSON block the page never reads, so the export carries the
+        // notes without carrying the editor
+        var s = clone.ownerDocument.createElement('script');
+        s.type = 'application/json'; s.id = 'lve-comments';
+        s.textContent = JSON.stringify(comments, null, 1);
+        body.appendChild(s);
+      }
+    }
+    var html = '<!doctype html>\n' + clone.outerHTML;
+    var blob = new Blob([html], { type: 'text/html' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = (document.title || 'page').replace(/[^\w一-龥-]+/g, '-').slice(0, 60) + '.html';
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+    flash('Exported');
+  }
+
+  /* ---------- toast ---------- */
+  var flashTimer = null;
+  function flash(msg, sticky) {
+    if (!el.toast) return;
+    el.toast.textContent = msg;
+    el.toast.classList.add('lve-toast-show');
+    clearTimeout(flashTimer);
+    if (sticky) return;                            // stays until the next flash
+    flashTimer = setTimeout(function () { el.toast.classList.remove('lve-toast-show'); }, 1600);
+  }
+
+  /* ---------- modes ---------- */
+  function setActive(on) {
+    on = !!on;
+    if (on) setCommenting(false);
+    state.on = on;
+    document.body.classList.toggle('lve-editing', state.on);
+    if (el.btn) {
+      el.btn.setAttribute('aria-pressed', String(state.on));
+      el.btn.textContent = state.on ? 'Done' : 'Edit';
+    }
+    if (el.bar) el.bar.classList.toggle('lve-bar-show', state.on || state.commenting);
+    applyHidden();                    // a mode always shows the UI
+
+    if (state.on) {
+      var found = collect();
+      state.nodes = found.html; state.svg = found.svg;
+      for (var i = 0; i < state.nodes.length; i++) {
+        var n = state.nodes[i];
+        n.setAttribute('contenteditable', 'true');
+        n.setAttribute('spellcheck', 'false');
+        if (!n.__lveBound) { n.addEventListener('input', onInput); n.__lveBound = true; }
+      }
+      for (var k = 0; k < state.svg.length; k++) state.svg[k].setAttribute('data-lve-svg', '');
+      if (API._onMode) API._onMode(true);
+      flash(state.nodes.length + ' text fields · ' + state.svg.length + ' in SVG'
+            + (API._modeNote ? API._modeNote() : ''));
+    } else {
+      closeSvgInput();
+      for (var j = 0; j < state.nodes.length; j++) {
+        state.nodes[j].removeAttribute('contenteditable');
+        state.nodes[j].removeAttribute('spellcheck');
+      }
+      for (var m = 0; m < state.svg.length; m++) state.svg[m].removeAttribute('data-lve-svg');
+      if (API._onMode) API._onMode(false);
+      save();
+    }
+  }
+
+  function setCommenting(on) {
+    on = !!on;
+    if (on) setActive(false);
+    state.commenting = on;
+    state.panelOpen = on;
+    document.body.classList.toggle('lve-commenting', on);
+    if (el.cbtn) { el.cbtn.setAttribute('aria-pressed', String(on)); el.cbtn.textContent = on ? 'Done' : 'Comment'; }
+    if (el.panel) el.panel.classList.toggle('lve-panel-show', on);
+    if (el.bar) el.bar.classList.toggle('lve-bar-show', state.on || on);
+    applyHidden();                    // a mode always shows the UI
+    if (!on) closeComposer();
+    renderPanel(); renderPins();
+    if (on) flash('Comment mode — click any text to leave a note');
+  }
+
+  var inputTimer = null;
+  function onInput() { clearTimeout(inputTimer); inputTimer = setTimeout(function () { save(true); }, 700); }
+
+  /* ---------- interaction guard ----------
+   * Goal: clicking a button/link/card to edit or annotate its text must NOT run
+   * the page's own handler. But caret placement, selection and scrolling must
+   * survive.  down/up -> stopPropagation only.  activation -> also preventDefault.
+   */
+  function ownedByEditor(t) { return isOurs(t); }
+  function closestSafe(t, sel) { return t && t.closest ? t.closest(sel) : null; }
+  function anyMode() { return state.on || state.commenting; }
+
+  function shouldSkipGuard(e) {
+    if (!anyMode()) return true;                      // not in a mode: never interfere
+    var t = e.target;
+    if (ownedByEditor(t)) return true;                // our own UI stays live
+    if (e.altKey) return true;                        // Alt/Option = pass through
+    if (closestSafe(t, ALLOW)) return true;           // explicit opt-in
+    return false;
+  }
+
+  function guardDown(e) { if (shouldSkipGuard(e)) return; e.stopPropagation(); }
+
+  function guardActivate(e) {
+    if (shouldSkipGuard(e)) return;
+    e.preventDefault(); e.stopPropagation();
+    var t = e.target;
+    if (e.type !== 'click') return;
+    if (state.commenting) {
+      var host = t && t.nodeType === 1 ? t : null;
+      if (host) openComposer(host);
+      return;
+    }
+    if (state.on && API._onClick && API._onClick(e)) return;
+    if (state.on && t && t.closest && t.closest('[data-lve-svg]')) {
+      openSvgInput(t.closest('[data-lve-svg]'));
+    }
+  }
+
+  function guardSubmit(e) { if (shouldSkipGuard(e)) return; e.preventDefault(); e.stopPropagation(); }
+
+  function guardDrag(e) {
+    if (shouldSkipGuard(e)) return;
+    if (closestSafe(e.target, '[contenteditable="true"]')) return;  // allow text drag
+    e.preventDefault(); e.stopPropagation();
+  }
+
+  function guardKey(e) {
+    if (shouldSkipGuard(e)) return;
+    var k = e.key;
+    if (k !== 'Enter' && k !== ' ' && k !== 'Spacebar') return;
+    if (closestSafe(e.target, '[contenteditable="true"]')) return;
+    if (!closestSafe(e.target, INTERACTIVE)) return;  // let Space scroll the page
+    e.preventDefault(); e.stopPropagation();
+  }
+
+  var GUARDS = [
+    ['pointerdown', guardDown], ['mousedown', guardDown], ['touchstart', guardDown],
+    ['pointerup', guardDown], ['mouseup', guardDown],
+    ['click', guardActivate], ['dblclick', guardActivate], ['auxclick', guardActivate],
+    ['submit', guardSubmit], ['dragstart', guardDrag], ['keydown', guardKey]
+  ];
+  function bindGuards() {
+    for (var i = 0; i < GUARDS.length; i++) document.addEventListener(GUARDS[i][0], GUARDS[i][1], true);
+    addEventListener('scroll', schedulePins, true);
+    addEventListener('resize', schedulePins);
+  }
+  function unbindGuards() {
+    for (var i = 0; i < GUARDS.length; i++) document.removeEventListener(GUARDS[i][0], GUARDS[i][1], true);
+    removeEventListener('scroll', schedulePins, true);
+    removeEventListener('resize', schedulePins);
+  }
+
+  /* ---------- UI ---------- */
+  var CSS =
+  '.lve-root{position:fixed;inset:auto auto 0 0;z-index:2147483000;font:500 13px/1.35 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;color-scheme:dark}' +
+  '.lve-root *{box-sizing:border-box}' +
+  '.lve-hot{position:fixed;left:0;bottom:0;width:150px;height:64px;z-index:2147483000}' +
+  '.lve-btn,.lve-cbtn{position:fixed;bottom:16px;z-index:2147483001;display:inline-flex;align-items:center;gap:6px;' +
+    'padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.16);' +
+    'background:rgba(18,18,22,.82);color:#f2f2f5;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);' +
+    'box-shadow:0 4px 16px rgba(0,0,0,.28);cursor:pointer;font:600 13px/1 inherit;' +
+    'opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .18s ease,transform .18s ease}' +
+  '.lve-btn{left:16px}.lve-cbtn{left:74px}' +
+  '.lve-hot:hover~.lve-btn,.lve-hot:hover~.lve-cbtn,.lve-btn:hover,.lve-cbtn:hover,' +
+  '.lve-btn:focus-visible,.lve-cbtn:focus-visible,body.lve-editing .lve-btn,body.lve-editing .lve-cbtn,' +
+  'body.lve-commenting .lve-btn,body.lve-commenting .lve-cbtn{opacity:1;transform:translateY(0);pointer-events:auto}' +
+  '.lve-btn[data-pinned="1"],.lve-cbtn[data-pinned="1"]{opacity:1;transform:translateY(0);pointer-events:auto}' +
+  '.lve-btn[aria-pressed="true"],.lve-cbtn[aria-pressed="true"]{background:rgba(96,150,255,.9);border-color:transparent;color:#fff}' +
+  '.lve-bar{position:fixed;left:16px;bottom:60px;z-index:2147483001;display:flex;gap:6px;padding:6px;' +
+    'border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(18,18,22,.86);' +
+    'backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(0,0,0,.32);' +
+    'opacity:0;transform:translateY(6px);pointer-events:none;transition:opacity .18s ease,transform .18s ease}' +
+  '.lve-bar.lve-bar-show{opacity:1;transform:translateY(0);pointer-events:auto}' +
+  '.lve-bar button{padding:6px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.12);' +
+    'background:rgba(255,255,255,.06);color:#e8e8ee;cursor:pointer;font:500 12px/1 inherit;white-space:nowrap}' +
+  '.lve-bar button:hover{background:rgba(255,255,255,.13)}' +
+  '.lve-toast{position:fixed;left:16px;bottom:104px;z-index:2147483001;padding:7px 12px;border-radius:8px;' +
+    'background:rgba(18,18,22,.9);color:#e8e8ee;border:1px solid rgba(255,255,255,.12);' +
+    'backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);font:500 12px/1 inherit;' +
+    'opacity:0;transform:translateY(4px);pointer-events:none;transition:opacity .2s ease,transform .2s ease}' +
+  '.lve-toast.lve-toast-show{opacity:1;transform:translateY(0)}' +
+  /* outline-only affordances => zero reflow */
+  'body.lve-editing [contenteditable="true"]{outline:1px dashed rgba(120,170,255,.62);outline-offset:3px;border-radius:3px;cursor:text}' +
+  'body.lve-editing [contenteditable="true"]:hover{outline-color:rgba(120,170,255,.9)}' +
+  'body.lve-editing [contenteditable="true"]:focus{outline:2px solid rgba(96,150,255,.95);outline-offset:3px;background:rgba(96,150,255,.07)}' +
+  'body.lve-editing [data-lve-svg]{cursor:text;outline:1px dashed rgba(120,170,255,.5);outline-offset:2px}' +
+  'body.lve-editing [data-lve-svg]:hover{outline-color:rgba(120,170,255,.95)}' +
+  'body.lve-commenting *{cursor:crosshair !important}' +
+  /* the SVG overlay input */
+  '.lve-svgin{position:fixed;z-index:2147483002;padding:3px 8px;border-radius:6px;' +
+    'border:2px solid rgba(96,150,255,.95);background:rgba(12,12,16,.96);color:#fff;outline:none}' +
+  /* comment pins + composer + panel */
+  '.lve-pins{position:fixed;inset:0;z-index:2147483001;pointer-events:none}' +
+  '.lve-pin{position:fixed;width:20px;height:20px;border-radius:999px;border:2px solid #fff;' +
+    'background:#e0241a;color:#fff;font:700 11px/1 inherit;cursor:pointer;pointer-events:auto;' +
+    'box-shadow:0 2px 8px rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center}' +
+  '.lve-comp{position:fixed;z-index:2147483002;width:288px;padding:10px;border-radius:12px;' +
+    'border:1px solid rgba(255,255,255,.16);background:rgba(18,18,22,.96);color:#e8e8ee;' +
+    'backdrop-filter:blur(12px);box-shadow:0 12px 32px rgba(0,0,0,.44)}' +
+  '.lve-comp q{display:block;font:400 12px/1.4 inherit;color:#a9a9b6;margin-bottom:7px;quotes:none}' +
+  '.lve-comp textarea{width:100%;resize:vertical;border-radius:8px;padding:7px 9px;' +
+    'border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.05);color:#fff;' +
+    'font:400 13px/1.4 inherit;outline:none}' +
+  '.lve-comp div{display:flex;gap:6px;margin-top:8px}' +
+  '.lve-comp button{padding:6px 11px;border-radius:8px;border:1px solid rgba(255,255,255,.14);' +
+    'background:rgba(255,255,255,.07);color:#e8e8ee;cursor:pointer;font:600 12px/1 inherit}' +
+  '.lve-comp button[data-act="ok"]{background:rgba(96,150,255,.92);border-color:transparent;color:#fff}' +
+  '.lve-panel{position:fixed;right:16px;top:16px;bottom:16px;width:312px;z-index:2147483001;' +
+    'border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(18,18,22,.94);' +
+    'backdrop-filter:blur(14px);box-shadow:0 12px 40px rgba(0,0,0,.42);color:#e8e8ee;' +
+    'display:flex;flex-direction:column;opacity:0;transform:translateX(8px);pointer-events:none;' +
+    'transition:opacity .18s ease,transform .18s ease}' +
+  '.lve-panel.lve-panel-show{opacity:1;transform:none;pointer-events:auto}' +
+  '.lve-ph{display:flex;align-items:center;gap:6px;padding:11px 12px;border-bottom:1px solid rgba(255,255,255,.1)}' +
+  '.lve-ph b{font:600 13px/1 inherit}.lve-ph span{font:500 11px/1 inherit;color:#8f8fa0;margin-right:auto}' +
+  '.lve-ph button{padding:5px 9px;border-radius:7px;border:1px solid rgba(255,255,255,.12);' +
+    'background:rgba(255,255,255,.06);color:#e8e8ee;cursor:pointer;font:500 11px/1 inherit}' +
+  '.lve-pb{overflow:auto;padding:8px;display:flex;flex-direction:column;gap:6px}' +
+  '.lve-empty{margin:12px 4px;font:400 12px/1.5 inherit;color:#8f8fa0}' +
+  '.lve-ci{display:grid;grid-template-columns:20px 1fr 20px;gap:8px;padding:9px;border-radius:9px;' +
+    'background:rgba(255,255,255,.04)}' +
+  '.lve-ci i{font:700 11px/20px inherit;font-style:normal;text-align:center;border-radius:999px;background:#e0241a;color:#fff;height:20px}' +
+  '.lve-ci em{display:block;font:600 10px/1.3 inherit;font-style:normal;color:#8f8fa0;letter-spacing:.04em}' +
+  '.lve-ci q{display:block;font:400 11px/1.4 inherit;color:#8f8fa0;margin:2px 0 4px;quotes:none}' +
+  '.lve-ci p{margin:0;font:500 12px/1.45 inherit}' +
+  '.lve-ci button{border:0;background:none;color:#8f8fa0;cursor:pointer;font:400 15px/1 inherit}' +
+  /* self-contained media swallows events before they reach our capture guards */
+  'body.lve-editing iframe,body.lve-editing video,body.lve-editing canvas,' +
+  'body.lve-editing embed,body.lve-editing object,body.lve-commenting iframe,' +
+  'body.lve-commenting video,body.lve-commenting canvas{pointer-events:none !important}' +
+  'body.lve-editing [data-lve-allow],body.lve-editing [data-lve-allow] *{pointer-events:auto !important}' +
+  /* ⚠⚠ THIS RULE USED TO READ `.lve-root,.lve-root *{pointer-events:auto}`
+     AND IT SILENTLY BROKE EVERY HIDDEN PIECE OF THE UI.  `.lve-root *` is
+     specificity (0,2,0) and beats `.lve-panel`'s (0,1,0), so the comment
+     panel — fixed, 312px, top to bottom of the right edge, opacity 0 —
+     kept swallowing clicks on every page the editor shipped on, and so did
+     the hidden toolbar at the bottom left.  Invisible and still eating the
+     page.  The root is now inert and each component turns itself on in its
+     own shown state, which is where that decision belongs. */
+  '.lve-root{pointer-events:none}' +
+  /* ⚠ AND THE HOT CORNER HAS TO STAY LIVE.  Making the root inert killed the
+     invisible 150x64 corner that reveals the buttons on hover — it cannot
+     receive :hover if it cannot receive a pointer, so the toolbar never
+     appeared and comment mode was unreachable from the UI.  Found by the
+     founder, 2026-08-29, one build after the fix that caused it.  The
+     lesson is in the acceptance list now: a pointer-events change is not
+     verified by a syntax check, only by clicking the thing it governs. */
+  '.lve-hot{pointer-events:auto}' +
+  '.lve-pins{pointer-events:none}' +
+  '@media print{.lve-root,.lve-hot,.lve-btn,.lve-cbtn,.lve-bar,.lve-toast,.lve-panel,.lve-pins{display:none !important}}' +
+  '@media (prefers-reduced-motion:reduce){.lve-btn,.lve-cbtn,.lve-bar,.lve-toast,.lve-panel{transition:none}}';
+
+  function build() {
+    var style = document.createElement('style');
+    style.id = 'lve-style';
+    style.setAttribute('data-lve-artifact', '');
+    style.textContent = CSS;
+    document.head.appendChild(style);
+
+    var root = document.createElement('div');
+    root.className = 'lve-root';
+    root.setAttribute('data-lve-artifact', '');
+    root.setAttribute('data-lve-skip', '');
+
+    var hot = document.createElement('div');
+    hot.className = 'lve-hot'; hot.setAttribute('aria-hidden', 'true');
+
+    var btn = document.createElement('button');
+    btn.className = 'lve-btn'; btn.type = 'button'; btn.textContent = 'Edit';
+    btn.setAttribute('aria-pressed', 'false');
+    btn.setAttribute('title', 'Toggle edit mode (Cmd/Ctrl+E)');
+
+    var cbtn = document.createElement('button');
+    cbtn.className = 'lve-cbtn'; cbtn.type = 'button'; cbtn.textContent = 'Comment';
+    cbtn.setAttribute('aria-pressed', 'false');
+    cbtn.setAttribute('title', 'Toggle comment mode (Cmd/Ctrl+K)');
+
+    var bar = document.createElement('div');
+    bar.className = 'lve-bar';
+    bar.appendChild(mkBtn('Save', function () { save(); }));
+    bar.appendChild(mkBtn('Export HTML', exportHTML));
+    bar.appendChild(mkBtn('Copy comments', copyComments));
+    bar.appendChild(mkBtn('Reset', function () {
+      if (confirm('Discard all local edits and comments, and reload?')) reset();
+    }));
+    bar.appendChild(mkBtn('Hide', function () { API.hideButton(); }));
+
+    var toast = document.createElement('div');
+    toast.className = 'lve-toast';
+
+    var pins = document.createElement('div');
+    pins.className = 'lve-pins';
+
+    var panel = document.createElement('div');
+    panel.className = 'lve-panel';
+
+    root.appendChild(hot); root.appendChild(btn); root.appendChild(cbtn);
+    root.appendChild(bar); root.appendChild(toast); root.appendChild(pins); root.appendChild(panel);
+    document.body.appendChild(root);
+    el = { root: root, hot: hot, btn: btn, cbtn: cbtn, bar: bar, toast: toast,
+           pins: pins, panel: panel, style: style, comp: null, svgin: null };
+
+    btn.addEventListener('click', function () { setActive(!state.on); });
+    cbtn.addEventListener('click', function () { setCommenting(!state.commenting); });
+    panel.addEventListener('click', function (e) {
+      var a = e.target.getAttribute && e.target.getAttribute('data-act');
+      var d = e.target.getAttribute && e.target.getAttribute('data-del');
+      if (a === 'copy') copyComments();
+      if (a === 'close') setCommenting(false);
+      if (a === 'clear' && comments.length && confirm('Delete all ' + comments.length + ' comments?')) {
+        comments = []; saveComments(); renderPins(); renderPanel();
+      }
+      if (d) removeComment(d);
+    });
+    pins.addEventListener('click', function (e) {
+      var id = e.target.getAttribute && e.target.getAttribute('data-id');
+      if (!id) return;
+      state.panelOpen = true;
+      if (el.panel) el.panel.classList.add('lve-panel-show');
+      renderPanel();
+    });
+  }
+
+  function mkBtn(label, fn) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.textContent = label;
+    b.addEventListener('click', fn);
+    return b;
+  }
+
+  /* ---------- keyboard ---------- */
+  /* ⚠⚠ Cmd/Ctrl+E IS NOT RELIABLE AND NOTHING IN THIS FILE CAN MAKE IT SO.
+     Browser-extension commands and browser accelerators are dispatched by the
+     BROWSER, before the keystroke ever reaches the document — so a page-level
+     listener, capture phase or not, never sees it and `preventDefault` has
+     nothing to prevent. Founder, 2026-08-30: "I open the html from file in
+     Chrome and press Cmd+E and Claude pops up instead of the widget." That is
+     the Claude extension holding Cmd+E; on a stock macOS Chrome the omnibox
+     holds it. Both win.
+
+     So Cmd/Ctrl+E is kept (it works wherever nothing has taken it) and a second
+     shortcut is added that essentially nothing binds: **Cmd/Ctrl+Alt+E**.
+     Cmd/Ctrl+Alt+K does the same for comments.
+     ⭐ And the button is the real answer — it cannot be intercepted by anything.
+     Never document a shortcut as the only way in. */
+  function onKey(e) {
+    var k = (e.key || '').toLowerCase();
+    var mod = e.metaKey || e.ctrlKey;
+    // `Alt` rewrites e.key on macOS (Alt+E gives a dead-key accent), so fall
+    // back to e.code, which is layout- and modifier-independent.
+    var physE = k === 'e' || e.code === 'KeyE';
+    var physK = k === 'k' || e.code === 'KeyK';
+    if (mod && e.altKey && physE) { e.preventDefault(); setActive(!state.on); return; }
+    if (mod && e.altKey && physK) { e.preventDefault(); setCommenting(!state.commenting); return; }
+    if (mod && k === 'e') { e.preventDefault(); setActive(!state.on); return; }
+    if (mod && k === 'k') { e.preventDefault(); setCommenting(!state.commenting); return; }
+    if (state.on && mod && k === 's') { e.preventDefault(); save(); return; }
+    if (mod && e.shiftKey && k === 'e') { e.preventDefault(); exportEdits(); return; }
+    if (k === 'escape') {
+      if (el.comp) { closeComposer(); return; }
+      if (el.svgin) { closeSvgInput(); return; }
+      if (state.on) setActive(false);
+      else if (state.commenting) setCommenting(false);
+    }
+  }
+
+  /* ---------- hidden-mode resolution ----------
+     ⚠⚠ HIDDEN MEANS "NOT SHOWN BY DEFAULT". IT MUST NEVER MEAN "UNREACHABLE".
+     `hideButton()` used to set `display:none` on the root and leave it there
+     for every future load, and the whole toolbar lives inside that root — so
+     Cmd/Ctrl+E entered edit mode with NOTHING VISIBLE, and the documented
+     escape hatch escaped to a blank corner.  One stray click on Hide and the
+     editor was gone from that page forever, with no way back that did not
+     involve the console.  Found the hard way, 2026-08-29: the founder lost it
+     for a day and there was no reason on screen.
+
+     Three parts, and all three are needed:
+       · entering a mode REVEALS the UI, hidden or not — `applyHidden()`
+       · `?edit=1` CLEARS the stored flag, so one URL fixes it permanently
+       · boot says how to get it back, in the console, when it is hidden */
+  function applyHidden() {
+    if (!el.root) return;
+    el.root.style.display = (state.hidden && !state.on && !state.commenting) ? 'none' : '';
+  }
+
+  function resolveHidden() {
+    try {
+      var q = new URLSearchParams(location.search);
+      if (q.get('edit') === '0') return true;
+      if (q.get('edit') === '1') { lsDel(HIDE_KEY); return false; }   // and it sticks
+    } catch (e) {}
+    if (document.documentElement.hasAttribute('data-lve-hidden')) return true;
+    if (document.body && document.body.hasAttribute('data-lve-hidden')) return true;
+    return lsGet(HIDE_KEY) === '1';
+  }
+
+  /* ---------- public API ---------- */
+  var API = {
+    toggle: function () { setActive(!state.on); },
+    enable: function () { setActive(true); },
+    disable: function () { setActive(false); },
+    comment: function (on) { setCommenting(on === undefined ? !state.commenting : !!on); },
+    comments: function () { return comments.slice(); },
+    commentsMarkdown: commentsMarkdown,
+    copyComments: copyComments,
+    save: save,
+    reset: reset,
+    edits: editsNow,
+    editsMarkdown: editsMarkdown,
+    exportEdits: exportEdits,
+    // the held snapshot, when one was taken from a different version of this page
+    savedIsStale: function () { return !!state.stale; },
+    restoreSaved: function () {
+      if (!state.stale) { flash('Nothing held'); return 0; }
+      var held = state.stale; state.stale = null;
+      lsSet(KEY, JSON.stringify({ t: held.t, s: state.src, d: held.d }));
+      var n = restore(); flash(n > 0 ? 'Restored ' + n + ' edit' + (n > 1 ? 's' : '') : 'Nothing matched');
+      return n;
+    },
+    exportHTML: exportHTML,
+    isEditing: function () { return state.on; },
+    count: function () { var f = collect(); return { html: f.html.length, svg: f.svg.length }; },
+    hideButton: function () {
+      state.hidden = true; lsSet(HIDE_KEY, '1');
+      setActive(false); setCommenting(false);
+      applyHidden();
+      console.info('[LiveEditor] Button hidden. Cmd/Ctrl+E still edits, Cmd/Ctrl+K still comments; LiveEditor.showButton() restores it.');
+    },
+    showButton: function () {
+      state.hidden = false; lsDel(HIDE_KEY);
+      applyHidden();
+    },
+    pin: function (on) {
+      var v = on === false ? '0' : '1';
+      if (el.btn) el.btn.setAttribute('data-pinned', v);
+      if (el.cbtn) el.cbtn.setAttribute('data-pinned', v);
+    },
+    destroy: function () {
+      setActive(false); setCommenting(false);
+      unbindGuards();
+      document.removeEventListener('keydown', onKey, true);
+      if (el.root && el.root.parentNode) el.root.parentNode.removeChild(el.root);
+      if (el.style && el.style.parentNode) el.style.parentNode.removeChild(el.style);
+      delete window.LiveEditor;
+    },
+    version: '1.5.0',
+    /* ⚠ NOT A PUBLIC API.  These exist so `lve-cloud.js` can add media editing
+       and server sync without a second copy of the path/collect machinery.
+       Nothing outside this repo should call them. */
+    _int: {
+      pathOf: pathOf, byPath: byPath, tagOf: tagOf, isOurs: isOurs,
+      collect: collect, flash: flash, ui: el, state: state,
+      lsGet: lsGet, lsSet: lsSet, lsDel: lsDel,
+      applyEdits: applyEdits, stampOf: stampOf,
+      getComments: function () { return comments; },
+      setComments: function (c) {
+        comments = c || [];
+        lsSet(CKEY, JSON.stringify({ t: Date.now(), c: comments }));
+        renderPanel(); renderPins();
+      }
+    }
+  };
+
+  /* ---------- boot ---------- */
+  function boot() {
+    if (state.booted) return;
+    state.booted = true;
+    build();
+    bindGuards();                                    // no-ops until a mode is on
+    document.addEventListener('keydown', onKey, true);
+    loadComments();
+    var _f = collect();
+    state.base = baseOf(_f);                        // ⚠ BEFORE restore(), always
+    state.src = stampOf(_f);
+    var n = restore();
+    if (n > 0) flash('Restored ' + n + ' edit' + (n > 1 ? 's' : ''));
+    if (n === -1) {
+      var when = state.stale && state.stale.t ? new Date(state.stale.t).toLocaleString() : 'earlier';
+      flash('This page changed since your saved edits (' + when + '). Nothing was restored. '
+        + 'Cmd/Ctrl+Shift+E exports them so they can be put back into the source.', true);
+      console.warn('[LiveEditor] A saved snapshot from ' + when + ' does not match this page — '
+        + 'it was NOT applied, so what you see is the file itself. '
+        + 'LiveEditor.restoreSaved() applies it anyway; LiveEditor.reset() discards it.');
+    }
+    if (resolveHidden()) {
+      state.hidden = true; applyHidden();
+      console.info('[LiveEditor] The button is hidden on this page. Cmd/Ctrl+E edits and '
+        + 'Cmd/Ctrl+K comments — both reveal the toolbar. Add ?edit=1 to the URL, or run '
+        + 'LiveEditor.showButton(), to bring the button back for good.');
+    }
+    window.LiveEditor = API;
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+
+</script>
