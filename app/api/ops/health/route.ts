@@ -12,7 +12,7 @@ export async function GET() {
     return Response.json({
       festival: d.info.name, source, warnings: backend.warnings,
       counts: { events: d.sessions.length, guests: d.guests.length, staff: d.staff.length, attendees: d.audience.length, shuttles: d.shuttles.length },
-      model: backend.model, ollama: backend.model ? await ollamaHealth() : null,
+      models: backend.models, ollama: await Promise.all(backend.models.map(m => ollamaHealth(process.env, fetch, m))),
     });
   } catch (e) { return errorResponse(e); }
 }
