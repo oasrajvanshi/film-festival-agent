@@ -5,9 +5,12 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
-  const llm = ollamaFromEnv();
+  const u = new URL(req.url);
+  // ?model= lets the test try another model without changing settings.
+  const testModel = u.searchParams.get('test') ? u.searchParams.get('model') : null;
+  const llm = ollamaFromEnv(testModel && /^[\w.:-]{1,60}$/.test(testModel) ? { ...process.env, OLLAMA_MODEL: testModel } : process.env);
   // ?test=1 makes one tiny model call, to check the key and model from a browser.
-  if (llm && new URL(req.url).searchParams.get('test')) {
+  if (llm && u.searchParams.get('test')) {
     const t0 = Date.now();
     try {
       const reply = await llm.chat([{ role: 'user', content: 'Reply with the single word OK.' }]);
