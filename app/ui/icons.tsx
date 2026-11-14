@@ -23,6 +23,11 @@ const paths: Record<string, ReactNode> = {
   send: <><path d="M21 3 10 14M21 3l-7 18-4-7-7-4z" /></>,
   sparkle: <><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6" /></>,
   x: <><path d="M6 6l12 12M18 6 6 18" /></>,
+  key: <><circle cx="8" cy="15" r="4.5" /><path d="M11.5 12 20 3.5M16.5 7l3 3M14 9.5l2 2" /></>,
+  ticket: <><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z" /><path d="M14 6v12" strokeDasharray="2 2" /></>,
+  truck: <><path d="M2 6h11v10H2zM13 9h4l4 4v3h-8z" /><circle cx="6" cy="18" r="2" /><circle cx="17" cy="18" r="2" /></>,
+  logout: <><path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 16l-4-4 4-4M6 12h10" /></>,
+  eye: <><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></>,
 };
 
 export function Icon({ name, size = 18 }: { name: keyof typeof paths | string; size?: number }) {

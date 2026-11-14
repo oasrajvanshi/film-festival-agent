@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAgent, writeSetup } from '../ui/useAgent';
+import { writeWho } from '../ui/profiles';
 import { Icon } from '../ui/icons';
 import { FestivalAgent } from '../../src/agent/agent';
 import { GATE_POLICY, type ActionKind } from '../../src/agent/approvals';
@@ -109,6 +110,7 @@ export default function Onboarding() {
     if (!built?.festival) return;
     s.loadFestival(structuredClone(built.festival), sheetFest ? 'Google Sheet' : `${uploads.length} uploaded files`);
     writeSetup({ festivalName: built.festival.name || meta.name, city: meta.city, approver, channels, onboardedAt: new Date().toISOString() });
+    writeWho({ kind: 'organizer', id: 'setup', name: approver || 'Organizer', detail: 'Set up the festival', code: '' });
     location.href = '/#today';
   };
 
@@ -143,7 +145,7 @@ export default function Onboarding() {
           <p>Connect your schedule, people and passes. The agent watches for changes and disruptions, works out who is affected, and drafts each person a recommendation. Your team approves anything that goes out.</p>
           <div className="row">
             <button className="primary big" onClick={() => setStarted(true)}>Set up a festival <Icon name="send" size={16} /></button>
-            <a className="ob-link" href="/" onClick={() => writeSetup({ festivalName: 'Harbor Lights Film Festival', city: 'New York', approver: 'Operations lead', channels: ['push', 'email'], onboardedAt: new Date().toISOString() })}>Or open the demo festival</a>
+            <a className="ob-link" href="/" onClick={() => { writeWho(null); writeSetup({ festivalName: 'Harbor Lights Film Festival', city: 'New York', approver: 'Operations lead', channels: ['push', 'email'], onboardedAt: new Date().toISOString() }); }}>Or open the demo festival</a>
           </div>
           <ol className="ob-steps-preview">
             {STEPS.map((t, i) => <li key={t}><span>{String(i + 1).padStart(2, '0')}</span>{t}</li>)}

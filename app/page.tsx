@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import { readSetup, useAgent, writeSetup } from './ui/useAgent';
 import { Approvals, Ask, Briefs, Data, Evaluation, Feeds, Grid, Log, Overview, Scan } from './ui/panels';
 import { Icon } from './ui/icons';
+import { AccessCodes, PersonalApp, SignIn, readWho, writeWho } from './ui/profiles';
+import type { Who } from '../src/access/profiles';
 import type { DayNumber } from '../src/core/types';
 
 const PAGES = [
@@ -17,6 +19,7 @@ const PAGES = [
   { id: 'log', label: 'Log', icon: 'list', group: 'Behind the scenes' },
   { id: 'eval', label: 'Evaluation', icon: 'chart', group: 'Behind the scenes' },
   { id: 'data', label: 'Data', icon: 'sheet', group: 'Behind the scenes' },
+  { id: 'codes', label: 'Access codes', icon: 'key', group: 'Behind the scenes' },
 ] as const;
 type PageId = typeof PAGES[number]['id'];
 const BOTTOM: PageId[] = ['today', 'approvals', 'scan', 'schedule'];
@@ -27,6 +30,9 @@ export default function App() {
   const [user, setUser] = useState('Operations lead');
   const [sheet, setSheet] = useState<null | 'settings' | 'more'>(null);
   const [armed, setArmed] = useState(false);
+  const [who, setWho] = useState<Who | null>(null);
+  const [ready, setReady] = useState(false);
+  const [viewAs, setViewAs] = useState<Who | null>(null);
   const f = s.agent.f;
   const pending = s.agent.queue.filter(q => q.status === 'pending').length;
   const flags = s.agent.flags.length;
@@ -68,6 +74,7 @@ export default function App() {
   };
   useEffect(() => {
     if (!readSetup()) { location.replace('/onboarding'); return; }
+    const w = readWho(); setWho(w); if (w?.kind === 'organizer') setUser(w.name); setReady(true);
     const fromHash = () => { const h = location.hash.slice(1); if (PAGES.some(p => p.id === h)) setPageState(h as PageId); };
     fromHash();
     window.addEventListener('hashchange', fromHash);
@@ -106,13 +113,20 @@ export default function App() {
           : alerts === 'unsupported' ? <span className="muted">Not available here. On iPhone, add the app to your Home Screen first.</span>
           : <button className="small primary" onClick={enableAlerts}><Icon name="bolt" size={14} /> Turn on alerts</button>}
       </div>
-      <button className="block" onClick={() => { if (armed) { s.reset(); setArmed(false); setSheet(null); } else { setArmed(true); setTimeout(() => setArmed(false), 4000); } }}>
+      <button className="block" onClick={signOut}><Icon name="logout" size={16} /> Sign out</button>
+      <button className="block" style={{ marginTop: 8 }} onClick={() => { if (armed) { s.reset(); setArmed(false); setSheet(null); } else { setArmed(true); setTimeout(() => setArmed(false), 4000); } }}>
         {armed ? 'Tap again to reset everything' : 'Reset demo'}
       </button>
       <button className="block" style={{ marginTop: 8 }} onClick={() => { writeSetup(null); location.href = '/onboarding'; }}>Set up a new festival</button>
       <p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>Prototype with made-up people. Nothing is sent outside this app.</p>
     </>
   );
+
+  function signOut() { writeWho(null); setWho(null); setViewAs(null); setSheet(null); window.scrollTo({ top: 0 }); }
+  if (!ready) return null;
+  if (!who) return <SignIn s={s} onIn={w => { setWho(w); if (w.kind === 'organizer') setUser(w.name); }} />;
+  if (who.kind !== 'organizer') return <PersonalApp s={s} who={who} onOut={signOut} />;
+  if (viewAs) return <PersonalApp s={s} who={viewAs} viewAs onOut={() => { setViewAs(null); window.scrollTo({ top: 0 }); }} />;
 
   return (
     <div className="shell">
@@ -168,6 +182,7 @@ export default function App() {
           {page === 'log' && <Log {...props} />}
           {page === 'eval' && <Evaluation {...props} />}
           {page === 'data' && <Data {...props} />}
+          {page === 'codes' && <AccessCodes s={s} onViewAs={w => { setViewAs(w); window.scrollTo({ top: 0 }); }} />}
         </main>
       </div>
 
