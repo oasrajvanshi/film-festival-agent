@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useAgent } from './ui/useAgent';
+import { readSetup, useAgent, writeSetup } from './ui/useAgent';
 import { Approvals, Ask, Briefs, Data, Evaluation, Feeds, Grid, Log, Overview, Scan } from './ui/panels';
 import { Icon } from './ui/icons';
 import type { DayNumber } from '../src/core/types';
@@ -39,6 +39,7 @@ export default function App() {
     window.scrollTo({ top: 0 });
   };
   useEffect(() => {
+    if (!readSetup()) { location.replace('/onboarding'); return; }
     const fromHash = () => { const h = location.hash.slice(1); if (PAGES.some(p => p.id === h)) setPageState(h as PageId); };
     fromHash();
     window.addEventListener('hashchange', fromHash);
@@ -74,6 +75,7 @@ export default function App() {
       <button className="block" onClick={() => { if (armed) { s.reset(); setArmed(false); setSheet(null); } else { setArmed(true); setTimeout(() => setArmed(false), 4000); } }}>
         {armed ? 'Tap again to reset everything' : 'Reset demo'}
       </button>
+      <button className="block" style={{ marginTop: 8 }} onClick={() => { writeSetup(null); location.href = '/onboarding'; }}>Set up a new festival</button>
       <p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>Prototype with made-up people. Nothing is sent outside this app.</p>
     </>
   );
@@ -95,7 +97,7 @@ export default function App() {
             ))}
           </nav>
         ))}
-        <div className="side-foot">Group Blue prototype · made-up data</div>
+        <div className="side-foot"><a href="/onboarding" style={{ color: 'inherit' }} onClick={() => writeSetup(null)}>Set up a new festival</a><br />Group Blue prototype · made-up data</div>
       </aside>
 
       <div className="main">

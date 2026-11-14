@@ -10,9 +10,19 @@ import type { Festival } from '../../src/core/types';
 
 export const DEFAULT_SHEET = 'https://docs.google.com/spreadsheets/d/18Pp1GAMQz__QzyvKYlddcR-agiG1p7rH5QJq8NV9lNM/edit';
 
-export interface SheetStatus { source: 'built-in' | 'sheet'; sheet?: string; loadedAt?: string; errors: string[]; warnings: string[]; message?: string }
+export interface SheetStatus { source: 'built-in' | 'sheet' | 'onboarding'; sheet?: string; loadedAt?: string; errors: string[]; warnings: string[]; message?: string }
 
 const KEY = 'ffa-state-v1';
+const SETUP_KEY = 'ffa-setup-v1';
+
+/** What the festival chose during onboarding. */
+export interface Setup { festivalName: string; city: string; approver: string; channels: string[]; onboardedAt: string }
+export function readSetup(): Setup | null {
+  try { const raw = localStorage.getItem(SETUP_KEY); return raw ? JSON.parse(raw) as Setup : null; } catch { return null; }
+}
+export function writeSetup(s: Setup | null) {
+  try { if (s) localStorage.setItem(SETUP_KEY, JSON.stringify(s)); else localStorage.removeItem(SETUP_KEY); } catch { /* ignore */ }
+}
 
 export const remoteLlm: LlmClient = {
   model: 'server',
@@ -75,6 +85,19 @@ export function useAgent() {
     setVersion(v => v + 1);
   }, [now]);
 
+  /** Start the agent on a festival that onboarding just built. */
+  const loadFestival = useCallback((festival: Festival, source: string) => {
+    agentRef.current = new FestivalAgent(festival, null, now);
+    agentRef.current.sweepClashes();
+    clockRef.current = `${festival.dates[1]}T09:00`;
+    setClockState(clockRef.current);
+    const next: SheetStatus = { source: 'onboarding', sheet: source, loadedAt: new Date().toLocaleTimeString(), errors: [], warnings: [],
+      message: `Onboarded ${festival.events.length} events, ${festival.people.length} people and ${festival.films.length} films.` };
+    sheetRef.current = next;
+    setSheet(next);
+    commit();
+  }, [commit, now]);
+
   /** mode 'replace' starts fresh from the sheet; 'sync' runs the agent on what changed. */
   const loadSheet = useCallback(async (url: string, mode: 'replace' | 'sync') => {
     const r = await fetch(`/api/festival?sheet=${encodeURIComponent(url)}`);
@@ -107,7 +130,7 @@ export function useAgent() {
     return message;
   }, [commit, now]);
 
-  return { agent: agentRef.current!, version, commit, clock, setClock, reset, llmInfo, useModel, setUseModel, sheet, loadSheet };
+  return { agent: agentRef.current!, version, commit, clock, setClock, reset, llmInfo, useModel, setUseModel, sheet, loadSheet, loadFestival };
 }
 
 export type AgentStore = ReturnType<typeof useAgent>;
