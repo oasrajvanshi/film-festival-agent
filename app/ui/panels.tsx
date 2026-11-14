@@ -1,7 +1,8 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { DEFAULT_SHEET, type AgentStore } from './useAgent';
+import { DEFAULT_SHEET, readSetup, type AgentStore } from './useAgent';
+import { riskSummary, type WeatherHour } from '../../src/agent/weather';
 import type { DayNumber, FestivalEvent, PassType } from '../../src/core/types';
 import { addMinutes, clock as fmt, toMinutes } from '../../src/core/time';
 import { PASS_LABELS, qrFor, type ScanResult } from '../../src/rules/access';
@@ -57,6 +58,8 @@ export function Overview({ s, go }: P) {
         <div className="stat"><div className="k"><Icon name="scan" size={14} />Check-ins</div><div className="v">{f.checkIns.filter(c => c.allowed).length}</div></div>
       </div>
 
+      <WeatherCard s={s} go={go} user="" compact />
+
       <div className="grid2">
         <div className="card">
           <div className="section-title"><h2>Venues right now</h2><span className="muted" style={{ fontSize: 12 }}>from door scans</span></div>
@@ -104,6 +107,44 @@ export function Overview({ s, go }: P) {
         </div>
       </div>
     </>
+  );
+}
+
+// ------------------------------------------------------------------ Weather
+/** Pull a forecast (real or a demo scenario) and let the agent plan around it. */
+export function WeatherCard({ s, go, compact }: P & { compact?: boolean }) {
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  const date = s.clock.slice(0, 10);
+  const city = (typeof window !== 'undefined' && readSetup()?.city) || 'New York';
+  const run = async (scenario?: string) => {
+    setBusy(true); setNote(null);
+    try {
+      const qs = new URLSearchParams({ date, ...(scenario ? { scenario } : { city }) });
+      const r = await fetch(`/api/weather?${qs}`, { cache: 'no-store' });
+      const j = await r.json() as { source?: string; hours?: WeatherHour[]; error?: string };
+      if (!r.ok || !j.hours) throw new Error(j.error ?? `HTTP ${r.status}`);
+      const out = await s.agent.onWeather(j.hours, j.source ?? 'Forecast');
+      s.commit();
+      const waiting = out.actions.filter(x => x.kind === 'notify_people');
+      setNote(!out.risks.length ? `${j.source}: no weather risks during festival hours.`
+        : !out.fresh.length ? `${out.risks.map(riskSummary).join('; ')}. Already handled.`
+        : `${out.fresh.map(riskSummary).join('; ')}. Staff and volunteers told. ${waiting.reduce((n, x) => n + (x.messages?.length ?? 0), 0)} personal updates are waiting for your approval.`);
+    } catch (e) { setNote(`Couldn't get the forecast: ${(e as Error).message}`); }
+    setBusy(false);
+  };
+  const scenarios: [string, string][] = [['storm', 'Thunderstorm'], ['snow', 'Snow'], ['heat', 'Heat wave']];
+  return (
+    <div className="card stack">
+      <div className="section-title"><h2><Icon name="cloud" size={18} /> Weather watch</h2><span className="muted" style={{ fontSize: 12 }}>Open-Meteo, no key needed</span></div>
+      {!compact && <p className="muted" style={{ margin: 0 }}>The agent checks the forecast for {city}, finds risky hours, tells staff and volunteers on shift, and drafts a personal note for everyone with tickets or plans in that window. Those notes wait for your approval.</p>}
+      <div className="row">
+        <button className="primary" disabled={busy} onClick={() => run()}>Check today's forecast</button>
+        {scenarios.map(([k, l]) => <button key={k} disabled={busy} onClick={() => run(k)}>Try: {l}</button>)}
+      </div>
+      {busy && <div className="muted">Checking the forecast…</div>}
+      {note && <div className="msg">{note}{note.includes('waiting') && <> <button className="small" onClick={() => go('approvals')}>Review</button></>}</div>}
+    </div>
   );
 }
 
@@ -366,7 +407,7 @@ export function Ask({ s }: P) {
 }
 
 // ------------------------------------------------------------------ Vendor feed & voting
-export function Feeds({ s }: P) {
+export function Feeds({ s, go, user }: P) {
   const f = s.agent.f;
   const guests = f.people.filter(p => p.role === 'guest');
   const [gid, setGid] = useState(guests[0].id);
@@ -378,7 +419,9 @@ export function Feeds({ s }: P) {
   const [note, setNote] = useState<string | null>(null);
   const date = s.clock.slice(0, 10);
   return (
-    <div className="grid2">
+    <>
+    <WeatherCard s={s} go={go} user={user} />
+    <div className="grid2" style={{ marginTop: 16 }}>
       <div className="card stack">
         <h2>Vendor and partner feeds</h2>
         <h3>Flight delay</h3>
@@ -400,6 +443,7 @@ export function Feeds({ s }: P) {
         <button onClick={() => { const a = s.agent.proposeVoteForm(vEvent); setNote(a ? `${a.title}. Waiting for approval.` : 'Nobody has checked in to that screening yet.'); s.commit(); }}>Prepare voting form</button>
       </div>
     </div>
+    </>
   );
 }
 

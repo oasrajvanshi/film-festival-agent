@@ -13,7 +13,7 @@ const PAGES = [
   { id: 'schedule', label: 'Schedule', icon: 'calendar', group: 'Festival day' },
   { id: 'ask', label: 'Ask', icon: 'chat', group: 'Festival day' },
   { id: 'briefs', label: 'Volunteer briefs', icon: 'users', group: 'Teams' },
-  { id: 'feeds', label: 'Feeds & voting', icon: 'bolt', group: 'Teams' },
+  { id: 'feeds', label: 'Alerts & feeds', icon: 'bolt', group: 'Teams' },
   { id: 'log', label: 'Log', icon: 'list', group: 'Behind the scenes' },
   { id: 'eval', label: 'Evaluation', icon: 'chart', group: 'Behind the scenes' },
   { id: 'data', label: 'Data', icon: 'sheet', group: 'Behind the scenes' },
