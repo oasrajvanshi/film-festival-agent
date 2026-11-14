@@ -9,7 +9,7 @@ export const metadata = {
 
 export const viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#120B09' };
 
-const FONTS = 'https://fonts.googleapis.com/css2?family=Libre+Caslon+Condensed:wght@400..700&family=Brygada+1918:ital,wght@0,400..700;1,400..700&family=Familjen+Grotesk:wght@400..700&family=Courier+Prime:wght@400;700&family=Geist:wght@300..700&family=Geist+Mono:wght@400..600&family=Archivo:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap';
+const FONTS = 'https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap';
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

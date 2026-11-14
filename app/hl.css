@@ -1,7 +1,6 @@
 /* Harbor Lights: one dark cinema look for every app.
-   Type: Libre Caslon Condensed for display, Brygada 1918 for titles,
-   Familjen Grotesk for interface text, Courier Prime (the screenplay face)
-   for times and places. Colour: umber, cream and one amber light. */
+   Type: Montserrat heavy caps for display and titles, Archivo for
+   interface text, times and places. Colour: umber, cream and one amber light. */
 
 :root {
   --bg: #120B09;
@@ -22,10 +21,10 @@
   --rust: #B0573A;
   --rust-glow: rgba(176, 87, 58, .26);
   --sage: #A8B394;
-  --f-display: "Libre Caslon Condensed", "Brygada 1918", Georgia, serif;
-  --f-title: "Brygada 1918", Georgia, serif;
-  --f-ui: "Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
-  --f-time: "Courier Prime", "Courier New", monospace;
+  --f-display: "Montserrat", "Futura", "Century Gothic", sans-serif;
+  --f-title: "Montserrat", "Futura", "Century Gothic", sans-serif;
+  --f-ui: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-time: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --ease: cubic-bezier(.2, .8, .2, 1);
   --r: 16px;
   color-scheme: dark;
@@ -444,3 +443,19 @@ a { color: inherit; }
 
 /* the first prototype keeps its own look */
 body:has(.legacy)::after { display: none; }
+
+/* Group Blue type: Montserrat heavy caps for headlines, Archivo for text.
+   Montserrat caps run much wider than the condensed serif, so sizes come down. */
+.wordmark, .display, .stat b, .days button b, .day-tabs button b { text-transform: uppercase; font-weight: 800; letter-spacing: .01em; line-height: 1; }
+.title { font-weight: 600; }
+.time { font-variant-numeric: tabular-nums; }
+.welcome .tag { font-style: normal; }
+.welcome .wordmark { font-size: clamp(38px, 11vw, 56px); }
+.onb-head .display { font-size: clamp(24px, 7vw, 32px); }
+.stat b { font-size: 26px; }
+.app-head .wordmark, .team-bar .wordmark { font-size: 15px; }
+.hero .display { font-size: clamp(30px, 8.6vw, 44px); }
+.days button b { font-size: 17px; }
+.day-title .display { font-size: clamp(22px, 2.1vw, 30px); }
+.day-tabs button b { font-size: 14px; }
+.panel-head .display { font-size: 21px; }

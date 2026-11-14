@@ -325,3 +325,18 @@
   .s-out .tx small { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .s-out, .s-out .ok, .s-sent { opacity: 1 !important; } }
+
+/* Group Blue type: Montserrat heavy caps, sized for its wider letters. */
+.s-h1, .s-h2, .s-leader-n, .s-rec-list h3, .s-stack-card h3, .s-stack-card .big, .s-outbox header b, .s-feeds .node-t { text-transform: uppercase; font-weight: 800; letter-spacing: .01em; }
+.s-nav .wordmark { font-size: 17px; }
+.s-h1 { font-size: clamp(34px, 4.1vw, 70px); line-height: 1; }
+.s-h2 { font-size: clamp(28px, 3.9vw, 64px); line-height: 1.02; }
+.s-leader-n { font-size: min(20vmin, 130px); }
+.s-feeds .node-t { font-size: 18px; }
+.s-rec-list h3 { font-size: 24px; }
+.s-stack-card h3 { font-size: clamp(24px, 2.9vw, 46px); line-height: 1.02; }
+.s-stack-card .big { font-size: clamp(52px, 7vw, 118px); }
+.s-outbox header b { font-size: 34px; }
+.s-kicker, .s-card.note { font-style: normal; }
+.s-kicker { text-transform: uppercase; letter-spacing: .12em; font-size: 13px; font-weight: 700; }
+@media (max-width: 760px) { .s-nav .wordmark { font-size: 15px; } }
