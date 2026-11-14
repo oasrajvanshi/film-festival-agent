@@ -83,7 +83,7 @@ npm run eval
 
 ## Festival data (Google Sheet)
 
-The festival lives in a Google Sheet that staff edit, one tab per table: Festival (name and dates), Schedule grid, Venues, Travel times, Films, People, Passes, Tickets, Saved events, Volunteer shifts and Official documents. A *Read me* tab explains the columns and allowed values.
+The festival lives in a [Google Sheet](https://docs.google.com/spreadsheets/d/18Pp1GAMQz__QzyvKYlddcR-agiG1p7rH5QJq8NV9lNM/edit) that staff edit (a snapshot is in [`data/`](data/): an .xlsx copy and one CSV per tab), one tab per table: Festival (name and dates), Schedule grid, Venues, Travel times, Films, People, Passes, Tickets, Saved events, Volunteer shifts and Official documents. A *Read me* tab explains the columns and allowed values.
 
 - The dashboard's **Data** tab loads the sheet. **Check sheet for changes** diffs the Schedule grid against what's loaded and runs the agent on the changes, so the right people get updates and recommendations.
 - The sheet must be shared as **anyone with the link can view**; the server exports each tab as CSV by its fixed tab ID (`src/data/sheet.ts`). Don't delete and recreate a tab, or its ID changes.
@@ -125,6 +125,7 @@ src/rules     pass and badge access rules, QR codes
 src/agent     agent loop, propagation, recommendations, clashes, briefs, Q&A, crowd, vendors, voting, approvals, log
 src/llm       Ollama client
 src/eval      the four evaluation scenarios
+data/         snapshot of the mock festival sheet (.xlsx and CSVs)
 ```
 
 ## Roadmap

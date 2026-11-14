@@ -56,3 +56,12 @@ describe('reading the published sheet', () => {
     await expect(fetchSheetTables('x'.repeat(30), fake)).rejects.toThrow(/anyone with the link can view/);
   });
 });
+
+import { readFileSync } from 'node:fs';
+describe('data/csv snapshot', () => {
+  it('matches the built-in mock festival', () => {
+    const t = festivalToTables(buildFestival());
+    const csv = parseCsv(readFileSync('data/csv/schedule-grid.csv', 'utf8').trimEnd());
+    expect(csv).toEqual(t['Schedule grid']);
+  });
+});
