@@ -1,7 +1,7 @@
 {
   "name": "snow",
   "title": "Snow from 2 pm on day 1",
-  "description": "The morning forecast shows light snow, under the line. At 1:05 pm the Harbor Loop shuttle runs 12 minutes late; at 1:10 pm the forecast is upgraded to about 3 inches from 2 to 7 pm. The agent drafts the weather notice (Comms), weighs an extra bus (Operations), and re-checks every guest still travelling: Pavel Kettering's drive from the airport is now at risk for his 3:30 pm call, and Elif Galloway's car later in the day is flagged amber with a re-check timer.",
+  "description": "The morning forecast shows light snow, under the line. At 1:05 pm the Harbor Loop shuttle runs 12 minutes late; at 1:10 pm the forecast is upgraded to about 3 inches from 2 to 7 pm. The agent drafts the weather notice (Comms), weighs an extra bus and holding the 3:00 pm starts (Operations), and re-checks every guest still travelling: Pavel Kettering's drive from the airport is now at risk for his 3:30 pm call, and Elif Galloway's car later in the day is flagged amber with a re-check timer.",
   "day": 1,
   "start": "11:30",
   "steps": [
@@ -30,6 +30,8 @@
     { "type": "outbox", "label": "Yara Hollis got one standby request", "template": "backup_standby", "count": 1 },
     { "type": "flag", "label": "Snow flag on the dashboard", "contains": "Snow 2:00 to 7:00 pm" },
     { "type": "decision", "label": "Elif Galloway's car: parked as amber, proposed by the 3:35 pm re-check", "key": "guest:p-078:e-015", "status": "open", "rule": "A" },
-    { "type": "decision_count", "label": "Exactly three decisions at 1:10 pm plus the later car decision", "prefix": "", "count": 4 }
+    { "type": "decision", "label": "Hold the 3:00 pm starts: rules recommend holding; nobody answered, so the safe default (late seating) ran", "key": "weather:hold", "status": "executed", "rule": "A", "chosen": "B", "chosenVia": "deadline" },
+    { "type": "outbox", "label": "No audience was told about a hold nobody approved", "template": "session_delay", "count": 0 },
+    { "type": "decision_count", "label": "Exactly four decisions at 1:10 pm plus the later car decision", "prefix": "", "count": 5 }
   ]
 }

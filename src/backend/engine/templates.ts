@@ -26,6 +26,7 @@ export const TEMPLATES = {
   stage_brief: '"{session}" at {start}: {backup} replaces {primary} at the start. {primary} joins on arrival (ETA {eta}); meet at the stage door.',
   stage_door_brief: '{name} is running late for "{session}" (ETA {eta}). Meet them at the stage door and bring them straight to the {spot}.',
   delay_brief: '"{session}" now starts at {newStart} (was {oldStart}). Hold the doors and tell arrivals their seats are held.',
+  late_seating: 'Keep the start times, and seat late arrivals for the first {holdMin} minutes: {route} is running about {delay} min late.',
   av_remote: 'Set up a video link for {name} on "{session}" by {setupBy}. Test call before {start}.',
   driver_change: "Move {name}'s pickup at {place} to {newPickup} (was {oldPickup}).",
   outdoor_brief: '"{session}" moves indoors at {venue} because of snow. Set up there by {setupBy}.',

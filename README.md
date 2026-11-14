@@ -20,6 +20,21 @@ npm run ops:compare
 
 Details: [docs/backend.md](docs/backend.md). What the scenarios need from the sheet: [docs/data-contract.md](docs/data-contract.md).
 
+## The apps and the site
+
+`npm run dev`, then open http://localhost:3000. Everything runs on the operations backend above.
+
+| Path | What it is |
+|---|---|
+| `/` | Product site: the problem and how the agent solves it, told by scrolling |
+| `/app` | Pick a role: attendee, festival team or staff. Each has its own onboarding (`/start/attendee`, `/start/team`, `/start/staff`) |
+| `/team` | Festival team, desktop and phone: the calendar is the main panel. Alerts arrive with a recommendation; opening it moves the events, lists every change, and one approval makes it the new plan. "Original plan" shows the sheet as it was |
+| `/attendee` | Attendee, phone: your agenda as it stands, what changed and what to do, and updates |
+| `/staff` | Staff, phone: your shift, the live brief for your venue and team, messages to you |
+| `/legacy` | The first prototype's dashboard, kept for reference |
+
+To demo, open `/team` and press **Snow** or **Late guest** (bottom left), then **Next** to play each feed event. The agent's recommendations come from the local model when Ollama is running, otherwise from the rules. `/team?alert=weather` opens a recommendation directly.
+
 ## What it does
 
 | Pain point (proposal) | What the agent does | Human stays in charge of |

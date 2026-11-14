@@ -6,7 +6,7 @@
 // briefs, heads-up to Transport.
 
 import type { DecisionCandidate, Fact, Iso, PlannedAction, Trigger } from '../domain/types';
-import { addMinutes, clock, isBefore, maxIso, minIso, minutesBetween, span } from '../domain/time';
+import { addMinutes, clock, isBefore, maxIso, minIso, minutesBetween, roundUp5, span } from '../domain/time';
 import type { FestivalView } from '../domain/view';
 import { estimatedShuttleDelay, summarizeSnow, TRAVEL_FACTORS, type SnowSummary } from '../model/snow';
 import { demandWindows, shuttleLoad } from '../model/shuttle';
@@ -158,6 +158,77 @@ export function planWeather(v: FestivalView, now: Iso): WeatherPlan {
           summary: `Heads-up to Operations: ${route.name} ${delay} min late`,
         });
       }
+    }
+  }
+
+  // --- decision: hold the first starts in the snow, so people on a late shuttle make them
+  const lateMin = Math.max(0, ...late.map(d => d.delay));
+  if (lateMin >= 5) {
+    const firstEnd = addMinutes(snow.start, 90);
+    const first = v.sessions().filter(s => s.status === 'scheduled' && s.expected > 0 && (s.kind === 'screening' || s.kind === 'panel')
+      && !v.state.overrides[s.id]?.start && !isBefore(s.start, snow.start!) && isBefore(s.start, firstEnd) && isBefore(addMinutes(now, 30), s.start)
+      && late.some(d => d.route.stops.includes(s.venueId)))
+      .sort((a, b) => a.start.localeCompare(b.start));
+    if (first.length) {
+      const holdMin = Math.min(30, roundUp5(lateMin));
+      const delay = String(lateMin);
+      // Each held session pushes whatever follows it in the same room, so nothing overlaps.
+      const moves: { s: typeof first[number]; start: Iso; end: Iso }[] = [];
+      for (const s of first) {
+        let start = addMinutes(s.start, holdMin), end = addMinutes(s.end, holdMin);
+        moves.push({ s, start, end });
+        for (let next = v.nextInRoom(s), guard = 0; next && guard < 6 && isBefore(next.start, end); next = v.nextInRoom(next), guard++) {
+          const push = minutesBetween(next.start, end);
+          start = addMinutes(next.start, push); end = addMinutes(next.end, push);
+          if (!moves.some(m => m.s.id === next!.id)) moves.push({ s: next, start, end });
+        }
+      }
+      const people = first.reduce((n, s) => n + s.expected, 0);
+      const starts = [...new Set(first.map(s => clock(s.start)))];
+      const startsText = starts.length === 1 ? `the ${starts[0]} starts` : `${first.length} starts`;
+      const venues = [...new Set(first.map(s => s.venueId))];
+      const c: DecisionCandidate = {
+        ref: 'hold_starts', key: `weather:hold:day${day}:${first[0].start}`, scenario: 'weather', owner: 'operations',
+        title: `Hold ${startsText} by ${holdMin} min`,
+        why: `${late.map(d => `${d.route.name} is ${d.delay} min late`).join(', ')} in the snow. ${people} people have ${first.map(s => `"${s.title}"`).join(', ')} in their plan.`,
+        options: keyed([
+          {
+            title: `Hold ${startsText} by ${holdMin} min`,
+            pros: `People on the late shuttle make the start; ${moves.length - first.length ? 'what follows in the same room moves with it' : 'nothing else moves'}.`,
+            cons: `Tells ${people} people their start moved. Cannot be taken back once sent.`,
+            cost: { people, messages: people, money: 0, reversible: false },
+            actions: [
+              ...moves.map(m => ({
+                kind: 'schedule_change' as const, summary: `"${m.s.title}" ${clock(m.s.start)} to ${clock(m.start)}`,
+                change: { sessionId: m.s.id, start: m.start, end: m.end, note: `Held ${holdMin} min for snow` },
+              })),
+              ...first.map(s => ({
+                kind: 'broadcast' as const, summary: `Tell ${s.expected} people with "${s.title}" in their plan`, to: [{ kind: 'segment' as const, id: `event:${s.id}` }],
+                channels: ['push' as const], template: 'session_delay', vars: { session: s.title, venue: v.placeName(s.venueId), newStart: clock(addMinutes(s.start, holdMin)), oldStart: clock(s.start) },
+              })),
+              ...first.map(s => ({
+                kind: 'update_brief' as const, summary: `Door brief at ${v.placeName(s.venueId)}`, to: [{ kind: 'team' as const, id: 'door', venueId: s.venueId }],
+                template: 'delay_brief', vars: { session: s.title, newStart: clock(addMinutes(s.start, holdMin)), oldStart: clock(s.start) },
+              })),
+            ],
+          },
+          {
+            title: `Keep the times, seat late arrivals for ${holdMin} min`,
+            pros: 'No message to the audience; nothing moves.',
+            cons: 'People on the late shuttle miss the first minutes.',
+            cost: { people: 0, messages: 0, money: 0, reversible: true },
+            actions: venues.map(venueId => ({
+              kind: 'update_brief' as const, summary: `Late seating brief at ${v.placeName(venueId)}`, to: [{ kind: 'team' as const, id: 'door', venueId }],
+              template: 'late_seating', vars: { holdMin: String(holdMin), delay, route: late[0].route.name },
+            })),
+          },
+        ]),
+        ruleRecommendation: lateMin >= 10 ? 'A' : 'B',
+        ruleReason: lateMin >= 10 ? `The shuttle is ${lateMin} min late, more than the 10 min a door can absorb.` : `The shuttle is only ${lateMin} min late; late seating covers it.`,
+        facts: [forecastFact, { key: 'shuttle_delay', value: `${lateMin} min`, source: { kind: 'feed', ref: 'shuttle feed', at: now } }],
+        deadline: clampDeadline(addMinutes(first[0].start, -45), now), state: `${holdMin}:${first.map(s => s.id).join(',')}`,
+      };
+      propose(plan, c, now, recheck, `${startsText} may need holding for the late shuttle. Decision by ${clock(c.deadline)}.`);
     }
   }
 
