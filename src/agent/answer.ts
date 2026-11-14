@@ -79,7 +79,7 @@ export async function answerQuestion(f: Festival, question: string, llm: LlmClie
   if (llm) {
     try {
       const raw = await llm.chat([
-        { role: 'system', content: 'You answer festival questions using ONLY the numbered sources. If the sources do not answer the question, set known to false. Never add facts. Reply as JSON: {"known": boolean, "answer": string, "cite": [source numbers]}.' },
+        { role: 'system', content: 'You answer festival questions using ONLY the numbered sources. If the sources let you answer, including a "no" (for example a source says something is not included or not admitted), set known to true and answer in one or two plain sentences. Set known to false only if the sources say nothing about the question. Never add facts. Reply as JSON: {"known": boolean, "answer": string, "cite": [source numbers]}.' },
         { role: 'user', content: `Sources:\n${sources.map((s, i) => `[${i + 1}] ${s.title}: ${s.text}`).join('\n')}\n\nQuestion: ${question}` },
       ], { json: true });
       const parsed = extractJson(raw) as { known?: boolean | string; answer?: string; cite?: (number | string)[] | number };
