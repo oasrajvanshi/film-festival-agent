@@ -127,8 +127,19 @@ export default function Onboarding() {
     return (
       <div className="ob ob-welcome">
         <div className="ob-poster">
-          <div className="eyebrow">Festival Agent</div>
-          <h1 className="display">Bring your festival.<br />We’ll keep everyone in step.</h1>
+          <div className="ob-mast display">Festival Agent</div>
+          <div className="ob-poster-grid">
+            <aside className="ob-meta">
+              <div><span>For film</span> <span>festivals</span></div>
+              <hr />
+              <div><span>Schedules</span> <span>People</span> <span>Passes</span> <span>Disruptions</span></div>
+              <hr />
+              <div><span>Your team</span> <span>approves first</span></div>
+            </aside>
+            <div className="ob-photo">
+              <h1 className="display">Bring your festival.<br />We’ll keep everyone in step.</h1>
+            </div>
+          </div>
           <p>Connect your schedule, people and passes. The agent watches for changes and disruptions, works out who is affected, and drafts each person a recommendation. Your team approves anything that goes out.</p>
           <div className="row">
             <button className="primary big" onClick={() => setStarted(true)}>Set up a festival <Icon name="send" size={16} /></button>
