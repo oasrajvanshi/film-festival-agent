@@ -33,7 +33,7 @@ export default function Dashboard() {
             <input type="time" value={s.clock.slice(11)} onChange={e => e.target.value && s.setClock(`${s.clock.slice(0, 11)}${e.target.value}`)} />
           </label>
           <label className="row">Acting as <input value={user} onChange={e => setUser(e.target.value)} style={{ width: 140 }} /></label>
-          <label className="row" title={s.llmInfo.available ? `Ollama model: ${s.llmInfo.model}` : 'Set OLLAMA_API_KEY on the server to enable'}>
+          <label className="row" title={s.llmInfo.available ? `Model: ${s.llmInfo.model}` : 'Set GROQ_API_KEY or OLLAMA_API_KEY on the server to enable'}>
             <input type="checkbox" disabled={!s.llmInfo.available} checked={s.useModel} onChange={e => s.setUseModel(e.target.checked)} />
             Use model {s.llmInfo.available ? `(${s.llmInfo.model})` : '(not configured)'}
           </label>

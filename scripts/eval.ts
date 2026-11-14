@@ -1,11 +1,11 @@
 // npm run eval            → offline (no model)
-// npm run eval -- --llm   → uses Ollama if OLLAMA_API_KEY is set
+// npm run eval -- --llm   → uses Groq or Ollama if GROQ_API_KEY or OLLAMA_API_KEY is set
 import { runAll } from '../src/eval/scenarios';
-import { ollamaFromEnv } from '../src/llm/ollama';
+import { llmFromEnv } from '../src/llm';
 
 const useLlm = process.argv.includes('--llm');
-const llm = useLlm ? ollamaFromEnv() : null;
-if (useLlm && !llm) console.log('No OLLAMA_API_KEY set; running offline.\n');
+const llm = useLlm ? llmFromEnv() : null;
+if (useLlm && !llm) console.log('No GROQ_API_KEY or OLLAMA_API_KEY set; running offline.\n');
 
 const suites = await runAll(llm);
 let allPass = true;

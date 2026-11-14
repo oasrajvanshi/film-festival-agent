@@ -48,10 +48,12 @@ A fixed rule in [`src/agent/approvals.ts`](src/agent/approvals.ts), not the mode
 
 ## Language model
 
-The model step uses **Ollama** (Ollama Cloud by default). It is optional: without a key everything runs deterministically, which is what the tests use.
+The model step uses **Groq** (free API key at [console.groq.com](https://console.groq.com/keys)) or **Ollama**. If `GROQ_API_KEY` is set, Groq is used; otherwise Ollama. It is optional: without a key everything runs deterministically, which is what the tests use.
 
 | Variable | Default | |
 |---|---|---|
+| `GROQ_API_KEY` | none | Your Groq key. Set it in Vercel or a local `.env`; never commit it. |
+| `GROQ_MODEL` | `openai/gpt-oss-120b` | Any Groq chat model |
 | `OLLAMA_API_KEY` | none | Your Ollama Cloud key. Set it in Vercel or a local `.env`; never commit it. |
 | `OLLAMA_MODEL` | `gpt-oss:120b` | Any Ollama chat model |
 | `OLLAMA_HOST` | `https://ollama.com` | Use `http://localhost:11434` for a local Ollama |
@@ -79,7 +81,7 @@ npm run eval
 | 20 QR scans across pass types: each allow or deny is correct | 20 of 20 |
 | 10 questions about the festival: from official documents, or "I don't know" | 10 of 10 |
 
-`npm run eval -- --llm` runs the question test through Ollama when `OLLAMA_API_KEY` is set.
+`npm run eval -- --llm` runs the question test through the model when `GROQ_API_KEY` or `OLLAMA_API_KEY` is set.
 
 ## Festival data (Google Sheet)
 
@@ -105,7 +107,7 @@ npm run dev       # http://localhost:3000
 
 ### Deploy on Vercel
 
-Import the repo in Vercel (framework: Next.js, no settings needed), then add `OLLAMA_API_KEY` under Project → Settings → Environment Variables and redeploy. Without it the dashboard works with the model switched off.
+Import the repo in Vercel (framework: Next.js, no settings needed), then add `GROQ_API_KEY` (or `OLLAMA_API_KEY`) under Project → Settings → Environment Variables and redeploy. Without it the dashboard works with the model switched off. Open `/api/llm?test=1` to check the key: it makes one tiny model call and reports `"test":"ok"` or the error.
 
 ## Develop
 
@@ -123,7 +125,7 @@ src/core      types and time helpers
 src/data      mock festival + official documents
 src/rules     pass and badge access rules, QR codes
 src/agent     agent loop, propagation, recommendations, clashes, briefs, Q&A, crowd, vendors, voting, approvals, log
-src/llm       Ollama client
+src/llm       Groq and Ollama clients
 src/eval      the four evaluation scenarios
 data/         snapshot of the mock festival sheet (.xlsx and CSVs)
 ```

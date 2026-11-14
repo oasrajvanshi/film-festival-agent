@@ -101,3 +101,13 @@ describe('extractJson', () => {
     expect(() => extractJson('')).toThrow(/empty/);
   });
 });
+
+import { llmFromEnv } from '../src/llm';
+describe('llmFromEnv', () => {
+  it('prefers Groq, falls back to Ollama, and is off with no key', () => {
+    expect(llmFromEnv({ GROQ_API_KEY: 'g', OLLAMA_API_KEY: 'o' })?.provider).toBe('groq');
+    expect(llmFromEnv({ GROQ_API_KEY: 'g' })?.model).toBe('openai/gpt-oss-120b');
+    expect(llmFromEnv({ OLLAMA_API_KEY: 'o' })?.provider).toBe('ollama');
+    expect(llmFromEnv({})).toBeNull();
+  });
+});
