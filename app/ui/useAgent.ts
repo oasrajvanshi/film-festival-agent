@@ -51,7 +51,7 @@ export function useAgent() {
       }
     } catch { /* fresh state */ }
     setVersion(v => v + 1);
-    fetch('/api/llm').then(r => r.json()).then(setLlmInfo).catch(() => {});
+    fetch('/api/llm', { cache: 'no-store' }).then(r => r.json()).then(setLlmInfo).catch(() => {});
   }, [now]);
 
   useEffect(() => {

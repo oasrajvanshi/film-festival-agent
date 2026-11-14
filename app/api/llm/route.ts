@@ -2,6 +2,7 @@
 import { ollamaFromEnv, type ChatMessage } from '../../../src/llm/ollama';
 
 export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   const llm = ollamaFromEnv();
