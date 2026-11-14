@@ -6,6 +6,35 @@ Group Blue · Oas, Sienna, David, Henry
 
 Film festival schedule changes are relayed by hand across emails, sheets and chats, so updates arrive late or reach the wrong people. Volunteers work from outdated briefs, guests get double-booked, and staff spend the day relaying information. The Film Festival Agent tracks the schedule, notifies and gives recommendation to everyone affected. It flags clashes and checks access, with staff approving anything sent publicly.
 
+## Operations backend: snow and a late key guest
+
+`src/backend` is the agent backend for the two scenarios we test: snow, and a key guest arriving late. It reads the team's mock sheet (Harbor Lights), routes each event to a weather desk or a talent desk agent, and lets a local Ollama model (`qwen3:8b`, with `llama3.1:8b` as fallback) drive tool calls while rules compute every option and a person approves anything public.
+
+```
+ollama pull qwen3:8b
+ollama pull llama3.1:8b
+npm run ops -- snow --llm
+npm run ops -- guest-late --llm
+npm run ops:compare
+```
+
+Details: [docs/backend.md](docs/backend.md). What the scenarios need from the sheet: [docs/data-contract.md](docs/data-contract.md).
+
+## The apps and the site
+
+`npm run dev`, then open http://localhost:3000. Everything runs on the operations backend above.
+
+| Path | What it is |
+|---|---|
+| `/` | Product site: the problem and how the agent solves it, told by scrolling |
+| `/app` | Pick a role: attendee, festival team or staff. Each has its own onboarding (`/start/attendee`, `/start/team`, `/start/staff`) |
+| `/team` | Festival team, desktop and phone: the calendar is the main panel. Alerts arrive with a recommendation; opening it moves the events, lists every change, and one approval makes it the new plan. "Original plan" shows the sheet as it was |
+| `/attendee` | Attendee, phone: your agenda as it stands, what changed and what to do, and updates |
+| `/staff` | Staff, phone: your shift, the live brief for your venue and team, messages to you |
+| `/legacy` | The first prototype's dashboard, kept for reference |
+
+To demo, open `/team` and press **Snow** or **Late guest** (bottom left), then **Next** to play each feed event. The agent's recommendations come from the local model when Ollama is running, otherwise from the rules. `/team?alert=weather` opens a recommendation directly.
+
 ## What it does
 
 | Pain point (proposal) | What the agent does | Human stays in charge of |

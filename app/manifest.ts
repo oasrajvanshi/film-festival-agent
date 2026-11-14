@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: 'Festival Agent',
     short_name: 'Festival',
     description: 'Run festival day from your phone: approvals, door scans, schedule changes and alerts.',
-    start_url: '/',
+    start_url: '/legacy',
     display: 'standalone',
     background_color: '#17151c',
     theme_color: '#17151c',

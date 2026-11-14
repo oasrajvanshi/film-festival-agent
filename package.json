@@ -9,7 +9,12 @@
     "typecheck": "tsc",
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "ops": "tsx scripts/ops.ts",
+    "ops:llm": "tsx scripts/ops.ts all --llm",
+    "ops:sync": "tsx scripts/ops-sync.ts",
+    "test:backend": "vitest run tests/backend",
+    "ops:compare": "tsx scripts/ops-compare.ts"
   },
   "keywords": [],
   "author": "",
@@ -24,6 +29,8 @@
   },
   "type": "module",
   "dependencies": {
+    "gsap": "^3.13.0",
+    "lenis": "^1.3.4",
     "next": "^15.5.29",
     "qrcode-generator": "^2.0.4",
     "react": "^19.3.1",

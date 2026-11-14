@@ -111,7 +111,7 @@ export default function Onboarding() {
     s.loadFestival(structuredClone(built.festival), sheetFest ? 'Google Sheet' : `${uploads.length} uploaded files`);
     writeSetup({ festivalName: built.festival.name || meta.name, city: meta.city, approver, channels, onboardedAt: new Date().toISOString() });
     writeWho({ kind: 'organizer', id: 'setup', name: approver || 'Organizer', detail: 'Set up the festival', code: '' });
-    location.href = '/#today';
+    location.href = '/legacy#today';
   };
 
   const canNext = [
@@ -145,7 +145,7 @@ export default function Onboarding() {
           <p>Connect your schedule, people and passes. The agent watches for changes and disruptions, works out who is affected, and drafts each person a recommendation. Your team approves anything that goes out.</p>
           <div className="row">
             <button className="primary big" onClick={() => setStarted(true)}>Set up a festival <Icon name="send" size={16} /></button>
-            <a className="ob-link" href="/" onClick={() => { writeWho(null); writeSetup({ festivalName: 'Harbor Lights Film Festival', city: 'New York', approver: 'Operations lead', channels: ['push', 'email'], onboardedAt: new Date().toISOString() }); }}>Or open the demo festival</a>
+            <a className="ob-link" href="/legacy" onClick={() => { writeWho(null); writeSetup({ festivalName: 'Harbor Lights Film Festival', city: 'New York', approver: 'Operations lead', channels: ['push', 'email'], onboardedAt: new Date().toISOString() }); }}>Or open the demo festival</a>
           </div>
           <ol className="ob-steps-preview">
             {STEPS.map((t, i) => <li key={t}><span>{String(i + 1).padStart(2, '0')}</span>{t}</li>)}
@@ -160,7 +160,7 @@ export default function Onboarding() {
       <header className="ob-head">
         <div className="brand-mark"><Icon name="film" size={18} /></div>
         <div className="ob-title display">Set up {meta.name || 'your festival'}</div>
-        <a className="ob-link" href="/">Exit</a>
+        <a className="ob-link" href="/legacy">Exit</a>
       </header>
       <nav className="ob-strip" aria-label="Steps">
         {STEPS.map((t, i) => (

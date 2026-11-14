@@ -1,0 +1,37 @@
+{
+  "name": "snow",
+  "title": "Snow from 2 pm on day 1",
+  "description": "The morning forecast shows light snow, under the line. At 1:05 pm the Harbor Loop shuttle runs 12 minutes late; at 1:10 pm the forecast is upgraded to about 3 inches from 2 to 7 pm. The agent drafts the weather notice (Comms), weighs an extra bus and holding the 3:00 pm starts (Operations), and re-checks every guest still travelling: Pavel Kettering's drive from the airport is now at risk for his 3:30 pm call, and Elif Galloway's car later in the day is flagged amber with a re-check timer.",
+  "day": 1,
+  "start": "11:30",
+  "steps": [
+    { "at": "11:40", "note": "Morning forecast: light snow, under the 2 in line",
+      "trigger": { "type": "weather_update", "forecast": { "source": "mock weather feed", "issued": "11:35",
+        "hourly": { "15:00": 0.15, "16:00": 0.25, "17:00": 0.25, "18:00": 0.15 } } } },
+    { "at": "13:05", "note": "Shuttle feed: Harbor Loop running 12 min late",
+      "trigger": { "type": "shuttle_update", "routeId": "r-loop", "delayMin": 12 } },
+    { "at": "13:10", "note": "Forecast upgraded: about 3 in from 2 pm",
+      "trigger": { "type": "weather_update", "forecast": { "source": "mock weather feed", "issued": "13:05",
+        "hourly": { "14:00": 0.5, "15:00": 0.7, "16:00": 0.7, "17:00": 0.6, "18:00": 0.45, "19:00": 0.05 },
+        "alerts": [{ "event": "Winter Weather Advisory", "start": "14:00", "end": "19:00" }] } } },
+    { "at": "13:20", "note": "Comms (Pavel Marchetti) sends the notice", "decide": { "key": "weather:notice", "option": "A", "by": "p-008" } },
+    { "at": "13:25", "note": "A door volunteer tries to approve the extra bus", "decide": { "key": "weather:shuttle", "option": "B", "by": "p-011", "expect": "forbidden" } },
+    { "at": "13:30", "note": "Guest relations (Elif Pell) asks the backup to stand by", "decide": { "key": "guest:p-073:e-056", "option": "A", "by": "p-005" } },
+    { "at": "13:45", "note": "Nobody answered the bus decision by its 1:40 pm deadline", "tick": true },
+    { "at": "15:40", "note": "Re-check timers fire (shuttle load, Elif Galloway's car)", "tick": true }
+  ],
+  "expect": [
+    { "type": "decision", "label": "Weather notice: rules recommend sending, Comms sent it", "key": "weather:notice", "status": "executed", "rule": "A", "chosen": "A", "chosenVia": "human" },
+    { "type": "outbox", "label": "Weather notice went out once per channel, only after approval", "template": "weather_notice", "count": 2, "notBefore": "13:20" },
+    { "type": "decision", "label": "Extra bus: skip and watch the load, run as the safe default at the deadline", "key": "weather:shuttle", "status": "executed", "rule": "A", "chosen": "A", "chosenVia": "deadline" },
+    { "type": "outbox", "label": "No bus was ordered without a person", "template": "vendor_extra_bus", "count": 0 },
+    { "type": "step", "label": "A volunteer cannot approve an Operations decision", "index": 4, "result": "forbidden" },
+    { "type": "decision", "label": "Pavel Kettering at risk: brief the named backup", "key": "guest:p-073:e-056", "status": "executed", "rule": "A", "chosen": "A" },
+    { "type": "outbox", "label": "Yara Hollis got one standby request", "template": "backup_standby", "count": 1 },
+    { "type": "flag", "label": "Snow flag on the dashboard", "contains": "Snow 2:00 to 7:00 pm" },
+    { "type": "decision", "label": "Elif Galloway's car: parked as amber, proposed by the 3:35 pm re-check", "key": "guest:p-078:e-015", "status": "open", "rule": "A" },
+    { "type": "decision", "label": "Hold the 3:00 pm starts: rules recommend holding; nobody answered, so the safe default (late seating) ran", "key": "weather:hold", "status": "executed", "rule": "A", "chosen": "B", "chosenVia": "deadline" },
+    { "type": "outbox", "label": "No audience was told about a hold nobody approved", "template": "session_delay", "count": 0 },
+    { "type": "decision_count", "label": "Exactly four decisions at 1:10 pm plus the later car decision", "prefix": "", "count": 5 }
+  ]
+}

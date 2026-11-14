@@ -1,0 +1,151 @@
+<title>Harbor Lights Mood Board</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a pinned board on dark felt. A hand of photo cards first (the
+   product's main object), then the collage pieces, colour, type, and the
+   cards as they appear in the app. Single dark look by choice. */
+:root {
+  --felt: #17110F; --felt-2: #221A17; --paper: #ECE7DB; --ink: #161514; --velvet: #A3221D;
+  --cobalt: #2446C8; --sun: #E3A21A; --blush: #F1C9BF; --muted: #A79E93;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --mono: "DM Mono", ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--felt); color: var(--paper); font-family: var(--display); }
+p { margin: 0; }
+.board { max-width: 1320px; margin: 0 auto; padding-block: 36px 80px; display: grid; gap: 44px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.mono { font-family: var(--mono); font-size: 13px; letter-spacing: .01em; color: var(--muted); }
+
+/* wordmark */
+.mast { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 24px; }
+.mast h1 { margin: 0; font-size: clamp(44px, 9vw, 128px); line-height: .86; font-weight: 800; font-stretch: 125%; letter-spacing: -.015em; }
+.mast .mono { text-align: right; line-height: 1.6; }
+
+/* the card: the product's main object */
+.hand { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 18px; }
+.card { position: relative; margin: 0; aspect-ratio: 63 / 88; border-radius: 14px; overflow: hidden; background: #222 var(--img) center / cover;
+  box-shadow: 0 0 0 6px #0c0908, 0 18px 40px rgba(0,0,0,.45); }
+.card::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.28), transparent 26%, transparent 70%, rgba(0,0,0,.32)); }
+.idx { position: absolute; z-index: 1; left: 9%; top: 6%; display: grid; justify-items: center; line-height: .95; font-weight: 600; font-size: clamp(16px, 2vw, 26px); color: #fff; }
+.idx i { font-style: normal; font-size: .9em; }
+.idx.b { left: auto; top: auto; right: 9%; bottom: 6%; transform: rotate(180deg); }
+.q { position: absolute; z-index: 1; right: 6%; top: 7%; writing-mode: vertical-rl; font-size: clamp(9px, .95vw, 12px); color: rgba(255,255,255,.92); max-height: 62%; }
+.h { position: absolute; z-index: 1; left: 6%; bottom: 7%; writing-mode: vertical-rl; transform: rotate(180deg); font-family: var(--mono); font-size: clamp(8px, .8vw, 10.5px); color: rgba(255,255,255,.8); }
+.cap { display: grid; gap: 2px; margin-top: 14px; }
+.cap b { font-size: 14px; font-weight: 600; }
+
+/* collage */
+.row { display: grid; gap: 28px; min-width: 0; }
+.r-collage { grid-template-columns: 7fr 5fr; }
+.collage { position: relative; aspect-ratio: 7 / 6; background: var(--felt-2); border-radius: 6px; overflow: hidden; }
+.collage img, .collage .ph { position: absolute; }
+.ph { background: center / cover; box-shadow: 0 10px 24px rgba(0,0,0,.4); }
+.chips { display: grid; gap: 10px; align-content: start; }
+.chip { display: grid; grid-template-columns: 1fr auto; align-items: end; height: 92px; padding: 12px 14px; border-radius: 4px; color: var(--ink); }
+.chip b { font-size: 15px; font-weight: 700; display: block; }
+.chip span { font-family: var(--mono); font-size: 12px; }
+.chip small { font-family: var(--mono); font-size: 11px; opacity: .8; }
+
+/* type */
+.r-type { grid-template-columns: 1fr 1fr; align-items: center; }
+.spec { display: grid; gap: 16px; }
+.spec .big { font-size: clamp(36px, 5.4vw, 72px); font-weight: 800; font-stretch: 125%; line-height: .9; }
+.spec .mid { font-size: 24px; font-weight: 500; }
+.spec .mono { font-size: 15px; color: var(--paper); line-height: 1.7; }
+
+/* in the app */
+.app { background: var(--paper); color: var(--ink); border-radius: 26px; padding: 22px; display: grid; gap: 14px; }
+.app .mono { color: #5f5a52; }
+.ev { display: grid; grid-template-columns: 58px 1fr; gap: 12px; align-items: stretch; }
+.ev .thumb { border-radius: 9px; background: center / cover; aspect-ratio: 63/88; position: relative; overflow: hidden; }
+.ev .thumb span { position: absolute; left: 6px; top: 4px; color: #fff; font-size: 12px; font-weight: 600; line-height: 1; text-align: center; }
+.ev .txt { display: grid; align-content: center; gap: 3px; border-bottom: 1px solid #D8D2C4; padding-bottom: 10px; }
+.ev b { font-size: 16px; }
+.ev small { font-family: var(--mono); font-size: 12px; color: #5f5a52; }
+.ev s { color: #9a948a; }
+.alert { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 12px; background: var(--ink); color: var(--paper); border-radius: 16px; padding: 14px 14px 14px 16px; }
+.alert b { display: block; font-size: 15px; }
+.alert .mono { color: #b9b0a4; font-size: 12px; }
+.btn { border: 0; border-radius: 999px; background: var(--velvet); color: #fff; font: 600 13px var(--display); padding: 10px 14px; }
+.inkrow { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 14px; background: var(--paper); border-radius: 6px; padding: 18px; }
+.inkrow img { width: 100%; aspect-ratio: 1; object-fit: contain; }
+@media (max-width: 900px) {
+  .hand { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .r-collage, .r-type { grid-template-columns: 1fr; }
+  .inkrow { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .mast { grid-template-columns: 1fr; } .mast .mono { text-align: left; }
+}
+</style>
+
+<div class="board">
+  <header class="mast">
+    <h1>HARBOR<br>LIGHTS</h1>
+    <p class="mono">film festival · 15–17.04.2027<br>four venues · one quiet agent<br>mood board v2</p>
+  </header>
+
+  <section>
+    <div class="hand">
+      <div><figure class="card" style="--img:url(assets/card-raincoat.jpg)"><span class="idx">A<i>♥</i></span><span class="idx b">A<i>♥</i></span><span class="q">What will you see first?</span><span class="h">@harborlights</span></figure>
+        <div class="cap"><b>Attendee</b><span class="mono">hearts</span></div></div>
+      <div><figure class="card" style="--img:url(assets/card-booth.jpg)"><span class="idx">K<i>♠</i></span><span class="idx b">K<i>♠</i></span><span class="q">What changes today?</span><span class="h">@harborlights</span></figure>
+        <div class="cap"><b>Festival team</b><span class="mono">spades</span></div></div>
+      <div><figure class="card" style="--img:url(assets/card-usher.jpg)"><span class="idx">J<i>♣</i></span><span class="idx b">J<i>♣</i></span><span class="q">Where are you needed?</span><span class="h">@harborlights</span></figure>
+        <div class="cap"><b>Staff</b><span class="mono">clubs</span></div></div>
+      <div><figure class="card" style="--img:url(assets/card-snow.jpg)"><span class="idx">2<i>♦</i></span><span class="idx b">2<i>♦</i></span><span class="q">Snow from 2 pm</span><span class="h">@harborlights</span></figure>
+        <div class="cap"><b>Alert</b><span class="mono">diamonds</span></div></div>
+      <div><figure class="card" style="--img:url(assets/card-arrival.jpg)"><span class="idx">7<i>♦</i></span><span class="idx b">7<i>♦</i></span><span class="q">New ETA 4:20 pm</span><span class="h">@harborlights</span></figure>
+        <div class="cap"><b>Alert</b><span class="mono">diamonds</span></div></div>
+      <div><figure class="card" style="--img:url(assets/card-ticket.jpg)"><span class="idx">10<i>♥</i></span><span class="idx b">10<i>♥</i></span><span class="q">Doors open 2:45</span><span class="h">@harborlights</span></figure>
+        <div class="cap"><b>Your plan</b><span class="mono">hearts</span></div></div>
+    </div>
+  </section>
+
+  <section class="row r-collage">
+    <div class="collage">
+      <div class="ph" style="background-image:url(assets/seats.jpg);left:4%;top:6%;width:40%;height:86%;transform:rotate(-2deg)"></div>
+      <img src="assets/paper-1.webp" alt="" style="left:40%;top:10%;width:40%;transform:rotate(3deg)">
+      <img src="assets/ink-projector.webp" alt="" style="left:47%;top:13%;width:24%">
+      <img src="assets/halftone.webp" alt="" style="right:4%;top:42%;width:26%;transform:rotate(-4deg)">
+      <img src="assets/paper-red-2.webp" alt="" style="left:36%;top:56%;width:44%;transform:rotate(-2deg)">
+      <img src="assets/tape-1.webp" alt="" style="left:30%;top:4%;width:16%;transform:rotate(-14deg)">
+      <img src="assets/film-strip.webp" alt="" style="left:30%;bottom:7%;width:66%;transform:rotate(-4deg)">
+      <p class="mono" style="position:absolute;right:4%;top:5%;color:var(--paper)">cut, tape, pin</p>
+    </div>
+    <div class="chips">
+      <div class="chip" style="background:#A3221D;color:#fff"><div><b>Velvet</b><small>needs your decision</small></div><span>#A3221D</span></div>
+      <div class="chip" style="background:#ECE7DB"><div><b>Paper</b><small>programme, cards</small></div><span>#ECE7DB</span></div>
+      <div class="chip" style="background:#161514;color:#ECE7DB;box-shadow:inset 0 0 0 1px #3a302b"><div><b>Ink</b><small>text, frames</small></div><span>#161514</span></div>
+      <div class="chip" style="background:#2446C8;color:#fff"><div><b>Cobalt</b><small>links, the agent</small></div><span>#2446C8</span></div>
+      <div class="chip" style="background:#E3A21A"><div><b>Curtain</b><small>now, highlights</small></div><span>#E3A21A</span></div>
+    </div>
+  </section>
+
+  <section class="row r-type">
+    <div class="spec">
+      <p class="big">STARTS<br>3:15</p>
+      <p class="mid">Late Country moved 15 minutes.</p>
+      <p class="mono">Archivo Expanded 800 · headlines<br>Archivo 500 · reading<br>DM Mono · times, captions, card edges</p>
+    </div>
+    <div class="app">
+      <p class="mono">thu 15 · your plan</p>
+      <div class="alert"><div><b>Snow from 2 pm</b><span class="mono">leave 10 min earlier</span></div><button class="btn">See plan</button></div>
+      <div class="ev"><div class="thumb" style="background-image:url(assets/card-ticket.jpg)"><span>3<br>♥</span></div><div class="txt"><b>Late Country</b><small><s>3:00</s> 3:15 pm · Harbor Theater</small></div></div>
+      <div class="ev"><div class="thumb" style="background-image:url(assets/card-raincoat.jpg)"><span>4<br>♥</span></div><div class="txt"><b>Selling at Markets</b><small>4:00 pm · Pier 9 Hall</small></div></div>
+    </div>
+  </section>
+
+  <section class="inkrow" aria-label="Ink drawings for empty states and roles">
+    <img src="assets/ink-ticket.webp" alt="Hand holding a ticket">
+    <img src="assets/ink-clapper.webp" alt="Hands holding a clapperboard">
+    <img src="assets/ink-flashlight.webp" alt="Hand holding a flashlight">
+    <img src="assets/ink-snow.webp" alt="Umbrella in snow">
+    <img src="assets/ink-suitcase.webp" alt="Hand holding a suitcase">
+    <img src="assets/ink-projector.webp" alt="Film projector">
+  </section>
+</div>
+<script src="live-editor.js" defer></script>
