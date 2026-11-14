@@ -81,6 +81,16 @@ npm run eval
 
 `npm run eval -- --llm` runs the question test through Ollama when `OLLAMA_API_KEY` is set.
 
+## Festival data (Google Sheet)
+
+The festival lives in a Google Sheet that staff edit, one tab per table: Festival (name and dates), Schedule grid, Venues, Travel times, Films, People, Passes, Tickets, Saved events, Volunteer shifts and Official documents. A *Read me* tab explains the columns and allowed values.
+
+- The dashboard's **Data** tab loads the sheet. **Check sheet for changes** diffs the Schedule grid against what's loaded and runs the agent on the changes, so the right people get updates and recommendations.
+- The sheet must be shared as **anyone with the link can view**; the server exports each tab as CSV by its fixed tab ID (`src/data/sheet.ts`). Don't delete and recreate a tab, or its ID changes.
+- Every row is checked: unknown venue, person, event or film IDs, bad times or days are listed by tab and row, and nothing loads until they're fixed.
+- `FESTIVAL_SHEET_ID` (optional env var) sets the default sheet for the server; otherwise the link in the Data tab is used.
+- `npx tsx scripts/export-tables.ts out.json` exports the built-in mock festival in the sheet's format.
+
 ## Management dashboard
 
 A Next.js app (the proposal's first demo). The agent runs in the browser and keeps demo state in localStorage, so no database is needed; model calls go through `/api/llm` so the key stays on the server.
@@ -124,5 +134,5 @@ src/eval      the four evaluation scenarios
 3. ✅ Conflicts and approvals
 4. ✅ Check-in and feedback (core logic)
 5. ✅ Management dashboard (Next.js): grid editor, approval queue, scan simulator, crowd view, log
-6. Google Sheets sync for the schedule grid and rosters
+6. ✅ Google Sheets as the data source (read; the dashboard grid does not write back)
 7. Festival app: mobile web with QR, volunteer mode and guest mode

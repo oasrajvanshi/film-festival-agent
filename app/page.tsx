@@ -2,10 +2,10 @@
 
 import { useState } from 'react';
 import { useAgent } from './ui/useAgent';
-import { Approvals, Ask, Briefs, Evaluation, Feeds, Grid, Log, Overview, Scan } from './ui/panels';
+import { Approvals, Ask, Briefs, Data, Evaluation, Feeds, Grid, Log, Overview, Scan } from './ui/panels';
 import type { DayNumber } from '../src/core/types';
 
-const TABS = ['Overview', 'Schedule grid', 'Approvals', 'Door scan', 'Volunteer briefs', 'Ask', 'Feeds & voting', 'Log', 'Evaluation'] as const;
+const TABS = ['Overview', 'Schedule grid', 'Approvals', 'Door scan', 'Volunteer briefs', 'Ask', 'Feeds & voting', 'Log', 'Evaluation', 'Data'] as const;
 type Tab = typeof TABS[number];
 
 export default function Dashboard() {
@@ -58,6 +58,7 @@ export default function Dashboard() {
         {tab === 'Feeds & voting' && <Feeds {...props} />}
         {tab === 'Log' && <Log {...props} />}
         {tab === 'Evaluation' && <Evaluation {...props} />}
+        {tab === 'Data' && <Data {...props} />}
       </main>
     </>
   );

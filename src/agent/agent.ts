@@ -116,6 +116,20 @@ export class FestivalAgent {
     return { runId, changes, actions: planned };
   }
 
+  /**
+   * The Google Sheet changed. Reference data (people, passes, tickets, shifts,
+   * documents...) is replaced first, then the schedule grid goes through the
+   * normal grid-edit run so the right people hear about changes.
+   */
+  async onSheetSync(next: Festival, by = 'Google Sheet') {
+    const runId = this.run('sync');
+    this.log.add(runId, 'trigger', `Sheet sync from ${by}`);
+    const { events, checkIns: _c, ...rest } = next;
+    void _c;
+    Object.assign(this.f, rest);
+    return this.onGridEdit(events, by);
+  }
+
   /** Full clash sweep, e.g. on load. */
   sweepClashes() {
     const runId = this.run('sweep');

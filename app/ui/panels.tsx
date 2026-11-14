@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import type { AgentStore } from './useAgent';
+import { DEFAULT_SHEET, type AgentStore } from './useAgent';
 import type { DayNumber, FestivalEvent, PassType } from '../../src/core/types';
 import { addMinutes, clock as fmt, toMinutes } from '../../src/core/time';
 import { PASS_LABELS, qrFor, type ScanResult } from '../../src/rules/access';
@@ -412,6 +412,53 @@ export function Evaluation({ s }: P) {
         </div>
       ))}
       <span className="muted" style={{ display: 'none' }}>{s.version}</span>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------ Data source
+export function Data({ s }: P) {
+  const [url, setUrl] = useState(s.sheet.sheet ?? DEFAULT_SHEET);
+  const [busy, setBusy] = useState<string | null>(null);
+  const run = async (mode: 'replace' | 'sync') => { setBusy(mode); await s.loadSheet(url, mode); setBusy(null); };
+  const f = s.agent.f;
+  return (
+    <div className="grid2">
+      <div className="card stack">
+        <h2>Festival data</h2>
+        <p>Source: <strong>{s.sheet.source === 'sheet' ? 'Google Sheet' : 'built-in mock festival'}</strong>
+          {s.sheet.loadedAt && <span className="muted"> · last read {s.sheet.loadedAt}</span>}</p>
+        <p className="muted">Staff keep the festival in a Google Sheet. The sheet must be shared as "anyone with the link can view". Edits made in this dashboard's grid are not written back to the sheet.</p>
+        <label className="stack"><span>Sheet link</span><input value={url} onChange={e => setUrl(e.target.value)} /></label>
+        <div className="row">
+          <button className="primary" disabled={!!busy} onClick={() => run('sync')}>{busy === 'sync' ? 'Checking…' : s.sheet.source === 'sheet' ? 'Check sheet for changes' : 'Load from sheet'}</button>
+          {s.sheet.source === 'sheet' && <button disabled={!!busy} onClick={() => run('replace')}>{busy === 'replace' ? 'Loading…' : 'Start over from sheet'}</button>}
+          <a href={url} target="_blank" rel="noreferrer">Open sheet</a>
+        </div>
+        {s.sheet.message && <div className="msg" style={{ borderColor: s.sheet.errors.length ? 'var(--bad)' : 'var(--ok)' }}>{s.sheet.message}</div>}
+        {s.sheet.errors.length > 0 && <div className="msg" style={{ borderColor: 'var(--bad)' }}>
+          <strong>Fix these in the sheet, then try again:</strong>
+          <ul>{s.sheet.errors.slice(0, 30).map((e, i) => <li key={i}>{e}</li>)}</ul>
+          {s.sheet.errors.length > 30 && <div className="muted">…and {s.sheet.errors.length - 30} more</div>}
+        </div>}
+        {s.sheet.warnings.length > 0 && <div className="msg" style={{ borderColor: 'var(--warn)' }}>
+          <strong>Warnings</strong><ul>{s.sheet.warnings.slice(0, 15).map((e, i) => <li key={i}>{e}</li>)}</ul></div>}
+      </div>
+      <div className="card">
+        <h2>What's loaded</h2>
+        <table><tbody>
+          <tr><td>Festival</td><td>{f.name}, {f.dates[1]} to {f.dates[3]}</td></tr>
+          <tr><td>Events</td><td>{f.events.length} ({f.events.filter(e => e.kind === 'screening').length} screenings, {f.events.filter(e => e.kind === 'panel').length} panels)</td></tr>
+          <tr><td>Films</td><td>{f.films.length}</td></tr>
+          <tr><td>Venues</td><td>{f.venues.length}</td></tr>
+          <tr><td>People</td><td>{f.people.length} ({f.people.filter(p => p.role === 'guest').length} guests, {f.people.filter(p => p.role === 'volunteer').length} volunteers)</td></tr>
+          <tr><td>Pass types in use</td><td>{new Set(f.passes.map(p => p.type)).size}</td></tr>
+          <tr><td>Tickets</td><td>{f.tickets.length}</td></tr>
+          <tr><td>Saved events</td><td>{f.bookings.length}</td></tr>
+          <tr><td>Volunteer shifts</td><td>{f.shifts.length}</td></tr>
+          <tr><td>Official documents</td><td>{f.docs.length} ({f.docs.reduce((n, d) => n + d.sections.length, 0)} sections)</td></tr>
+        </tbody></table>
+      </div>
     </div>
   );
 }
