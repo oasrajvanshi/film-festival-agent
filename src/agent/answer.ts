@@ -7,7 +7,16 @@ import { clock } from '../core/time';
 import type { LlmClient } from '../llm/ollama';
 
 export interface Source { ref: string; title: string; text: string; score: number }
-export interface Answer { known: boolean; text: string; citations: string[]; via: 'llm' | 'extractive' | 'schedule' | 'none' }
+export interface Answer { known: boolean; text: string; citations: string[]; via: 'llm' | 'extractive' | 'schedule' | 'none'; note?: string }
+
+/** Pull the first JSON object out of a model reply (models sometimes wrap it in prose or code fences). */
+export function extractJson(raw: string): unknown {
+  const t = raw.trim().replace(/^```(?:json)?\s*/i, '').replace(/```$/, '');
+  try { return JSON.parse(t); } catch { /* look for an object inside */ }
+  const a = t.indexOf('{'), b = t.lastIndexOf('}');
+  if (a >= 0 && b > a) return JSON.parse(t.slice(a, b + 1));
+  throw new Error(raw.trim() ? 'model reply was not JSON' : 'model returned an empty reply');
+}
 
 export const IDK = "I don't know. That isn't in the festival's official documents. Please ask at the info desk.";
 
@@ -66,19 +75,23 @@ export async function answerQuestion(f: Festival, question: string, llm: LlmClie
   const sources = retrieve(f, question);
   if (!sources.length || sources[0].score < MIN_SCORE) return { known: false, text: IDK, citations: [], via: 'none' };
 
+  let note: string | undefined;
   if (llm) {
     try {
       const raw = await llm.chat([
         { role: 'system', content: 'You answer festival questions using ONLY the numbered sources. If the sources do not answer the question, set known to false. Never add facts. Reply as JSON: {"known": boolean, "answer": string, "cite": [source numbers]}.' },
         { role: 'user', content: `Sources:\n${sources.map((s, i) => `[${i + 1}] ${s.title}: ${s.text}`).join('\n')}\n\nQuestion: ${question}` },
       ], { json: true });
-      const parsed = JSON.parse(raw) as { known?: boolean; answer?: string; cite?: number[] };
-      if (parsed.known === false) return { known: false, text: IDK, citations: [], via: 'llm' };
-      const cites = (parsed.cite ?? []).map(n => sources[n - 1]?.ref).filter((x): x is string => !!x);
-      if (parsed.answer && cites.length) return { known: true, text: parsed.answer, citations: cites, via: 'llm' };
-    } catch {
-      // fall through to extractive
+      const parsed = extractJson(raw) as { known?: boolean | string; answer?: string; cite?: (number | string)[] | number };
+      if (parsed.known === false || parsed.known === 'false') return { known: false, text: IDK, citations: [], via: 'llm' };
+      const citeList = Array.isArray(parsed.cite) ? parsed.cite : parsed.cite != null ? [parsed.cite] : [];
+      const cites = citeList.map(n => sources[Number(String(n).replace(/\D/g, '')) - 1]?.ref).filter((x): x is string => !!x);
+      if (parsed.answer && cites.length) return { known: true, text: parsed.answer, citations: [...new Set(cites)], via: 'llm' };
+      if (parsed.answer) return { known: true, text: parsed.answer, citations: [sources[0].ref], via: 'llm' };
+      note = 'model reply had no answer';
+    } catch (e) {
+      note = (e as Error).message.slice(0, 160);
     }
   }
-  return { known: true, text: sources[0].text, citations: [sources[0].ref], via: 'extractive' };
+  return { known: true, text: sources[0].text, citations: [sources[0].ref], via: 'extractive', ...(note ? { note } : {}) };
 }

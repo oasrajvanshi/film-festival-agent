@@ -91,3 +91,13 @@ describe('vendor feed', () => {
     expect(agent.outbox.some(d => d.personId === 'p-071')).toBe(false);
   });
 });
+
+import { extractJson } from '../src/agent/answer';
+describe('extractJson', () => {
+  it('reads plain, fenced and wrapped JSON', () => {
+    expect(extractJson('{"known":true}')).toEqual({ known: true });
+    expect(extractJson('```json\n{"a":1}\n```')).toEqual({ a: 1 });
+    expect(extractJson('Here you go: {"a":2} done')).toEqual({ a: 2 });
+    expect(() => extractJson('')).toThrow(/empty/);
+  });
+});

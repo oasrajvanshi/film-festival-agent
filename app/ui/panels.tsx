@@ -321,7 +321,7 @@ export function Ask({ s }: P) {
         <div className="msg" key={i}>
           <div className="who">{h.q}</div>
           <div>{h.a.text}</div>
-          <div className="who">{h.a.known ? `Source: ${h.a.citations.join(', ')}` : 'No source found'} · {h.a.via}</div>
+          <div className="who">{h.a.known ? `Source: ${h.a.citations.join(', ')}` : 'No source found'} · {h.a.via}{h.a.note ? ` (model skipped: ${h.a.note})` : ''}</div>
         </div>
       ))}
     </div>

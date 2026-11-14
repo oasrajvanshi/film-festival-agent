@@ -16,8 +16,10 @@ export async function POST(req: Request) {
   if (!Array.isArray(body.messages) || body.messages.length > 10) return Response.json({ error: 'bad request' }, { status: 400 });
   try {
     const content = await llm.chat(body.messages, { json: !!body.json });
+    console.log(`[llm] ok model=${llm.model} chars=${content.length}`);
     return Response.json({ content });
   } catch (e) {
+    console.error(`[llm] failed model=${llm.model}: ${(e as Error).message}`);
     return Response.json({ error: (e as Error).message }, { status: 502 });
   }
 }
