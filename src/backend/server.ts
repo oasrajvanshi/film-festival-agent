@@ -1,5 +1,5 @@
 // One backend per server process, shared by the API routes. State lives in
-// a JSON file (OPS_STORE, default .data/ops-state.json), so deadlines and
+// a JSON file (OPS_STORE, default .data/ops-state.json, /tmp on Vercel), so deadlines and
 // re-check timers survive a restart. On a serverless host, point a cron at
 // POST /api/ops/tick every minute; the filesystem there is temporary, so use
 // a real database behind the Store interface before deploying.
@@ -18,7 +18,7 @@ const h: Holder = (holder.__opsBackend ??= {});
 export function getBackend(): Promise<{ backend: OpsBackend; source: string }> {
   h.backend ??= (async () => {
     const { data, warnings, source } = await loadFestivalData();
-    const store = new FileStore(process.env.OPS_STORE ?? '.data/ops-state.json', () => initialState(data));
+    const store = new FileStore(process.env.OPS_STORE ?? (process.env.VERCEL ? '/tmp/ops-state.json' : '.data/ops-state.json'), () => initialState(data));
     return { backend: new OpsBackend({ data, store, llms: llmsFromEnv(), integrations: integrationsFromEnv(), warnings }), source };
   })().catch(e => { h.backend = undefined; throw e; });
   return h.backend;

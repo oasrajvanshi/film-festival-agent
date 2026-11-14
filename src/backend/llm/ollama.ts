@@ -124,6 +124,8 @@ export const DEFAULT_MODELS = ['qwen3:8b', 'llama3.1:8b'];
  */
 export function llmsFromEnv(env: Record<string, string | undefined> = process.env): Llm[] {
   if (env.OPS_LLM === 'off') return [];
+  // On a hosted deploy there is no local Ollama: use rules unless a host is set.
+  if (env.VERCEL && !env.OLLAMA_HOST) return [];
   const host = env.OLLAMA_HOST ?? 'http://localhost:11434';
   if (host.includes('ollama.com') && !env.OLLAMA_API_KEY) return [];
   const names = [env.OLLAMA_MODEL ?? DEFAULT_MODELS[0], env.OLLAMA_FALLBACK_MODEL ?? DEFAULT_MODELS[1]]
