@@ -1,5 +1,4 @@
 import './hl.css';
-import Script from 'next/script';
 import type { ReactNode } from 'react';
 
 export const metadata = {
@@ -21,7 +20,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body>
         {children}
-        <Script src="/live-editor.js" strategy="afterInteractive" />
+        {/* The design editor loads only on request (?edit=1), so the live site stays clean. */}
+        <script dangerouslySetInnerHTML={{ __html: "if(/[?&]edit=1/.test(location.search)){var s=document.createElement('script');s.src='/live-editor.js';document.body.appendChild(s)}" }} />
       </body>
     </html>
   );

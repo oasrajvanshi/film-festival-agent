@@ -88,8 +88,8 @@
 .s-float .pill { margin-left: 8px; border-radius: 999px; background: var(--amber); color: var(--amber-ink); font-weight: 600; font-size: 12.5px; padding: 7px 12px; white-space: nowrap; }
 
 /* sticky scenes */
-.s-pin { position: relative; height: 340vh; }
-.s-pin.short { height: 240vh; }
+.s-pin { position: relative; height: 210vh; }
+.s-pin.short { height: 160vh; }
 .s-sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; display: grid; align-items: center;
   padding: 90px max(28px, env(safe-area-inset-right, 0px)) 40px max(28px, env(safe-area-inset-left, 0px)); }
 .s-progress { position: absolute; left: max(28px, env(safe-area-inset-left, 0px)); right: max(28px, env(safe-area-inset-right, 0px)); bottom: 26px; height: 1px; background: var(--line); }
