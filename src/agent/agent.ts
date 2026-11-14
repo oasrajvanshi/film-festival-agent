@@ -14,6 +14,7 @@ import { planVoteForm } from './voting';
 import { buildBrief, briefText } from './briefs';
 import { suggestRedirects, venueView } from './crowd';
 import { polishMessages } from './phrase';
+import { assessWeather, planWeather, riskSummary, type WeatherHour, type WeatherRisk } from './weather';
 
 export interface Delivery { actionId: string; personId: string; channel: string; subject: string; body: string; at: string }
 
@@ -116,6 +117,20 @@ export class FestivalAgent {
     return { runId, changes, actions: planned };
   }
 
+  /**
+   * The Google Sheet changed. Reference data (people, passes, tickets, shifts,
+   * documents...) is replaced first, then the schedule grid goes through the
+   * normal grid-edit run so the right people hear about changes.
+   */
+  async onSheetSync(next: Festival, by = 'Google Sheet') {
+    const runId = this.run('sync');
+    this.log.add(runId, 'trigger', `Sheet sync from ${by}`);
+    const { events, checkIns: _c, ...rest } = next;
+    void _c;
+    Object.assign(this.f, rest);
+    return this.onGridEdit(events, by);
+  }
+
   /** Full clash sweep, e.g. on load. */
   sweepClashes() {
     const runId = this.run('sweep');
@@ -147,6 +162,21 @@ export class FestivalAgent {
     this.log.add(runId, 'decide', `${actions.length} action(s)`, actions.map(a => a.id));
     this.dispatch(runId, actions);
     return actions;
+  }
+
+  /** A weather forecast arrived (live or a demo scenario). Only new risk windows produce actions. */
+  async onWeather(hours: WeatherHour[], source: string) {
+    const runId = this.run('weather');
+    const risks = assessWeather(hours);
+    this.log.add(runId, 'trigger', `Weather forecast from ${source}: ${hours.length} hours`, { risks: risks.map(riskSummary) });
+    const seen = new Set(this.flags.map(fl => (fl.payload as { risk?: WeatherRisk } | undefined)?.risk).filter(Boolean).map(r => `${r!.hazard}|${r!.from}`));
+    const fresh = risks.filter(r => !seen.has(`${r.hazard}|${r.from}`));
+    this.log.add(runId, 'understand', fresh.length ? fresh.map(riskSummary).join('; ') : 'No new weather risks', {});
+    const actions = planWeather(this.f, fresh, source);
+    for (const a of actions) if (a.messages && this.llm && a.kind === 'notify_people') a.messages = await polishMessages(this.llm, a.messages);
+    this.log.add(runId, 'decide', `${actions.length} action(s)`, actions.map(a => a.id));
+    this.dispatch(runId, actions);
+    return { risks, fresh, actions };
   }
 
   proposeVoteForm(eventId: string) {

@@ -91,3 +91,23 @@ describe('vendor feed', () => {
     expect(agent.outbox.some(d => d.personId === 'p-071')).toBe(false);
   });
 });
+
+import { extractJson } from '../src/agent/answer';
+describe('extractJson', () => {
+  it('reads plain, fenced and wrapped JSON', () => {
+    expect(extractJson('{"known":true}')).toEqual({ known: true });
+    expect(extractJson('```json\n{"a":1}\n```')).toEqual({ a: 1 });
+    expect(extractJson('Here you go: {"a":2} done')).toEqual({ a: 2 });
+    expect(() => extractJson('')).toThrow(/empty/);
+  });
+});
+
+import { llmFromEnv } from '../src/llm';
+describe('llmFromEnv', () => {
+  it('prefers Groq, falls back to Ollama, and is off with no key', () => {
+    expect(llmFromEnv({ GROQ_API_KEY: 'g', OLLAMA_API_KEY: 'o' })?.provider).toBe('groq');
+    expect(llmFromEnv({ GROQ_API_KEY: 'g' })?.model).toBe('openai/gpt-oss-120b');
+    expect(llmFromEnv({ OLLAMA_API_KEY: 'o' })?.provider).toBe('ollama');
+    expect(llmFromEnv({})).toBeNull();
+  });
+});

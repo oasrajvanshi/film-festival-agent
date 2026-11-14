@@ -77,10 +77,12 @@ A fixed rule in [`src/agent/approvals.ts`](src/agent/approvals.ts), not the mode
 
 ## Language model
 
-The model step uses **Ollama** (Ollama Cloud by default). It is optional: without a key everything runs deterministically, which is what the tests use.
+The model step uses **Groq** (free API key at [console.groq.com](https://console.groq.com/keys)) or **Ollama**. If `GROQ_API_KEY` is set, Groq is used; otherwise Ollama. It is optional: without a key everything runs deterministically, which is what the tests use.
 
 | Variable | Default | |
 |---|---|---|
+| `GROQ_API_KEY` | none | Your Groq key. Set it in Vercel or a local `.env`; never commit it. |
+| `GROQ_MODEL` | `openai/gpt-oss-120b` | Any Groq chat model |
 | `OLLAMA_API_KEY` | none | Your Ollama Cloud key. Set it in Vercel or a local `.env`; never commit it. |
 | `OLLAMA_MODEL` | `gpt-oss:120b` | Any Ollama chat model |
 | `OLLAMA_HOST` | `https://ollama.com` | Use `http://localhost:11434` for a local Ollama |
@@ -108,7 +110,17 @@ npm run eval
 | 20 QR scans across pass types: each allow or deny is correct | 20 of 20 |
 | 10 questions about the festival: from official documents, or "I don't know" | 10 of 10 |
 
-`npm run eval -- --llm` runs the question test through Ollama when `OLLAMA_API_KEY` is set.
+`npm run eval -- --llm` runs the question test through the model when `GROQ_API_KEY` or `OLLAMA_API_KEY` is set.
+
+## Festival data (Google Sheet)
+
+The festival lives in a [Google Sheet](https://docs.google.com/spreadsheets/d/18Pp1GAMQz__QzyvKYlddcR-agiG1p7rH5QJq8NV9lNM/edit) that staff edit (a snapshot is in [`data/`](data/): an .xlsx copy and one CSV per tab), one tab per table: Festival (name and dates), Schedule grid, Venues, Travel times, Films, People, Passes, Tickets, Saved events, Volunteer shifts and Official documents. A *Read me* tab explains the columns and allowed values.
+
+- The dashboard's **Data** tab loads the sheet. **Check sheet for changes** diffs the Schedule grid against what's loaded and runs the agent on the changes, so the right people get updates and recommendations.
+- The sheet must be shared as **anyone with the link can view**; the server exports each tab as CSV by its fixed tab ID (`src/data/sheet.ts`). Don't delete and recreate a tab, or its ID changes.
+- Every row is checked: unknown venue, person, event or film IDs, bad times or days are listed by tab and row, and nothing loads until they're fixed.
+- `FESTIVAL_SHEET_ID` (optional env var) sets the default sheet for the server; otherwise the link in the Data tab is used.
+- `npx tsx scripts/export-tables.ts out.json` exports the built-in mock festival in the sheet's format.
 
 ## Management dashboard
 
@@ -124,7 +136,7 @@ npm run dev       # http://localhost:3000
 
 ### Deploy on Vercel
 
-Import the repo in Vercel (framework: Next.js, no settings needed), then add `OLLAMA_API_KEY` under Project → Settings → Environment Variables and redeploy. Without it the dashboard works with the model switched off.
+Import the repo in Vercel (framework: Next.js, no settings needed), then add `GROQ_API_KEY` (or `OLLAMA_API_KEY`) under Project → Settings → Environment Variables and redeploy. Without it the dashboard works with the model switched off. Open `/api/llm?test=1` to check the key: it makes one tiny model call and reports `"test":"ok"` or the error.
 
 ## Develop
 
@@ -142,8 +154,9 @@ src/core      types and time helpers
 src/data      mock festival + official documents
 src/rules     pass and badge access rules, QR codes
 src/agent     agent loop, propagation, recommendations, clashes, briefs, Q&A, crowd, vendors, voting, approvals, log
-src/llm       Ollama client
+src/llm       Groq and Ollama clients
 src/eval      the four evaluation scenarios
+data/         snapshot of the mock festival sheet (.xlsx and CSVs)
 ```
 
 ## Roadmap
@@ -153,5 +166,5 @@ src/eval      the four evaluation scenarios
 3. ✅ Conflicts and approvals
 4. ✅ Check-in and feedback (core logic)
 5. ✅ Management dashboard (Next.js): grid editor, approval queue, scan simulator, crowd view, log
-6. Google Sheets sync for the schedule grid and rosters
+6. ✅ Google Sheets as the data source (read; the dashboard grid does not write back)
 7. Festival app: mobile web with QR, volunteer mode and guest mode

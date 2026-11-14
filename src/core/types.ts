@@ -59,6 +59,8 @@ export interface Person {
   name: string;
   role: PersonRole;
   email: string;
+  /** Mobile number for SMS, if given. */
+  phone?: string;
   /** Channels this person has opted in to. */
   channels: Channel[];
   /** Volunteers and staff: their job, e.g. "door", "usher", "projection". */

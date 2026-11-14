@@ -1,0 +1,70 @@
+Event ID,Day,Start,End,Type,Title,Venue ID,Film ID,Guest IDs,Restriction,Status
+e-051,1,08:00,09:48,screening,Press screening: Borrowed Season,v-river,f-04,,press_only,scheduled
+e-064,1,09:00,10:45,market,"Industry Market, Day 1",v-pier9,,,industry_only,scheduled
+e-001,1,10:00,11:30,screening,Salt Houses,v-harbor,f-01,p-071,,scheduled
+e-028,1,10:00,11:36,screening,Last Rooms,v-canal,f-18,,,scheduled
+e-045,1,10:00,11:31,screening,Wild Weather,v-river,f-35,,,scheduled
+e-054,1,11:00,12:00,panel,Financing the Independent Feature,v-pier9,,"p-081, p-082, p-083",,scheduled
+e-002,1,11:30,11:50,qa,Q&A: Salt Houses,v-harbor,f-01,p-071,,scheduled
+e-013,1,12:30,14:12,screening,Open Gods,v-harbor,f-07,p-077,,scheduled
+e-034,1,12:30,14:17,screening,Silver Water,v-canal,f-24,,,scheduled
+e-055,1,13:30,14:30,panel,Documentary Ethics Now,v-pier9,,"p-083, p-084, p-085",,scheduled
+e-014,1,14:12,14:32,qa,Q&A: Open Gods,v-harbor,f-07,p-077,,scheduled
+e-003,1,15:00,16:17,screening,Wild Tide,v-river,f-02,p-072,,scheduled
+e-023,1,15:00,16:41,screening,Late Country,v-harbor,f-13,,,scheduled
+e-040,1,15:00,16:29,screening,Quiet Animals,v-canal,f-30,,,scheduled
+e-056,1,16:00,17:00,panel,Selling at Markets,v-pier9,,"p-085, p-071, p-073",,scheduled
+e-004,1,16:17,16:37,qa,Q&A: Wild Tide,v-river,f-02,p-072,,scheduled
+e-015,1,17:30,18:57,screening,Last Gods,v-river,f-08,p-078,,scheduled
+e-029,1,17:30,18:53,screening,Last Light,v-harbor,f-19,,,scheduled
+e-046,1,17:30,19:10,screening,Bright Weather,v-canal,f-36,,,scheduled
+e-057,1,18:30,19:30,panel,Writing for Small Budgets,v-pier9,,"p-072, p-073, p-074",,scheduled
+e-016,1,18:57,19:17,qa,Q&A: Last Gods,v-river,f-08,p-078,,scheduled
+e-024,1,20:00,21:21,screening,Last Harbor,v-river,f-14,,,scheduled
+e-035,1,20:00,21:23,screening,Paper Bridges,v-harbor,f-25,,,scheduled
+e-065,1,20:00,22:00,activity,"Filmmaker Reception, Day 1",v-pier9,,,vip_only,scheduled
+e-052,2,08:00,09:42,screening,Press screening: Open Gods,v-river,f-07,,press_only,scheduled
+e-066,2,09:00,10:45,market,"Industry Market, Day 2",v-pier9,,,industry_only,scheduled
+e-005,2,10:00,11:42,screening,Borrowed Tide,v-canal,f-03,p-073,,scheduled
+e-030,2,10:00,11:36,screening,Late Letters,v-river,f-20,,,scheduled
+e-041,2,10:00,11:35,screening,Paper Animals,v-harbor,f-31,,,scheduled
+e-058,2,11:00,12:00,panel,Distribution After Streaming,v-pier9,,"p-074, p-075, p-076",,scheduled
+e-006,2,11:42,12:02,qa,Q&A: Borrowed Tide,v-canal,f-03,p-073,,scheduled
+e-017,2,12:30,14:20,screening,Lost Animals,v-canal,f-09,p-079,,scheduled
+e-036,2,12:30,14:00,screening,Last Fields,v-river,f-26,,,scheduled
+e-047,2,12:30,13:47,screening,Small Weather,v-harbor,f-37,,,scheduled
+e-059,2,13:30,14:30,panel,Festival Strategy 101,v-pier9,,"p-076, p-077, p-078",,scheduled
+e-018,2,14:20,14:40,qa,Q&A: Lost Animals,v-canal,f-09,p-079,,scheduled
+e-025,2,15:00,16:35,screening,Salt Bridges,v-canal,f-15,,,scheduled
+e-042,2,15:00,16:48,screening,Iron Country,v-river,f-32,,,scheduled
+e-060,2,16:00,17:00,panel,Sound on a Shoestring,v-pier9,,"p-078, p-079, p-080",,scheduled
+e-007,2,17:30,19:18,screening,Borrowed Season,v-harbor,f-04,p-074,,scheduled
+e-031,2,17:30,19:13,screening,Hollow Water,v-canal,f-21,,,scheduled
+e-048,2,17:30,18:54,screening,Night Bridges,v-river,f-38,,,scheduled
+e-061,2,18:30,19:30,panel,The Producer's Toolkit,v-pier9,,"p-080, p-081, p-082",,scheduled
+e-008,2,19:18,19:38,qa,Q&A: Borrowed Season,v-harbor,f-04,p-074,,scheduled
+e-019,2,20:00,21:27,screening,Far Rooms,v-harbor,f-10,p-080,,scheduled
+e-037,2,20:00,21:48,screening,Northern Signal,v-canal,f-27,,,scheduled
+e-067,2,20:00,22:00,activity,"Filmmaker Reception, Day 2",v-pier9,,,vip_only,scheduled
+e-020,2,21:27,21:47,qa,Q&A: Far Rooms,v-harbor,f-10,p-080,,scheduled
+e-053,3,08:00,09:27,screening,Press screening: Far Rooms,v-river,f-10,,press_only,scheduled
+e-068,3,09:00,10:45,market,"Industry Market, Day 3",v-pier9,,,industry_only,scheduled
+e-009,3,10:00,11:16,screening,Quiet Gods,v-river,f-05,p-075,,scheduled
+e-026,3,10:00,11:42,screening,Silver Gods,v-harbor,f-16,,,scheduled
+e-043,3,10:00,11:47,screening,Hollow Harbor,v-canal,f-33,,,scheduled
+e-062,3,11:00,12:00,panel,Archival Rights Explained,v-pier9,,"p-082, p-083, p-084",,scheduled
+e-010,3,11:16,11:36,qa,Q&A: Quiet Gods,v-river,f-05,p-075,,scheduled
+e-021,3,12:30,14:04,screening,Last Orchard,v-river,f-11,,,scheduled
+e-032,3,12:30,14:03,screening,Open Bridges,v-harbor,f-22,,,scheduled
+e-049,3,12:30,14:16,screening,Wild Shore,v-canal,f-39,,,scheduled
+e-063,3,13:30,14:30,panel,"First Features, First Mistakes",v-pier9,,"p-084, p-085, p-071",,scheduled
+e-027,3,15:00,16:39,screening,Second Country,v-river,f-17,,,scheduled
+e-038,3,15:00,16:23,screening,Hollow Season,v-harbor,f-28,,,scheduled
+e-011,3,17:30,19:00,screening,Bright Kingdom,v-canal,f-06,p-076,,scheduled
+e-033,3,17:30,18:56,screening,Borrowed Water,v-river,f-23,,,scheduled
+e-044,3,17:30,19:10,screening,Late Tide,v-harbor,f-34,,,scheduled
+e-012,3,19:00,19:20,qa,Q&A: Bright Kingdom,v-canal,f-06,p-076,,scheduled
+e-022,3,20:00,21:29,screening,Low Tide,v-canal,f-12,,,scheduled
+e-039,3,20:00,21:38,screening,Second Kingdom,v-river,f-29,,,scheduled
+e-050,3,20:00,21:31,screening,Silver Rooms,v-harbor,f-40,,,scheduled
+e-069,3,20:00,22:00,activity,"Filmmaker Reception, Day 3",v-pier9,,,vip_only,scheduled

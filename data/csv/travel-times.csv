@@ -1,0 +1,5 @@
+From \ To (minutes),v-harbor,v-canal,v-pier9,v-river
+v-harbor,0,20,10,30
+v-canal,20,0,25,15
+v-pier9,10,25,0,35
+v-river,30,15,35,0

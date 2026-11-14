@@ -6,8 +6,23 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { FestivalAgent } from '../../src/agent/agent';
 import { buildFestival } from '../../src/data/seed';
 import type { LlmClient, ChatMessage } from '../../src/llm/ollama';
+import type { Festival } from '../../src/core/types';
+
+export const DEFAULT_SHEET = 'https://docs.google.com/spreadsheets/d/18Pp1GAMQz__QzyvKYlddcR-agiG1p7rH5QJq8NV9lNM/edit';
+
+export interface SheetStatus { source: 'built-in' | 'sheet' | 'onboarding'; sheet?: string; loadedAt?: string; errors: string[]; warnings: string[]; message?: string }
 
 const KEY = 'ffa-state-v1';
+const SETUP_KEY = 'ffa-setup-v1';
+
+/** What the festival chose during onboarding. */
+export interface Setup { festivalName: string; city: string; approver: string; channels: string[]; onboardedAt: string }
+export function readSetup(): Setup | null {
+  try { const raw = localStorage.getItem(SETUP_KEY); return raw ? JSON.parse(raw) as Setup : null; } catch { return null; }
+}
+export function writeSetup(s: Setup | null) {
+  try { if (s) localStorage.setItem(SETUP_KEY, JSON.stringify(s)); else localStorage.removeItem(SETUP_KEY); } catch { /* ignore */ }
+}
 
 export const remoteLlm: LlmClient = {
   model: 'server',
@@ -25,6 +40,9 @@ export function useAgent() {
   const [llmInfo, setLlmInfo] = useState<{ available: boolean; model: string | null }>({ available: false, model: null });
   const [useModel, setUseModel] = useState(false);
   const agentRef = useRef<FestivalAgent | null>(null);
+  const [sheet, setSheet] = useState<SheetStatus>({ source: 'built-in', errors: [], warnings: [] });
+  const sheetRef = useRef(sheet);
+  sheetRef.current = sheet;
   const now = useCallback(() => clockRef.current, []);
 
   if (!agentRef.current) agentRef.current = new FestivalAgent(buildFestival(), null, now);
@@ -36,13 +54,14 @@ export function useAgent() {
         const s = JSON.parse(raw);
         agentRef.current = FestivalAgent.restore(s.agent, null, now);
         clockRef.current = s.clock ?? clockRef.current;
+        if (s.sheet) setSheet(s.sheet);
         setClockState(clockRef.current);
       } else {
         agentRef.current!.sweepClashes();
       }
     } catch { /* fresh state */ }
     setVersion(v => v + 1);
-    fetch('/api/llm').then(r => r.json()).then(setLlmInfo).catch(() => {});
+    fetch('/api/llm', { cache: 'no-store' }).then(r => r.json()).then(setLlmInfo).catch(() => {});
   }, [now]);
 
   useEffect(() => {
@@ -50,7 +69,7 @@ export function useAgent() {
   }, [useModel, llmInfo.available, version]);
 
   const commit = useCallback(() => {
-    try { localStorage.setItem(KEY, JSON.stringify({ agent: agentRef.current!.snapshot(), clock: clockRef.current })); } catch { /* ignore */ }
+    try { localStorage.setItem(KEY, JSON.stringify({ agent: agentRef.current!.snapshot(), clock: clockRef.current, sheet: sheetRef.current })); } catch { /* ignore */ }
     setVersion(v => v + 1);
   }, []);
 
@@ -62,10 +81,56 @@ export function useAgent() {
     agentRef.current.sweepClashes();
     clockRef.current = '2027-04-15T09:00';
     setClockState(clockRef.current);
+    setSheet({ source: 'built-in', errors: [], warnings: [] });
     setVersion(v => v + 1);
   }, [now]);
 
-  return { agent: agentRef.current!, version, commit, clock, setClock, reset, llmInfo, useModel, setUseModel };
+  /** Start the agent on a festival that onboarding just built. */
+  const loadFestival = useCallback((festival: Festival, source: string) => {
+    agentRef.current = new FestivalAgent(festival, null, now);
+    agentRef.current.sweepClashes();
+    clockRef.current = `${festival.dates[1]}T09:00`;
+    setClockState(clockRef.current);
+    const next: SheetStatus = { source: 'onboarding', sheet: source, loadedAt: new Date().toLocaleTimeString(), errors: [], warnings: [],
+      message: `Onboarded ${festival.events.length} events, ${festival.people.length} people and ${festival.films.length} films.` };
+    sheetRef.current = next;
+    setSheet(next);
+    commit();
+  }, [commit, now]);
+
+  /** mode 'replace' starts fresh from the sheet; 'sync' runs the agent on what changed. */
+  const loadSheet = useCallback(async (url: string, mode: 'replace' | 'sync') => {
+    const r = await fetch(`/api/festival?sheet=${encodeURIComponent(url)}`);
+    const body = await r.json() as { festival?: Festival | null; errors?: string[]; warnings?: string[]; error?: string };
+    if (!r.ok || body.error) {
+      setSheet(st => ({ ...st, errors: [body.error ?? `HTTP ${r.status}`], message: undefined }));
+      return null;
+    }
+    if (!body.festival) {
+      setSheet(st => ({ ...st, errors: body.errors ?? [], warnings: body.warnings ?? [], message: 'The sheet has errors, so nothing was loaded.' }));
+      return null;
+    }
+    const at = new Date().toLocaleTimeString();
+    let message: string;
+    if (mode === 'replace' || sheetRef.current.source !== 'sheet') {
+      const firstDay = body.festival.dates[1];
+      agentRef.current = new FestivalAgent(body.festival, null, now);
+      agentRef.current.sweepClashes();
+      clockRef.current = `${firstDay}T09:00`;
+      setClockState(clockRef.current);
+      message = `Loaded ${body.festival.events.length} events, ${body.festival.people.length} people and ${body.festival.films.length} films.`;
+    } else {
+      const res = await agentRef.current!.onSheetSync(body.festival, 'Google Sheet');
+      message = res.changes.length ? `${res.changes.length} schedule change(s) found. See Approvals and Overview.` : 'No schedule changes since the last check. Other tabs were refreshed.';
+    }
+    const next: SheetStatus = { source: 'sheet', sheet: url, loadedAt: at, errors: [], warnings: body.warnings ?? [], message };
+    sheetRef.current = next;
+    setSheet(next);
+    commit();
+    return message;
+  }, [commit, now]);
+
+  return { agent: agentRef.current!, version, commit, clock, setClock, reset, llmInfo, useModel, setUseModel, sheet, loadSheet, loadFestival };
 }
 
 export type AgentStore = ReturnType<typeof useAgent>;

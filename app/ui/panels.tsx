@@ -1,15 +1,17 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import type { AgentStore } from './useAgent';
+import { DEFAULT_SHEET, readSetup, type AgentStore } from './useAgent';
+import { riskSummary, type WeatherHour } from '../../src/agent/weather';
 import type { DayNumber, FestivalEvent, PassType } from '../../src/core/types';
 import { addMinutes, clock as fmt, toMinutes } from '../../src/core/time';
 import { PASS_LABELS, qrFor, type ScanResult } from '../../src/rules/access';
 import type { Answer } from '../../src/agent/answer';
 import { runAll, type SuiteResult } from '../../src/eval/scenarios';
 import type { Recommendation } from '../../src/agent/recommend';
+import { Icon } from './icons';
 
-type P = { s: AgentStore; user: string };
+type P = { s: AgentStore; user: string; go: (page: 'today' | 'approvals' | 'scan' | 'schedule' | 'ask' | 'briefs' | 'feeds' | 'log' | 'eval' | 'data') => void };
 
 const dayOf = (iso: string, dates: Record<DayNumber, string>): DayNumber =>
   Number(Object.entries(dates).find(([, d]) => iso.startsWith(d))?.[0] ?? 1) as DayNumber;
@@ -24,48 +26,124 @@ function useLookups(s: AgentStore) {
 }
 
 // ------------------------------------------------------------------ Overview
-export function Overview({ s }: P) {
+export function Overview({ s, go }: P) {
   const a = s.agent;
+  const f = a.f;
   const crowd = a.crowd(s.clock);
-  const pending = a.queue.filter(q => q.status === 'pending').length;
+  const pending = a.queue.filter(q => q.status === 'pending');
+  const now = toMinutes(s.clock);
+  const day = dayOf(s.clock, f.dates);
+  const upNext = f.events
+    .filter(e => e.day === day && e.status === 'scheduled' && toMinutes(e.start) >= now)
+    .sort((x, y) => toMinutes(x.start) - toMinutes(y.start)).slice(0, 5);
+  const venueName = (id: string) => f.venues.find(v => v.id === id)?.name ?? id;
+  const dateLabel = new Date(`${f.dates[day]}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   return (
-    <div className="grid2">
-      <div className="card">
-        <h2>Right now · {fmt(s.clock)}, day {dayOf(s.clock, a.f.dates)}</h2>
+    <>
+      <section className="hero">
+        <div className="eyebrow">Day {day} · {dateLabel} · {fmt(s.clock)}</div>
+        <h2>{pending.length ? `${pending.length} update${pending.length > 1 ? 's' : ''} waiting for you` : a.flags.length ? `${a.flags.length} thing${a.flags.length > 1 ? 's' : ''} to look at` : 'All quiet at the festival'}</h2>
+        <p>The agent watches the schedule, the doors and outside feeds. Anything sent to attendees or guests waits for your approval.</p>
         <div className="row">
-          <span className="chip warn">{pending} waiting for approval</span>
-          <span className="chip bad">{a.flags.length} flags</span>
-          <span className="chip">{a.outbox.length} messages delivered</span>
-          <span className="chip">{a.f.checkIns.filter(c => c.allowed).length} check-ins</span>
+          {pending.length > 0 && <button className="primary" onClick={() => go('approvals')}><Icon name="inbox" size={16} />Review approvals</button>}
+          <button onClick={() => go('schedule')}><Icon name="calendar" size={16} />Edit schedule</button>
+          <button onClick={() => go('scan')}><Icon name="scan" size={16} />Scan a pass</button>
         </div>
-        <h3>Venues (from check-in scans)</h3>
-        {crowd.venues.map(v => (
-          <div key={v.venueId} style={{ marginBottom: 8 }}>
-            <div className="row" style={{ justifyContent: 'space-between' }}>
-              <span>{v.venueName} <span className="muted">· {v.event ? v.event.title : 'nothing on'}</span></span>
-              <span className="muted">{v.inside}/{v.capacity}</span>
+      </section>
+
+      <div className="stats">
+        <button className={`stat ${pending.length ? 'hot' : ''}`} onClick={() => go('approvals')}><div className="k"><Icon name="inbox" size={14} />Waiting for approval</div><div className="v">{pending.length}</div></button>
+        <div className={`stat ${a.flags.length ? 'warn' : ''}`}><div className="k"><Icon name="flag" size={14} />Flags</div><div className="v">{a.flags.length}</div></div>
+        <button className="stat" onClick={() => go('log')}><div className="k"><Icon name="send" size={14} />Messages sent</div><div className="v">{a.outbox.length}</div></button>
+        <div className="stat"><div className="k"><Icon name="scan" size={14} />Check-ins</div><div className="v">{f.checkIns.filter(c => c.allowed).length}</div></div>
+      </div>
+
+      <WeatherCard s={s} go={go} user="" compact />
+
+      <div className="grid2">
+        <div className="card">
+          <div className="section-title"><h2>Venues right now</h2><span className="muted" style={{ fontSize: 12 }}>from door scans</span></div>
+          <div className="venues">
+            {crowd.venues.map(v => (
+              <div className="venue" key={v.venueId}>
+                <div className="name">{v.venueName}</div>
+                <div className="now">{v.event ? v.event.title : 'Nothing on'}</div>
+                <div className={`bar ${v.status}`}><div style={{ width: `${Math.min(100, v.fill * 100)}%` }} /></div>
+                <div className="num"><span>{v.inside} inside</span><span>{v.capacity} seats</span></div>
+              </div>
+            ))}
+          </div>
+          {crowd.redirects.length > 0 && <>
+            <h3>Suggested redirects <span className="muted">(staff decide)</span></h3>
+            {crowd.redirects.map((r, i) => <div className="msg" key={i}>{r.summary}</div>)}
+          </>}
+          <h3>Up next today</h3>
+          {upNext.length === 0 && <div className="empty-note">Nothing else scheduled today.</div>}
+          {upNext.map(e => (
+            <div className="item" key={e.id}>
+              <div className="ic"><Icon name={e.kind === 'panel' ? 'users' : e.kind === 'qa' ? 'chat' : 'film'} size={16} /></div>
+              <div style={{ minWidth: 0 }}>
+                <div className="t">{e.title}</div>
+                <div className="d">{fmt(e.start)} · {venueName(e.venueId)}</div>
+              </div>
             </div>
-            <div className={`bar ${v.status}`}><div style={{ width: `${Math.min(100, v.fill * 100)}%` }} /></div>
-          </div>
-        ))}
-        {crowd.redirects.length > 0 && <>
-          <h3>Suggested redirects <span className="muted">(staff decide)</span></h3>
-          {crowd.redirects.map((r, i) => <div className="msg" key={i}>{r.summary}</div>)}
-        </>}
+          ))}
+        </div>
+
+        <div className="card">
+          <div className="section-title"><h2>Needs attention</h2>{a.flags.length > 0 && <span className="chip bad">{a.flags.length}</span>}</div>
+          {a.flags.length === 0 && <div className="empty-note">No clashes or risks flagged.</div>}
+          {[...a.flags].reverse().map(fl => (
+            <div className="item" key={fl.id}>
+              <div className="ic bad"><Icon name="alert" size={16} /></div>
+              <div style={{ minWidth: 0 }}><div className="t">{fl.title}</div><div className="d">{fl.rationale}</div></div>
+            </div>
+          ))}
+          <h3>Recent schedule changes</h3>
+          {a.changeFeed.length === 0 && <div className="empty-note">None yet. Edit the schedule to see the agent work.</div>}
+          {[...a.changeFeed].reverse().slice(0, 6).map((c, i) => (
+            <div className="item" key={i}><div className="ic info"><Icon name="calendar" size={16} /></div><div className="d">{c}</div></div>
+          ))}
+        </div>
       </div>
-      <div className="card">
-        <h2>Flags</h2>
-        {a.flags.length === 0 && <p className="muted">No clashes or risks flagged.</p>}
-        {[...a.flags].reverse().map(fl => (
-          <div className="msg" key={fl.id} style={{ borderColor: 'var(--bad)' }}>
-            <strong>{fl.title}</strong>
-            <div>{fl.rationale}</div>
-          </div>
-        ))}
-        <h3>Recent grid changes</h3>
-        {a.changeFeed.length === 0 && <p className="muted">None yet. Edit the schedule grid to see the agent work.</p>}
-        {[...a.changeFeed].reverse().slice(0, 8).map((c, i) => <div className="msg" key={i}>{c}</div>)}
+    </>
+  );
+}
+
+// ------------------------------------------------------------------ Weather
+/** Pull a forecast (real or a demo scenario) and let the agent plan around it. */
+export function WeatherCard({ s, go, compact }: P & { compact?: boolean }) {
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  const date = s.clock.slice(0, 10);
+  const city = (typeof window !== 'undefined' && readSetup()?.city) || 'New York';
+  const run = async (scenario?: string) => {
+    setBusy(true); setNote(null);
+    try {
+      const qs = new URLSearchParams({ date, ...(scenario ? { scenario } : { city }) });
+      const r = await fetch(`/api/weather?${qs}`, { cache: 'no-store' });
+      const j = await r.json() as { source?: string; hours?: WeatherHour[]; error?: string };
+      if (!r.ok || !j.hours) throw new Error(j.error ?? `HTTP ${r.status}`);
+      const out = await s.agent.onWeather(j.hours, j.source ?? 'Forecast');
+      s.commit();
+      const waiting = out.actions.filter(x => x.kind === 'notify_people');
+      setNote(!out.risks.length ? `${j.source}: no weather risks during festival hours.`
+        : !out.fresh.length ? `${out.risks.map(riskSummary).join('; ')}. Already handled.`
+        : `${out.fresh.map(riskSummary).join('; ')}. Staff and volunteers told. ${waiting.reduce((n, x) => n + (x.messages?.length ?? 0), 0)} personal updates are waiting for your approval.`);
+    } catch (e) { setNote(`Couldn't get the forecast: ${(e as Error).message}`); }
+    setBusy(false);
+  };
+  const scenarios: [string, string][] = [['storm', 'Thunderstorm'], ['snow', 'Snow'], ['heat', 'Heat wave']];
+  return (
+    <div className="card stack">
+      <div className="section-title"><h2><Icon name="cloud" size={18} /> Weather watch</h2><span className="muted" style={{ fontSize: 12 }}>Open-Meteo, no key needed</span></div>
+      {!compact && <p className="muted" style={{ margin: 0 }}>The agent checks the forecast for {city}, finds risky hours, tells staff and volunteers on shift, and drafts a personal note for everyone with tickets or plans in that window. Those notes wait for your approval.</p>}
+      <div className="row">
+        <button className="primary" disabled={busy} onClick={() => run()}>Check today's forecast</button>
+        {scenarios.map(([k, l]) => <button key={k} disabled={busy} onClick={() => run(k)}>Try: {l}</button>)}
       </div>
+      {busy && <div className="muted">Checking the forecast…</div>}
+      {note && <div className="msg">{note}{note.includes('waiting') && <> <button className="small" onClick={() => go('approvals')}>Review</button></>}</div>}
     </div>
   );
 }
@@ -138,12 +216,12 @@ export function Grid({ s, user }: P) {
       </div>
       {result && <div className="msg" style={{ borderColor: 'var(--ok)' }}>{result} See Approvals and Flags.</div>}
       <div className="scroll">
-        <table>
+        <table className="stackable">
           <thead><tr><th>Time</th><th>Event</th><th>Venue</th><th>Guests</th><th></th></tr></thead>
           <tbody>
             {events.map(e => (
               <tr key={e.id} className={draft[e.id] ? 'changed' : ''}>
-                <td style={{ whiteSpace: 'nowrap' }}>{fmt(e.start)}–{fmt(e.end)}</td>
+                <td className="t-time" style={{ whiteSpace: 'nowrap' }}>{fmt(e.start)}–{fmt(e.end)}</td>
                 <td className={e.status === 'cancelled' ? 'cancelled' : ''}>
                   {e.title} <span className="chip">{e.kind}</span>{e.restriction && <> <span className="chip warn">{e.restriction.replace('_', ' ')}</span></>}
                   {editing === e.id && (
@@ -159,8 +237,8 @@ export function Grid({ s, user }: P) {
                     </div>
                   )}
                 </td>
-                <td>{venue(e.venueId)}</td>
-                <td>{e.guestIds.map(g => person(g)?.name).join(', ')}</td>
+                <td data-label="Venue">{venue(e.venueId)}</td>
+                <td data-label={e.guestIds.length ? 'Guests' : undefined}>{e.guestIds.map(g => person(g)?.name).join(', ')}</td>
                 <td><button className="small" onClick={() => setEditing(editing === e.id ? null : e.id)}>{editing === e.id ? 'Done' : 'Edit'}</button></td>
               </tr>
             ))}
@@ -321,7 +399,7 @@ export function Ask({ s }: P) {
         <div className="msg" key={i}>
           <div className="who">{h.q}</div>
           <div>{h.a.text}</div>
-          <div className="who">{h.a.known ? `Source: ${h.a.citations.join(', ')}` : 'No source found'} · {h.a.via}</div>
+          <div className="who">{h.a.known ? `Source: ${h.a.citations.join(', ')}` : 'No source found'} · {h.a.via}{h.a.note ? ` (model skipped: ${h.a.note})` : ''}</div>
         </div>
       ))}
     </div>
@@ -329,7 +407,7 @@ export function Ask({ s }: P) {
 }
 
 // ------------------------------------------------------------------ Vendor feed & voting
-export function Feeds({ s }: P) {
+export function Feeds({ s, go, user }: P) {
   const f = s.agent.f;
   const guests = f.people.filter(p => p.role === 'guest');
   const [gid, setGid] = useState(guests[0].id);
@@ -341,7 +419,9 @@ export function Feeds({ s }: P) {
   const [note, setNote] = useState<string | null>(null);
   const date = s.clock.slice(0, 10);
   return (
-    <div className="grid2">
+    <>
+    <WeatherCard s={s} go={go} user={user} />
+    <div className="grid2" style={{ marginTop: 16 }}>
       <div className="card stack">
         <h2>Vendor and partner feeds</h2>
         <h3>Flight delay</h3>
@@ -363,6 +443,7 @@ export function Feeds({ s }: P) {
         <button onClick={() => { const a = s.agent.proposeVoteForm(vEvent); setNote(a ? `${a.title}. Waiting for approval.` : 'Nobody has checked in to that screening yet.'); s.commit(); }}>Prepare voting form</button>
       </div>
     </div>
+    </>
   );
 }
 
@@ -378,12 +459,12 @@ export function Log({ s }: P) {
       </div>
       <div className="scroll">
         {tab === 'log' ? (
-          <table><thead><tr><th>#</th><th>Festival time</th><th>Step</th><th>What happened</th></tr></thead>
+          <table className="stackable"><thead><tr><th>#</th><th>Festival time</th><th>Step</th><th>What happened</th></tr></thead>
             <tbody>{[...s.agent.log.entries].reverse().slice(0, 300).map(e => (
               <tr key={e.seq}><td>{e.seq}</td><td style={{ whiteSpace: 'nowrap' }}>{e.at.includes('T') ? `${e.at.slice(5, 10)} ${fmt(e.at)}` : e.at}</td><td><span className="chip">{e.kind}</span></td><td>{e.summary}</td></tr>
             ))}</tbody></table>
         ) : (
-          <table><thead><tr><th>To</th><th>Channel</th><th>Message</th></tr></thead>
+          <table className="stackable"><thead><tr><th>To</th><th>Channel</th><th>Message</th></tr></thead>
             <tbody>{[...s.agent.outbox].reverse().slice(0, 300).map((d, i) => (
               <tr key={i}><td>{person(d.personId)?.name}<div className="muted">{person(d.personId)?.role}</div></td><td>{d.channel.replace('_', ' ')}</td><td style={{ whiteSpace: 'pre-wrap' }}>{d.body}</td></tr>
             ))}</tbody></table>
@@ -412,6 +493,53 @@ export function Evaluation({ s }: P) {
         </div>
       ))}
       <span className="muted" style={{ display: 'none' }}>{s.version}</span>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------ Data source
+export function Data({ s }: P) {
+  const [url, setUrl] = useState(s.sheet.sheet ?? DEFAULT_SHEET);
+  const [busy, setBusy] = useState<string | null>(null);
+  const run = async (mode: 'replace' | 'sync') => { setBusy(mode); await s.loadSheet(url, mode); setBusy(null); };
+  const f = s.agent.f;
+  return (
+    <div className="grid2">
+      <div className="card stack">
+        <h2>Festival data</h2>
+        <p>Source: <strong>{s.sheet.source === 'sheet' ? 'Google Sheet' : 'built-in mock festival'}</strong>
+          {s.sheet.loadedAt && <span className="muted"> · last read {s.sheet.loadedAt}</span>}</p>
+        <p className="muted">Staff keep the festival in a Google Sheet. The sheet must be shared as "anyone with the link can view". Edits made in this dashboard's grid are not written back to the sheet.</p>
+        <label className="stack"><span>Sheet link</span><input value={url} onChange={e => setUrl(e.target.value)} /></label>
+        <div className="row">
+          <button className="primary" disabled={!!busy} onClick={() => run('sync')}>{busy === 'sync' ? 'Checking…' : s.sheet.source === 'sheet' ? 'Check sheet for changes' : 'Load from sheet'}</button>
+          {s.sheet.source === 'sheet' && <button disabled={!!busy} onClick={() => run('replace')}>{busy === 'replace' ? 'Loading…' : 'Start over from sheet'}</button>}
+          <a href={url} target="_blank" rel="noreferrer">Open sheet</a>
+        </div>
+        {s.sheet.message && <div className="msg" style={{ borderColor: s.sheet.errors.length ? 'var(--bad)' : 'var(--ok)' }}>{s.sheet.message}</div>}
+        {s.sheet.errors.length > 0 && <div className="msg" style={{ borderColor: 'var(--bad)' }}>
+          <strong>Fix these in the sheet, then try again:</strong>
+          <ul>{s.sheet.errors.slice(0, 30).map((e, i) => <li key={i}>{e}</li>)}</ul>
+          {s.sheet.errors.length > 30 && <div className="muted">…and {s.sheet.errors.length - 30} more</div>}
+        </div>}
+        {s.sheet.warnings.length > 0 && <div className="msg" style={{ borderColor: 'var(--warn)' }}>
+          <strong>Warnings</strong><ul>{s.sheet.warnings.slice(0, 15).map((e, i) => <li key={i}>{e}</li>)}</ul></div>}
+      </div>
+      <div className="card">
+        <h2>What's loaded</h2>
+        <table><tbody>
+          <tr><td>Festival</td><td>{f.name}, {f.dates[1]} to {f.dates[3]}</td></tr>
+          <tr><td>Events</td><td>{f.events.length} ({f.events.filter(e => e.kind === 'screening').length} screenings, {f.events.filter(e => e.kind === 'panel').length} panels)</td></tr>
+          <tr><td>Films</td><td>{f.films.length}</td></tr>
+          <tr><td>Venues</td><td>{f.venues.length}</td></tr>
+          <tr><td>People</td><td>{f.people.length} ({f.people.filter(p => p.role === 'guest').length} guests, {f.people.filter(p => p.role === 'volunteer').length} volunteers)</td></tr>
+          <tr><td>Pass types in use</td><td>{new Set(f.passes.map(p => p.type)).size}</td></tr>
+          <tr><td>Tickets</td><td>{f.tickets.length}</td></tr>
+          <tr><td>Saved events</td><td>{f.bookings.length}</td></tr>
+          <tr><td>Volunteer shifts</td><td>{f.shifts.length}</td></tr>
+          <tr><td>Official documents</td><td>{f.docs.length} ({f.docs.reduce((n, d) => n + d.sections.length, 0)} sections)</td></tr>
+        </tbody></table>
+      </div>
     </div>
   );
 }

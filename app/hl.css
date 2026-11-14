@@ -441,3 +441,6 @@ a { color: inherit; }
 .device > span { font-size: 13px; color: var(--muted); }
 .device .seg { width: 100%; }
 .device .seg button { flex: 1; padding: 9px 0; }
+
+/* the first prototype keeps its own look */
+body:has(.legacy)::after { display: none; }
