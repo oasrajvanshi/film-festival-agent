@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { readSetup, useAgent, writeSetup } from './ui/useAgent';
 import { Approvals, Ask, Briefs, Data, Evaluation, Feeds, Grid, Log, Overview, Scan } from './ui/panels';
 import { Icon } from './ui/icons';
@@ -32,6 +32,34 @@ export default function App() {
   const flags = s.agent.flags.length;
   const day = Number(Object.entries(f.dates).find(([, d]) => s.clock.startsWith(d))?.[0] ?? 1) as DayNumber;
   const current = PAGES.find(p => p.id === page)!;
+  const [alerts, setAlerts] = useState<'unsupported' | 'default' | 'granted' | 'denied'>('default');
+  const seen = useRef<{ pending: number; flags: number } | null>(null);
+
+  // Organizer alerts on this phone or laptop: a notification whenever something
+  // new needs approval or a new flag appears, even if the app is in the background.
+  useEffect(() => {
+    if (typeof Notification === 'undefined' || !('serviceWorker' in navigator)) { setAlerts('unsupported'); return; }
+    setAlerts(Notification.permission as 'default' | 'granted' | 'denied');
+  }, []);
+  useEffect(() => {
+    const prev = seen.current;
+    seen.current = { pending, flags };
+    if (!prev || alerts !== 'granted') return;
+    const notes: [string, string, string][] = [];
+    if (pending > prev.pending) {
+      const q = s.agent.queue.filter(x => x.status === 'pending').at(-1);
+      notes.push([`${pending - prev.pending} new update${pending - prev.pending > 1 ? 's' : ''} to approve`, q?.action.title ?? '', '/#approvals']);
+    }
+    if (flags > prev.flags) notes.push(['Needs attention', s.agent.flags.at(-1)?.title ?? '', '/#today']);
+    for (const [title, body, url] of notes) {
+      navigator.serviceWorker.ready.then(r => r.showNotification(title, { body, icon: '/icon-192.png', badge: '/icon-192.png', tag: url, data: { url } })).catch(() => {});
+    }
+  }, [pending, flags, alerts, s.agent]);
+  const enableAlerts = async () => {
+    const r = await Notification.requestPermission();
+    setAlerts(r as 'default' | 'granted' | 'denied');
+    if (r === 'granted') (await navigator.serviceWorker.ready).showNotification('Alerts are on', { body: 'You will hear about new approvals and flags on this device.', icon: '/icon-192.png', data: { url: '/#today' } });
+  };
 
   const setPage = (p: PageId) => {
     setPageState(p); setSheet(null);
@@ -72,6 +100,12 @@ export default function App() {
           {s.llmInfo.available ? <>Use {s.llmInfo.model}</> : 'Not configured'}
         </span>
       </label>
+      <div className="field">Alerts on this device
+        {alerts === 'granted' ? <span className="muted">On. New approvals and flags show as notifications.</span>
+          : alerts === 'denied' ? <span className="muted">Blocked in this browser's settings.</span>
+          : alerts === 'unsupported' ? <span className="muted">Not available here. On iPhone, add the app to your Home Screen first.</span>
+          : <button className="small primary" onClick={enableAlerts}><Icon name="bolt" size={14} /> Turn on alerts</button>}
+      </div>
       <button className="block" onClick={() => { if (armed) { s.reset(); setArmed(false); setSheet(null); } else { setArmed(true); setTimeout(() => setArmed(false), 4000); } }}>
         {armed ? 'Tap again to reset everything' : 'Reset demo'}
       </button>
