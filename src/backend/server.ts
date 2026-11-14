@@ -8,7 +8,7 @@ import { loadFestivalData, type SheetError } from './data/load';
 import { isDecisionError } from './engine/decisions';
 import { FileStore, initialState } from './engine/store';
 import { integrationsFromEnv } from './integrations';
-import { llmFromEnv } from './llm/ollama';
+import { llmsFromEnv } from './llm/ollama';
 import { OpsBackend } from './service';
 
 interface Holder { backend?: Promise<{ backend: OpsBackend; source: string }> }
@@ -19,7 +19,7 @@ export function getBackend(): Promise<{ backend: OpsBackend; source: string }> {
   h.backend ??= (async () => {
     const { data, warnings, source } = await loadFestivalData();
     const store = new FileStore(process.env.OPS_STORE ?? '.data/ops-state.json', () => initialState(data));
-    return { backend: new OpsBackend({ data, store, llm: llmFromEnv(), integrations: integrationsFromEnv(), warnings }), source };
+    return { backend: new OpsBackend({ data, store, llms: llmsFromEnv(), integrations: integrationsFromEnv(), warnings }), source };
   })().catch(e => { h.backend = undefined; throw e; });
   return h.backend;
 }

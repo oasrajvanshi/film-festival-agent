@@ -20,7 +20,7 @@ export type Route =
 
 export interface Routing { routes: Route[]; via: 'rules' | 'llm'; inbound?: InboundReading; facts: { guestId: string; fact: Fact }[] }
 
-export async function route(t: Trigger, v: FestivalView, now: Iso, llm: Llm | null, audit: Audit): Promise<Routing> {
+export async function route(t: Trigger, v: FestivalView, now: Iso, llm: Llm | Llm[] | null, audit: Audit): Promise<Routing> {
   const r = (routes: Route[], via: Routing['via'] = 'rules', extra: Partial<Routing> = {}): Routing => ({ routes, via, facts: [], ...extra });
   switch (t.type) {
     case 'weather_update':

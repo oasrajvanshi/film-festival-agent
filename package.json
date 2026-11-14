@@ -13,7 +13,8 @@
     "ops": "tsx scripts/ops.ts",
     "ops:llm": "tsx scripts/ops.ts all --llm",
     "ops:sync": "tsx scripts/ops-sync.ts",
-    "test:backend": "vitest run tests/backend"
+    "test:backend": "vitest run tests/backend",
+    "ops:compare": "tsx scripts/ops-compare.ts"
   },
   "keywords": [],
   "author": "",

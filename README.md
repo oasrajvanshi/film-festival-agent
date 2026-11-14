@@ -8,12 +8,14 @@ Film festival schedule changes are relayed by hand across emails, sheets and cha
 
 ## Operations backend: snow and a late key guest
 
-`src/backend` is the agent backend for the two scenarios we test: snow, and a key guest arriving late. It reads the team's mock sheet (Harbor Lights), routes each event to a weather desk or a talent desk agent, and lets a local Ollama model (`qwen3:8b`) drive tool calls while rules compute every option and a person approves anything public.
+`src/backend` is the agent backend for the two scenarios we test: snow, and a key guest arriving late. It reads the team's mock sheet (Harbor Lights), routes each event to a weather desk or a talent desk agent, and lets a local Ollama model (`qwen3:8b`, with `llama3.1:8b` as fallback) drive tool calls while rules compute every option and a person approves anything public.
 
 ```
 ollama pull qwen3:8b
+ollama pull llama3.1:8b
 npm run ops -- snow --llm
 npm run ops -- guest-late --llm
+npm run ops:compare
 ```
 
 Details: [docs/backend.md](docs/backend.md). What the scenarios need from the sheet: [docs/data-contract.md](docs/data-contract.md).

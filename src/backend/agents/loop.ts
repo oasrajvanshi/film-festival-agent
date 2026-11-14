@@ -48,6 +48,13 @@ export async function invokeTool(tools: Tool[], call: ToolCall, ctx: ToolCtx, au
     if (typeof args === 'string') {
       try { args = args.trim() ? JSON.parse(args) : {}; } catch { args = undefined; }
     }
+    // Small models (Llama 3.1) often send guest / session for guest_id / session_id.
+    if (args && typeof args === 'object') {
+      const a = args as Record<string, unknown>;
+      for (const [alias, real] of [['guest', 'guest_id'], ['session', 'session_id'], ['ref', 'decision_ref']]) {
+        if (a[alias] !== undefined && a[real] === undefined && tool.parameters.properties?.[real] && !tool.parameters.properties?.[alias]) { a[real] = a[alias]; delete a[alias]; }
+      }
+    }
     const checked = validate(tool.parameters, args);
     if (!checked.ok) trace.error = `Bad arguments: ${checked.errors.join('; ')}`;
     else {
@@ -124,15 +131,25 @@ export async function runWithRules(spec: AgentSpec, ctx: ToolCtx, audit: Audit, 
   return out;
 }
 
-/** Model first, rules for whatever is left; rules only if there is no model or it fails. */
-export async function runAgent(llm: Llm | null, spec: AgentSpec, ctx: ToolCtx, audit: Audit): Promise<AgentOutcome> {
-  if (!llm) return runWithRules(spec, ctx, audit);
-  try {
-    const out = await runWithModel(llm, spec, ctx, audit);
-    return runWithRules(spec, ctx, audit, out);
-  } catch (e) {
-    audit('error', `${spec.name} agent: model failed (${(e as Error).message}); finishing on rules`);
-    const out = await runWithRules(spec, ctx, audit);
-    return { ...out, error: (e as Error).message };
+/**
+ * Models in order (Qwen, then Llama), rules for whatever is left. If a model
+ * fails (down, not pulled, timed out), the next one starts over on the same
+ * scratch; anything it already submitted stands. After the last, rules finish.
+ */
+export async function runAgent(llm: Llm | Llm[] | null, spec: AgentSpec, ctx: ToolCtx, audit: Audit): Promise<AgentOutcome> {
+  const chain = Array.isArray(llm) ? llm : llm ? [llm] : [];
+  const errors: string[] = [];
+  for (const [i, m] of chain.entries()) {
+    try {
+      const out = await runWithModel(m, spec, ctx, audit);
+      const done = await runWithRules(spec, ctx, audit, out);
+      return errors.length ? { ...done, error: errors.join('; ') } : done;
+    } catch (e) {
+      errors.push(`${m.model}: ${(e as Error).message}`);
+      const next = chain[i + 1];
+      audit('error', `${spec.name} agent: ${m.model} failed (${(e as Error).message}); ${next ? `trying ${next.model}` : 'finishing on rules'}`);
+    }
   }
+  const out = await runWithRules(spec, ctx, audit);
+  return errors.length ? { ...out, error: errors.join('; ') } : out;
 }

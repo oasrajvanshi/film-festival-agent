@@ -5,7 +5,7 @@ The backend handles two scenarios only, on the team's mock festival (Harbor Ligh
 1. **Snow (weather change).** A forecast over the snow line: weather notice to pass and ticket holders, an extra bus if the shuttle is late or full, briefs for door teams and drivers, and a re-check of every guest still travelling.
 2. **A key guest is late.** A flight, a car or an email says a speaker will miss their call: brief a backup, move a car earlier, start with the backup, delay the session, or let the guest join by video.
 
-The model (Ollama, local `qwen3:8b` by default) reads messages and drives the tool calls. Rules compute every number and every option. A person approves anything that leaves the team.
+The model (Ollama, local: `qwen3:8b` first, `llama3.1:8b` if Qwen fails) reads messages and drives the tool calls. Rules compute every number and every option. A person approves anything that leaves the team.
 
 ## Architecture
 
@@ -35,7 +35,7 @@ The model (Ollama, local `qwen3:8b` by default) reads messages and drives the to
 2. It calls tools. Each call is checked against the tool's JSON schema; a bad call, an unknown tool or a reason with a time or number that is not in any tool result goes back to the model as an error, and the model corrects itself.
 3. The **plan tool** runs the playbook (rules) and returns the decisions to make, each with costed options (people affected, messages, money, reversible) and the rule recommendation.
 4. The model calls `submit_decision` once per decision: the option it recommends and one or two sentences why. It may disagree with the rules; both picks are stored and shown.
-5. Whatever the model leaves undone is finished by rules. If Ollama is down, the whole run uses rules. A decision always exists either way.
+5. Whatever the model leaves undone is finished by rules. If Qwen fails (down, not pulled, timed out), Llama starts over; if Llama fails too, rules finish the run. A decision always exists either way.
 
 ### What the model does, and what it does not
 
@@ -62,9 +62,12 @@ There is no "send" tool. The model cannot message anyone.
 ```bash
 npm install
 ollama pull qwen3:8b
+ollama pull llama3.1:8b
 npm run ops -- snow            # rules only, deterministic
-npm run ops -- guest-late --llm  # Ollama drives the tools
+npm run ops -- guest-late --llm  # Ollama drives the tools: Qwen, then Llama
+npm run ops -- snow --model llama3.1:8b   # one model only
 npm run ops:llm                # both scenarios with Ollama
+npm run ops:compare            # both scenarios on each model, side by side
 npm run test:backend           # backend tests (the model is faked)
 npm run ops:sync               # refresh data/harbor-lights from the Google Sheet
 npm run dev                    # API on http://localhost:3000/api/ops
@@ -77,8 +80,9 @@ On an M2 Max, one agent run with `qwen3:8b` takes about 9 to 12 seconds; both sc
 | Variable | Default | |
 |---|---|---|
 | `OLLAMA_HOST` | `http://localhost:11434` | `https://ollama.com` for Ollama Cloud (then set `OLLAMA_API_KEY`) |
-| `OLLAMA_MODEL` | `qwen3:8b` | Any Ollama model with tool calling (`ollama show <model>` lists `tools`) |
-| `OLLAMA_THINK` | off | `on` lets thinking models think before tool calls (slower) |
+| `OLLAMA_MODEL` | `qwen3:8b` | First model. Any Ollama model with tool calling (`ollama show <model>` lists `tools`) |
+| `OLLAMA_FALLBACK_MODEL` | `llama3.1:8b` | Used when the first model fails; `none` for no fallback |
+| `OLLAMA_THINK` | off | `on` lets Qwen think before tool calls (slower). Only sent to models that can think; Llama 3.1 cannot |
 | `OPS_LLM` | on | `off` runs everything on rules |
 | `OPS_SHEET_ID` | none | Read the Google Sheet live instead of the snapshot |
 | `OPS_DATA_DIR` | `data/harbor-lights` | Snapshot of the sheet, one CSV per tab |

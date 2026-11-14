@@ -1,7 +1,8 @@
 // Replay a scenario against the backend and print what the agent did.
 //
 //   npm run ops -- snow                 # rules only (no model), deterministic
-//   npm run ops -- guest-late --llm     # with Ollama (OLLAMA_MODEL, default qwen3:8b)
+//   npm run ops -- guest-late --llm     # with Ollama: qwen3:8b, falling back to llama3.1:8b
+//   npm run ops -- snow --model llama3.1:8b   # one model only, no fallback
 //   npm run ops -- all --llm --json out.json
 //
 // Data: data/harbor-lights (snapshot of the team sheet) + data/scenario-extras.
@@ -12,7 +13,7 @@ import { loadFestivalData } from '../src/backend/data/load';
 import { clock } from '../src/backend/domain/time';
 import { teamName } from '../src/backend/domain/view';
 import { MemoryStore, initialState } from '../src/backend/engine/store';
-import { llmFromEnv, ollamaHealth } from '../src/backend/llm/ollama';
+import { llmsFromEnv, ollamaHealth } from '../src/backend/llm/ollama';
 import { runScenario, type ScenarioFile, type StepResult } from '../src/backend/scenarios';
 import { OpsBackend, type RunReport } from '../src/backend/service';
 import type { OpsState } from '../src/backend/domain/types';
@@ -28,19 +29,18 @@ const tty = process.stdout.isTTY;
 const c = (code: string) => (s: string) => (tty ? `\x1b[${code}m${s}\x1b[0m` : s);
 const dim = c('2'), bold = c('1'), red = c('31'), green = c('32'), amber = c('33'), cyan = c('36');
 
-if (opt('model')) process.env.OLLAMA_MODEL = opt('model');
-let llm = flag('llm') ? llmFromEnv() : null;
-if (flag('llm')) {
-  const h = await ollamaHealth();
-  if (!h.reachable || !h.installed || !h.tools) {
-    console.log(amber(`Ollama not usable (${h.error ?? (h.tools ? '' : `${h.model} cannot call tools`)}); running on rules.`));
-    llm = null;
-  }
+if (opt('model')) { process.env.OLLAMA_MODEL = opt('model'); process.env.OLLAMA_FALLBACK_MODEL = 'none'; }
+const wantModel = flag('llm') || !!opt('model');
+const llms = [];
+for (const m of wantModel ? llmsFromEnv() : []) {
+  const h = await ollamaHealth(process.env, fetch, m.model);
+  if (h.reachable && h.installed && h.tools) llms.push(m);
+  else console.log(amber(`${m.model} not usable (${h.error ?? 'cannot call tools'}); skipped.`));
 }
 const { data, warnings, source } = await loadFestivalData();
 const store = new MemoryStore(() => initialState(data));
-const backend = new OpsBackend({ data, store, llm, warnings });
-console.log(dim(`${data.info.name} | data: ${source} | agent: ${llm ? `Ollama ${llm.model}` : 'rules only'}`));
+const backend = new OpsBackend({ data, store, llms, warnings });
+console.log(dim(`${data.info.name} | data: ${source} | agent: ${llms.length ? `Ollama ${llms.map(m => m.model).join(', then ')}` : 'rules only'}`));
 for (const w of warnings) console.log(dim(`  sheet warning: ${w}`));
 
 let state: OpsState = await backend.state();

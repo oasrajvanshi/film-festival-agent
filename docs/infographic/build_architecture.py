@@ -32,7 +32,7 @@ I = {
 }
 def ic(k, sz=16):
     return f'<svg class="ic" width="{sz}" height="{sz}" viewBox="0 0 24 24" aria-hidden="true">{I[k]}</svg>'
-def M(t='qwen3:8b'): return f'<span class="ch ml">{ic("cpu",13)}{t}</span>'
+def M(t='qwen3 · llama3.1'): return f'<span class="ch ml">{ic("cpu",13)}{t}</span>'
 def T(t): return f'<span class="ch tl">{t}</span>'
 def S(t): return f'<span class="ch sv">{ic("plug",13)}{t}</span>'
 def R(t='Rules'): return f'<span class="ch rl">{t}</span>'
@@ -82,7 +82,8 @@ class Board:
     def diamond(self, id, cx, cy, num, text):
         self.nodes[id] = dict(x=cx - 52, y=cy - 52, w=104, h=104, kind='diamond')
         self.parts.append(f'<div class="dm" style="left:{cx - 37}px;top:{cy - 37}px"></div>'
-                          f'<span class="nb dmb" style="left:{cx - 11}px;top:{cy - 74}px">{num}</span>'
+                          + (f'<span class="nb dmb" style="left:{cx - 11}px;top:{cy - 74}px">{num}</span>' if num else '')
+                          + 
                           f'<p class="dmt" style="left:{cx - 48}px;top:{cy - 22}px">{text}</p>')
 
     def anchor(self, id, side, d=0):
@@ -121,7 +122,9 @@ class Board:
                   '<span><i class="lw" style="border-color:#2563EB;border-top-style:dotted"></i>Feeds</span>'
                   '<span><i class="lw" style="border-color:#D9730D;border-top-style:dashed"></i>Loop, timer</span>'
                   '<span><i class="lw" style="border-color:#B54A3F;border-top-style:dashed"></i>Stops</span></div>')
-        head = f'<p class="bt">{self.title}</p>'
+        head = (f'<p class="bt">{self.title}</p>'
+                f'<div class="mbox"><span class="mbl">AI model</span><span class="ch ml">{ic("cpu", 13)}qwen3:8b</span><span class="arr">then</span>'
+                f'<span class="ch ml">{ic("cpu", 13)}llama3.1:8b</span><span class="arr">then</span><span class="ch rl">Rules</span><span class="mbs">on Ollama, local</span></div>')
         return f'<div class="bd" id="{self.id}" style="height:{self.H}px">{head}{legend}{"".join(self.lanes)}{wires}{"".join(self.parts)}{labs}</div>'
 
 
@@ -216,6 +219,46 @@ def late():
     return b
 
 
+# ------------------------------------------------------------------ Master: the shared architecture
+def master():
+    b = Board('master', 'Master agent architecture', 900)
+    b.step('sort', 460, 260, 170, 120, '1', 'Sort the event', R('Router: rules') + M())
+    frame(b, [
+        ('cloud', 'Live feeds', 'Open-Meteo · GPS · FlightAware'),
+        ('mail', 'Inbox', 'Gmail API · Twilio'),
+        ('door', 'Check-ins', 'QR door scans'),
+        ('cal', 'Festival sheet', 'Google Sheet'),
+        ('clock', 'Re-check timers', 'Backend scheduler')])
+    b.diamond('trust', 702, 320, '', 'Sender<br>trusted?')
+    b.step('person', 622, 448, 160, 70, '', 'A person reads it', cls='hu')
+    b.parts.append('<div class="nd" style="left:800px;top:223px;width:250px;height:214px"></div>')
+    b.step('desk', 790, 213, 250, 214, '2', 'Specialist agent', M() + T('read tools') + T('analysis tools') + T('submit_decision') + R('playbook rules'), sub='one per kind of problem')
+    b.diamond('leave', 1112, 320, '3', 'Leaves<br>the team?')
+    b.step('auto', 1056, 140, 112, 74, '', 'Runs on its own')
+    b.step('decide', 1196, 222, 170, 196, '4', 'A person decides', S('Ops dashboard') + O('approve') + O('reject'), cls='hu')
+    b.out('staff', 1398, 139, 168, 92, 'people', 'Staff, volunteers', S('Slack') + S('Email'))
+    b.out('guests', 1398, 274, 168, 92, 'person', 'Guests', S('SMS') + S('Email'))
+    b.out('vendors', 1398, 409, 168, 92, 'bus', 'Vendors', S('Email'))
+    b.pill('ops', 1196, 470, 170, 52, 'No answer: safe<br>default or Ops', 'stop')
+    b.step('notice', 1196, 712, 170, 96, '', 'Notices, plan updates', S('Push') + S('SMS'))
+    b.step('plans', 790, 712, 250, 96, '', 'Saved plans', sub='who is affected')
+
+    b.edge('sort', 'trust')
+    b.edge('trust', 'desk', label='yes', at=(752, 300))
+    b.edge('trust', 'person', 'stop', fs='b', ts='t', label='no', at=(710, 390))
+    b.raw('loop', [(1010, 213), (1010, 189), (830, 189), (830, 213)], 'bad tool call: retry', (850, 167))
+    b.edge('desk', 'leave')
+    b.edge('leave', 'auto', fs='t', ts='b', label='no', at=(1120, 236))
+    b.edge('leave', 'decide', label='yes', at=(1167, 298))
+    b.raw('main', [(1168, 177), (1398, 177)])
+    b.raw('main', [(1366, 320), (1398, 320)])
+    b.raw('main', [(1382, 320), (1382, 455), (1398, 455)])
+    b.edge('decide', 'ops', 'stop', fs='b', ts='t')
+    b.raw('main', [(1240, 418), (1240, 440), (1180, 440), (1180, 760), (1196, 760)], 'audience', (1110, 600))
+    b.edge('plans', 'hub', 'loop', fs='l', ts='r', td=260, label='plans show who is affected', at=(450, 738))
+    return b
+
+
 CSS = '''
 :root { --bg: #F4F4F1; --ink: #18181B; --muted: #55555C; color-scheme: light; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #141416; --ink: #EDEDF0; --muted: #B4B4BC; color-scheme: dark } }
@@ -275,6 +318,10 @@ p { margin: 0; }
 .lg.dia { width: 12px; height: 12px; transform: rotate(45deg); border-radius: 2px; background: #fff; box-shadow: inset 0 0 0 1.5px #55555C; margin: 0 3px; }
 .lg.hu { background: #FFF6F0; box-shadow: inset 0 0 0 1.5px #E9A27A; } .lg.out { background: #FAFAF7; outline: 1.5px dashed #8A8A91; outline-offset: -1.5px; }
 .lw { display: inline-block; width: 24px; height: 0; border-top: 2px solid; }
+.mbox { position: absolute; right: 24px; top: 20px; display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 12px; background: #fff; }
+.mbl { font-size: 13.5px; font-weight: 700; color: #4C2A9E; }
+.arr { font-size: 12.5px; color: #55555C; }
+.mbs { font-size: 12.5px; color: #55555C; margin-left: 4px; }
 '''
 
 FIT = '''
@@ -288,7 +335,7 @@ FIT = '''
 
 def page():
     lve = pathlib.Path.home().joinpath('.claude/skills/html-live-editor/assets/live-editor.js').read_text().replace('</script', '<\\/script')
-    boards = ''.join(f'<div class="stage">{b.html()}</div>' for b in (snow(), late()))
+    boards = ''.join(f'<div class="stage">{b.html()}</div>' for b in (master(), snow(), late()))
     return f'''<title>Harbor Lights Ops Agent</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -296,7 +343,7 @@ def page():
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@700&display=swap">
 <style>{CSS}</style>
 <div class="page">
-  <header><h1>Harbor Lights Ops Agent</h1><p>Agent architecture for the two scenarios we test.</p></header>
+  <header><h1>Harbor Lights Ops Agent</h1><p>One architecture, then the two scenarios we test.</p></header>
   {boards}
 </div>
 <script>{FIT}</script>

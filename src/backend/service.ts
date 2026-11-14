@@ -56,7 +56,9 @@ export interface RunReport {
 export interface BackendOptions {
   data: FestivalData;
   store: Store;
+  /** One model, or several tried in order (Qwen, then Llama). */
   llm?: Llm | null;
+  llms?: Llm[];
   integrations?: Integrations;
   warnings?: string[];
 }
@@ -78,7 +80,7 @@ export function describeTrigger(t: Trigger, v: FestivalView): string {
 export class OpsBackend {
   readonly data: FestivalData;
   readonly warnings: string[];
-  private llm: Llm | null;
+  private llms: Llm[];
   private integrations: Integrations;
   private store: Store;
   private lock: Promise<unknown> = Promise.resolve();
@@ -86,13 +88,14 @@ export class OpsBackend {
   constructor(o: BackendOptions) {
     this.data = o.data;
     this.store = o.store;
-    this.llm = o.llm ?? null;
+    this.llms = o.llms ?? (o.llm ? [o.llm] : []);
     this.integrations = o.integrations ?? { messenger: mockMessenger };
     this.warnings = o.warnings ?? [];
   }
 
-  get model(): string | null { return this.llm?.model ?? null; }
-  setLlm(llm: Llm | null) { this.llm = llm; }
+  get model(): string | null { return this.llms.length ? this.llms.map(m => m.model).join(' -> ') : null; }
+  get models(): string[] { return this.llms.map(m => m.model); }
+  setLlms(llms: Llm[]) { this.llms = llms; }
 
   private serial<T>(fn: () => Promise<T>): Promise<T> {
     const run = this.lock.then(fn, fn);
@@ -197,7 +200,7 @@ export class OpsBackend {
     audit('trigger', report.trigger, { id, trigger: t.type === 'inbound_message' ? { ...t, text: `${t.text.length} chars` } : t });
     await this.applyTrigger(s, t, audit);
 
-    const routing = await route(t, view, now, this.llm, audit);
+    const routing = await route(t, view, now, this.llms, audit);
     report.routes = routing.routes;
     report.routedBy = routing.via;
     audit('route', routing.routes.map(r => `${r.to}${'guestId' in r ? ` ${view.name(r.guestId)}` : ''}: ${r.reason}`).join(' | '), { via: routing.via, inbound: routing.inbound });
@@ -239,7 +242,7 @@ export class OpsBackend {
     const snow = ctx.snow;
     const delays = Object.entries(s.conditions.shuttleDelays).map(([id, d]) => `${this.data.shuttles.find(r => r.id === id)?.name ?? id} ${d} min late`);
     ctx.brief = `Festival time ${clock(now)}. The forecast says ${snow.start && snow.end ? `snow ${clock(snow.start)} to ${clock(snow.end)}, about ${snow.totalIn} in` : 'no snow'}. ${delays.length ? `Shuttle feed: ${delays.join(', ')}.` : ''} Assess the impact and recommend an option for each decision.`;
-    const outcome = await runAgent(this.llm, weatherAgent, ctx, audit);
+    const outcome = await runAgent(this.llms, weatherAgent, ctx, audit);
     this.commit(s, now, runId, audit, report, ctx.scratch, outcome, 'weather', 'weather:');
   }
 
@@ -252,7 +255,7 @@ export class OpsBackend {
     ctx.brief = `Festival time ${clock(now)}. Check guest ${g.name} (id ${g.id})${sessionId ? ` for session ${sessionId}` : ''}.`
       + (fact ? ` ${fact.source.ref} wrote at ${clock(fact.source.at)}: "${fact.source.quote}" (unconfirmed).` : '')
       + ' Work out whether they will make their call and recommend an option for each decision.';
-    const outcome = await runAgent(this.llm, guestAgent, ctx, audit);
+    const outcome = await runAgent(this.llms, guestAgent, ctx, audit);
     this.commit(s, now, runId, audit, report, ctx.scratch, outcome, 'guest', `guest:${guestId}:${sessionId ?? ''}`, g.name);
   }
 

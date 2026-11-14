@@ -63,7 +63,7 @@ function quoteWithTime(text: string): string | undefined {
   return parts.find(p => /\b\d{1,2}(?::\d{2})\s*(am|pm)?\b|\b\d{1,2}\s*(am|pm)\b/i.test(p))?.trim();
 }
 
-export async function readInbound(llm: Llm | null, v: FestivalView, t: Extract<Trigger, { type: 'inbound_message' }>, now: Iso, audit: Audit): Promise<InboundReading> {
+export async function readInbound(llm: Llm | Llm[] | null, v: FestivalView, t: Extract<Trigger, { type: 'inbound_message' }>, now: Iso, audit: Audit): Promise<InboundReading> {
   const sender = identifySender(v, t.from);
   if (!sender) return { intent: 'other', confidence: 'low', via: 'rules', reason: `Sender ${t.from} is not on the guest or staff sheets` };
   if (sender.kind === 'staff') return { sender, intent: 'other', confidence: 'low', via: 'rules', reason: 'Staff messages go to the dashboard, not the agent' };
@@ -73,9 +73,9 @@ export async function readInbound(llm: Llm | null, v: FestivalView, t: Extract<T
   let confidence: InboundReading['confidence'] = 'low';
   let quote: string | undefined;
   let via: InboundReading['via'] = 'rules';
-  if (llm) {
+  for (const m of Array.isArray(llm) ? llm : llm ? [llm] : []) {
     try {
-      const res = await llm.chat({
+      const res = await m.chat({
         format: CLASSIFY_SCHEMA,
         messages: [
           { role: 'system', content: CLASSIFY_SYSTEM },
@@ -87,13 +87,14 @@ export async function readInbound(llm: Llm | null, v: FestivalView, t: Extract<T
       if (['high', 'medium', 'low'].includes(j.confidence ?? '')) confidence = j.confidence as InboundReading['confidence'];
       quote = j.eta_quote?.trim() || undefined;
       via = 'llm';
-      audit('llm', `Inbound classifier: ${intent} (${confidence})${quote ? `, quote "${quote}"` : ''}`, { ms: res.ms });
+      audit('llm', `Inbound classifier (${m.model}): ${intent} (${confidence})${quote ? `, quote "${quote}"` : ''}`, { ms: res.ms });
       if (quote && !t.text.includes(quote)) {
         audit('blocked', `Model quote "${quote}" is not in the message; ignored`);
         quote = undefined;
       }
+      break;
     } catch (e) {
-      audit('error', `Inbound classifier failed (${(e as Error).message}); using rules`);
+      audit('error', `Inbound classifier ${m.model} failed (${(e as Error).message})`);
       via = 'rules';
     }
   }
