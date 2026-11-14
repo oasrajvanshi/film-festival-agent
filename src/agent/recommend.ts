@@ -116,7 +116,9 @@ export function recommendFor(f: Festival, change: ScheduleChange, person: Person
     basis.push(`previous: ${prev.id} ends ${clock(prev.end)}, travel ${travel} min, slack ${slack} min`);
     if (slack < 0) issues.push(`You can't get there from "${prev.title}" in time (${travel} min travel).`);
     else if (change.fields.includes('venueId') || change.fields.includes('start')) {
-      issues.push(`Leave ${venueName(f, prev.venueId)} by ${clock(addMinutes(after.start, -travel - 10))}${travel ? ` (${travel} min to ${venueName(f, after.venueId)})` : ''}.`);
+      issues.push(travel
+        ? `Leave ${venueName(f, prev.venueId)} by ${clock(addMinutes(after.start, -travel - 10))} (${travel} min to ${venueName(f, after.venueId)}).`
+        : `It's now in the same building as "${prev.title}", so stay at ${venueName(f, after.venueId)}.`);
     }
   }
   if (next) {

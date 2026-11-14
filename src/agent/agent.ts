@@ -6,7 +6,7 @@ import type { LlmClient } from '../llm/ollama';
 import { AuditLog } from './log';
 import { gateFor, type Action, type QueueItem } from './approvals';
 import { diffSchedules, planPropagation, describeChange } from './propagate';
-import { findGuestClashes, findOrphanedQas } from './conflicts';
+import { findGuestClashes, findOrphanedQas, findVenueClashes } from './conflicts';
 import { recordScan, type ScanResult } from '../rules/access';
 import { answerQuestion, type Answer } from './answer';
 import { handleVendorAlert, type VendorAlert } from './vendors';
@@ -75,10 +75,15 @@ export class FestivalAgent {
       this.changeFeed.push(desc);
     }
     const clashesBefore = new Set(findGuestClashes(this.f).map(k => `${k.guestId}|${k.a.id}|${k.b.id}`));
+    const roomsBefore = new Set(findVenueClashes(this.f).map(k => `${k.a.id}|${k.b.id}`));
     this.f.events = newEvents;
     for (const k of findGuestClashes(this.f)) {
       if (clashesBefore.has(`${k.guestId}|${k.a.id}|${k.b.id}`)) continue;
       planned.push({ id: `clash-${k.guestId}-${k.a.id}-${k.b.id}`, kind: 'flag', title: `Guest clash: ${k.guestName}`, rationale: k.summary, payload: k });
+    }
+    for (const k of findVenueClashes(this.f)) {
+      if (roomsBefore.has(`${k.a.id}|${k.b.id}`)) continue;
+      planned.push({ id: `room-${k.a.id}-${k.b.id}`, kind: 'flag', title: 'Venue double-booked', rationale: k.summary, payload: k });
     }
     for (const q of findOrphanedQas(this.f)) {
       planned.push({ id: `orphan-${q.id}`, kind: 'flag', title: `Q&A left behind: ${q.title}`, rationale: 'Its screening moved but the Q&A did not.', payload: { eventId: q.id } });
@@ -95,6 +100,15 @@ export class FestivalAgent {
       const merged: Action = { id: `notify-${runId}`, kind: 'notify_people', title: `Notify ${byPerson.size} affected people`,
         rationale: notices.map(a => a.rationale).join(' '), messages: [...byPerson.values()] };
       planned.splice(0, planned.length, merged, ...planned.filter(a => a.kind !== 'notify_people'));
+    }
+    const listings = planned.filter(a => a.kind === 'update_website');
+    if (listings.length > 1) {
+      const merged: Action = { id: `web-${runId}`, kind: 'update_website', title: `Update ${listings.length} public listings`,
+        rationale: listings.map(a => a.rationale).join(' '), payload: listings.map(a => a.payload) };
+      const at = planned.indexOf(listings[0]);
+      const rest = planned.filter(a => a.kind !== 'update_website');
+      rest.splice(at, 0, merged);
+      planned.splice(0, planned.length, ...rest);
     }
     for (const a of planned) if (a.messages && this.llm) a.messages = await polishMessages(this.llm, a.messages);
     this.log.add(runId, 'decide', `${planned.length} action(s) planned`, { actions: planned.map(a => ({ id: a.id, kind: a.kind, gate: gateFor(a) })) });
@@ -149,6 +163,21 @@ export class FestivalAgent {
   crowd(at: string) {
     return { venues: venueView(this.f, at), redirects: suggestRedirects(this.f, at) };
   }
+
+  // --- Persistence (the dashboard keeps state in the browser) -----------
+
+  snapshot() {
+    return { f: this.f, queue: this.queue, outbox: this.outbox, flags: this.flags, changeFeed: this.changeFeed, log: this.log.entries, runs: this.runs };
+  }
+
+  static restore(s: ReturnType<FestivalAgent['snapshot']>, llm: LlmClient | null, now: () => string) {
+    const a = new FestivalAgent(s.f, llm, now);
+    a.queue = s.queue; a.outbox = s.outbox; a.flags = s.flags; a.changeFeed = s.changeFeed; a.runs = s.runs;
+    a.log.restore(s.log);
+    return a;
+  }
+
+  setLlm(llm: LlmClient | null) { this.llm = llm; }
 
   // --- Human decisions --------------------------------------------------
 

@@ -1,0 +1,417 @@
+'use client';
+
+import { useMemo, useState } from 'react';
+import type { AgentStore } from './useAgent';
+import type { DayNumber, FestivalEvent, PassType } from '../../src/core/types';
+import { addMinutes, clock as fmt, toMinutes } from '../../src/core/time';
+import { PASS_LABELS, qrFor, type ScanResult } from '../../src/rules/access';
+import type { Answer } from '../../src/agent/answer';
+import { runAll, type SuiteResult } from '../../src/eval/scenarios';
+import type { Recommendation } from '../../src/agent/recommend';
+
+type P = { s: AgentStore; user: string };
+
+const dayOf = (iso: string, dates: Record<DayNumber, string>): DayNumber =>
+  Number(Object.entries(dates).find(([, d]) => iso.startsWith(d))?.[0] ?? 1) as DayNumber;
+
+function useLookups(s: AgentStore) {
+  const f = s.agent.f;
+  return useMemo(() => ({
+    person: (id: string) => f.people.find(p => p.id === id),
+    venue: (id: string) => f.venues.find(v => v.id === id)?.name ?? id,
+    event: (id: string) => f.events.find(e => e.id === id),
+  }), [f, s.version]); // eslint-disable-line react-hooks/exhaustive-deps
+}
+
+// ------------------------------------------------------------------ Overview
+export function Overview({ s }: P) {
+  const a = s.agent;
+  const crowd = a.crowd(s.clock);
+  const pending = a.queue.filter(q => q.status === 'pending').length;
+  return (
+    <div className="grid2">
+      <div className="card">
+        <h2>Right now · {fmt(s.clock)}, day {dayOf(s.clock, a.f.dates)}</h2>
+        <div className="row">
+          <span className="chip warn">{pending} waiting for approval</span>
+          <span className="chip bad">{a.flags.length} flags</span>
+          <span className="chip">{a.outbox.length} messages delivered</span>
+          <span className="chip">{a.f.checkIns.filter(c => c.allowed).length} check-ins</span>
+        </div>
+        <h3>Venues (from check-in scans)</h3>
+        {crowd.venues.map(v => (
+          <div key={v.venueId} style={{ marginBottom: 8 }}>
+            <div className="row" style={{ justifyContent: 'space-between' }}>
+              <span>{v.venueName} <span className="muted">· {v.event ? v.event.title : 'nothing on'}</span></span>
+              <span className="muted">{v.inside}/{v.capacity}</span>
+            </div>
+            <div className={`bar ${v.status}`}><div style={{ width: `${Math.min(100, v.fill * 100)}%` }} /></div>
+          </div>
+        ))}
+        {crowd.redirects.length > 0 && <>
+          <h3>Suggested redirects <span className="muted">(staff decide)</span></h3>
+          {crowd.redirects.map((r, i) => <div className="msg" key={i}>{r.summary}</div>)}
+        </>}
+      </div>
+      <div className="card">
+        <h2>Flags</h2>
+        {a.flags.length === 0 && <p className="muted">No clashes or risks flagged.</p>}
+        {[...a.flags].reverse().map(fl => (
+          <div className="msg" key={fl.id} style={{ borderColor: 'var(--bad)' }}>
+            <strong>{fl.title}</strong>
+            <div>{fl.rationale}</div>
+          </div>
+        ))}
+        <h3>Recent grid changes</h3>
+        {a.changeFeed.length === 0 && <p className="muted">None yet. Edit the schedule grid to see the agent work.</p>}
+        {[...a.changeFeed].reverse().slice(0, 8).map((c, i) => <div className="msg" key={i}>{c}</div>)}
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------ Schedule grid
+type Patch = Partial<Pick<FestivalEvent, 'start' | 'end' | 'venueId' | 'status' | 'guestIds'>>;
+
+export function Grid({ s, user }: P) {
+  const f = s.agent.f;
+  const { venue, person } = useLookups(s);
+  const [day, setDay] = useState<DayNumber>(dayOf(s.clock, f.dates));
+  const [draft, setDraft] = useState<Record<string, Patch>>({});
+  const [editing, setEditing] = useState<string | null>(null);
+  const [moveQa, setMoveQa] = useState(true);
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<string | null>(null);
+  const guests = f.people.filter(p => p.role === 'guest');
+
+  const events = f.events.filter(e => e.day === day).map(e => ({ ...e, ...draft[e.id] }))
+    .sort((a, b) => toMinutes(a.start) - toMinutes(b.start));
+
+  const patch = (id: string, p: Patch) => {
+    const base = f.events.find(e => e.id === id)!;
+    const cur = { ...base, ...draft[id] };
+    const next: Record<string, Patch> = { ...draft, [id]: { ...draft[id], ...p } };
+    // Moving a screening's start shifts its end, and optionally its Q&A.
+    if (p.start) {
+      const delta = toMinutes(p.start) - toMinutes(cur.start);
+      next[id].end = addMinutes(cur.end, delta);
+      if (moveQa && base.kind === 'screening') {
+        const qa = f.events.find(e => e.kind === 'qa' && e.filmId === base.filmId && e.start === base.end);
+        if (qa) { const q = { ...qa, ...draft[qa.id] }; next[qa.id] = { ...draft[qa.id], start: addMinutes(q.start, delta), end: addMinutes(q.end, delta) }; }
+      }
+    }
+    if (p.venueId && moveQa && base.kind === 'screening') {
+      const qa = f.events.find(e => e.kind === 'qa' && e.filmId === base.filmId && e.start === base.end);
+      if (qa) next[qa.id] = { ...draft[qa.id], venueId: p.venueId };
+    }
+    setDraft(next);
+  };
+
+  const save = async () => {
+    setBusy(true);
+    const newEvents = f.events.map(e => (draft[e.id] ? { ...e, ...draft[e.id] } : { ...e }));
+    const r = await s.agent.onGridEdit(newEvents, user);
+    setDraft({}); setEditing(null); setBusy(false);
+    const asks = r.actions.filter(a => a.kind === 'notify_people' || a.kind === 'update_website').length;
+    const auto = r.actions.filter(a => a.kind === 'update_brief' || a.kind === 'notify_staff').length;
+    const flags = r.actions.filter(a => a.kind === 'flag').length;
+    setResult(`${r.changes.length} change(s). ${auto} internal update(s) sent, ${asks} item(s) waiting for approval, ${flags} flag(s).`);
+    s.commit();
+  };
+
+  const dirty = Object.keys(draft).length;
+  return (
+    <div className="card">
+      <div className="row" style={{ justifyContent: 'space-between' }}>
+        <h2 style={{ margin: 0 }}>Schedule grid</h2>
+        <div className="row">
+          {([1, 2, 3] as DayNumber[]).map(d => (
+            <button key={d} className={d === day ? 'primary small' : 'small'} onClick={() => setDay(d)}>Day {d} · {f.dates[d].slice(5)}</button>
+          ))}
+        </div>
+      </div>
+      <p className="muted">Edit like staff would in the sheet, then save. The agent diffs the grid and works out who is affected.</p>
+      <div className="row" style={{ marginBottom: 8 }}>
+        <label className="row"><input type="checkbox" checked={moveQa} onChange={e => setMoveQa(e.target.checked)} /> Move a screening's Q&A with it</label>
+        <button className="primary" disabled={!dirty || busy} onClick={save}>{busy ? 'Running agent…' : `Save grid${dirty ? ` (${dirty} edited)` : ''}`}</button>
+        {dirty > 0 && <button onClick={() => setDraft({})}>Discard</button>}
+      </div>
+      {result && <div className="msg" style={{ borderColor: 'var(--ok)' }}>{result} See Approvals and Flags.</div>}
+      <div className="scroll">
+        <table>
+          <thead><tr><th>Time</th><th>Event</th><th>Venue</th><th>Guests</th><th></th></tr></thead>
+          <tbody>
+            {events.map(e => (
+              <tr key={e.id} className={draft[e.id] ? 'changed' : ''}>
+                <td style={{ whiteSpace: 'nowrap' }}>{fmt(e.start)}–{fmt(e.end)}</td>
+                <td className={e.status === 'cancelled' ? 'cancelled' : ''}>
+                  {e.title} <span className="chip">{e.kind}</span>{e.restriction && <> <span className="chip warn">{e.restriction.replace('_', ' ')}</span></>}
+                  {editing === e.id && (
+                    <div className="stack" style={{ marginTop: 8 }}>
+                      <label className="row">Start <input type="time" value={e.start.slice(11)} onChange={x => x.target.value && patch(e.id, { start: `${e.start.slice(0, 11)}${x.target.value}` })} /></label>
+                      <label className="row">Venue <select value={e.venueId} onChange={x => patch(e.id, { venueId: x.target.value })}>
+                        {f.venues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}</select></label>
+                      <label className="row">Guests <select multiple size={4} value={e.guestIds} onChange={x => patch(e.id, { guestIds: [...x.target.selectedOptions].map(o => o.value) })}>
+                        {guests.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
+                      <div className="row">
+                        <button className="small" onClick={() => patch(e.id, { status: e.status === 'cancelled' ? 'scheduled' : 'cancelled' })}>{e.status === 'cancelled' ? 'Restore' : 'Cancel event'}</button>
+                      </div>
+                    </div>
+                  )}
+                </td>
+                <td>{venue(e.venueId)}</td>
+                <td>{e.guestIds.map(g => person(g)?.name).join(', ')}</td>
+                <td><button className="small" onClick={() => setEditing(editing === e.id ? null : e.id)}>{editing === e.id ? 'Done' : 'Edit'}</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------ Approvals
+export function Approvals({ s, user }: P) {
+  const { person } = useLookups(s);
+  const [open, setOpen] = useState<Record<string, boolean>>({});
+  const items = [...s.agent.queue].reverse();
+  const pending = items.filter(q => q.status === 'pending');
+  const done = items.filter(q => q.status !== 'pending');
+  const act = (id: string, ok: boolean) => { ok ? s.agent.approve(id, user) : s.agent.reject(id, user); s.commit(); };
+  return (
+    <div className="stack">
+      <div className="card">
+        <h2>Waiting for approval ({pending.length})</h2>
+        <p className="muted">Anything that reaches attendees, guests, partners or the public waits here. One approval sends the whole bundle.</p>
+        {pending.length === 0 && <p className="muted">Nothing waiting.</p>}
+        {pending.map(q => {
+          const msgs = q.action.messages ?? [];
+          const shown = open[q.action.id] ? msgs : msgs.slice(0, 4);
+          return (
+            <div key={q.action.id} className="card" style={{ marginBottom: 10 }}>
+              <div className="row" style={{ justifyContent: 'space-between' }}>
+                <strong>{q.action.title}</strong>
+                <span className="chip">{q.action.kind.replace('_', ' ')}</span>
+              </div>
+              <p className="muted">{q.action.rationale}</p>
+              {shown.map((m, i) => {
+                const rec = (m as { recommendation?: Recommendation }).recommendation;
+                return (
+                  <div className="msg" key={i}>
+                    <div className="who">{person(m.personId)?.name} · {person(m.personId)?.role} · {m.channel.replace('_', ' ')}</div>
+                    <div style={{ whiteSpace: 'pre-wrap' }}>{m.body}</div>
+                    {rec && rec.basis.length > 0 && <div className="who">Why: {rec.basis.join('; ')}</div>}
+                  </div>
+                );
+              })}
+              {msgs.length > 4 && <button className="small" onClick={() => setOpen({ ...open, [q.action.id]: !open[q.action.id] })}>{open[q.action.id] ? 'Show fewer' : `Show all ${msgs.length}`}</button>}
+              <div className="row" style={{ marginTop: 8 }}>
+                <button className="primary" onClick={() => act(q.action.id, true)}>Approve and send</button>
+                <button onClick={() => act(q.action.id, false)}>Reject</button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="card">
+        <h2>Decided</h2>
+        {done.length === 0 && <p className="muted">None yet.</p>}
+        {done.map(q => (
+          <div className="msg" key={q.action.id}>
+            <span className={`chip ${q.status === 'rejected' ? 'bad' : 'ok'}`}>{q.status === 'rejected' ? 'rejected' : 'sent'}</span> {q.action.title}
+            <div className="who">by {q.decidedBy} at {q.decidedAt && fmt(q.decidedAt)}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------ Door scan
+export function Scan({ s }: P) {
+  const f = s.agent.f;
+  const { venue } = useLookups(s);
+  const day = dayOf(s.clock, f.dates);
+  const dayEvents = f.events.filter(e => e.day === day);
+  const [type, setType] = useState<PassType>('three_day');
+  const holders = f.passes.filter(p => p.type === type).map(p => f.people.find(x => x.id === p.personId)!);
+  const [pid, setPid] = useState(holders[0]?.id ?? '');
+  const [eid, setEid] = useState(dayEvents[0]?.id ?? '');
+  const [res, setRes] = useState<ScanResult | null>(null);
+  const [rush, setRush] = useState(60);
+
+  const scan = () => { setRes(s.agent.onScan(qrFor(pid), eid, s.clock)); s.commit(); };
+  const doorRush = () => {
+    const ev = f.events.find(e => e.id === eid);
+    if (!ev) return;
+    let n = 0;
+    for (const p of f.people) {
+      if (n >= rush) break;
+      const r = s.agent.onScan(qrFor(p.id), eid, s.clock);
+      if (r.allowed) n++;
+    }
+    setRes({ allowed: true, reason: `${n} people admitted to "${ev.title}". See the crowd view on Overview.` });
+    s.commit();
+  };
+  return (
+    <div className="grid2">
+      <div className="card stack">
+        <h2>Door scan (volunteer mode)</h2>
+        <p className="muted">Each person has one QR code covering their pass and every extra ticket. Time is the festival clock ({fmt(s.clock)}).</p>
+        <label className="row">Pass type <select value={type} onChange={e => { const t = e.target.value as PassType; setType(t); setPid(f.passes.find(p => p.type === t)!.personId); }}>
+          {(Object.keys(PASS_LABELS) as PassType[]).map(t => <option key={t} value={t}>{PASS_LABELS[t]}</option>)}</select></label>
+        <label className="row">Holder <select value={pid} onChange={e => setPid(e.target.value)}>
+          {holders.map(h => {
+            const pass = f.passes.find(p => p.personId === h.id)!;
+            const tix = f.tickets.filter(t => t.personId === h.id).length;
+            return <option key={h.id} value={h.id}>{h.name}{pass.validDays.length < 3 ? ` (day ${pass.validDays.join(',')})` : ''}{tix ? ` +${tix} ticket` : ''}</option>;
+          })}</select></label>
+        <label className="row">Event <select value={eid} onChange={e => setEid(e.target.value)}>
+          {dayEvents.map(e => <option key={e.id} value={e.id}>{fmt(e.start)} {e.title} ({venue(e.venueId)})</option>)}</select></label>
+        <div className="muted" style={{ fontFamily: 'ui-monospace, monospace', fontSize: 12 }}>QR: {pid && qrFor(pid)}</div>
+        <div className="row"><button className="primary" onClick={scan}>Scan</button></div>
+        <h3>Simulate a door rush</h3>
+        <div className="row"><input type="number" min={1} max={400} value={rush} onChange={e => setRush(+e.target.value)} style={{ width: 80 }} /> <button onClick={doorRush}>Scan people in</button></div>
+      </div>
+      <div className="card">
+        {res ? <div className={`scan ${res.allowed ? 'ok' : 'bad'}`}>{res.allowed ? 'ALLOW' : 'DENY'}<div style={{ fontSize: 14, fontWeight: 400, marginTop: 8 }}>{res.personName && <>{res.personName} · </>}{res.reason}</div></div>
+          : <p className="muted">Scan a code to see green or red.</p>}
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------ Briefs
+export function Briefs({ s }: P) {
+  const f = s.agent.f;
+  const vols = f.people.filter(p => p.role === 'volunteer');
+  const [pid, setPid] = useState(vols[0].id);
+  return (
+    <div className="card stack">
+      <h2>Live volunteer brief</h2>
+      <p className="muted">Rebuilt from the current grid each time it's opened, with the handbook sections for the volunteer's role.</p>
+      <label className="row">Volunteer <select value={pid} onChange={e => setPid(e.target.value)}>
+        {vols.map(v => <option key={v.id} value={v.id}>{v.name} · {v.staffRole}</option>)}</select></label>
+      <pre className="brief msg">{s.agent.brief(pid, s.clock)}</pre>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------ Ask
+export function Ask({ s }: P) {
+  const [q, setQ] = useState('Does a day pass get me into panels?');
+  const [busy, setBusy] = useState(false);
+  const [history, setHistory] = useState<{ q: string; a: Answer }[]>([]);
+  const ask = async () => {
+    if (!q.trim()) return;
+    setBusy(true);
+    const a = await s.agent.onQuestion(q, 'dashboard');
+    setHistory([{ q, a }, ...history]); setBusy(false); s.commit();
+  };
+  return (
+    <div className="card stack">
+      <h2>Ask the agent</h2>
+      <p className="muted">Answers come only from the festival's official documents and schedule, with the source cited, or "I don't know".</p>
+      <div className="row">
+        <input style={{ flex: 1, minWidth: 220 }} value={q} onChange={e => setQ(e.target.value)} onKeyDown={e => e.key === 'Enter' && ask()} />
+        <button className="primary" disabled={busy} onClick={ask}>{busy ? 'Thinking…' : 'Ask'}</button>
+      </div>
+      {history.map((h, i) => (
+        <div className="msg" key={i}>
+          <div className="who">{h.q}</div>
+          <div>{h.a.text}</div>
+          <div className="who">{h.a.known ? `Source: ${h.a.citations.join(', ')}` : 'No source found'} · {h.a.via}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------ Vendor feed & voting
+export function Feeds({ s }: P) {
+  const f = s.agent.f;
+  const guests = f.people.filter(p => p.role === 'guest');
+  const [gid, setGid] = useState(guests[0].id);
+  const [arrive, setArrive] = useState('09:30');
+  const [mins, setMins] = useState(45);
+  const [filmId, setFilmId] = useState(f.films[0].id);
+  const [eta, setEta] = useState('09:30');
+  const [vEvent, setVEvent] = useState(f.events.find(e => e.kind === 'screening' && !e.restriction)!.id);
+  const [note, setNote] = useState<string | null>(null);
+  const date = s.clock.slice(0, 10);
+  return (
+    <div className="grid2">
+      <div className="card stack">
+        <h2>Vendor and partner feeds</h2>
+        <h3>Flight delay</h3>
+        <label className="row">Guest <select value={gid} onChange={e => setGid(e.target.value)}>{guests.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
+        <label className="row">Lands at <input type="time" value={arrive} onChange={e => setArrive(e.target.value)} /> on {date}</label>
+        <label className="row">Airport to venue <input type="number" value={mins} onChange={e => setMins(+e.target.value)} style={{ width: 70 }} /> min</label>
+        <button onClick={() => { const a = s.agent.onVendorAlert({ type: 'flight_delay', guestId: gid, flight: 'HL204', newArrival: `${date}T${arrive}`, arrivalVenueMin: mins }); setNote(`${a.length} action(s): ${a.map(x => x.title).join('; ') || 'nothing at risk'}`); s.commit(); }}>Send alert</button>
+        <h3>Print delivery delay</h3>
+        <label className="row">Film <select value={filmId} onChange={e => setFilmId(e.target.value)}>{f.films.map(x => <option key={x.id} value={x.id}>{x.title}</option>)}</select></label>
+        <label className="row">New ETA <input type="time" value={eta} onChange={e => setEta(e.target.value)} /> on {date}</label>
+        <button onClick={() => { const a = s.agent.onVendorAlert({ type: 'print_delay', filmId, newEta: `${date}T${eta}` }); setNote(`${a.length} action(s): ${a.map(x => x.title).join('; ') || 'nothing at risk'}`); s.commit(); }}>Send alert</button>
+        {note && <div className="msg">{note}</div>}
+      </div>
+      <div className="card stack">
+        <h2>Audience award voting (post-MVP)</h2>
+        <p className="muted">The voting form goes only to people with an allowed check-in scan for that screening.</p>
+        <label className="row">Screening <select value={vEvent} onChange={e => setVEvent(e.target.value)}>
+          {f.events.filter(e => e.kind === 'screening' && !e.restriction).map(e => <option key={e.id} value={e.id}>{f.dates[e.day].slice(5)} {fmt(e.start)} {e.title}</option>)}</select></label>
+        <button onClick={() => { const a = s.agent.proposeVoteForm(vEvent); setNote(a ? `${a.title}. Waiting for approval.` : 'Nobody has checked in to that screening yet.'); s.commit(); }}>Prepare voting form</button>
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------ Outbox & log
+export function Log({ s }: P) {
+  const { person } = useLookups(s);
+  const [tab, setTab] = useState<'log' | 'outbox'>('log');
+  return (
+    <div className="card">
+      <div className="row" style={{ marginBottom: 8 }}>
+        <button className={tab === 'log' ? 'primary small' : 'small'} onClick={() => setTab('log')}>Audit log ({s.agent.log.entries.length})</button>
+        <button className={tab === 'outbox' ? 'primary small' : 'small'} onClick={() => setTab('outbox')}>Delivered messages ({s.agent.outbox.length})</button>
+      </div>
+      <div className="scroll">
+        {tab === 'log' ? (
+          <table><thead><tr><th>#</th><th>Festival time</th><th>Step</th><th>What happened</th></tr></thead>
+            <tbody>{[...s.agent.log.entries].reverse().slice(0, 300).map(e => (
+              <tr key={e.seq}><td>{e.seq}</td><td style={{ whiteSpace: 'nowrap' }}>{e.at.includes('T') ? `${e.at.slice(5, 10)} ${fmt(e.at)}` : e.at}</td><td><span className="chip">{e.kind}</span></td><td>{e.summary}</td></tr>
+            ))}</tbody></table>
+        ) : (
+          <table><thead><tr><th>To</th><th>Channel</th><th>Message</th></tr></thead>
+            <tbody>{[...s.agent.outbox].reverse().slice(0, 300).map((d, i) => (
+              <tr key={i}><td>{person(d.personId)?.name}<div className="muted">{person(d.personId)?.role}</div></td><td>{d.channel.replace('_', ' ')}</td><td style={{ whiteSpace: 'pre-wrap' }}>{d.body}</td></tr>
+            ))}</tbody></table>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------ Evaluation
+export function Evaluation({ s }: P) {
+  const [res, setRes] = useState<SuiteResult[] | null>(null);
+  const [busy, setBusy] = useState(false);
+  return (
+    <div className="card stack">
+      <h2>Evaluation: the proposal's four tests</h2>
+      <p className="muted">Runs on a fresh copy of the scripted festival day, without the model, so results are repeatable. It doesn't touch the dashboard state.</p>
+      <div><button className="primary" disabled={busy} onClick={async () => { setBusy(true); setRes(await runAll(null)); setBusy(false); }}>{busy ? 'Running…' : 'Run all four'}</button></div>
+      {res?.map(r => (
+        <div key={r.suite} className="card">
+          <div className="row" style={{ justifyContent: 'space-between' }}>
+            <strong>{r.suite}</strong>
+            <span className={`chip ${r.passed === r.total ? 'ok' : 'bad'}`}>{r.passed}/{r.total} · pass mark: {r.passMark}</span>
+          </div>
+          {r.cases.map(c => <div key={c.name} className="msg" style={{ borderColor: c.passed ? 'var(--ok)' : 'var(--bad)' }}><strong>{c.passed ? '✓' : '✗'} {c.name}</strong><div className="who">{c.detail}</div></div>)}
+        </div>
+      ))}
+      <span className="muted" style={{ display: 'none' }}>{s.version}</span>
+    </div>
+  );
+}

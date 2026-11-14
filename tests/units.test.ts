@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { buildFestival } from '../src/data/seed';
 import { FestivalAgent } from '../src/agent/agent';
 import { GATE_POLICY } from '../src/agent/approvals';
-import { findGuestClashes } from '../src/agent/conflicts';
+import { findGuestClashes, findVenueClashes } from '../src/agent/conflicts';
 import { keepsFacts, polishMessages } from '../src/agent/phrase';
 import { ACCESS_RULES, PASS_LABELS, parseQr, qrFor } from '../src/rules/access';
 import type { LlmClient } from '../src/llm/ollama';
@@ -23,6 +23,7 @@ describe('mock festival', () => {
   it('is deterministic and starts with no guest clashes', () => {
     expect(JSON.stringify(buildFestival())).toBe(JSON.stringify(buildFestival()));
     expect(findGuestClashes(f)).toEqual([]);
+    expect(findVenueClashes(f)).toEqual([]);
   });
   it('uses only made-up contact details', () => {
     expect(f.people.every(p => p.email.endsWith('@example.test'))).toBe(true);

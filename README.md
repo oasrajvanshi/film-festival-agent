@@ -14,7 +14,7 @@ Film festival schedule changes are relayed by hand across emails, sheets and cha
 | Slow door checks | Access rules for all 10 pass and badge types encoded once; a QR scan returns green or red with a reason | Overrides and exceptions |
 | Pass vs. ticket | Every pass and extra ticket is linked to one person and one QR code | Refunds and disputes |
 | Misinformed volunteers | Live brief by role and venue, rebuilt from the current grid; answers from official documents only, or "I don't know" | Shift changes and final rosters |
-| Guest conflicts | Flags clashes, counting travel time between venues, and Q&As left behind when a screening moves | Resolving the conflict |
+| Guest conflicts | Flags guest clashes, counting travel time between venues; also double-booked rooms and Q&As left behind when a screening moves | Resolving the conflict |
 | No crowd view | Live venue view from check-in scans, with suggestions where to redirect people | Crowd and safety decisions |
 | Unverified votes (post-MVP) | Voting form only to people who checked in | Award results |
 | Outside failures | Reads vendor feeds (flight delays, print delays, cancellations), flags what's at risk, drafts contingency messages | Sending them |
@@ -81,6 +81,22 @@ npm run eval
 
 `npm run eval -- --llm` runs the question test through Ollama when `OLLAMA_API_KEY` is set.
 
+## Management dashboard
+
+A Next.js app (the proposal's first demo). The agent runs in the browser and keeps demo state in localStorage, so no database is needed; model calls go through `/api/llm` so the key stays on the server.
+
+Tabs: **Overview** (crowd view, flags, recent changes) · **Schedule grid** (edit times, venues, guests, cancel; save runs the agent) · **Approvals** (each person's message and recommendation, with the reasons) · **Door scan** (green/red for any pass, door-rush simulator) · **Volunteer briefs** · **Ask** · **Feeds & voting** (flight and print delays, audience-award form) · **Log** (audit log and delivered messages) · **Evaluation** (runs the four tests).
+
+The festival clock in the header sets "now" for scans, briefs and the crowd view. *Reset demo* restores the original festival.
+
+```
+npm run dev       # http://localhost:3000
+```
+
+### Deploy on Vercel
+
+Import the repo in Vercel (framework: Next.js, no settings needed), then add `OLLAMA_API_KEY` under Project → Settings → Environment Variables and redeploy. Without it the dashboard works with the model switched off.
+
 ## Develop
 
 ```
@@ -107,6 +123,6 @@ src/eval      the four evaluation scenarios
 2. ✅ Propagate and answer
 3. ✅ Conflicts and approvals
 4. ✅ Check-in and feedback (core logic)
-5. Management dashboard (Next.js on Vercel): grid editor, approval queue, scan simulator, crowd view, log
+5. ✅ Management dashboard (Next.js): grid editor, approval queue, scan simulator, crowd view, log
 6. Google Sheets sync for the schedule grid and rosters
 7. Festival app: mobile web with QR, volunteer mode and guest mode

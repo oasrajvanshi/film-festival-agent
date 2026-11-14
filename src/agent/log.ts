@@ -22,6 +22,11 @@ export class AuditLog {
     return e;
   }
 
+  restore(entries: LogEntry[]) {
+    this.entries = entries;
+    this.seq = entries.reduce((m, e) => Math.max(m, e.seq), 0);
+  }
+
   forRun(runId: string) {
     return this.entries.filter(e => e.runId === runId);
   }

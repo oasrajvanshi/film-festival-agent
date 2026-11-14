@@ -1,0 +1,90 @@
+:root {
+  --bg: #f7f6f3;
+  --panel: #ffffff;
+  --ink: #1d1d1f;
+  --muted: #6b6b70;
+  --line: #e4e2dc;
+  --accent: #b4462b;
+  --accent-ink: #ffffff;
+  --ok: #1f7a4d;
+  --ok-bg: #e5f4ec;
+  --bad: #b3261e;
+  --bad-bg: #fbe9e7;
+  --warn: #8a5a00;
+  --warn-bg: #fff3d6;
+  --chip: #efede8;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141416;
+    --panel: #1c1c1f;
+    --ink: #ececee;
+    --muted: #9a9aa2;
+    --line: #2e2e33;
+    --accent: #e0714f;
+    --accent-ink: #141416;
+    --ok: #6fd3a0;
+    --ok-bg: #173226;
+    --bad: #ff8a80;
+    --bad-bg: #3a1a18;
+    --warn: #f3c46b;
+    --warn-bg: #362a10;
+    --chip: #2a2a2f;
+    color-scheme: dark;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-size: 14px; line-height: 1.45; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button {
+  border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 6px 12px; cursor: pointer;
+}
+button:hover { border-color: var(--muted); }
+button:disabled { opacity: 0.45; cursor: default; }
+button.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+button.small { padding: 3px 8px; font-size: 12px; }
+input, select, textarea {
+  border: 1px solid var(--line); background: var(--panel); border-radius: 8px; padding: 6px 8px; max-width: 100%;
+}
+.wrap { max-width: 1200px; margin: 0 auto; padding: 16px; }
+header.top { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--line); background: var(--panel); position: sticky; top: 0; z-index: 2; }
+header.top h1 { font-size: 16px; margin: 0; }
+header.top .sub { color: var(--muted); font-size: 12px; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+nav.tabs { display: flex; gap: 4px; overflow-x: auto; padding: 8px 16px; border-bottom: 1px solid var(--line); background: var(--panel); }
+nav.tabs button { border: none; background: transparent; border-radius: 6px; white-space: nowrap; }
+nav.tabs button.on { background: var(--chip); font-weight: 600; }
+.badge { display: inline-block; min-width: 18px; padding: 0 6px; border-radius: 9px; background: var(--accent); color: var(--accent-ink); font-size: 11px; text-align: center; margin-left: 4px; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px; }
+.card h2 { font-size: 14px; margin: 0 0 10px; }
+.card h3 { font-size: 13px; margin: 12px 0 6px; }
+.muted { color: var(--muted); }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.stack > * + * { margin-top: 8px; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; color: var(--muted); font-weight: 500; }
+.scroll { overflow-x: auto; }
+.chip { display: inline-block; padding: 1px 8px; border-radius: 10px; background: var(--chip); font-size: 12px; }
+.chip.ok { background: var(--ok-bg); color: var(--ok); }
+.chip.bad { background: var(--bad-bg); color: var(--bad); }
+.chip.warn { background: var(--warn-bg); color: var(--warn); }
+.scan { border-radius: 12px; padding: 24px; text-align: center; font-size: 18px; font-weight: 600; }
+.scan.ok { background: var(--ok-bg); color: var(--ok); }
+.scan.bad { background: var(--bad-bg); color: var(--bad); }
+.msg { border-left: 3px solid var(--line); padding: 4px 10px; margin: 6px 0; }
+.msg .who { font-size: 12px; color: var(--muted); }
+.bar { height: 8px; border-radius: 4px; background: var(--chip); overflow: hidden; }
+.bar > div { height: 100%; background: var(--ok); }
+.bar.busy > div { background: var(--warn); }
+.bar.full > div { background: var(--bad); }
+pre.brief { white-space: pre-wrap; font-family: inherit; margin: 0; }
+.cancelled { text-decoration: line-through; color: var(--muted); }
+.changed { background: var(--warn-bg); }
+@media (max-width: 600px) {
+  .wrap { padding: 12px 16px; }
+  th, td { padding: 6px 4px; }
+}

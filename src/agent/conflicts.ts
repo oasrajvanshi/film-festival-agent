@@ -53,3 +53,18 @@ export function findOrphanedQas(f: Festival): FestivalEvent[] {
     return !!s && s.status === 'scheduled' && (s.venueId !== q.venueId || toMinutes(q.start) < toMinutes(s.end));
   });
 }
+
+export interface VenueClash { venueId: string; a: FestivalEvent; b: FestivalEvent; summary: string }
+
+/** Two scheduled events in the same room at the same time. */
+export function findVenueClashes(f: Festival): VenueClash[] {
+  const out: VenueClash[] = [];
+  const name = (id: string) => f.venues.find(v => v.id === id)?.name ?? id;
+  const evs = f.events.filter(e => e.status === 'scheduled').sort((x, y) => toMinutes(x.start) - toMinutes(y.start));
+  for (let i = 0; i < evs.length; i++) for (let j = i + 1; j < evs.length; j++) {
+    const a = evs[i], b = evs[j];
+    if (a.venueId !== b.venueId || toMinutes(b.start) >= toMinutes(a.end)) continue;
+    out.push({ venueId: a.venueId, a, b, summary: `${name(a.venueId)} is double-booked: "${a.title}" (${clock(a.start)}–${clock(a.end)}) and "${b.title}" (${clock(b.start)}).` });
+  }
+  return out;
+}
