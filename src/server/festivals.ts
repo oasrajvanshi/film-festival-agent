@@ -141,7 +141,7 @@ export function sliceFor(s: Snapshot, who: Who): Snapshot {
     shifts: staff ? f.shifts : mine(f.shifts),
     checkIns: staff ? f.checkIns.map(c => ({ ...c, personId: '' })) : [],
   };
-  return { f: sliced, queue: [], outbox: vendor ? [] : s.outbox.filter(d => d.personId === who.id), flags: [], changeFeed: s.changeFeed, log: [], runs: s.runs, memory: [] } as Snapshot;
+  return { f: sliced, queue: [], outbox: vendor ? [] : s.outbox.filter(d => d.personId === who.id), flags: [], sorted: [], changeFeed: s.changeFeed, log: [], runs: s.runs, memory: [] } as Snapshot;
 }
 
 // ------------------------------------------------------------------ merging
@@ -180,6 +180,9 @@ export function mergeSnapshots(stored: Snapshot, incoming: Snapshot): Snapshot {
     const seen = new Set(cur.map(x => JSON.stringify(x)));
     out[k] = [...cur, ...v.filter(x => !seen.has(JSON.stringify(x)))];
   }
+  // A flag someone sorted out on either device stays sorted.
+  const sorted = new Set(((out.sorted as { id: string }[] | undefined) ?? []).map(x => x.id));
+  out.flags = out.flags.filter(x => !sorted.has(x.id));
   return out;
 }
 

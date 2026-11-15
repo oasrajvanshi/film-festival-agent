@@ -6,7 +6,7 @@ import type { Festival } from '../core/types';
 import { clock } from '../core/time';
 import type { LlmClient } from '../llm/ollama';
 
-export interface Source { ref: string; title: string; text: string; score: number }
+export interface Source { ref: string; title: string; text: string; score: number; /** Matched a word that few sections use (not just "screening"). */ specific?: boolean }
 export interface Answer { known: boolean; text: string; citations: string[]; via: 'llm' | 'extractive' | 'schedule' | 'none'; note?: string }
 
 /** Pull the first JSON object out of a model reply (models sometimes wrap it in prose or code fences). */
@@ -28,6 +28,9 @@ function tokens(s: string): string[] {
     .map(w => w.replace(/(ing|es|s)$/, '')).filter(w => w.length > 1 && !STOP.has(w));
 }
 
+/** A word in more than this share of sections is too common to answer on its own. */
+export const MAX_COMMON = 0.2;
+
 /** BM25-style retrieval over document sections. */
 export function retrieve(f: Festival, question: string, k = 3): Source[] {
   const sections = f.docs.flatMap(d => d.sections.map(s => ({
@@ -42,15 +45,17 @@ export function retrieve(f: Festival, question: string, k = 3): Source[] {
   const q = [...new Set(tokens(question))];
   return sections.map(s => {
     let score = 0;
+    let specific = false;
     for (const t of q) {
       const tf = s.toks.filter(x => x === t).length;
       if (!tf) continue;
+      if (df.get(t)! / N <= MAX_COMMON) specific = true;
       const idf = Math.log(1 + (N - df.get(t)! + 0.5) / (df.get(t)! + 0.5));
       score += idf * (tf * 2.2) / (tf + 1.2 * (0.25 + 0.75 * s.toks.length / avg));
       // A question naming a section's topic is a strong signal.
       if (s.head.has(t)) score += idf;
     }
-    return { ref: s.ref, title: s.title, text: s.text, score };
+    return { ref: s.ref, title: s.title, text: s.text, score, specific };
   }).filter(s => s.score > 0).sort((a, b) => b.score - a.score).slice(0, k);
 }
 
@@ -73,7 +78,8 @@ export async function answerQuestion(f: Festival, question: string, llm: LlmClie
   const sched = scheduleAnswer(f, question);
   if (sched) return sched;
   const sources = retrieve(f, question);
-  if (!sources.length || sources[0].score < MIN_SCORE) return { known: false, text: IDK, citations: [], via: 'none' };
+  // The best section must share a telling word with the question, not only a common one like "screening".
+  if (!sources.length || sources[0].score < MIN_SCORE || !sources[0].specific) return { known: false, text: IDK, citations: [], via: 'none' };
 
   let note: string | undefined;
   if (llm) {
