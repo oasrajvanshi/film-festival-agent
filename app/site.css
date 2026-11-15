@@ -430,3 +430,10 @@ body:has(.s-root) { background: #efe7d8; }
 .s-footer .btn { color: #fff8ee; border-color: rgba(255, 248, 238, .45); }
 .s-footer .btn:hover { border-color: #fff8ee; }
 .s-footer .btn.primary { background: #fff8ee; color: #a8141f; border-color: #fff8ee; }
+/* stamps sit on top of the cards instead of being clipped by them */
+.s-doc { overflow: visible; }
+.s-doc > .bar { border-radius: 10px 10px 0 0; }
+.s-doc .s-stamp { z-index: 3; top: -14px; right: 12px; box-shadow: 0 4px 10px rgba(21, 17, 16, .12); }
+.s-doc.d-sheet table { border-radius: 0 0 10px 10px; overflow: hidden; }
+.s-doc.d-phone b { color: #fff8ee; }
+.s-card.note { z-index: 2; }
