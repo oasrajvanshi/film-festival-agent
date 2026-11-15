@@ -340,3 +340,13 @@
 .s-kicker, .s-card.note { font-style: normal; }
 .s-kicker { text-transform: uppercase; letter-spacing: .12em; font-size: 13px; font-weight: 700; }
 @media (max-width: 760px) { .s-nav .wordmark { font-size: 15px; } }
+/* Rec beat: keep the heading clear of the calendar and its alert. */
+@media (min-width: 901px) { .s-rec-copy { top: 84px; } }
+.s-rec-copy h2.s-h2 { font-size: clamp(26px, 2.7vw, 44px); }
+.s-rec-copy .s-lead { font-size: 17px; max-width: 34em; }
+.s-rec-stage { height: min(56vh, 540px); margin-top: 210px; }
+.s-rec-list { margin-top: 110px; }
+@media (max-width: 900px) { .s-rec-stage { margin-top: 18px; height: 44vh; } .s-rec-list { margin-top: 12px; } }
+/* Both rec steps share one cell, so the taller one sets the height. */
+.s-rec-copy { display: grid; }
+.s-rec-copy > [data-rec-step] { grid-area: 1 / 1; position: relative !important; top: auto !important; }
