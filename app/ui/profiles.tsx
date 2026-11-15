@@ -47,6 +47,7 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
         <div className="ob-mast display" style={{ fontSize: 'clamp(36px, 6.4vw, 78px)' }}>{f.name}</div>
         {!kind ? (
           <>
+            <p className="signin-kicker">Usher your festival with ease</p>
             <p className="signin-lede">Who's signing in?</p>
             <div className="profile-grid">
               {PROFILES.map(p => (

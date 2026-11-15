@@ -1,4 +1,6 @@
-# Film Festival Agent
+# Usher
+
+*Usher your festival with ease.* Usher is the Group Blue film festival agent.
 
 Group Blue · Oas, Sienna, David, Henry
 

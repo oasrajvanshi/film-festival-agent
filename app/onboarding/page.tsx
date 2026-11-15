@@ -129,7 +129,8 @@ export default function Onboarding() {
     return (
       <div className="ob ob-welcome">
         <div className="ob-poster">
-          <div className="ob-mast display">Festival Agent</div>
+          <div className="ob-mast display">Usher</div>
+          <div className="ob-tag">Usher your festival with ease.</div>
           <div className="ob-poster-grid">
             <aside className="ob-meta">
               <div><span>For film</span> <span>festivals</span></div>

@@ -2,9 +2,9 @@ import './globals.css';
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: 'Festival Agent',
-  description: 'Management dashboard for the Film Festival Agent (Group Blue prototype, made-up data).',
-  appleWebApp: { capable: true, title: 'Festival', statusBarStyle: 'black-translucent' as const },
+  title: 'Usher',
+  description: 'Usher your festival with ease. The festival agent for organizers, staff, guests, attendees and vendors (Group Blue prototype, made-up data).',
+  appleWebApp: { capable: true, title: 'Usher', statusBarStyle: 'black-translucent' as const },
 };
 
 export const viewport = {

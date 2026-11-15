@@ -133,7 +133,7 @@ export default function App() {
       <aside className="side">
         <div className="brand">
           <div className="brand-mark"><Icon name="film" /></div>
-          <div><div className="brand-name">{f.name}</div><div className="brand-sub">Festival Agent</div></div>
+          <div><div className="brand-name">{f.name}</div><div className="brand-sub">Usher</div></div>
         </div>
         {groups.map(g => (
           <nav className="nav-group" key={g}>
@@ -145,7 +145,7 @@ export default function App() {
             ))}
           </nav>
         ))}
-        <div className="side-foot"><a href="/onboarding" style={{ color: 'inherit' }} onClick={() => writeSetup(null)}>Set up a new festival</a><br />Group Blue prototype · made-up data</div>
+        <div className="side-foot"><a href="/onboarding" style={{ color: 'inherit' }} onClick={() => writeSetup(null)}>Set up a new festival</a><br />Usher · Group Blue prototype · made-up data</div>
       </aside>
 
       <div className="main">

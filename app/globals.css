@@ -1,4 +1,4 @@
-/* Festival Agent: vintage cinema look. Cream paper, black ink type, velvet red, film grain. */
+/* Usher: vintage cinema look. Cream paper, black ink type, velvet red, film grain. */
 :root {
   --bg: #efe7d8;
   --bg-2: #e6dccb;
@@ -346,6 +346,8 @@ pre.brief { white-space: pre-wrap; font-family: inherit; margin: 0; }
   background: var(--panel) var(--grain); color: var(--ink); box-shadow: var(--shadow-lg); border: 1px solid var(--line);
 }
 .ob-mast { font-size: clamp(30px, 7.6vw, 92px); line-height: 1; letter-spacing: .04em; margin: 0 0 22px; font-weight: 700; }
+.ob-tag { font-family: var(--sans); font-size: clamp(16px, 1.6vw, 20px); font-weight: 600; letter-spacing: .02em; margin: -12px 0 22px; color: var(--accent); }
+.signin-kicker { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); margin: -8px 0 6px; }
 .ob-poster-grid { display: grid; grid-template-columns: 170px 1fr; gap: 28px; align-items: stretch; }
 .ob-meta { font-family: var(--display); font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; line-height: 1.35; display: flex; flex-direction: column; gap: 12px; }
 .ob-meta span { display: block; }
