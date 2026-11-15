@@ -9,6 +9,7 @@ import { addMinutes, clock as fmt, toMinutes } from '../../src/core/time';
 import { PASS_LABELS, qrFor, type ScanResult } from '../../src/rules/access';
 import type { Answer } from '../../src/agent/answer';
 import { runAll, type SuiteResult } from '../../src/eval/scenarios';
+import { evalRandomFestivals } from '../../src/eval/fuzz';
 import type { Recommendation } from '../../src/agent/recommend';
 import { Icon } from './icons';
 
@@ -257,7 +258,21 @@ export function Approvals({ s, user }: P) {
   const items = [...s.agent.queue].reverse();
   const pending = items.filter(q => q.status === 'pending');
   const done = items.filter(q => q.status !== 'pending');
-  const act = (id: string, ok: boolean) => { ok ? s.agent.approve(id, user) : s.agent.reject(id, user); s.commit(); };
+  const [notes, setNotes] = useState<Record<string, string>>({});
+  const act = (id: string, ok: boolean) => { const n = notes[id]?.trim() || undefined; ok ? s.agent.approve(id, user, n) : s.agent.reject(id, user, n); s.commit(); };
+  // Decision memory: what the team did last time with this kind of action.
+  const memo = (q: { action: { id: string; kind: string } }) => {
+    const past = s.agent.pastDecisions?.(q.action) ?? [];
+    if (!past.length) return null;
+    const last = past[0];
+    const rejected = past.filter(d => d.status === 'rejected').length;
+    const noted = past.find(d => d.note);
+    return <div className="memo muted" style={{ fontSize: 13, borderLeft: '3px solid var(--line, #d8ccb6)', paddingLeft: 8, margin: '6px 0' }}>
+      Last time: {last.by} {last.status} “{last.title}” on {fmt(last.at)}.
+      {rejected > 1 && <> {rejected} of the last {past.length} like this were rejected.</>}
+      {noted && <> Note: “{noted.note}”</>}
+    </div>;
+  };
   return (
     <div className="stack">
       <div className="card">
@@ -274,6 +289,7 @@ export function Approvals({ s, user }: P) {
                 <span className="chip">{q.action.kind.replace('_', ' ')}</span>
               </div>
               <p className="muted">{q.action.rationale}</p>
+              {memo(q)}
               {shown.map((m, i) => {
                 const rec = (m as { recommendation?: Recommendation }).recommendation;
                 return (
@@ -285,6 +301,7 @@ export function Approvals({ s, user }: P) {
                 );
               })}
               {msgs.length > 4 && <button className="small" onClick={() => setOpen({ ...open, [q.action.id]: !open[q.action.id] })}>{open[q.action.id] ? 'Show fewer' : `Show all ${msgs.length}`}</button>}
+              <input placeholder="Note for next time (optional)" value={notes[q.action.id] ?? ''} onChange={e => setNotes({ ...notes, [q.action.id]: e.target.value })} style={{ marginTop: 8, width: '100%' }} />
               <div className="row" style={{ marginTop: 8 }}>
                 <button className="primary" onClick={() => act(q.action.id, true)}>Approve and send</button>
                 <button onClick={() => act(q.action.id, false)}>Reject</button>
@@ -408,11 +425,27 @@ export function Ask({ s }: P) {
 }
 
 // ------------------------------------------------------------------ Vendor feed & voting
+const g12 = (iso: string) => `${new Date(`${iso.slice(0, 10)}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })} ${fmt(iso)}`;
+
 export function Feeds({ s, go, user }: P) {
   const f = s.agent.f;
-  const guests = f.people.filter(p => p.role === 'guest');
-  const [gid, setGid] = useState(guests[0].id);
-  const [arrive, setArrive] = useState('09:30');
+  const guests = f.people.filter(p => p.role === 'guest').sort((a, b) => (a.arrives ?? 'z').localeCompare(b.arrives ?? 'z'));
+  const [gid, setGid] = useState(guests[0]?.id ?? '');
+  const guest = guests.find(g => g.id === gid);
+  const flightOf = (note = '') => /\b([A-Z0-9]{2}) ?(\d{1,4})\b/.exec(note)?.slice(1).join('') ?? '';
+  const [flight, setFlight] = useState(flightOf(guest?.travelNote));
+  const [arriveAt, setArriveAt] = useState(guest?.arrives ?? `${s.clock.slice(0, 10)}T09:30`);
+  const [live, setLive] = useState<string | null>(null);
+  const pickGuest = (id: string) => { const g = guests.find(x => x.id === id); setGid(id); setFlight(flightOf(g?.travelNote)); setArriveAt(g?.arrives ?? `${s.clock.slice(0, 10)}T09:30`); setLive(null); };
+  const checkFlight = async () => {
+    setLive('Checking…');
+    const r = await fetch(`/api/flight?flight=${encodeURIComponent(flight)}`).then(x => x.json()).catch(() => ({ error: 'offline' }));
+    if (!r.configured) { setLive('Live flight status isn’t connected (add FLIGHT_API_KEY in Vercel). Using the arrival time from your files.'); return; }
+    if (r.error) { setLive(r.error); return; }
+    if (!r.found) { setLive(`No live data for ${flight}. Test festivals use made-up flight numbers.`); return; }
+    setArriveAt(r.estimated);
+    setLive(`${r.flight} is ${r.status}, landing ${r.iata} ${fmt(r.estimated)}${r.delayMin ? ` (${r.delayMin} min late)` : ''}.`);
+  };
   const [mins, setMins] = useState(45);
   const [filmId, setFilmId] = useState(f.films[0].id);
   const [eta, setEta] = useState('09:30');
@@ -425,11 +458,17 @@ export function Feeds({ s, go, user }: P) {
     <div className="grid2" style={{ marginTop: 16 }}>
       <div className="card stack">
         <h2>Vendor and partner feeds</h2>
-        <h3>Flight delay</h3>
-        <label className="row">Guest <select value={gid} onChange={e => setGid(e.target.value)}>{guests.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
-        <label className="row">Lands at <input type="time" value={arrive} onChange={e => setArrive(e.target.value)} /> on {date}</label>
+        <h3>Guest flights</h3>
+        {guests.length === 0 ? <div className="empty-note">No guests in this festival.</div> : <>
+        <label className="row">Guest <select value={gid} onChange={e => pickGuest(e.target.value)}>{guests.map(g => <option key={g.id} value={g.id}>{g.name}{g.arrives ? ` · lands ${g12(g.arrives)}` : ''}</option>)}</select></label>
+        {guest?.arrives && <div className="muted">On file: lands {g12(guest.arrives)}{guest.travelNote ? ` · ${guest.travelNote}` : ''}</div>}
+        <div className="row"><label className="row">Flight <input value={flight} onChange={e => setFlight(e.target.value.toUpperCase())} placeholder="UA512" style={{ width: 90 }} /></label>
+          <button className="small" disabled={!flight} onClick={checkFlight}>Check live status</button></div>
+        {live && <div className="muted">{live}</div>}
+        <label className="row">Now lands <input type="datetime-local" value={arriveAt} onChange={e => setArriveAt(e.target.value)} /></label>
         <label className="row">Airport to venue <input type="number" value={mins} onChange={e => setMins(+e.target.value)} style={{ width: 70 }} /> min</label>
-        <button onClick={() => { const a = s.agent.onVendorAlert({ type: 'flight_delay', guestId: gid, flight: 'HL204', newArrival: `${date}T${arrive}`, arrivalVenueMin: mins }); setNote(`${a.length} action(s): ${a.map(x => x.title).join('; ') || 'nothing at risk'}`); s.commit(); }}>Send alert</button>
+        <button onClick={() => { const a = s.agent.onFlightUpdate(gid, flight, arriveAt.slice(0, 16), mins); setNote(`${a.length} action(s): ${a.map(x => x.title).join('; ') || 'nothing at risk'}`); s.commit(); }}>Update arrival</button>
+        </>}
         <h3>Print delivery delay</h3>
         <label className="row">Film <select value={filmId} onChange={e => setFilmId(e.target.value)}>{f.films.map(x => <option key={x.id} value={x.id}>{x.title}</option>)}</select></label>
         <label className="row">New ETA <input type="time" value={eta} onChange={e => setEta(e.target.value)} /> on {date}</label>
@@ -494,6 +533,28 @@ export function Evaluation({ s }: P) {
         </div>
       ))}
       <span className="muted" style={{ display: 'none' }}>{s.version}</span>
+      <FuzzEval />
+    </div>
+  );
+}
+
+/** Beyond our own festival: 50 random festivals with problems planted on purpose. */
+function FuzzEval() {
+  const [r, setR] = useState<SuiteResult | null>(null);
+  const [all, setAll] = useState(false);
+  return (
+    <div className="card stack">
+      <h2>Stress test: 50 random festivals</h2>
+      <p className="muted">Each one has different people, guests, tickets and times, with a double-booked guest, an oversold screening and a late flight planted on purpose. Usher should find all three every time and raise nothing else new.</p>
+      <div><button onClick={() => setTimeout(() => setR(evalRandomFestivals(50)), 0)}>Run the stress test</button></div>
+      {r && <>
+        <div className="row" style={{ justifyContent: 'space-between' }}>
+          <strong>{r.passed} of {r.total} festivals clean</strong>
+          <span className={`chip ${r.passed === r.total ? 'ok' : 'bad'}`}>{r.passMark}</span>
+        </div>
+        {(all ? r.cases : r.cases.filter(c => !c.passed).concat(r.cases.filter(c => c.passed).slice(0, 3))).map(c => <div key={c.name} className="msg" style={{ borderColor: c.passed ? 'var(--ok)' : 'var(--bad)' }}><strong>{c.passed ? '✓' : '✗'} {c.name}</strong><div className="who">{c.detail}</div></div>)}
+        {!all && <button className="small" onClick={() => setAll(true)}>Show all {r.total}</button>}
+      </>}
     </div>
   );
 }

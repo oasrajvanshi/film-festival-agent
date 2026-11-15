@@ -24,3 +24,11 @@ describe('evaluation on the scripted festival day', () => {
     expect(r.total).toBe(10);
   });
 });
+
+describe('random festivals with planted problems', async () => {
+  const { evalRandomFestivals } = await import('../src/eval/fuzz');
+  it('finds every planted problem with no false alarms', () => {
+    const r = evalRandomFestivals(20);
+    expect(r.passed).toBe(r.total);
+  });
+});

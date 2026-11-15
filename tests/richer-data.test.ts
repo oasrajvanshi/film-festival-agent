@@ -145,3 +145,16 @@ describe('any Google Sheet layout', () => {
     expect(f.events[0]).toMatchObject({ title: 'Film A', start: '2027-05-20T19:00' });
   });
 });
+
+describe('flight updates', () => {
+  it('moves the guest’s arrival and flags an appearance they can no longer make', async () => {
+    const { FestivalAgent } = await import('../src/agent/agent');
+    const f = buildFestival();
+    const e = f.events.find(x => x.guestIds.length && x.status === 'scheduled')!;
+    const a = new FestivalAgent(f);
+    const acts = a.onFlightUpdate(e.guestIds[0], 'UA512', e.start, 45);
+    expect(f.people.find(p => p.id === e.guestIds[0])!.arrives).toBe(e.start);
+    expect(acts.some(x => x.id === `arrival-${e.guestIds[0]}-${e.id}`)).toBe(true);
+    expect(a.flags.some(x => x.id === `arrival-${e.guestIds[0]}-${e.id}`)).toBe(true);
+  });
+});

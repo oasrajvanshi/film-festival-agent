@@ -171,6 +171,23 @@ export class FestivalAgent {
     return actions;
   }
 
+  /**
+   * A guest's flight changed (live flight status or someone on the phone).
+   * Their arrival time is updated, the usual delay actions are drafted, and
+   * any appearance they can no longer make is flagged.
+   */
+  onFlightUpdate(guestId: string, flight: string, newArrival: string, arrivalVenueMin: number) {
+    const guest = this.f.people.find(p => p.id === guestId);
+    if (!guest) return [];
+    const before = new Set(this.flags.map(fl => fl.id));
+    guest.arrives = newArrival;
+    if (flight && !(guest.travelNote ?? '').includes(flight)) guest.travelNote = guest.travelNote ? `${flight}, ${guest.travelNote}` : flight;
+    const actions = this.onVendorAlert({ type: 'flight_delay', guestId, flight: flight || 'their flight', newArrival, arrivalVenueMin });
+    const late = otherFlags(this.f).filter(k => k.id.startsWith(`arrival-${guestId}-`) && !before.has(k.id));
+    this.dispatch(this.run('flight'), late.map(k => ({ ...k, kind: 'flag' as const })));
+    return [...actions, ...late];
+  }
+
   /** A weather forecast arrived (live or a demo scenario). Only new risk windows produce actions. */
   async onWeather(hours: WeatherHour[], source: string) {
     const runId = this.run('weather');
