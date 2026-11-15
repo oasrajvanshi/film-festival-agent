@@ -142,7 +142,7 @@ export default function Onboarding() {
     <div className="ob">
       <header className="ob-head">
         <div className="brand-mark"><Icon name="film" size={18} /></div>
-        <div className="ob-title display">Set up {meta.name || 'your festival'}</div>
+        <div className="ob-title display">Usher</div>
         <a className="ob-link" href="/">Exit</a>
       </header>
       <nav className="ob-strip" aria-label="Steps">
