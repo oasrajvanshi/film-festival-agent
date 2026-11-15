@@ -115,3 +115,33 @@ describe('reading these from a festival’s own files', () => {
     expect(findArrivalClashes(f).length).toBe(1);
   });
 });
+
+describe('events past midnight', () => {
+  it('a 11:30pm screening with a 100-minute run ends at 1:10am the next day, and survives the sheet', () => {
+    const r = buildTables({ name: 'T', startDate: '2027-05-20', days: 2 }, [
+      up('venue-list.csv', [['Location', 'Capacity', 'Address'], ['The Marquee', '520', '1 Main St']]),
+      up('screening-schedule.csv', [['Screening ID', 'Title', 'Screening Date', 'Start Time', 'Run Time', 'Location'], ['S1', 'Midnight Movie', '5/20/2027', '11:30pm', '100 mins', 'The Marquee']]),
+    ]);
+    const f = tablesToFestival(r.tables).festival!;
+    expect(f.events[0]).toMatchObject({ start: '2027-05-20T23:30', end: '2027-05-21T01:10' });
+    const back = tablesToFestival(festivalToTables(f));
+    expect(back.errors).toEqual([]);
+    expect(back.festival!.events[0].end).toBe('2027-05-21T01:10');
+  });
+});
+
+describe('any Google Sheet layout', () => {
+  it('reads every tab of a workbook, matches them, and re-reads with the saved mapping', async () => {
+    const XLSX = await import('xlsx');
+    const { workbookTabs, tabsToUploads, rebuildFromTabs } = await import('../src/onboard/workbook');
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Location', 'Capacity', 'Address'], ['The Marquee', 520, '1 Main St']]), 'Theatres');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['Screening ID', 'Title', 'Screening Date', 'Start Time', 'Run Time', 'Location'], ['S1', 'Film A', '5/20/2027', '7:00pm', '90 mins', 'The Marquee']]), 'Program');
+    const tabs = workbookTabs(XLSX.write(wb, { type: 'array', bookType: 'xlsx' }));
+    const ups = tabsToUploads(tabs);
+    expect(ups.map(u => u.kind)).toEqual(['venues', 'schedule']);
+    const mapping = { meta: { name: 'T', startDate: '2027-05-20', days: 2 }, tabs: ups.map(u => ({ name: u.name, kind: u.kind, columns: u.columns })) };
+    const f = rebuildFromTabs(mapping, tabs).festival!;
+    expect(f.events[0]).toMatchObject({ title: 'Film A', start: '2027-05-20T19:00' });
+  });
+});

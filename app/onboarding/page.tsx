@@ -10,6 +10,7 @@ import type { Festival } from '../../src/core/types';
 import { parseCsv, tablesToFestival } from '../../src/data/sheet';
 import { buildTables, guessKind, KIND_ORDER, KINDS, matchColumns, scheduleDateRange, summarizeNotes, type Kind, type Upload } from '../../src/onboard/mapping';
 import { clock } from '../../src/core/time';
+import { tabsToUploads } from '../../src/onboard/workbook';
 import type { GuestClash, VenueClash } from '../../src/agent/conflicts';
 
 const STEPS = ['Festival & data', 'Matching', 'Check', 'Team'] as const;
@@ -45,6 +46,7 @@ export default function Onboarding() {
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [sheetFest, setSheetFest] = useState<Festival | null>(null);
   const [sheetUrl, setSheetUrl] = useState('');
+  const [fromSheet, setFromSheet] = useState(false);
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const [approver, setApprover] = useState('Operations lead');
@@ -84,9 +86,14 @@ export default function Onboarding() {
     try {
       const r = await fetch(`/api/festival?sheet=${encodeURIComponent(sheetUrl)}`);
       const b = await r.json();
-      if (!r.ok || b.error) throw new Error(b.error ?? `HTTP ${r.status}`);
-      if (!b.festival) throw new Error((b.errors ?? []).slice(0, 3).join(' · ') || 'The sheet has errors.');
-      setSheetFest(b.festival); setUploads([]); setStep(2);
+      if (r.ok && !b.error && b.festival) { setSheetFest(b.festival); setUploads([]); setStep(2); setBusy(''); return; }
+      // Not in Usher's own layout: read every tab and match it like uploaded files.
+      const t = await fetch(`/api/festival?tabs=1&sheet=${encodeURIComponent(sheetUrl)}`);
+      const tb = await t.json() as { tabs?: { name: string; table: string[][] }[]; error?: string };
+      if (!t.ok || tb.error || !tb.tabs?.length) throw new Error(tb.error ?? b.error ?? 'The sheet has no tabs Usher can read.');
+      setSheetFest(null); setFromSheet(true);
+      setUploads(tabsToUploads(tb.tabs));
+      setStep(1);
     } catch (e) { setError((e as Error).message); }
     setBusy('');
   };
@@ -155,12 +162,16 @@ export default function Onboarding() {
 
   const goodToKnow = useMemo(() => (built ? summarizeNotes([...built.unresolved, ...built.warnings, ...built.notes]) : []), [built]);
 
-  const goLive = () => {
+  const goLive = async () => {
     if (!built?.festival) return;
-    s.loadFestival(structuredClone(built.festival), sheetFest ? 'Google Sheet' : `${uploads.length} uploaded files`);
-    writeSetup({ festivalName: built.festival.name || meta.name, city: meta.city, approver, channels, onboardedAt: new Date().toISOString() });
-    writeWho({ kind: 'organizer', id: 'setup', name: approver || 'Organizer', detail: 'Set up the festival', code: '' });
-    location.href = '/#today';
+    setBusy('Going live…'); setError('');
+    try {
+      await s.goLive(structuredClone(built.festival), sheetFest ? 'Google Sheet' : `${uploads.length} uploaded files`,
+        { festivalName: built.festival.name || meta.name, city: meta.city, approver, channels, onboardedAt: new Date().toISOString(),
+          ...(sheetFest || fromSheet ? { sheetUrl } : {}),
+          ...(fromSheet ? { sheetMapping: { meta, tabs: uploads.map(u => ({ name: u.name, kind: u.kind, columns: u.columns })) } } : {}) });
+      location.href = '/#today';
+    } catch (e) { setError((e as Error).message); setBusy(''); }
   };
 
   const canNext = [
@@ -193,7 +204,7 @@ export default function Onboarding() {
           <p>Connect your schedule, people and passes. The agent watches for changes and disruptions, works out who is affected, and drafts each person a recommendation. Your team approves anything that goes out.</p>
           <div className="row">
             <button className="primary big" onClick={() => setStarted(true)}>Set up a festival <Icon name="send" size={16} /></button>
-            <a className="ob-link" href="/" onClick={() => { writeWho(null); writeSetup({ festivalName: 'Harbor Lights Film Festival', city: 'New York', approver: 'Operations lead', channels: ['push', 'email'], onboardedAt: new Date().toISOString() }); }}>Or explore a sample festival</a>
+            <a className="ob-link" href="/" onClick={async e => { e.preventDefault(); await s.openSample(); location.href = '/'; }}>Or explore a sample festival</a>
           </div>
           <ol className="ob-steps-preview">
             {STEPS.map((t, i) => <li key={t}><span>{String(i + 1).padStart(2, '0')}</span>{t}</li>)}
@@ -403,17 +414,9 @@ export default function Onboarding() {
 
 /** Each sheet of an .xlsx workbook as CSV text, named "<file> - <sheet>.csv". Loaded only when needed. */
 async function excelToCsv(file: File): Promise<{ name: string; text: string }[]> {
-  const { default: readXlsx } = await import('read-excel-file/browser');
-  const sheets = await readXlsx(file);
+  const { workbookTabs } = await import('../../src/onboard/workbook');
+  const tabs = workbookTabs(new Uint8Array(await file.arrayBuffer()));
   const base = file.name.replace(/\.xlsx$/i, '');
-  const cell = (v: unknown): string => {
-    if (v instanceof Date) {
-      const iso = v.toISOString();
-      if (v.getUTCFullYear() < 1901) return iso.slice(11, 16); // a time on its own
-      return iso.slice(11, 16) === '00:00' ? iso.slice(0, 10) : `${iso.slice(0, 10)} ${iso.slice(11, 16)}`;
-    }
-    return v == null ? '' : String(v);
-  };
-  const csv = (rows: unknown[][]) => rows.map(r => r.map(v => { const t = cell(v); return /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; }).join(',')).join('\n');
-  return sheets.filter(s => s.data.length > 1).map(s => ({ name: sheets.length > 1 ? `${base} - ${s.sheet}.csv` : `${base}.csv`, text: csv(s.data as unknown[][]) }));
+  const csv = (rows: string[][]) => rows.map(r => r.map(t => /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t).join(',')).join('\n');
+  return tabs.filter(t => t.table.length > 1).map(t => ({ name: tabs.length > 1 ? `${base} - ${t.name}.csv` : `${base}.csv`, text: csv(t.table) }));
 }

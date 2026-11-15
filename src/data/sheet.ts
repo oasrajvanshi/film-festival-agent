@@ -8,6 +8,10 @@ import type {
 } from '../core/types';
 import { ACCESS_RULES } from '../rules/access';
 import { MAX_DAYS } from '../core/types';
+import { addMinutes } from '../core/time';
+
+/** An end time earlier than the start means the event runs past midnight into the next day. */
+const endAt = (date: string, s: string, e: string) => e > s ? `${date}T${e}` : addMinutes(`${date}T00:00`, 1440 + Number(e.slice(0, 2)) * 60 + Number(e.slice(3, 5)));
 
 export type Table = string[][];
 export type Tables = Record<TabName, Table>;
@@ -198,7 +202,7 @@ export function tablesToFestival(t: Partial<Tables>): LoadResult {
     if (restriction && !RESTRICTIONS.includes(restriction)) err(tab, i, `Restriction must be blank or one of ${RESTRICTIONS.join(', ')}`);
     const status = /^cancel/i.test(r.Status) ? 'cancelled' : 'scheduled';
     if (!d || !s || !e || !dates[d]) return;
-    if (e <= s) err(tab, i, 'End must be after Start (events past midnight are not supported)');
+    if (e === s) err(tab, i, 'End must be different from Start');
     const num = (col: string) => {
       const raw = (r[col] ?? '').trim();
       if (!raw) return undefined;
@@ -212,7 +216,7 @@ export function tablesToFestival(t: Partial<Tables>): LoadResult {
     const seatsSold = num('Seats sold'), seatsHeld = num('Seats held');
     events.push({
       id: r['Event ID'], kind, title: r.Title, venueId: r['Venue ID'], day: d,
-      start: `${dates[d]}T${s}`, end: `${dates[d]}T${e}`, filmId: r['Film ID'] || undefined,
+      start: `${dates[d]}T${s}`, end: endAt(dates[d], s, e), filmId: r['Film ID'] || undefined,
       guestIds, restriction: restriction || undefined, status,
       ...(room ? { room: v?.rooms?.find(x => x.name.toLowerCase() === room.toLowerCase())?.name ?? room } : {}),
       ...(seatsSold !== undefined ? { seatsSold } : {}), ...(seatsHeld !== undefined ? { seatsHeld } : {}),
@@ -257,7 +261,7 @@ export function tablesToFestival(t: Partial<Tables>): LoadResult {
     if (!personIds.has(r['Person ID'])) err(tab, i, `unknown person "${r['Person ID']}"`);
     if (!venueIds.has(r['Venue ID'])) err(tab, i, `unknown venue "${r['Venue ID']}"`);
     if (!d || !s || !e || !dates[d]) return [];
-    return [{ id: r['Shift ID'] || `s-${i + 1}`, personId: r['Person ID'], venueId: r['Venue ID'], day: d, start: `${dates[d]}T${s}`, end: `${dates[d]}T${e}`, task: r.Task }];
+    return [{ id: r['Shift ID'] || `s-${i + 1}`, personId: r['Person ID'], venueId: r['Venue ID'], day: d, start: `${dates[d]}T${s}`, end: endAt(dates[d], s, e), task: r.Task }];
   });
 
   const docMap = new Map<string, OfficialDoc>();

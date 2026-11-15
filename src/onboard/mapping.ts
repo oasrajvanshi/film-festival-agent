@@ -297,8 +297,9 @@ export function daysFrom(raw: string, dates: string[]): number[] {
 
 const slug = (s: string) => norm(s).replace(/\s+/g, '-').slice(0, 24) || 'x';
 const addMin = (hhmm: string, min: number) => {
-  const t = Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3)) + min;
-  return `${String(Math.min(23, Math.floor(t / 60))).padStart(2, '0')}:${String(t >= 24 * 60 ? 59 : t % 60).padStart(2, '0')}`;
+  // Wraps past midnight: a 23:30 start plus 100 minutes ends at 01:10 the next day.
+  const t = (Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3)) + min) % (24 * 60);
+  return `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
 };
 
 // ------------------------------------------------------------ building canonical tables

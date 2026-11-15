@@ -92,3 +92,15 @@ describe('Ask', () => {
     expect(a.text).toBe(IDK);
   });
 });
+
+describe('sorted flags across devices', () => {
+  it('a flag sorted on one device is not brought back by a merge', async () => {
+    const { mergeSnapshots } = await import('../src/server/festivals');
+    const { a, flagId } = withGap();
+    const stored = structuredClone(a.snapshot());
+    a.resolveFlag(flagId, 'Ops');
+    const merged = mergeSnapshots(stored as never, structuredClone(a.snapshot()) as never) as ReturnType<FestivalAgent['snapshot']>;
+    expect(merged.flags.some(x => x.id === flagId)).toBe(false);
+    expect(merged.sorted.map(x => x.id)).toContain(flagId);
+  });
+});

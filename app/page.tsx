@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { readSetup, useAgent, writeSetup } from './ui/useAgent';
+import { readSetup, useAgent, writeSetup, writeWho } from './ui/useAgent';
 import { Approvals, Ask, Briefs, Data, Evaluation, Feeds, Grid, Log, Overview, Scan } from './ui/panels';
 import { Icon } from './ui/icons';
-import { AccessCodes, PersonalApp, SignIn, readWho, writeWho } from './ui/profiles';
+import { AccessCodes, Feedback, PersonalApp, SignIn } from './ui/profiles';
 import type { Who } from '../src/access/profiles';
 import type { DayNumber } from '../src/core/types';
 import { festivalDays } from '../src/core/types';
@@ -21,6 +21,7 @@ const PAGES = [
   { id: 'eval', label: 'Evaluation', icon: 'chart', group: 'Behind the scenes' },
   { id: 'data', label: 'Data', icon: 'sheet', group: 'Behind the scenes' },
   { id: 'codes', label: 'Access codes', icon: 'key', group: 'Behind the scenes' },
+  { id: 'feedback', label: 'Feedback', icon: 'chat', group: 'Behind the scenes' },
 ] as const;
 type PageId = typeof PAGES[number]['id'];
 const BOTTOM: PageId[] = ['today', 'approvals', 'scan', 'schedule'];
@@ -31,8 +32,8 @@ export default function App() {
   const [user, setUser] = useState('Operations lead');
   const [sheet, setSheet] = useState<null | 'settings' | 'more'>(null);
   const [armed, setArmed] = useState(false);
-  const [who, setWho] = useState<Who | null>(null);
-  const [ready, setReady] = useState(false);
+  const who = s.who;
+  const ready = s.mode !== 'loading';
   const [viewAs, setViewAs] = useState<Who | null>(null);
   const f = s.agent.f;
   const pending = s.agent.queue.filter(q => q.status === 'pending').length;
@@ -65,7 +66,20 @@ export default function App() {
   const enableAlerts = async () => {
     const r = await Notification.requestPermission();
     setAlerts(r as 'default' | 'granted' | 'denied');
-    if (r === 'granted') (await navigator.serviceWorker.ready).showNotification('Alerts are on', { body: 'You will hear about new approvals and flags on this device.', icon: '/icon-192.png', data: { url: '/#today' } });
+    if (r !== 'granted') return;
+    const reg = await navigator.serviceWorker.ready;
+    // Shared mode: subscribe this device to server push, so alerts arrive even when Usher is closed.
+    if (s.shared && 'PushManager' in window) {
+      try {
+        const k = await s.call<{ publicKey: string }>('vapid', {}, 'GET');
+        const raw = atob(k.body.publicKey.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - k.body.publicKey.length % 4) % 4));
+        const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: Uint8Array.from(raw, c => c.charCodeAt(0)) });
+        await s.call('push-subscribe', { sub: sub.toJSON() });
+        await s.call('push-test');
+        return;
+      } catch { /* fall back to a local notification */ }
+    }
+    reg.showNotification('Alerts are on', { body: 'You will hear about new approvals and flags on this device.', icon: '/icon-192.png', data: { url: '/#today' } });
   };
 
   const setPage = (p: PageId) => {
@@ -74,8 +88,11 @@ export default function App() {
     window.scrollTo({ top: 0 });
   };
   useEffect(() => {
-    if (!readSetup()) { location.replace('/onboarding'); return; }
-    const w = readWho(); setWho(w); if (w?.kind === 'organizer') setUser(w.name); setReady(true);
+    if (!ready) return;
+    if (s.shared ? !s.fid : !readSetup()) { location.replace('/onboarding'); return; }
+  }, [ready, s.shared, s.fid]);
+  useEffect(() => { if (who?.kind === 'organizer') setUser(who.name); }, [who]);
+  useEffect(() => {
     const fromHash = () => { const h = location.hash.slice(1); if (PAGES.some(p => p.id === h)) setPageState(h as PageId); };
     fromHash();
     window.addEventListener('hashchange', fromHash);
@@ -114,19 +131,20 @@ export default function App() {
           : alerts === 'unsupported' ? <span className="muted">Not available here. On iPhone, add the app to your Home Screen first.</span>
           : <button className="small primary" onClick={enableAlerts}><Icon name="bolt" size={14} /> Turn on alerts</button>}
       </div>
-      <button className="block" onClick={() => { location.href = '/onboarding'; }}><Icon name="film" size={16} /> Set up a new festival</button>
-      <button className="block" style={{ marginTop: 8 }} onClick={signOut}><Icon name="logout" size={16} /> Sign out</button>
+      <button className="block" onClick={signOut}><Icon name="logout" size={16} /> Sign out</button>
       <button className="block" style={{ marginTop: 8 }} onClick={() => { if (armed) { s.reset(); setArmed(false); setSheet(null); } else { setArmed(true); setTimeout(() => setArmed(false), 4000); } }}>
         {armed ? 'Tap again to reset everything' : 'Reset demo'}
       </button>
-      <button className="block" style={{ marginTop: 8 }} onClick={() => { writeSetup(null); location.href = '/onboarding'; }}>Set up a new festival</button>
-      <p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>Prototype with made-up people. Nothing is sent outside this app.</p>
+      <button className="block" style={{ marginTop: 8 }} onClick={() => { writeSetup(null); writeWho(null); try { localStorage.removeItem('ffa-fid-v1'); } catch { /* ignore */ } location.href = '/onboarding'; }}>Set up a new festival</button>
+      <p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>{s.shared
+        ? 'Saved on the server, so every signed-in device sees the same festival. Test mode: emails and texts go only to the team’s own inbox and phone.'
+        : 'Saved in this browser only. Test mode: nothing is sent to the people in the data.'}</p>
     </>
   );
 
-  function signOut() { writeWho(null); setWho(null); setViewAs(null); setSheet(null); window.scrollTo({ top: 0 }); }
+  function signOut() { s.signOut(); setViewAs(null); setSheet(null); window.scrollTo({ top: 0 }); }
   if (!ready) return null;
-  if (!who) return <SignIn s={s} onIn={w => { setWho(w); if (w.kind === 'organizer') setUser(w.name); }} />;
+  if (!who) return <SignIn s={s} onIn={w => { if (w.kind === 'organizer') setUser(w.name); }} />;
   if (who.kind !== 'organizer') return <PersonalApp s={s} who={who} onOut={signOut} />;
   if (viewAs) return <PersonalApp s={s} who={viewAs} viewAs onOut={() => { setViewAs(null); window.scrollTo({ top: 0 }); }} />;
 
@@ -172,6 +190,7 @@ export default function App() {
           <button className="ghost small" aria-label="Settings" onClick={() => setSheet('settings')}><Icon name="gear" /></button>
         </header>
 
+        {s.notice && <div className="issues" role="status" style={{ margin: '8px 16px 0' }}>{s.notice}</div>}
         <main className="wrap" key={s.version >= 1 ? 'ready' : 'boot'}>
           {page === 'today' && <Overview {...props} />}
           {page === 'schedule' && <Grid {...props} />}
@@ -183,6 +202,7 @@ export default function App() {
           {page === 'log' && <Log {...props} />}
           {page === 'eval' && <Evaluation {...props} />}
           {page === 'data' && <Data {...props} />}
+          {page === 'feedback' && <Feedback s={s} />}
           {page === 'codes' && <AccessCodes s={s} onViewAs={w => { setViewAs(w); window.scrollTo({ top: 0 }); }} />}
         </main>
       </div>
