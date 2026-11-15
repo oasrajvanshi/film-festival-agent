@@ -8,7 +8,9 @@ import { FestivalAgent } from '../../src/agent/agent';
 import { GATE_POLICY, type ActionKind } from '../../src/agent/approvals';
 import type { Festival } from '../../src/core/types';
 import { parseCsv, tablesToFestival } from '../../src/data/sheet';
-import { buildTables, guessKind, KIND_ORDER, KINDS, matchColumns, type Kind, type Upload } from '../../src/onboard/mapping';
+import { buildTables, guessKind, KIND_ORDER, KINDS, matchColumns, summarizeNotes, type Kind, type Upload } from '../../src/onboard/mapping';
+import { clock } from '../../src/core/time';
+import type { GuestClash, VenueClash } from '../../src/agent/conflicts';
 
 const STEPS = ['Festival & data', 'Matching', 'Check', 'Team'] as const;
 const SAMPLES = ['program.csv', 'theatres.csv', 'walking-times.csv', 'film-catalog.csv', 'registrations.csv', 'ticket-orders.csv', 'my-schedule-saves.csv', 'volunteer-rota.csv', 'faq-and-policies.csv'];
@@ -95,6 +97,24 @@ export default function Onboarding() {
     a.sweepClashes();
     return a;
   }, [built]);
+
+  // One short line per flag on the Check step; the full wording is on the dashboard.
+  const shortFlag = (fl: { id: string; title: string; payload?: unknown }) => {
+    const f = built?.festival;
+    const venue = (id: string) => f?.venues.find(v => v.id === id)?.name ?? id;
+    const day = (iso: string) => new Date(`${iso.slice(0, 10)}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', timeZone: 'UTC' });
+    if (fl.id.startsWith('clash-')) {
+      const k = fl.payload as GuestClash;
+      return <><b>{k.guestName}</b> is double-booked {day(k.a.start)} {clock(k.b.start)}: {venue(k.a.venueId)} and {venue(k.b.venueId)}.</>;
+    }
+    if (fl.id.startsWith('room-')) {
+      const k = fl.payload as VenueClash;
+      return <><b>{venue(k.venueId)}</b> has two events at once, {day(k.b.start)} {clock(k.b.start)}.</>;
+    }
+    return <b>{fl.title}</b>;
+  };
+
+  const goodToKnow = useMemo(() => (built ? summarizeNotes([...built.unresolved, ...built.warnings, ...built.notes]) : []), [built]);
 
   const goLive = () => {
     if (!built?.festival) return;
@@ -278,13 +298,14 @@ export default function Onboarding() {
             </>}
             {built.errors.length > 0 && <div className="issues bad"><h3>Must fix ({built.errors.length})</h3>{built.errors.slice(0, 12).map((e, i) => <div key={i}>{e}</div>)}<p className="muted">Fix these in your file and upload it again, or go back and change a column match.</p></div>}
             {preview && preview.flags.length > 0 && (
-              <div className="issues warn"><h3>Already in your schedule ({preview.flags.length})</h3>
-                {preview.flags.slice(0, 4).map(fl => <div key={fl.id}><b>{fl.title}.</b> {fl.rationale}</div>)}
-                <p className="muted">The agent will keep these on the dashboard until someone resolves them.</p></div>
+              <div className="issues warn"><h3>Needs a person ({preview.flags.length})</h3>
+                {preview.flags.slice(0, 5).map(fl => <div key={fl.id}>{shortFlag(fl)}</div>)}
+                {preview.flags.length > 5 && <div className="muted">and {preview.flags.length - 5} more</div>}
+                <p className="muted">They'll wait on the dashboard until someone sorts them out.</p></div>
             )}
-            {[...built.unresolved, ...built.warnings, ...built.notes].length > 0 && (
-              <details className="issues"><summary>Good to know ({built.unresolved.length + built.warnings.length + built.notes.length})</summary>
-                {[...built.unresolved, ...built.warnings, ...built.notes].slice(0, 40).map((n, i) => <div key={i}>{n}</div>)}</details>
+            {goodToKnow.length > 0 && (
+              <details className="issues"><summary>Good to know ({goodToKnow.length})</summary>
+                {goodToKnow.slice(0, 8).map((n, i) => <div key={i}>{n}</div>)}</details>
             )}
           </section>
         )}

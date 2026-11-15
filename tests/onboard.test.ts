@@ -57,3 +57,19 @@ describe('badge and job names from other festivals', () => {
     expect(['Box Office', 'Guest Relations', ''].some(j => isOrganizerJob(j))).toBe(false);
   });
 });
+
+describe('Check step stays short', () => {
+  it('groups row-by-row notes', async () => {
+    const { summarizeNotes } = await import('../src/onboard/mapping');
+    const out = summarizeNotes([
+      'People row 24: pass "Speaker" not recognised', 'People row 25: pass "Speaker" not recognised',
+      '"A": no end time, so it ends at 12:00 (from its length).', '"B": no end time, so it ends at 13:00 (from its length).',
+      'No travel times between venues, so 15 minutes is assumed between any two.',
+    ]);
+    expect(out).toEqual([
+      '2 events have no end time, so Usher worked them out from the running time.',
+      'People: pass "Speaker" not recognised (2 rows)',
+      'No travel times between venues, so 15 minutes is assumed between any two.',
+    ]);
+  });
+});

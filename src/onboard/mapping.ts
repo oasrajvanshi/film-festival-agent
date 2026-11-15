@@ -343,7 +343,7 @@ export function buildTables(meta: FestivalMeta, uploads: Upload[]): BuildResult 
       }
       const runtime = Number(films.find(f => f[0] === filmId)?.[3]) || 0;
       const end = parseTime(g(r, 'end')) ?? addMin(start, duration || (kind === 'screening' ? runtime || 90 : kind === 'qa' ? 20 : 60));
-      if (!parseTime(g(r, 'end'))) notes.push(`"${title}": no end time, so it ends at ${end} (from its length).`);
+      if (!parseTime(g(r, 'end'))) notes.push(`"${title}" (day ${day}, ${start}): no end time, so it ends at ${end} (from its length).`);
       const id = g(r, 'id') || `e-${String(events.length + 1).padStart(3, '0')}`;
       const status = /cancel/i.test(g(r, 'status')) ? 'cancelled' : 'scheduled';
       const restr = g(r, 'restriction').toLowerCase();
@@ -428,7 +428,26 @@ export function buildTables(meta: FestivalMeta, uploads: Upload[]): BuildResult 
       'Volunteer shifts': [T('Volunteer shifts'), ...shifts],
       'Official documents': [T('Official documents'), ...docs],
     },
-    notes: [...new Set(notes)].slice(0, 30),
+    notes: [...new Set(notes)],
     unresolved,
   };
+}
+
+// ------------------------------------------------------------ short summaries for the Check step
+/**
+ * Collapse row-by-row notes into a few lines: "People row 24: pass "Speaker"
+ * not recognised" ×6 becomes one line with a count; the per-event "no end
+ * time" notes become one line.
+ */
+export function summarizeNotes(lines: string[]): string[] {
+  const groups = new Map<string, number>();
+  let noEnd = 0;
+  for (const l of lines) {
+    if (/: no end time, so it ends at/.test(l)) { noEnd++; continue; }
+    const key = l.replace(/^([A-Za-z ]+?) row \d+(?: \("[^"]*"\))?: /, '$1: ');
+    groups.set(key, (groups.get(key) ?? 0) + 1);
+  }
+  const out = [...groups].map(([k, n]) => (n > 1 ? `${k} (${n} rows)` : k));
+  if (noEnd) out.unshift(`${noEnd} event${noEnd === 1 ? ' has' : 's have'} no end time, so Usher worked ${noEnd === 1 ? 'it' : 'them'} out from the running time.`);
+  return out;
 }
