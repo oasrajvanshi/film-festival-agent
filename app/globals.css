@@ -503,6 +503,7 @@ button.big { min-height: 48px; padding: 10px 22px; font-size: 15px; border-radiu
 .code-box h2 { font-size: 26px; margin: 10px 0 4px; }
 .code-input { width: 100%; font-family: var(--display); font-size: 26px; letter-spacing: .2em; text-align: center; padding: 12px; min-height: 60px; border: 1.5px solid var(--ink); border-radius: 6px; text-transform: uppercase; }
 .signin-foot { font-size: 12.5px; margin: 24px 0 0; }
+.ob-poster.signin > p.signin-foot { max-width: none; text-wrap: pretty; }
 .code-chip { font-family: var(--display); font-weight: 700; letter-spacing: .08em; background: var(--chip); padding: 3px 8px; border-radius: 6px; }
 .viewas-bar { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 16px; background: var(--ink); color: var(--bg); font-size: 13px; }
 .viewas-bar button { margin-left: auto; background: var(--bg); color: var(--ink); }
