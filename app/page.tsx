@@ -1,13 +1,13 @@
 'use client';
 // Usher: the product's own website. One story, told by scrolling:
-// changes travel by hand today; the forecast changes; the agent redraws the
+// changes travel by hand today; a schedule change lands; Usher redraws the
 // calendar; a person approves once; everyone's phone is right.
 
 import './site.css';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useEffect, useRef, type MouseEvent } from 'react';
-import { Bell, Brief, Move, People, Snow, Swap } from './hl/icons';
+import { Bell, Brief, Move, People, Swap } from './hl/icons';
 
 // ---------------------------------------------------------------- the calendar (1 pm to 7 pm, four venues)
 
@@ -185,8 +185,8 @@ export default function Site() {
       <nav className="s-nav" aria-label="Site">
         <span className="wordmark">Usher</span>
         <span className="spacer" />
-        <a className="navlink" href="#story" onClick={go('#story')}>How the agent works</a>
-        <a className="btn small primary" href="/app">Try the live demo</a>
+        <a className="navlink" href="#story" onClick={go('#story')}>How Usher works</a>
+        <a className="btn small primary" href="https://film-festival-agent.vercel.app/onboarding">Try the live demo</a>
       </nav>
 
       {/* hero */}
@@ -194,11 +194,11 @@ export default function Site() {
         <div className="s-hero-bg" data-hero-bg style={{ backgroundImage: 'url(/hl/projector.jpg)' }} />
         <div className="s-hero-copy">
           <p className="s-kicker" data-hero-fade>Usher your festival with ease</p>
-          <h1 className="s-h1" data-split>An agent that re-plans your festival.</h1>
-          <p className="s-lead" data-hero-fade>When snow hits or a guest runs late, the agent works out who is affected, rewrites the schedule, and emails every attendee, guest and volunteer their own next step. You approve it in one tap.</p>
+          <h1 className="s-h1" data-split>Every schedule change, to everyone it affects.</h1>
+          <p className="s-lead" data-hero-fade>Festival schedules change all day. A screening moves, a guest runs late, a delivery slips. Usher tracks the schedule, works out who each change affects, and gives every attendee, guest, staff member and vendor their own next step. It flags clashes and checks passes, and your team approves anything that goes out.</p>
           <div className="s-ctas" data-hero-fade>
-            <a className="btn primary" href="/app">Try the live demo</a>
-            <a className="btn" href="#story" onClick={go('#story')}>See the agent work</a>
+            <a className="btn primary" href="https://film-festival-agent.vercel.app/onboarding">Try the live demo</a>
+            <a className="btn" href="#story" onClick={go('#story')}>See how it works</a>
           </div>
         </div>
         <div className="s-hero-stage" data-lve-skip aria-hidden="true">
@@ -206,7 +206,7 @@ export default function Site() {
             <Cal id="hero" />
           </div>
           <div className="s-float" data-hero-float style={{ top: '2%', left: '6%' }}>
-            <span className="ic"><Snow /></span><span><b>Snow coming in 50 min</b><small>About 3 in · Harbor Loop 12 min late</small></span><span className="pill">Recommendation</span>
+            <span className="ic"><Move /></span><span><b>Late Country moves to 3:15 pm</b><small>Harbor Theater · 21 people affected</small></span><span className="pill">Recommendation</span>
           </div>
           <div className="s-float" data-hero-float style={{ bottom: '6%', right: '0%' }}>
             <span className="ic"><Bell /></span><span><b>Wild Tide now 3:15 pm</b><small>Your seat is held. Leave 15 min early.</small></span>
@@ -239,9 +239,9 @@ export default function Site() {
             </div>
             <div className="s-card s-doc d-mail" data-r="3" style={{ right: '0%', top: '12%' }}>
               <div className="bar"><b>Inbox</b><span>47 unread</span></div>
-              <div className="row u"><b>Mara Quist</b><span>Pavel is stuck on the bridge, new ETA 4:20</span><em>2:58 pm</em></div>
+              <div className="row u"><b>Mara Quist</b><span>Pavel is running late, new ETA 4:20</span><em>2:58 pm</em></div>
               <div className="row u"><b>Kaia Ivers</b><span>Re: Re: Fwd: schedule v7 FINAL (2)</span><em>2:41 pm</em></div>
-              <div className="row"><b>Weather service</b><span>Winter weather advisory, 2 to 7 pm</span><em>1:05 pm</em></div>
+              <div className="row"><b>Lantern Print Couriers</b><span>Prints for 3 screenings running 15 min late</span><em>1:05 pm</em></div>
               <div className="row"><b>Box office</b><span>21 people asking about Wild Tide</span><em>12:50 pm</em></div>
               <span className="s-stamp">Late</span>
             </div>
@@ -277,13 +277,13 @@ export default function Site() {
       <section className="s-pin s-rec" data-scene="rec">
         <div className="s-sticky">
           <div className="s-rec-copy">
-            <div data-rec-step="1"><h2 className="s-h2">It rewrites the schedule.</h2><p className="s-lead">Three 3:00 pm screenings move to 3:15, so people on the late shuttle make the start.</p></div>
-            <div data-rec-step="2" style={{ position: 'absolute', top: 0, opacity: 0 }}><h2 className="s-h2">And finds a backup speaker.</h2><p className="s-lead">Pavel is stuck on the bridge. Yara Hollis opens his panel, and he joins when he arrives.</p></div>
+            <div data-rec-step="1"><h2 className="s-h2">Usher updates the plan.</h2><p className="s-lead">A late print delivery pushes three 3:00 pm screenings to 3:15. Usher finds everyone holding a seat, the door teams and the vendors, and drafts each one a note.</p></div>
+            <div data-rec-step="2" style={{ position: 'absolute', top: 0, opacity: 0 }}><h2 className="s-h2">And covers a late guest.</h2><p className="s-lead">Pavel Kettering is running late for his 4:00 panel. Yara Hollis opens it, and he joins when he arrives.</p></div>
           </div>
           <div className="s-rec-stage" data-lve-skip aria-hidden="true">
             <div style={{ position: 'absolute', inset: 0, transformStyle: 'preserve-3d' }}><Cal id="rec" /></div>
             <div className="s-float" data-rec-alert style={{ top: '-30px', right: '3%' }}>
-              <span className="ic"><Snow /></span><span><b>Snow coming in 50 min</b><small>About 3 in, 2 to 7 pm</small></span><span className="pill">Recommendation</span>
+              <span className="ic"><Brief /></span><span><b>Print delivery 15 min late</b><small>3 screenings at 3:00 pm</small></span><span className="pill">Recommendation</span>
             </div>
           </div>
           <div className="s-rec-list" data-lve-skip>
@@ -304,15 +304,11 @@ export default function Site() {
       {/* call to action */}
       <footer className="s-footer">
         <div className="s-footer-bg" data-footer-bg />
-        <h2 className="s-h1" data-split-scroll>Watch the agent handle a snow day.</h2>
-        <p className="s-lead" data-reveal>Open the demo as an attendee, the festival team or staff. Play the snow day or the late guest, and approve the agent&apos;s plan yourself.</p>
+        <h2 className="s-h1" data-split-scroll>See Usher run a festival day.</h2>
+        <p className="s-lead" data-reveal>Set up a festival in a few minutes, move a screening or make a guest run late, then approve Usher&apos;s plan yourself.</p>
         <div className="s-roles" data-reveal>
-          <a className="btn primary" href="/app">Try the live demo</a>
-          <a className="btn" href="/start/attendee">As an attendee</a>
-          <a className="btn" href="/start/team">As the festival team</a>
-          <a className="btn" href="/start/staff">As staff</a>
+          <a className="btn primary" href="https://film-festival-agent.vercel.app/onboarding">Try the live demo</a>
         </div>
-        <div className="s-credit"><span>Usher · Group Blue</span><span>A prototype. Everyone in it is made up.</span></div>
       </footer>
     </div>
   );

@@ -388,13 +388,12 @@ body:has(.s-root) { background: #efe7d8; }
 .s-nav a.navlink:hover { color: var(--amber); }
 
 /* hero: paper on the left, drawn velvet seats behind the calendar on the right */
-.s-hero-bg { background: var(--velvet-panel) !important; opacity: 1; left: 44%; inset: 0 0 0 44%; border-radius: 0 0 0 28px; }
-.s-hero::after { background: linear-gradient(90deg, var(--bg) 43.5%, rgba(239, 231, 216, .0) 52%), linear-gradient(0deg, var(--bg), transparent 14%); }
+.s-hero-bg { background: var(--velvet-panel) !important; opacity: 1; inset: 92px 28px 44px 46%; border-radius: 22px; box-shadow: 0 30px 60px rgba(40, 8, 8, .25), inset 0 0 0 1px rgba(21, 17, 16, .25); }
+.s-hero::after { display: none; }
 .s-hero .s-kicker { color: var(--amber); }
-.s-scrollcue i { background: linear-gradient(var(--cream), transparent); }
+.s-scrollcue { display: none; }
 @media (max-width: 900px) {
-  .s-hero-bg { inset: auto 0 0 0; height: 470px; left: 0; border-radius: 0; }
-  .s-hero::after { background: linear-gradient(180deg, var(--bg) 0, var(--bg) calc(100% - 470px), transparent calc(100% - 430px)); }
+  .s-hero-bg { inset: auto 16px 28px 16px; height: 440px; border-radius: 18px; }
 }
 
 /* calendar = a printed schedule card */
@@ -427,7 +426,7 @@ body:has(.s-root) { background: #efe7d8; }
 /* footer: a velvet curtain call */
 .s-footer { --cream: #fff8ee; --text: #f4e6dc; --muted: #e2c3bb; --line: rgba(255, 248, 238, .2); --line-2: rgba(255, 248, 238, .35); color: var(--text); }
 .s-footer > .s-footer-bg { position: absolute; inset: 0; z-index: 0; background: var(--velvet-panel); opacity: 1; }
-.s-footer::after { background: linear-gradient(180deg, var(--bg) 0, rgba(16, 6, 6, .45) 16%, rgba(16, 6, 6, .7)); }
+.s-footer::after { background: linear-gradient(180deg, rgba(16, 6, 6, .5), rgba(16, 6, 6, .72)); }
 .s-footer .btn { color: #fff8ee; border-color: rgba(255, 248, 238, .45); }
 .s-footer .btn:hover { border-color: #fff8ee; }
 .s-footer .btn.primary { background: #fff8ee; color: #a8141f; border-color: #fff8ee; }
