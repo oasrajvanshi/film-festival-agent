@@ -134,7 +134,7 @@ export default function App() {
       <aside className="side">
         <div className="brand">
           <div className="brand-mark"><Icon name="film" /></div>
-          <div><div className="brand-name">{f.name}</div><div className="brand-sub">Usher</div></div>
+          <div><div className="brand-name">Usher</div></div>
         </div>
         {groups.map(g => (
           <nav className="nav-group" key={g}>

@@ -44,11 +44,11 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
   return (
     <div className="ob ob-welcome">
       <div className="ob-poster signin">
-        <div className="ob-mast display" style={{ fontSize: 'clamp(36px, 6.4vw, 78px)' }}>{f.name}</div>
+        <div className="ob-mast display" style={{ fontSize: 'clamp(36px, 6.4vw, 78px)' }}>Usher</div>
         {!kind ? (
           <>
             <p className="signin-kicker">Usher your festival with ease</p>
-            <p className="signin-lede">Who's signing in?</p>
+            <p className="signin-lede">Who's signing in to {f.name}?</p>
             <div className="profile-grid">
               {PROFILES.map(p => (
                 <button key={p.kind} className="profile-card" onClick={() => { setKind(p.kind); setErr(''); setCode(''); }}>
@@ -138,7 +138,7 @@ export function PersonalApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who
       <header className="me-head">
         <div className="brand-mark"><Icon name="film" size={18} /></div>
         <div style={{ minWidth: 0, flex: 1 }}>
-          <div className="me-fest display">{f.name}</div>
+          <div className="me-fest display">Usher</div>
           <div className="me-sub">{profile.label} · {who.name}</div>
         </div>
         <span className="chip">Day {day} · {fmt(s.clock)}</span>
@@ -287,7 +287,7 @@ function PassCard({ s, who }: { s: AgentStore; who: Who }) {
       <div className="pass-top">
         <div className="eyebrow">{f.name}</div>
         <div className="display pass-name">{who.name}</div>
-        <div>{pass ? PASS_LABELS[pass.type] : 'Ticket holder'}{pass && pass.validDays.length < 3 ? ` · Day ${pass.validDays.join(', ')}` : pass ? ' · All days' : ''}</div>
+        <div>{pass ? PASS_LABELS[pass.type] : 'Ticket holder'}{pass && pass.validDays.length < Object.keys(f.dates).length ? ` · Day ${pass.validDays.join(', ')}` : pass ? ' · All days' : ''}</div>
       </div>
       <div className="pass-qr" dangerouslySetInnerHTML={{ __html: svg }} />
       <div className="pass-foot"><code>{code}</code><span>Show this at the door. One code covers your pass and every ticket.</span></div>
