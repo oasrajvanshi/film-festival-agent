@@ -24,7 +24,7 @@
   --f-display: "Montserrat", "Futura", "Century Gothic", sans-serif;
   --f-title: "Montserrat", "Futura", "Century Gothic", sans-serif;
   --f-ui: "Archivo", "Helvetica Neue", Arial, sans-serif;
-  --f-time: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --f-time: "DM Mono", "Courier Prime", ui-monospace, monospace;
   --ease: cubic-bezier(.2, .8, .2, 1);
   --r: 16px;
   color-scheme: dark;
