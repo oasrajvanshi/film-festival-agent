@@ -170,7 +170,7 @@ export default function Onboarding() {
         { festivalName: built.festival.name || meta.name, city: meta.city, approver, channels, onboardedAt: new Date().toISOString(),
           ...(sheetFest || fromSheet ? { sheetUrl } : {}),
           ...(fromSheet ? { sheetMapping: { meta, tabs: uploads.map(u => ({ name: u.name, kind: u.kind, columns: u.columns })) } } : {}) });
-      location.href = '/#today';
+      location.href = '/app#today';
     } catch (e) { setError((e as Error).message); setBusy(''); }
   };
 
@@ -204,7 +204,7 @@ export default function Onboarding() {
           <p>Connect your schedule, people and passes. The agent watches for changes and disruptions, works out who is affected, and drafts each person a recommendation. Your team approves anything that goes out.</p>
           <div className="row">
             <button className="primary big" onClick={() => setStarted(true)}>Set up a festival <Icon name="send" size={16} /></button>
-            <a className="ob-link" href="/" onClick={async e => { e.preventDefault(); await s.openSample(); location.href = '/'; }}>Or explore a sample festival</a>
+            <a className="ob-link" href="/app" onClick={async e => { e.preventDefault(); await s.openSample(); location.href = '/app'; }}>Or explore a sample festival</a>
           </div>
           <ol className="ob-steps-preview">
             {STEPS.map((t, i) => <li key={t}><span>{String(i + 1).padStart(2, '0')}</span>{t}</li>)}

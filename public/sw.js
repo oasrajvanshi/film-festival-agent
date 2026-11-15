@@ -6,12 +6,12 @@ self.addEventListener('push', e => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch { d = { body: e.data && e.data.text() }; }
   e.waitUntil(self.registration.showNotification(d.title || 'Festival Agent', {
-    body: d.body || '', icon: '/icon-192.png', badge: '/icon-192.png', data: { url: d.url || '/' },
+    body: d.body || '', icon: '/icon-192.png', badge: '/icon-192.png', data: { url: d.url || '/app' },
   }));
 });
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  const url = (e.notification.data && e.notification.data.url) || '/';
+  const url = (e.notification.data && e.notification.data.url) || '/app';
   e.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
     const open = list.find(c => new URL(c.url).origin === self.location.origin);
     if (open) { open.navigate(url); return open.focus(); }

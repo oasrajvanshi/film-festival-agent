@@ -68,8 +68,8 @@ function deliverNew(kv: Kv, rec: FestRecord, origin: string) {
       if (want.has('sms')) jobs.push(sendSms(`Usher test (${fest}): ${title}. ${msgs.length} message${msgs.length === 1 ? '' : 's'} went out, e.g. to ${msgs[0].personName}: "${msgs[0].subject}"`));
     }
     if (want.has('push')) {
-      if (newAsks.length) jobs.push(sendPush(kv, rec.id, { title: `${newAsks.length} update${newAsks.length > 1 ? 's' : ''} to approve`, body: newAsks.at(-1)!.action.title, url: `${origin}/#approvals` }));
-      if (newFlags.length) jobs.push(sendPush(kv, rec.id, { title: 'Needs attention', body: newFlags.length > 1 ? `${newFlags.at(-1)!.title} and ${newFlags.length - 1} more` : newFlags[0].title, url: `${origin}/#today` }));
+      if (newAsks.length) jobs.push(sendPush(kv, rec.id, { title: `${newAsks.length} update${newAsks.length > 1 ? 's' : ''} to approve`, body: newAsks.at(-1)!.action.title, url: `${origin}/app#approvals` }));
+      if (newFlags.length) jobs.push(sendPush(kv, rec.id, { title: 'Needs attention', body: newFlags.length > 1 ? `${newFlags.at(-1)!.title} and ${newFlags.length - 1} more` : newFlags[0].title, url: `${origin}/app#today` }));
     }
     await Promise.allSettled(jobs);
   });
@@ -139,7 +139,7 @@ export async function POST(req: Request) {
     if (!r.ok) return json({ ok: false, reason: r.reason });
     const code = rec.codes[codeKey(r.who)];
     const profile = PROFILES.find(p => p.kind === kind)!.label;
-    const link = `${origin}/?f=${rec.id}`;
+    const link = `${origin}/app?f=${rec.id}`;
     const sent = await sendEmail(`Your ${f.name} access code: ${code}`, codeHtml({ name: r.who.name, email: String(b.email), code, festival: f.name, profile, link })).catch(() => false);
     // Without email, show the code on screen (demo only); with email, never.
     return json({ ok: true, sent, code: sent ? undefined : code });
@@ -262,7 +262,7 @@ export async function POST(req: Request) {
   }
 
   if (action === 'push-test') {
-    const n = await sendPush(kv, fid, { title: 'Alerts are on', body: `You'll hear about ${f.name} approvals and flags on this device.`, url: `${origin}/#today` });
+    const n = await sendPush(kv, fid, { title: 'Alerts are on', body: `You'll hear about ${f.name} approvals and flags on this device.`, url: `${origin}/app#today` });
     return json({ sent: n });
   }
 

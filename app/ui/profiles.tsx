@@ -151,7 +151,7 @@ export function AccessCodes({ s, onViewAs }: { s: AgentStore; onViewAs: (w: Who)
     s.call<{ people: Who[] }>('codes', {}, 'GET').then(r => r.ok && setServer(r.body.people)).catch(() => {});
   }, [s.shared, s.version]); // eslint-disable-line react-hooks/exhaustive-deps
   const all = s.shared ? server ?? [] : local;
-  const link = typeof window !== 'undefined' && s.fid ? `${location.origin}/?f=${s.fid}` : '';
+  const link = typeof window !== 'undefined' && s.fid ? `${location.origin}/app?f=${s.fid}` : '';
   const [kind, setKind] = useState<ProfileKind>('staff');
   const [q, setQ] = useState('');
   const rows = all.filter(w => w.kind === kind && (!q || `${w.name} ${w.detail} ${w.code}`.toLowerCase().includes(q.toLowerCase())));
