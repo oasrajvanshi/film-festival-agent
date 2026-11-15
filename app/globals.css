@@ -534,3 +534,4 @@ button.big { min-height: 48px; padding: 10px 22px; font-size: 15px; border-radiu
   .me-body { padding: 16px 16px calc(96px + env(safe-area-inset-bottom)); }
 }
 @media (max-width: 420px) { .profile-grid { grid-template-columns: 1fr; } .profile-card { flex-direction: row; align-items: center; flex-wrap: wrap; } .pc-blurb { flex-basis: 100%; } }
+.ob-card h3.ob-sub { color: var(--ink); margin: 22px 0 4px; padding-top: 18px; border-top: 1px solid var(--line); font-family: var(--display); text-transform: uppercase; letter-spacing: .02em; font-size: 18px; }

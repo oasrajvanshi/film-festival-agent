@@ -6,12 +6,11 @@ import { writeWho } from '../ui/profiles';
 import { Icon } from '../ui/icons';
 import { FestivalAgent } from '../../src/agent/agent';
 import { GATE_POLICY, type ActionKind } from '../../src/agent/approvals';
-import { addMinutes, clock } from '../../src/core/time';
 import type { Festival } from '../../src/core/types';
 import { parseCsv, tablesToFestival } from '../../src/data/sheet';
 import { buildTables, guessKind, KIND_ORDER, KINDS, matchColumns, type Kind, type Upload } from '../../src/onboard/mapping';
 
-const STEPS = ['Festival', 'Data', 'Matching', 'Check', 'Team', 'Try it'] as const;
+const STEPS = ['Festival & data', 'Matching', 'Check', 'Team'] as const;
 const SAMPLES = ['program.csv', 'theatres.csv', 'walking-times.csv', 'film-catalog.csv', 'registrations.csv', 'ticket-orders.csv', 'my-schedule-saves.csv', 'volunteer-rota.csv', 'faq-and-policies.csv'];
 const GATE_LABELS: Partial<Record<ActionKind, string>> = {
   notify_people: 'Messages to attendees and guests', update_website: 'Website listing changes', public_announcement: 'Festival-wide announcements',
@@ -63,21 +62,21 @@ export default function Onboarding() {
       const b = await r.json();
       if (!r.ok || b.error) throw new Error(b.error ?? `HTTP ${r.status}`);
       if (!b.festival) throw new Error((b.errors ?? []).slice(0, 3).join(' · ') || 'The sheet has errors.');
-      setSheetFest(b.festival); setUploads([]); setStep(3);
+      setSheetFest(b.festival); setUploads([]); setStep(2);
     } catch (e) { setError((e as Error).message); }
     setBusy('');
   };
 
   // Matching: reveal files one by one, like the agent reading them.
   useEffect(() => {
-    if (step !== 2) return;
+    if (step !== 1) return;
     setRevealed(0);
     const t = setInterval(() => setRevealed(n => { if (n >= uploads.length) { clearInterval(t); return n; } return n + 1; }), 380);
     return () => clearInterval(t);
   }, [step, uploads.length]);
 
   const built = useMemo(() => {
-    if (step < 3) return null;
+    if (step < 2) return null;
     if (sheetFest) return { festival: sheetFest, errors: [] as string[], unresolved: [] as string[], warnings: [] as string[], notes: [] as string[] };
     const b = buildTables(meta, uploads);
     const r = tablesToFestival(b.tables);
@@ -91,21 +90,6 @@ export default function Onboarding() {
     return a;
   }, [built]);
 
-  // Try it: pick the busiest screening and move it 30 minutes.
-  const [trial, setTrial] = useState<null | { title: string; from: string; to: string; agent: FestivalAgent }>(null);
-  const busiest = useMemo(() => {
-    const f = built?.festival; if (!f) return null;
-    const score = (id: string) => f.tickets.filter(t => t.eventId === id).length + f.bookings.filter(b => b.eventId === id).length;
-    return [...f.events].filter(e => e.kind === 'screening' && e.status === 'scheduled' && !e.restriction).sort((x, y) => score(y.id) - score(x.id))[0] ?? null;
-  }, [built]);
-  const runTrial = async () => {
-    if (!built?.festival || !busiest) return;
-    const a = new FestivalAgent(structuredClone(built.festival));
-    const qa = a.f.events.find(e => e.kind === 'qa' && e.filmId === busiest.filmId && e.start === busiest.end);
-    const evs = a.f.events.map(e => (e.id === busiest.id || e.id === qa?.id) ? { ...e, start: addMinutes(e.start, 30), end: addMinutes(e.end, 30) } : { ...e });
-    await a.onGridEdit(evs, approver);
-    setTrial({ title: busiest.title, from: clock(busiest.start), to: clock(addMinutes(busiest.start, 30)), agent: a });
-  };
   const goLive = () => {
     if (!built?.festival) return;
     s.loadFestival(structuredClone(built.festival), sheetFest ? 'Google Sheet' : `${uploads.length} uploaded files`);
@@ -115,15 +99,13 @@ export default function Onboarding() {
   };
 
   const canNext = [
-    !!meta.name && /^\d{4}-\d{2}-\d{2}$/.test(meta.startDate),
-    uploads.length > 0 || !!sheetFest,
+    !!meta.name && /^\d{4}-\d{2}-\d{2}$/.test(meta.startDate) && (uploads.length > 0 || !!sheetFest),
     uploads.length > 0 && uploads.some(u => u.kind === 'schedule'),
     !!built?.festival,
     !!approver,
-    true,
   ][step];
-  const next = () => setStep(n => Math.min(STEPS.length - 1, sheetFest && n === 1 ? 3 : n + 1));
-  const back = () => setStep(n => Math.max(0, sheetFest && n === 3 ? 1 : n - 1));
+  const next = () => setStep(n => Math.min(STEPS.length - 1, sheetFest && n === 0 ? 2 : n + 1));
+  const back = () => setStep(n => Math.max(0, sheetFest && n === 2 ? 0 : n - 1));
 
   if (!started) {
     return (
@@ -175,7 +157,7 @@ export default function Onboarding() {
         {step === 0 && (
           <section className="ob-card">
             <h2 className="display">Tell us about your festival</h2>
-            <p className="muted">This sets the festival days and where the agent watches the weather.</p>
+            <p className="muted">The basics, then your schedule. Usher works out the rest.</p>
             <label className="field">Festival name<input value={meta.name} onChange={e => setMeta({ ...meta, name: e.target.value })} /></label>
             <div className="ob-two">
               <label className="field">First day<input type="date" value={meta.startDate} onChange={e => setMeta({ ...meta, startDate: e.target.value })} /></label>
@@ -184,12 +166,7 @@ export default function Onboarding() {
               </label>
             </div>
             <label className="field">City<input value={meta.city} onChange={e => setMeta({ ...meta, city: e.target.value })} placeholder="e.g. New York" /></label>
-          </section>
-        )}
-
-        {step === 1 && (
-          <section className="ob-card">
-            <h2 className="display">Bring your data</h2>
+            <h3 className="ob-sub">Bring your data</h3>
             <p className="muted">Use the files you already have. Column names don’t need to match anything; the agent works them out.</p>
             <div className={`drop ${uploads.length ? 'has' : ''}`}
               onDragOver={e => e.preventDefault()}
@@ -224,7 +201,7 @@ export default function Onboarding() {
           </section>
         )}
 
-        {step === 2 && (
+        {step === 1 && (
           <section className="ob-card wide">
             <h2 className="display">The agent read your files</h2>
             <p className="muted">It worked out what each file is and which column means what. Check anything marked <span className="chip warn">check</span>.</p>
@@ -284,7 +261,7 @@ export default function Onboarding() {
           </section>
         )}
 
-        {step === 3 && built && (
+        {step === 2 && built && (
           <section className="ob-card wide">
             <h2 className="display">{built.festival ? 'Everything checks out' : 'A few things to fix'}</h2>
             {built.festival && <>
@@ -308,7 +285,7 @@ export default function Onboarding() {
           </section>
         )}
 
-        {step === 4 && (
+        {step === 3 && (
           <section className="ob-card wide">
             <h2 className="display">Your team and the rules</h2>
             <label className="field">Who approves outgoing messages<input value={approver} onChange={e => setApprover(e.target.value)} /></label>
@@ -330,37 +307,6 @@ export default function Onboarding() {
                 </button>
               ))}
             </div>
-          </section>
-        )}
-
-        {step === 5 && built?.festival && (
-          <section className="ob-card wide">
-            <h2 className="display">Try it before going live</h2>
-            {!trial && busiest && <>
-              <p>Your busiest screening is <b>{busiest.title}</b> at {clock(busiest.start)}. Let’s pretend it has to start 30 minutes later.</p>
-              <button className="primary big" onClick={runTrial}><Icon name="clock" size={16} />Move it to {clock(addMinutes(busiest.start, 30))}</button>
-            </>}
-            {trial && (() => {
-              const q = trial.agent.queue.filter(x => x.status === 'pending');
-              const msgs = q.flatMap(x => x.action.messages ?? []);
-              const auto = trial.agent.log.entries.filter(e => e.kind === 'act').length;
-              const person = (id: string) => trial.agent.f.people.find(p => p.id === id);
-              return (
-                <div className="trial">
-                  <div className="stats">
-                    <div className="stat hot"><div className="k">People affected</div><div className="v">{msgs.length}</div></div>
-                    <div className="stat"><div className="k">Waiting for you</div><div className="v">{q.length}</div></div>
-                    <div className="stat"><div className="k">Done on its own</div><div className="v">{auto}</div></div>
-                    <div className="stat"><div className="k">Flags</div><div className="v">{trial.agent.flags.length}</div></div>
-                  </div>
-                  <p className="muted">“{trial.title}” moved from {trial.from} to {trial.to}. Volunteer briefs and staff were updated on their own. Each affected person got a draft with a recommendation, waiting for {approver}:</p>
-                  {msgs.slice(0, 3).map((m, i) => (
-                    <div className="msg" key={i}><div className="who">To {person(m.personId)?.name} · {person(m.personId)?.role}</div><div style={{ whiteSpace: 'pre-wrap' }}>{m.body}</div></div>
-                  ))}
-                  <p className="muted" style={{ fontSize: 12.5 }}>This was a rehearsal. Nothing was sent, and your real schedule is unchanged.</p>
-                </div>
-              );
-            })()}
           </section>
         )}
       </main>
