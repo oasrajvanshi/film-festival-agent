@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { DEFAULT_SHEET, readSetup, type AgentStore } from './useAgent';
 import { riskSummary, type WeatherHour } from '../../src/agent/weather';
 import type { DayNumber, FestivalEvent, PassType } from '../../src/core/types';
+import { festivalDays } from '../../src/core/types';
 import { addMinutes, clock as fmt, toMinutes } from '../../src/core/time';
 import { PASS_LABELS, qrFor, type ScanResult } from '../../src/rules/access';
 import type { Answer } from '../../src/agent/answer';
@@ -203,7 +204,7 @@ export function Grid({ s, user }: P) {
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <h2 style={{ margin: 0 }}>Schedule grid</h2>
         <div className="row">
-          {([1, 2, 3] as DayNumber[]).map(d => (
+          {festivalDays(f).map(d => (
             <button key={d} className={d === day ? 'primary small' : 'small'} onClick={() => setDay(d)}>Day {d} · {f.dates[d].slice(5)}</button>
           ))}
         </div>

@@ -23,6 +23,12 @@ const CHANNELS = [
 ];
 
 type Meta = { name: string; startDate: string; days: number; city: string };
+const MAX_DAYS = 31;
+const DAY_MS = 864e5;
+/** Last festival day as YYYY-MM-DD. */
+const endDate = (m: Meta) => /^\d{4}-\d{2}-\d{2}$/.test(m.startDate) ? new Date(Date.parse(`${m.startDate}T12:00:00Z`) + (m.days - 1) * DAY_MS).toISOString().slice(0, 10) : '';
+/** Days from first to last, inclusive (1 to 31). */
+const daysBetween = (a: string, b: string) => { const n = Math.round((Date.parse(`${b}T12:00:00Z`) - Date.parse(`${a}T12:00:00Z`)) / DAY_MS) + 1; return Number.isFinite(n) ? Math.min(MAX_DAYS, Math.max(1, n)) : 1; };
 
 export default function Onboarding() {
   const s = useAgent();
@@ -161,9 +167,7 @@ export default function Onboarding() {
             <label className="field">Festival name<input value={meta.name} onChange={e => setMeta({ ...meta, name: e.target.value })} /></label>
             <div className="ob-two">
               <label className="field">First day<input type="date" value={meta.startDate} onChange={e => setMeta({ ...meta, startDate: e.target.value })} /></label>
-              <label className="field">How many days
-                <div className="seg">{[1, 2, 3].map(d => <button key={d} className={meta.days === d ? 'on' : ''} onClick={() => setMeta({ ...meta, days: d })}>{d}</button>)}</div>
-              </label>
+              <label className="field">Last day<input type="date" value={endDate(meta)} min={meta.startDate} onChange={e => setMeta({ ...meta, days: daysBetween(meta.startDate, e.target.value) })} /></label>
             </div>
             <label className="field">City<input value={meta.city} onChange={e => setMeta({ ...meta, city: e.target.value })} placeholder="e.g. New York" /></label>
             <h3 className="ob-sub">Bring your data</h3>

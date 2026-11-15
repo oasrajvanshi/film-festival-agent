@@ -3,6 +3,7 @@
 // show, these decide who is who.
 
 import type { DayNumber, Festival, FestivalEvent, Person } from '../core/types';
+import { festivalDays } from '../core/types';
 import { addMinutes, toMinutes } from '../core/time';
 
 export type ProfileKind = 'organizer' | 'staff' | 'guest' | 'attendee' | 'vendor';
@@ -43,7 +44,7 @@ export interface Vendor { id: string; name: string; service: string; contact: st
  */
 export function deriveVendors(f: Festival): Vendor[] {
   const byStart = (a: VendorDelivery, b: VendorDelivery) => a.at.localeCompare(b.at);
-  const days = ([1, 2, 3] as DayNumber[]).filter(d => f.events.some(e => e.day === d));
+  const days = festivalDays(f).filter(d => f.events.some(e => e.day === d));
 
   const print: VendorDelivery[] = [];
   const firstShow = new Map<string, FestivalEvent>();

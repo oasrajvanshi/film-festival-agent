@@ -247,7 +247,7 @@ const body = (t: Table) => t.slice(1).filter(r => r.some(c => (c ?? '').trim()))
 export function festivalDates(meta: FestivalMeta): string[] {
   const out: string[] = [];
   const d0 = new Date(`${meta.startDate}T12:00:00Z`);
-  for (let i = 0; i < Math.min(3, Math.max(1, meta.days)); i++) out.push(new Date(d0.getTime() + i * 864e5).toISOString().slice(0, 10));
+  for (let i = 0; i < Math.min(31, Math.max(1, meta.days)); i++) out.push(new Date(d0.getTime() + i * 864e5).toISOString().slice(0, 10));
   return out;
 }
 
@@ -256,7 +256,7 @@ export function buildTables(meta: FestivalMeta, uploads: Upload[]): BuildResult 
   const notes: string[] = [];
   const unresolved: string[] = [];
   const dates = festivalDates(meta);
-  while (dates.length < 3) dates.push(dates[dates.length - 1]);
+  const ALL = dates.map((_, i) => i + 1).join(' ');
   const of = (k: Kind) => uploads.filter(u => u.kind === k);
 
   // Venues
@@ -301,7 +301,7 @@ export function buildTables(meta: FestivalMeta, uploads: Upload[]): BuildResult 
     body(u.table).forEach((r, i) => {
       const [pid] = personId(g(r, 'person')); const pass = normPass(g(r, 'pass'));
       if (!pid || !pass) { unresolved.push(`Passes row ${i + 2}: ${!pid ? `unknown person "${g(r, 'person')}"` : `pass "${g(r, 'pass')}" not recognised`}`); return; }
-      const days = (g(r, 'days').match(/\d/g) ?? []).join(' ') || '1 2 3';
+      const days = (g(r, 'days').match(/\d+/g) ?? []).join(' ') || ALL;
       const at = passes.findIndex(p => p[0] === pid);
       if (at >= 0) passes[at] = [pid, pass, days]; else passes.push([pid, pass, days]);
     });
@@ -365,7 +365,7 @@ export function buildTables(meta: FestivalMeta, uploads: Upload[]): BuildResult 
       const [pid] = personId(g(r, 'person')); const eid = eventId(g(r, 'event'));
       if (!pid || !eid) { unresolved.push(`Tickets row ${i + 2}: ${!pid ? `unknown person "${g(r, 'person')}"` : `unknown event "${g(r, 'event')}"`}`); return; }
       tickets.push([g(r, 'id') || `t-${String(tickets.length + 1).padStart(3, '0')}`, pid, eid]);
-      if (!passes.some(p => p[0] === pid)) passes.push([pid, 'single_ticket', '1 2 3']);
+      if (!passes.some(p => p[0] === pid)) passes.push([pid, 'single_ticket', ALL]);
     });
   }
   for (const u of of('saved')) {
@@ -384,7 +384,7 @@ export function buildTables(meta: FestivalMeta, uploads: Upload[]): BuildResult 
       const s = parseTime(g(r, 'start')), e = parseTime(g(r, 'end'));
       if (!pid || !day || !s || !e) { unresolved.push(`Volunteer shifts row ${i + 2}: ${!pid ? `unknown volunteer "${g(r, 'person')}"` : 'date or time not understood'}`); return; }
       shifts.push([`s-${String(shifts.length + 1).padStart(3, '0')}`, pid, venueId(g(r, 'venue')), String(day), s, e, g(r, 'task') || 'usher']);
-      if (!passes.some(p => p[0] === pid)) passes.push([pid, 'volunteer', '1 2 3']);
+      if (!passes.some(p => p[0] === pid)) passes.push([pid, 'volunteer', ALL]);
     });
   }
 
@@ -410,13 +410,13 @@ export function buildTables(meta: FestivalMeta, uploads: Upload[]): BuildResult 
   if (!of('docs').length) notes.push('No FAQ or policy documents yet, so the Ask feature will answer "I don\'t know" until you add some.');
   for (const p of people) if (!passes.some(x => x[0] === p[0])) {
     const role = p[2];
-    passes.push([p[0], role === 'festival_staff' ? 'festival_staff' : role === 'volunteer' ? 'volunteer' : role === 'press' ? 'press' : role === 'industry' ? 'industry' : role === 'guest' ? 'featured_filmmaker' : 'day_pass', '1 2 3']);
+    passes.push([p[0], role === 'festival_staff' ? 'festival_staff' : role === 'volunteer' ? 'volunteer' : role === 'press' ? 'press' : role === 'industry' ? 'industry' : role === 'guest' ? 'featured_filmmaker' : 'day_pass', ALL]);
   }
 
   const T = (k: keyof typeof TABS) => [...TABS[k].header] as string[];
   return {
     tables: {
-      Festival: [T('Festival'), ['Name', meta.name], ...[0, 1, 2].map(i => [`Day ${i + 1} date`, dates[i]])],
+      Festival: [T('Festival'), ['Name', meta.name], ...dates.map((d, i) => [`Day ${i + 1} date`, d])],
       'Schedule grid': [T('Schedule grid'), ...events],
       Venues: [T('Venues'), ...venues.map(v => [v.id, v.name, String(v.capacity), v.address])],
       'Travel times': travel,

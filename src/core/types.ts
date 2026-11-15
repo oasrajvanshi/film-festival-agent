@@ -1,7 +1,11 @@
 // Core data model for the festival. Everything the agent reads lives here.
 // The prototype uses only made-up people (proposal guardrail: Privacy).
 
-export type DayNumber = 1 | 2 | 3;
+/** Festival day, counted from 1. Festivals can run any number of days (up to 31). */
+export type DayNumber = number;
+export const MAX_DAYS = 31;
+/** The festival's day numbers in order, from its dates. */
+export const festivalDays = (f: { dates: Record<number, string> }): DayNumber[] => Object.keys(f.dates).map(Number).filter(n => n >= 1).sort((a, b) => a - b);
 
 export interface Venue {
   id: string;

@@ -7,6 +7,7 @@ import { Icon } from './ui/icons';
 import { AccessCodes, PersonalApp, SignIn, readWho, writeWho } from './ui/profiles';
 import type { Who } from '../src/access/profiles';
 import type { DayNumber } from '../src/core/types';
+import { festivalDays } from '../src/core/types';
 
 const PAGES = [
   { id: 'today', label: 'Today', icon: 'home', group: 'Festival day' },
@@ -90,7 +91,7 @@ export default function App() {
     <>
       <div className="field">Festival day
         <div className="row">
-          {([1, 2, 3] as DayNumber[]).map(d => (
+          {festivalDays(f).map(d => (
             <button key={d} className={d === day ? 'primary small' : 'small'} onClick={() => s.setClock(`${f.dates[d]}T${s.clock.slice(11)}`)}>Day {d}</button>
           ))}
         </div>
@@ -155,7 +156,7 @@ export default function App() {
           <span className="clock-pill">
             <Icon name="clock" size={16} />
             <select aria-label="Festival day" value={day} onChange={e => s.setClock(`${f.dates[+e.target.value as DayNumber]}T${s.clock.slice(11)}`)}>
-              {([1, 2, 3] as DayNumber[]).map(d => <option key={d} value={d}>Day {d} · {f.dates[d].slice(5)}</option>)}
+              {festivalDays(f).map(d => <option key={d} value={d}>Day {d} · {f.dates[d].slice(5)}</option>)}
             </select>
             <input aria-label="Festival time" type="time" value={s.clock.slice(11)} onChange={e => e.target.value && s.setClock(`${s.clock.slice(0, 11)}${e.target.value}`)} />
           </span>

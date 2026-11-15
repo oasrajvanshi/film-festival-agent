@@ -7,6 +7,7 @@ import type {
   Channel, DayNumber, EventKind, EventRestriction, Festival, FestivalEvent, OfficialDoc, PassType, PersonRole,
 } from '../core/types';
 import { ACCESS_RULES } from '../rules/access';
+import { MAX_DAYS } from '../core/types';
 
 export type Table = string[][];
 export type Tables = Record<TabName, Table>;
@@ -34,7 +35,7 @@ const hhmm = (iso: string) => iso.slice(11, 16);
 export function festivalToTables(f: Festival): Tables {
   const venueIds = f.venues.map(v => v.id);
   return {
-    Festival: [[...TABS.Festival.header], ['Name', f.name], ['Day 1 date', f.dates[1]], ['Day 2 date', f.dates[2]], ['Day 3 date', f.dates[3]]],
+    Festival: [[...TABS.Festival.header], ['Name', f.name], ...Object.keys(f.dates).map(Number).sort((a, b) => a - b).map(d => [`Day ${d} date`, f.dates[d]])],
     'Schedule grid': [[...TABS['Schedule grid'].header], ...f.events.map(e => [
       e.id, String(e.day), hhmm(e.start), hhmm(e.end), e.kind, e.title, e.venueId, e.filmId ?? '', e.guestIds.join(', '), e.restriction ?? '', e.status,
     ])],
@@ -86,14 +87,17 @@ export function tablesToFestival(t: Partial<Tables>): LoadResult {
   const err = (tab: string, i: number, msg: string) => errors.push(`${tab}, row ${i + 2}: ${msg}`);
 
   const settings = Object.fromEntries(rows(t.Festival).map(r => [r.Setting.toLowerCase(), r.Value]));
-  const dates = { 1: settings['day 1 date'], 2: settings['day 2 date'], 3: settings['day 3 date'] } as Record<DayNumber, string>;
-  for (const d of [1, 2, 3] as DayNumber[]) {
+  const dates: Record<DayNumber, string> = {};
+  for (let d = 1; d <= MAX_DAYS && (d === 1 || settings[`day ${d} date`]); d++) dates[d] = settings[`day ${d} date`];
+  const dayCount = Object.keys(dates).length;
+  const allDays = Object.keys(dates).map(Number) as DayNumber[];
+  for (const d of allDays) {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dates[d] ?? '')) errors.push(`Festival: "Day ${d} date" must look like 2027-04-15 (got "${dates[d] ?? ''}")`);
   }
   const day = (raw: string, tab: string, i: number): DayNumber | null => {
     const n = Number(raw);
-    if (n === 1 || n === 2 || n === 3) return n;
-    err(tab, i, `Day must be 1, 2 or 3 (got "${raw}")`);
+    if (Number.isInteger(n) && n >= 1 && n <= dayCount) return n;
+    err(tab, i, `Day must be a number from 1 to ${dayCount} (got "${raw}")`);
     return null;
   };
   const time = (raw: string, tab: string, i: number, col: string): string | null => {
@@ -185,10 +189,10 @@ export function tablesToFestival(t: Partial<Tables>): LoadResult {
     if (!PASS_TYPES.includes(type)) err('Passes', i, `Pass type must be one of ${PASS_TYPES.join(', ')} (got "${r['Pass type']}")`);
     if (!personIds.has(r['Person ID'])) err('Passes', i, `unknown person "${r['Person ID']}"`);
     // "1 2 3", "1,2,3" or a number Sheets turned "1,2,3" into (123).
-    const raw = r['Valid days'] || '1 2 3';
+    const raw = r['Valid days'] || allDays.join(' ');
     const parts = /^\d+$/.test(raw) ? raw.split('') : list(raw);
-    const validDays = parts.map(Number).filter((n): n is DayNumber => n === 1 || n === 2 || n === 3);
-    return { id: `pass-${r['Person ID']}`, personId: r['Person ID'], type, validDays: validDays.length ? validDays : [1, 2, 3] as DayNumber[] };
+    const validDays = parts.map(Number).filter(n => Number.isInteger(n) && n >= 1 && n <= dayCount);
+    return { id: `pass-${r['Person ID']}`, personId: r['Person ID'], type, validDays: validDays.length ? validDays : [...allDays] };
   });
   for (const p of people) if (!passes.some(x => x.personId === p.id)) warnings.push(`People: ${p.id} (${p.name}) has no pass, so every scan will be denied`);
 
