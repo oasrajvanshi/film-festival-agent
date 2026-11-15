@@ -180,7 +180,7 @@ export function guessKind(fileName: string, headers: string[]): { kind: Kind; co
 // ------------------------------------------------------------ values
 const PASS_WORDS: [RegExp, PassType][] = [
   [/staff|crew|organi[sz]er/i, 'festival_staff'], [/volunteer/i, 'volunteer'], [/press|media|journalist/i, 'press'],
-  [/industry|market|buyer|sales/i, 'industry'], [/panel/i, 'panelist'], [/filmmaker|director|talent|featured/i, 'featured_filmmaker'],
+  [/industry|market|buyer|sales/i, 'industry'], [/panel|speaker|moderator/i, 'panelist'], [/filmmaker|director|talent|featured|jury|juror/i, 'featured_filmmaker'],
   [/vip|patron|premium|all access/i, 'vip'], [/3|three|full|festival pass|multi/i, 'three_day'], [/day/i, 'day_pass'], [/single|ticket/i, 'single_ticket'],
 ];
 export function normPass(raw: string): PassType | null {

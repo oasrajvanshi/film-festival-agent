@@ -19,8 +19,11 @@ export const PROFILES: { kind: ProfileKind; label: string; blurb: string; prefix
 /** Festival staff in these jobs run the festival; other staff get the staff view. */
 export const ORGANIZER_JOBS = ['director', 'operations', 'programmer'];
 
+/** "Operations", "Festival Director", "Lead programmer" all count; case and extra words don't matter. */
+export const isOrganizerJob = (job = '') => job.toLowerCase().split(/[^a-z]+/).some(w => ORGANIZER_JOBS.includes(w));
+
 export function profileOf(p: Person): Exclude<ProfileKind, 'vendor'> {
-  if (p.role === 'festival_staff') return ORGANIZER_JOBS.includes(p.staffRole ?? '') ? 'organizer' : 'staff';
+  if (p.role === 'festival_staff') return isOrganizerJob(p.staffRole) ? 'organizer' : 'staff';
   if (p.role === 'volunteer') return 'staff';
   if (p.role === 'guest' || p.role === 'press') return 'guest';
   return 'attendee'; // attendee, industry

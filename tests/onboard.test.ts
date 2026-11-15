@@ -43,3 +43,17 @@ describe('onboarding from a festival’s own exports', () => {
     expect(normPass('Press badge')).toBe('press');
   });
 });
+
+describe('badge and job names from other festivals', () => {
+  it('reads speaker and jury badges as guests', async () => {
+    const { normPass: np } = await import('../src/onboard/mapping');
+    expect(np('Speaker')).toBe('panelist');
+    expect(np('Moderator')).toBe('panelist');
+    expect(np('Jury')).toBe('featured_filmmaker');
+  });
+  it('treats directors, operations and programmers as organizers whatever the casing', async () => {
+    const { isOrganizerJob } = await import('../src/access/profiles');
+    expect(['Operations', 'Festival Director', 'Lead Programmer', 'operations'].every(j => isOrganizerJob(j))).toBe(true);
+    expect(['Box Office', 'Guest Relations', ''].some(j => isOrganizerJob(j))).toBe(false);
+  });
+});
