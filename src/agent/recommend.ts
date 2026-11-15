@@ -7,6 +7,7 @@ import type { Festival, FestivalEvent, Person } from '../core/types';
 import { addMinutes, clock, toMinutes } from '../core/time';
 import { ACCESS_RULES } from '../rules/access';
 import type { AffectedReason, ScheduleChange } from './propagate';
+import { seatsLeft } from './conflicts';
 
 export interface Recommendation {
   /** One line: what this person should do. */
@@ -28,10 +29,6 @@ function canAttend(f: Festival, person: Person, e: FestivalEvent): boolean {
   return rule.kinds.includes(e.kind) && (!e.restriction || rule.restrictions.includes(e.restriction)) && pass.validDays.includes(e.day);
 }
 
-function seatsFree(f: Festival, e: FestivalEvent): number {
-  const cap = f.venues.find(v => v.id === e.venueId)!.capacity;
-  return cap - f.checkIns.filter(c => c.eventId === e.id && c.allowed).length;
-}
 
 /** The person's other plans that day: tickets, saved events, guest bookings. */
 function planFor(f: Festival, person: Person, day: number, exceptId: string): FestivalEvent[] {
@@ -52,7 +49,7 @@ function alternatives(f: Festival, person: Person, around: FestivalEvent, keep: 
     || toMinutes(e.end) + f.travel[e.venueId][k.venueId] <= toMinutes(k.start));
   return f.events
     .filter(e => !exclude.has(e.id) && e.kind === around.kind && e.day === around.day
-      && Math.abs(toMinutes(e.start) - t0) <= 90 && canAttend(f, person, e) && seatsFree(f, e) > 0 && fits(e))
+      && Math.abs(toMinutes(e.start) - t0) <= 90 && canAttend(f, person, e) && seatsLeft(f, e) > 0 && fits(e))
     .sort((a, b) => Math.abs(toMinutes(a.start) - t0) - Math.abs(toMinutes(b.start) - t0))
     .slice(0, 3)
     .map(e => `"${e.title}" at ${venueName(f, e.venueId)}, ${clock(e.start)}`);
@@ -76,7 +73,15 @@ export function recommendFor(f: Festival, change: ScheduleChange, person: Person
     const opts = alternatives(f, person, ev, plan, new Set([ev.id]));
     basis.push(`cancelled ${ev.id}`, `pass/tickets checked for ${opts.length} alternatives`);
     const hasTicket = reasons.includes('ticket');
-    const ticketLine = 'The ticketing partner will contact you about your ticket.';
+    const ticket = f.tickets.find(t => t.personId === person.id && t.eventId === ev.id);
+    const free = ticket && (ticket.price === 0 || /comp|complimentary|free|guest|press/i.test(ticket.type ?? ''));
+    const money = (n: number) => '$' + n.toFixed(2);
+    const ticketLine = free
+      ? 'Your complimentary ticket is released; there is nothing to refund.'
+      : ticket?.price !== undefined
+      ? `You'll get a full refund of ${money(ticket.price)}${ticket.type ? ` for your ${ticket.type.toLowerCase()} ticket` : ''} to your original card.`
+      : 'The ticketing partner will contact you about your ticket.';
+    if (ticket) basis.push(`ticket ${ticket.id}: ${ticket.type ?? 'type unknown'}, ${ticket.price !== undefined ? money(ticket.price) : 'price unknown'}`);
     return {
       action: hasTicket
         ? (opts.length ? `${ticketLine} Your pass also gets you into these instead.` : ticketLine)
@@ -88,6 +93,12 @@ export function recommendFor(f: Festival, change: ScheduleChange, person: Person
 
   // Guest on the event: check their own schedule around the new slot.
   if (reasons.includes('guest')) {
+    if (person.arrives && toMinutes(after.start) < toMinutes(person.arrives) + 60) {
+      return {
+        action: `This is now at ${clock(after.start)}, before you're due in (${clock(person.arrives)}${person.travelNote ? `, ${person.travelNote}` : ''}). Guest relations will contact you about timing; please don't change your travel until they do.`,
+        options: [], basis: [`guest arrives ${person.arrives}`],
+      };
+    }
     const clashes = plan.filter(e => toMinutes(e.start) < toMinutes(after.end) + f.travel[after.venueId][e.venueId]
       && toMinutes(e.end) + f.travel[e.venueId][after.venueId] > toMinutes(after.start));
     if (clashes.length) {

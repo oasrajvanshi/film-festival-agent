@@ -12,7 +12,11 @@ export interface Venue {
   name: string;
   capacity: number;
   address: string;
+  /** Screens or rooms inside the venue, each with its own seats. */
+  rooms?: Room[];
 }
+
+export interface Room { name: string; capacity: number }
 
 /** Minutes to travel between two venues, door to door. */
 export type TravelMatrix = Record<string, Record<string, number>>;
@@ -46,6 +50,11 @@ export interface FestivalEvent {
   guestIds: string[];
   restriction?: EventRestriction;
   status: 'scheduled' | 'cancelled';
+  /** Screen or room inside the venue, if the venue has several. */
+  room?: string;
+  /** Box office: seats sold, and seats held back for guests, press and sponsors. */
+  seatsSold?: number;
+  seatsHeld?: number;
 }
 
 export type PersonRole =
@@ -71,6 +80,13 @@ export interface Person {
   staffRole?: string;
   /** Opted in to crowd tracking via check-in scans. */
   crowdOptIn: boolean;
+  /** Guests: when they arrive in town and leave (ISO local datetime), and how. */
+  arrives?: string;
+  departs?: string;
+  travelNote?: string;
+  /** Volunteers: what they can do (e.g. "projection", "Spanish") and the days they can work. */
+  skills?: string[];
+  availableDays?: DayNumber[];
 }
 
 /**
@@ -103,6 +119,10 @@ export interface Ticket {
   id: string;
   personId: string;
   eventId: string;
+  /** e.g. "General", "Student", "Member", "Comp". */
+  type?: string;
+  /** What the holder paid, in dollars. */
+  price?: number;
 }
 
 /** A volunteer or staff shift at a venue. */

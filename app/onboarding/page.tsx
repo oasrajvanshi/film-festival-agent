@@ -299,8 +299,8 @@ export default function Onboarding() {
             {built.errors.length > 0 && <div className="issues bad"><h3>Must fix ({built.errors.length})</h3>{built.errors.slice(0, 12).map((e, i) => <div key={i}>{e}</div>)}<p className="muted">Fix these in your file and upload it again, or go back and change a column match.</p></div>}
             {preview && preview.flags.length > 0 && (
               <div className="issues warn"><h3>Needs a person ({preview.flags.length})</h3>
-                {preview.flags.slice(0, 5).map(fl => <div key={fl.id}>{shortFlag(fl)}</div>)}
-                {preview.flags.length > 5 && <div className="muted">and {preview.flags.length - 5} more</div>}
+                {preview.flags.slice(0, 8).map(fl => <div key={fl.id}>{shortFlag(fl)}</div>)}
+                {preview.flags.length > 8 && <div className="muted">and {preview.flags.length - 8} more</div>}
                 <p className="muted">They'll wait on the dashboard until someone sorts them out.</p></div>
             )}
             {goodToKnow.length > 0 && (

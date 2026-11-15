@@ -6,7 +6,7 @@ import type { LlmClient } from '../llm/ollama';
 import { AuditLog } from './log';
 import { gateFor, type Action, type QueueItem } from './approvals';
 import { diffSchedules, planPropagation, describeChange } from './propagate';
-import { findGuestClashes, findOrphanedQas, findVenueClashes } from './conflicts';
+import { findGuestClashes, findOrphanedQas, otherFlags } from './conflicts';
 import { recordScan, type ScanResult } from '../rules/access';
 import { answerQuestion, type Answer } from './answer';
 import { handleVendorAlert, type VendorAlert } from './vendors';
@@ -76,15 +76,15 @@ export class FestivalAgent {
       this.changeFeed.push(desc);
     }
     const clashesBefore = new Set(findGuestClashes(this.f).map(k => `${k.guestId}|${k.a.id}|${k.b.id}`));
-    const roomsBefore = new Set(findVenueClashes(this.f).map(k => `${k.a.id}|${k.b.id}`));
+    const flagsBefore = new Set(otherFlags(this.f).map(k => k.id));
     this.f.events = newEvents;
     for (const k of findGuestClashes(this.f)) {
       if (clashesBefore.has(`${k.guestId}|${k.a.id}|${k.b.id}`)) continue;
       planned.push({ id: `clash-${k.guestId}-${k.a.id}-${k.b.id}`, kind: 'flag', title: `Guest clash: ${k.guestName}`, rationale: k.summary, payload: k });
     }
-    for (const k of findVenueClashes(this.f)) {
-      if (roomsBefore.has(`${k.a.id}|${k.b.id}`)) continue;
-      planned.push({ id: `room-${k.a.id}-${k.b.id}`, kind: 'flag', title: 'Venue double-booked', rationale: k.summary, payload: k });
+    for (const k of otherFlags(this.f)) {
+      if (flagsBefore.has(k.id)) continue;
+      planned.push({ ...k, kind: 'flag' });
     }
     for (const q of findOrphanedQas(this.f)) {
       planned.push({ id: `orphan-${q.id}`, kind: 'flag', title: `Q&A left behind: ${q.title}`, rationale: 'Its screening moved but the Q&A did not.', payload: { eventId: q.id } });
@@ -136,7 +136,10 @@ export class FestivalAgent {
     const runId = this.run('sweep');
     const clashes = findGuestClashes(this.f);
     this.log.add(runId, 'trigger', 'Clash sweep');
-    this.dispatch(runId, clashes.map(k => ({ id: `clash-${k.guestId}-${k.a.id}-${k.b.id}`, kind: 'flag' as const, title: `Guest clash: ${k.guestName}`, rationale: k.summary, payload: k })));
+    this.dispatch(runId, [
+      ...clashes.map(k => ({ id: `clash-${k.guestId}-${k.a.id}-${k.b.id}`, kind: 'flag' as const, title: `Guest clash: ${k.guestName}`, rationale: k.summary, payload: k })),
+      ...otherFlags(this.f).map(k => ({ ...k, kind: 'flag' as const })),
+    ]);
     return clashes;
   }
 

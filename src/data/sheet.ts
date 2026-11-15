@@ -14,13 +14,13 @@ export type Tables = Record<TabName, Table>;
 
 export const TABS = {
   Festival: { gid: 0, header: ['Setting', 'Value'] },
-  'Schedule grid': { gid: 1, header: ['Event ID', 'Day', 'Start', 'End', 'Type', 'Title', 'Venue ID', 'Film ID', 'Guest IDs', 'Restriction', 'Status'] },
-  Venues: { gid: 2, header: ['Venue ID', 'Name', 'Capacity', 'Address'] },
+  'Schedule grid': { gid: 1, header: ['Event ID', 'Day', 'Start', 'End', 'Type', 'Title', 'Venue ID', 'Film ID', 'Guest IDs', 'Restriction', 'Status', 'Room', 'Seats sold', 'Seats held'] },
+  Venues: { gid: 2, header: ['Venue ID', 'Name', 'Capacity', 'Address', 'Rooms'] },
   'Travel times': { gid: 3, header: ['From \\ To (minutes)'] },
   Films: { gid: 4, header: ['Film ID', 'Title', 'Director', 'Runtime (min)', 'Section', 'Featured filmmaker IDs'] },
-  People: { gid: 5, header: ['Person ID', 'Name', 'Role', 'Email', 'Channels', 'Staff role', 'Crowd opt-in', 'Phone'] },
+  People: { gid: 5, header: ['Person ID', 'Name', 'Role', 'Email', 'Channels', 'Staff role', 'Crowd opt-in', 'Phone', 'Arrives', 'Departs', 'Travel note', 'Skills', 'Available days'] },
   Passes: { gid: 6, header: ['Person ID', 'Pass type', 'Valid days'] },
-  Tickets: { gid: 7, header: ['Ticket ID', 'Person ID', 'Event ID'] },
+  Tickets: { gid: 7, header: ['Ticket ID', 'Person ID', 'Event ID', 'Ticket type', 'Price'] },
   'Saved events': { gid: 8, header: ['Person ID', 'Event ID'] },
   'Volunteer shifts': { gid: 9, header: ['Shift ID', 'Person ID', 'Venue ID', 'Day', 'Start', 'End', 'Task'] },
   'Official documents': { gid: 10, header: ['Document ID', 'Document title', 'Section', 'Text'] },
@@ -38,13 +38,15 @@ export function festivalToTables(f: Festival): Tables {
     Festival: [[...TABS.Festival.header], ['Name', f.name], ...Object.keys(f.dates).map(Number).sort((a, b) => a - b).map(d => [`Day ${d} date`, f.dates[d]])],
     'Schedule grid': [[...TABS['Schedule grid'].header], ...f.events.map(e => [
       e.id, String(e.day), hhmm(e.start), hhmm(e.end), e.kind, e.title, e.venueId, e.filmId ?? '', e.guestIds.join(', '), e.restriction ?? '', e.status,
+      e.room ?? '', e.seatsSold === undefined ? '' : String(e.seatsSold), e.seatsHeld === undefined ? '' : String(e.seatsHeld),
     ])],
-    Venues: [[...TABS.Venues.header], ...f.venues.map(v => [v.id, v.name, String(v.capacity), v.address])],
+    Venues: [[...TABS.Venues.header], ...f.venues.map(v => [v.id, v.name, String(v.capacity), v.address, (v.rooms ?? []).map(r => `${r.name}: ${r.capacity}`).join('; ')])],
     'Travel times': [[TABS['Travel times'].header[0], ...venueIds], ...venueIds.map(a => [a, ...venueIds.map(b => String(f.travel[a][b]))])],
     Films: [[...TABS.Films.header], ...f.films.map(x => [x.id, x.title, x.director, String(x.runtimeMin), x.section, x.filmmakerIds.join(', ')])],
-    People: [[...TABS.People.header], ...f.people.map(p => [p.id, p.name, p.role, p.email, p.channels.join(', '), p.staffRole ?? '', p.crowdOptIn ? 'TRUE' : 'FALSE', p.phone ?? ''])],
+    People: [[...TABS.People.header], ...f.people.map(p => [p.id, p.name, p.role, p.email, p.channels.join(', '), p.staffRole ?? '', p.crowdOptIn ? 'TRUE' : 'FALSE', p.phone ?? '',
+      p.arrives ?? '', p.departs ?? '', p.travelNote ?? '', (p.skills ?? []).join(', '), (p.availableDays ?? []).join(' ')])],
     Passes: [[...TABS.Passes.header], ...f.passes.map(p => [p.personId, p.type, p.validDays.join(' ')])],
-    Tickets: [[...TABS.Tickets.header], ...f.tickets.map(t => [t.id, t.personId, t.eventId])],
+    Tickets: [[...TABS.Tickets.header], ...f.tickets.map(t => [t.id, t.personId, t.eventId, t.type ?? '', t.price === undefined ? '' : String(t.price)])],
     'Saved events': [[...TABS['Saved events'].header], ...f.bookings.map(b => [b.personId, b.eventId])],
     'Volunteer shifts': [[...TABS['Volunteer shifts'].header], ...f.shifts.map(s => [s.id, s.personId, s.venueId, String(s.day), hhmm(s.start), hhmm(s.end), s.task])],
     'Official documents': [[...TABS['Official documents'].header], ...f.docs.flatMap(d => d.sections.map(s => [d.id, d.title, s.heading, s.body]))],
@@ -52,6 +54,22 @@ export function festivalToTables(f: Festival): Tables {
 }
 
 // ------------------------------------------------------------ tables → Festival
+const ISO_DT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/;
+function optionalPersonFields(r: Record<string, string>, i: number, dayCount: number, err: (tab: string, i: number, msg: string) => void) {
+  const out: { arrives?: string; departs?: string; travelNote?: string; skills?: string[]; availableDays?: DayNumber[] } = {};
+  for (const [col, key] of [['Arrives', 'arrives'], ['Departs', 'departs']] as const) {
+    const v = (r[col] ?? '').trim();
+    if (!v) continue;
+    if (ISO_DT.test(v)) out[key] = v; else err('People', i, `${col} must look like 2027-05-21T14:30 (got "${v}")`);
+  }
+  if (r['Travel note']) out.travelNote = r['Travel note'];
+  const skills = (r.Skills ?? '').split(/[,;]/).map(x => x.trim()).filter(Boolean);
+  if (skills.length) out.skills = skills;
+  const days = (r['Available days'] ?? '').match(/\d+/g)?.map(Number).filter(n => n >= 1 && n <= dayCount);
+  if (days?.length) out.availableDays = [...new Set(days)].sort((a, b) => a - b);
+  return out;
+}
+
 export interface LoadResult { festival: Festival | null; errors: string[]; warnings: string[] }
 
 /** Accepts 10:00, 10:00:00, 9:5, 10:00 AM, 2:30 pm. */
@@ -110,7 +128,13 @@ export function tablesToFestival(t: Partial<Tables>): LoadResult {
     const capacity = Number(r.Capacity);
     if (!r['Venue ID']) err('Venues', i, 'missing Venue ID');
     if (!(capacity > 0)) err('Venues', i, `Capacity must be a number (got "${r.Capacity}")`);
-    return { id: r['Venue ID'], name: r.Name || r['Venue ID'], capacity, address: r.Address };
+    // "Screen 1: 320; Screen 2: 200"
+    const rooms = (r.Rooms ?? '').split(';').map(x => x.trim()).filter(Boolean).map(x => {
+      const m = /^(.*?)[:=]\s*(\d+)\s*$/.exec(x);
+      if (!m) { err('Venues', i, `Rooms must look like "Screen 1: 200; Screen 2: 120" (got "${x}")`); return null; }
+      return { name: m[1].trim(), capacity: Number(m[2]) };
+    }).filter((x): x is { name: string; capacity: number } => !!x);
+    return { id: r['Venue ID'], name: r.Name || r['Venue ID'], capacity, address: r.Address, ...(rooms.length ? { rooms } : {}) };
   });
   const venueIds = new Set(venues.map(v => v.id));
 
@@ -142,6 +166,7 @@ export function tablesToFestival(t: Partial<Tables>): LoadResult {
     return {
       id: r['Person ID'], name: r.Name, role, email: r.Email, phone: r.Phone || undefined, channels: channels.length ? channels : ['email' as Channel],
       staffRole: r['Staff role'] || undefined, crowdOptIn: /^(true|yes|y|1)$/i.test(r['Crowd opt-in']),
+      ...optionalPersonFields(r, i, dayCount, err),
     };
   });
   const personIds = new Set(people.map(p => p.id));
@@ -174,10 +199,23 @@ export function tablesToFestival(t: Partial<Tables>): LoadResult {
     const status = /^cancel/i.test(r.Status) ? 'cancelled' : 'scheduled';
     if (!d || !s || !e || !dates[d]) return;
     if (e <= s) err(tab, i, 'End must be after Start (events past midnight are not supported)');
+    const num = (col: string) => {
+      const raw = (r[col] ?? '').trim();
+      if (!raw) return undefined;
+      const n = Number(raw);
+      if (!Number.isInteger(n) || n < 0) { err(tab, i, `${col} must be a whole number (got "${raw}")`); return undefined; }
+      return n;
+    };
+    const room = (r.Room ?? '').trim();
+    const v = venues.find(x => x.id === r['Venue ID']);
+    if (room && v?.rooms && !v.rooms.some(x => x.name.toLowerCase() === room.toLowerCase())) err(tab, i, `"${room}" is not a room at ${v.name}`);
+    const seatsSold = num('Seats sold'), seatsHeld = num('Seats held');
     events.push({
       id: r['Event ID'], kind, title: r.Title, venueId: r['Venue ID'], day: d,
       start: `${dates[d]}T${s}`, end: `${dates[d]}T${e}`, filmId: r['Film ID'] || undefined,
       guestIds, restriction: restriction || undefined, status,
+      ...(room ? { room: v?.rooms?.find(x => x.name.toLowerCase() === room.toLowerCase())?.name ?? room } : {}),
+      ...(seatsSold !== undefined ? { seatsSold } : {}), ...(seatsHeld !== undefined ? { seatsHeld } : {}),
     });
   });
   const eventIds = new Set(events.map(e => e.id));
@@ -199,7 +237,12 @@ export function tablesToFestival(t: Partial<Tables>): LoadResult {
   const tickets = rows(t.Tickets).map((r, i) => {
     if (!personIds.has(r['Person ID'])) err('Tickets', i, `unknown person "${r['Person ID']}"`);
     if (!eventIds.has(r['Event ID'])) err('Tickets', i, `unknown event "${r['Event ID']}"`);
-    return { id: r['Ticket ID'] || `t-${i + 1}`, personId: r['Person ID'], eventId: r['Event ID'] };
+    const price = (r.Price ?? '').replace(/[$,\s]/g, '');
+    if (price && !(Number(price) >= 0)) err('Tickets', i, `Price must be an amount like 16 or $16.00 (got "${r.Price}")`);
+    return {
+      id: r['Ticket ID'] || `t-${i + 1}`, personId: r['Person ID'], eventId: r['Event ID'],
+      ...(r['Ticket type'] ? { type: r['Ticket type'] } : {}), ...(price && Number(price) >= 0 ? { price: Number(price) } : {}),
+    };
   });
   const bookings = rows(t['Saved events']).map((r, i) => {
     if (!personIds.has(r['Person ID'])) err('Saved events', i, `unknown person "${r['Person ID']}"`);

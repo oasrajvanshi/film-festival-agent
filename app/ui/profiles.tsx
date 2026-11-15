@@ -234,12 +234,17 @@ function StaffHome({ s, who }: { s: AgentStore; who: Who }) {
   const next = mine.find(x => x.end >= s.clock) ?? null;
   const venue = (id: string) => f.venues.find(v => v.id === id)?.name ?? id;
   const crowd = next ? a.crowd(s.clock).venues.find(v => v.venueId === next.venueId) : null;
+  const me = f.people.find(p => p.id === who.id);
   return (
     <>
       <section className="hero">
         <div className="eyebrow">{next ? `${dayLabel(f.dates[next.day])} · your next shift` : 'Your shifts'}</div>
         <h2>{next ? `${next.task} · ${venue(next.venueId)}` : 'No more shifts'}</h2>
         <p>{next ? `${fmt(next.start)} to ${fmt(next.end)}. Your brief below is rebuilt from the live schedule every time you open it.` : 'Thanks for your help this festival.'}</p>
+        {(me?.availableDays?.length || me?.skills?.length) ? <p className="muted">
+          {me.availableDays?.length ? `You can work ${me.availableDays.map(d => dayLabel(f.dates[d]).split(',')[0]).join(', ')}.` : ''}
+          {me.skills?.length ? ` Skills: ${me.skills.join(', ')}.` : ''}
+        </p> : null}
       </section>
       <div className="grid2">
         <div className="card">
@@ -285,12 +290,16 @@ function PersonHome({ s, who, go }: { s: AgentStore; who: Who; go: (t: string) =
   const next = upcoming[0];
   const unread = s.agent.outbox.filter(d => d.personId === who.id).length;
   const days = [...new Set(plans.map(p => p.e.day))].sort();
+  const me = f.people.find(p => p.id === who.id);
+  const where = (e: FestivalEvent) => `${venue(e.venueId)}${e.room ? `, ${e.room}` : ''}`;
+  const when = (iso: string) => `${new Date(`${iso.slice(0, 10)}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })} ${fmt(iso)}`;
   return (
     <>
       <section className="hero">
         <div className="eyebrow">{next ? `Next up · ${dayLabel(f.dates[next.e.day])}` : 'Your festival'}</div>
         <h2>{next ? next.e.title : 'Nothing else on your list'}</h2>
-        <p>{next ? `${fmt(next.e.start)} at ${venue(next.e.venueId)}. ${next.why === 'You’re appearing' ? 'You’re on stage for this one.' : 'Doors open 20 minutes before.'}` : 'Browse the program or ask a question any time.'}</p>
+        <p>{next ? `${fmt(next.e.start)} at ${where(next.e)}. ${next.why === 'You’re appearing' ? 'You’re on stage for this one.' : 'Doors open 20 minutes before.'}` : 'Browse the program or ask a question any time.'}</p>
+        {me?.arrives && <p className="muted">You arrive {when(me.arrives)}{me.departs ? ` and leave ${when(me.departs)}` : ''}{me.travelNote ? ` · ${me.travelNote}` : ''}.</p>}
         <div className="row">
           <button className="primary" onClick={() => go('pass')}><Icon name="ticket" size={16} />Show my pass</button>
           {unread > 0 && <button onClick={() => go('updates')}><Icon name="inbox" size={16} />{unread} update{unread > 1 ? 's' : ''}</button>}
@@ -307,7 +316,7 @@ function PersonHome({ s, who, go }: { s: AgentStore; who: Who; go: (t: string) =
                 <div className={`ic ${p.why === 'You’re appearing' ? 'bad' : ''}`}><Icon name={p.e.kind === 'panel' ? 'users' : p.e.kind === 'qa' ? 'chat' : 'film'} size={16} /></div>
                 <div style={{ minWidth: 0, flex: 1 }}>
                   <div className="t">{p.e.title}</div>
-                  <div className="d">{fmt(p.e.start)}–{fmt(p.e.end)} · {venue(p.e.venueId)}</div>
+                  <div className="d">{fmt(p.e.start)}–{fmt(p.e.end)} · {where(p.e)}</div>
                 </div>
                 <span className={`chip ${p.e.status === 'cancelled' ? 'bad' : p.why === 'You’re appearing' ? 'warn' : ''}`}>{p.e.status === 'cancelled' ? 'Cancelled' : p.why}</span>
               </div>

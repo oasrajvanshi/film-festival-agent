@@ -11,7 +11,7 @@ import type { PassType, PersonRole } from '../core/types';
 import { parseTime, TABS, type Table, type Tables } from '../data/sheet';
 
 // ------------------------------------------------------------ what the agent understands
-export type Kind = 'schedule' | 'venues' | 'films' | 'people' | 'passes' | 'tickets' | 'saved' | 'shifts' | 'docs' | 'travel';
+export type Kind = 'schedule' | 'venues' | 'rooms' | 'films' | 'people' | 'arrivals' | 'availability' | 'passes' | 'tickets' | 'saved' | 'shifts' | 'docs' | 'travel';
 
 export interface FieldSpec { key: string; label: string; required?: boolean; synonyms: string[] }
 
@@ -24,13 +24,24 @@ export const KINDS: Record<Kind, { label: string; describe: string; fields: Fiel
       { key: 'start', label: 'Start time', required: true, synonyms: ['start', 'start time', 'time', 'showtime', 'show time', 'begins', 'from', 'screening time', 'starts'] },
       { key: 'end', label: 'End time', synonyms: ['end', 'end time', 'ends', 'until', 'to', 'finish'] },
       { key: 'duration', label: 'Length (minutes)', synonyms: ['duration', 'length', 'runtime', 'running time', 'minutes', 'mins', 'run time'] },
-      { key: 'venue', label: 'Venue', required: true, synonyms: ['venue', 'theatre', 'theater', 'location', 'room', 'screen', 'cinema', 'hall', 'venue id', 'space'] },
+      { key: 'venue', label: 'Venue', required: true, synonyms: ['venue', 'theatre', 'theater', 'location', 'cinema', 'hall', 'venue id', 'space', 'building'] },
+      { key: 'room', label: 'Screen or room', synonyms: ['room', 'screen', 'auditorium', 'house', 'cinema number', 'screen number', 'room name'] },
+      { key: 'sold', label: 'Seats sold', synonyms: ['seats sold', 'sold', 'tickets sold', 'sales', 'sold seats'] },
+      { key: 'held', label: 'Seats held', synonyms: ['seats held', 'held', 'holds', 'house seats', 'comps held', 'reserved'] },
       { key: 'type', label: 'Event type', synonyms: ['type', 'kind', 'category', 'format', 'event type'] },
       { key: 'film', label: 'Film', synonyms: ['film id', 'film', 'movie', 'film title', 'work'] },
       { key: 'guests', label: 'Guests', synonyms: ['guests', 'guest', 'talent', 'speakers', 'panelists', 'in person', 'filmmakers attending', 'guest ids'] },
       { key: 'restriction', label: 'Who can attend', synonyms: ['restriction', 'access', 'audience', 'admission', 'eligibility'] },
       { key: 'status', label: 'Status', synonyms: ['status', 'state', 'cancelled', 'canceled'] },
       { key: 'id', label: 'Event ID', synonyms: ['event id', 'id', 'code', 'screening id', 'session id'] },
+    ],
+  },
+  rooms: {
+    label: 'Screens and rooms', describe: 'screens or rooms inside each venue, with their seats',
+    fields: [
+      { key: 'venue', label: 'Venue', required: true, synonyms: ['venue', 'location', 'theatre', 'theater', 'building', 'cinema'] },
+      { key: 'room', label: 'Screen or room', required: true, synonyms: ['room', 'screen', 'auditorium', 'house', 'room name', 'screen name'] },
+      { key: 'capacity', label: 'Seats', required: true, synonyms: ['seats', 'capacity', 'seating', 'seat count', 'size'] },
     ],
   },
   venues: {
@@ -67,6 +78,24 @@ export const KINDS: Record<Kind, { label: string; describe: string; fields: Fiel
       { key: 'id', label: 'Person ID', synonyms: ['person id', 'id', 'attendee id', 'contact id', 'registration id'] },
     ],
   },
+  arrivals: {
+    label: 'Guest travel', describe: 'when guests arrive and leave, and how',
+    fields: [
+      { key: 'person', label: 'Guest', required: true, synonyms: ['guest', 'name', 'email', 'person', 'filmmaker', 'talent'] },
+      { key: 'arrives', label: 'Arrives', required: true, synonyms: ['arrives', 'arrival', 'arriving', 'arrival time', 'lands', 'eta', 'in town'] },
+      { key: 'departs', label: 'Leaves', synonyms: ['departs', 'departure', 'leaves', 'leaving', 'departure time', 'out'] },
+      { key: 'how', label: 'Flight or train', synonyms: ['flight', 'flight number', 'train', 'transport', 'travel', 'carrier'] },
+      { key: 'hotel', label: 'Hotel', synonyms: ['hotel', 'accommodation', 'staying at', 'lodging'] },
+    ],
+  },
+  availability: {
+    label: 'Volunteer availability', describe: 'which days volunteers can work and what they can do',
+    fields: [
+      { key: 'person', label: 'Volunteer', required: true, synonyms: ['volunteer', 'name', 'email', 'person'] },
+      { key: 'days', label: 'Available days', synonyms: ['available days', 'availability', 'available', 'days available', 'can work'] },
+      { key: 'skills', label: 'Skills', synonyms: ['skills', 'skill', 'languages', 'certifications', 'qualifications', 'can do', 'experience'] },
+    ],
+  },
   passes: {
     label: 'Passes', describe: 'who holds which pass or badge',
     fields: [
@@ -81,6 +110,8 @@ export const KINDS: Record<Kind, { label: string; describe: string; fields: Fiel
       { key: 'person', label: 'Holder', required: true, synonyms: ['person', 'holder', 'name', 'email', 'person id', 'buyer', 'purchaser'] },
       { key: 'event', label: 'Event', required: true, synonyms: ['event', 'screening', 'event id', 'film', 'session', 'session code', 'show'] },
       { key: 'id', label: 'Ticket ID', synonyms: ['ticket id', 'id', 'order', 'barcode'] },
+      { key: 'type', label: 'Ticket type', synonyms: ['ticket type', 'type', 'price level', 'tier', 'fare'] },
+      { key: 'price', label: 'Price', synonyms: ['price', 'amount', 'paid', 'total', 'cost'] },
     ],
   },
   saved: {
@@ -111,7 +142,7 @@ export const KINDS: Record<Kind, { label: string; describe: string; fields: Fiel
   },
   travel: { label: 'Travel times', describe: 'minutes between venues', fields: [] },
 };
-export const KIND_ORDER: Kind[] = ['schedule', 'venues', 'films', 'people', 'passes', 'tickets', 'saved', 'shifts', 'docs', 'travel'];
+export const KIND_ORDER: Kind[] = ['schedule', 'venues', 'rooms', 'films', 'people', 'arrivals', 'availability', 'passes', 'tickets', 'saved', 'shifts', 'docs', 'travel'];
 
 // ------------------------------------------------------------ matching
 const norm = (s: string) => s.toLowerCase().replace(/\(.*?\)/g, ' ').replace(/[^a-z0-9]+/g, ' ').trim();
@@ -154,9 +185,10 @@ export function matchColumns(kind: Kind, headers: string[]): ColumnMatch[] {
 /** What a file most likely is, from its name and headers. */
 export function guessKind(fileName: string, headers: string[]): { kind: Kind; confidence: number } {
   const name = norm(fileName);
-  if (/travel|distance|walk/.test(name) || /from.*to/.test(norm(headers[0] ?? ''))) return { kind: 'travel', confidence: 0.9 };
+  if ((/travel|distance|walk/.test(name) && !/guest|arriv|flight/.test(name)) || /from.*to/.test(norm(headers[0] ?? ''))) return { kind: 'travel', confidence: 0.9 };
   const hints: [Kind, RegExp][] = [
-    ['schedule', /schedule|program|grid|screenings|showtimes|sessions|events/], ['venues', /venue|theat|locations|rooms/],
+    ['schedule', /schedule|program|grid|screenings|showtimes|sessions|events/], ['venues', /venue|theat|locations/], ['rooms', /rooms|screens|auditoria|auditoriums/],
+    ['arrivals', /arriv|flights|hotel|itinerar.*guest|guest.*(travel|itinerar)/], ['availability', /availab|skills|sign ?ups?/],
     ['films', /film|catalog|movies|titles/], ['people', /people|attendee|guest|contacts|registr|badge holders|staff list/],
     ['passes', /pass|badge|credential/], ['tickets', /ticket|orders/], ['saved', /saved|itinerar|favorite|my schedule/],
     ['shifts', /shift|volunteer|rota|roster/], ['docs', /faq|policy|policies|documents|handbook|guide/],
@@ -227,6 +259,42 @@ export function dayFrom(raw: string, dates: string[]): number | null {
   return i >= 0 ? i + 1 : null;
 }
 
+/** A calendar date in any common format → "2027-05-21" (the year defaults to the festival's). */
+export function isoDate(raw: string, year: string): string | null {
+  const r = raw.trim().toLowerCase();
+  let m = /(\d{4})-(\d{1,2})-(\d{1,2})/.exec(r);
+  if (m) return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
+  m = /(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/.exec(r);
+  if (m) return `${m[3] ? (m[3].length === 2 ? `20${m[3]}` : m[3]) : year}-${m[1].padStart(2, '0')}-${m[2].padStart(2, '0')}`;
+  const mon = MONTHS.findIndex(x => r.includes(x));
+  const dd = /\b(\d{1,2})\b(?!:)/.exec(r.replace(/\d{1,2}[:.]\d{2}.*/, ''));
+  if (mon >= 0 && dd) return `${year}-${String(mon + 1).padStart(2, '0')}-${dd[1].padStart(2, '0')}`;
+  return null;
+}
+/** "5/21/2027 2:30pm", "May 21, 14:30", "2027-05-21T14:30" → "2027-05-21T14:30". */
+export function isoDateTime(raw: string, year: string): string | null {
+  const date = isoDate(raw, year);
+  const t = /(\d{1,2}[:.]\d{2}\s*(?:am|pm)?)\s*$/i.exec(raw.trim().replace(/T(?=\d)/, ' '));
+  const time = t ? parseTime(t[1]) : null;
+  return date && time ? `${date}T${time}` : null;
+}
+const WEEKDAYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+/** "Thu, Fri, Sat", "5/20; 5/21", "Day 1 2", "all" → festival day numbers. */
+export function daysFrom(raw: string, dates: string[]): number[] {
+  const r = raw.trim().toLowerCase();
+  if (!r) return [];
+  if (/^(all|any|every ?day|all days|any day|whole festival)$/.test(r)) return dates.map((_, i) => i + 1);
+  const out = new Set<number>();
+  for (const tok of r.split(/[,;&+]|\band\b/).map(x => x.trim()).filter(Boolean)) {
+    const wd = WEEKDAYS.findIndex(w => tok.startsWith(w));
+    if (wd >= 0 && !/\d/.test(tok)) { dates.forEach((d, i) => { if (new Date(`${d}T12:00:00Z`).getUTCDay() === wd) out.add(i + 1); }); continue; }
+    const d = dayFrom(tok, dates);
+    if (d) out.add(d);
+    else for (const n of tok.match(/^(?:days?\s*)?([\d\s]+)$/)?.[1].trim().split(/\s+/) ?? []) if (Number(n) >= 1 && Number(n) <= dates.length) out.add(Number(n));
+  }
+  return [...out].sort((a, b) => a - b);
+}
+
 const slug = (s: string) => norm(s).replace(/\s+/g, '-').slice(0, 24) || 'x';
 const addMin = (hhmm: string, min: number) => {
   const t = Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3)) + min;
@@ -272,7 +340,28 @@ export function buildTables(meta: FestivalMeta, uploads: Upload[]): BuildResult 
     return vid;
   };
   for (const u of of('venues')) { const g = getter(u); for (const r of body(u.table)) addVenue(g(r, 'name') || g(r, 'id'), Number(g(r, 'capacity')) || 0, g(r, 'address'), g(r, 'id')); }
+  const rooms = new Map<string, { name: string; capacity: number }[]>();
+  for (const u of of('rooms')) {
+    const g = getter(u);
+    body(u.table).forEach((r, i) => {
+      const vname = g(r, 'venue'), room = g(r, 'room'), seats = Number(g(r, 'capacity').replace(/\D/g, ''));
+      if (!vname || !room) return;
+      if (!seats) { unresolved.push(`Rooms row ${i + 2}: "${room}" has no seat count`); return; }
+      const vid = venueKey.get(norm(vname)) ?? addVenue(vname, seats);
+      const list = rooms.get(vid) ?? [];
+      if (!list.some(x => norm(x.name) === norm(room))) list.push({ name: room, capacity: seats });
+      rooms.set(vid, list);
+    });
+  }
+  for (const v of venues) {
+    const list = rooms.get(v.id);
+    if (!list?.length) continue;
+    const total = list.reduce((a, x) => a + x.capacity, 0);
+    if (v.capacity !== total) notes.push(`${v.name}: seats taken from its ${list.length} rooms (${total} in all).`);
+    v.capacity = total;
+  }
   const venueId = (raw: string) => venueKey.get(norm(raw)) ?? addVenue(raw);
+  const roomOf = (vid: string, raw: string) => rooms.get(vid)?.find(x => norm(x.name) === norm(raw))?.name;
 
   // People (and passes given in the people file)
   const people: string[][] = [];
@@ -288,13 +377,41 @@ export function buildTables(meta: FestivalMeta, uploads: Upload[]): BuildResult 
       const role = normRole(g(r, 'role'), pass);
       const email = g(r, 'email'), phone = g(r, 'phone');
       const channels = ['app_push', email && 'email', phone && 'sms'].filter(Boolean).join(', ');
-      people.push([id, name, role, email, channels, g(r, 'staffRole') || (role === 'volunteer' ? 'usher' : ''), 'FALSE', phone]);
+      people.push([id, name, role, email, channels, g(r, 'staffRole') || (role === 'volunteer' ? 'usher' : ''), 'FALSE', phone, '', '', '', '', '']);
       for (const k of [id, name, email]) if (k) personKey.set(norm(k), id);
       if (pass) passes.push([id, pass, dates.slice(0, meta.days).map((_, j) => j + 1).join(' ')]);
       else if (g(r, 'pass')) unresolved.push(`People row ${i + 2}: pass "${g(r, 'pass')}" not recognised`);
     });
   }
   const personId = (raw: string) => raw.split(/[,;]|\band\b/).map(x => personKey.get(norm(x))).filter((x): x is string => !!x);
+  const year = dates[0]?.slice(0, 4) ?? '2027';
+  const personRow = (pid: string) => people.find(p => p[0] === pid)!;
+
+  for (const u of of('arrivals')) {
+    const g = getter(u);
+    body(u.table).forEach((r, i) => {
+      const [pid] = personId(g(r, 'person'));
+      if (!pid) { unresolved.push(`Guest travel row ${i + 2}: unknown guest "${g(r, 'person')}"`); return; }
+      const row = personRow(pid);
+      const arr = isoDateTime(g(r, 'arrives'), year), dep = g(r, 'departs') ? isoDateTime(g(r, 'departs'), year) : '';
+      if (!arr) { unresolved.push(`Guest travel row ${i + 2}: arrival "${g(r, 'arrives')}" needs a date and a time`); return; }
+      if (dep === null) unresolved.push(`Guest travel row ${i + 2}: departure "${g(r, 'departs')}" needs a date and a time`);
+      row[8] = arr; row[9] = dep || '';
+      row[10] = [g(r, 'how'), g(r, 'hotel') && `staying at ${g(r, 'hotel')}`].filter(Boolean).join(', ');
+    });
+  }
+  for (const u of of('availability')) {
+    const g = getter(u);
+    body(u.table).forEach((r, i) => {
+      const [pid] = personId(g(r, 'person'));
+      if (!pid) { unresolved.push(`Volunteer availability row ${i + 2}: unknown volunteer "${g(r, 'person')}"`); return; }
+      const row = personRow(pid);
+      const days = daysFrom(g(r, 'days'), dates);
+      if (g(r, 'days') && !days.length) unresolved.push(`Volunteer availability row ${i + 2}: days "${g(r, 'days')}" not understood`);
+      row[11] = g(r, 'skills').split(/[,;/]/).map(x => x.trim()).filter(Boolean).join(', ');
+      row[12] = days.join(' ');
+    });
+  }
 
   for (const u of of('passes')) {
     const g = getter(u);
@@ -351,7 +468,15 @@ export function buildTables(meta: FestivalMeta, uploads: Upload[]): BuildResult 
       const guestsRaw = g(r, 'guests');
       const guests = personId(guestsRaw);
       if (guestsRaw && guests.length === 0) unresolved.push(`Schedule row ${i + 2}: guest "${guestsRaw}" is not in the people list`);
-      events.push([id, String(day), start, end, kind, title, venueId(g(r, 'venue')), filmId ?? '', guests.join(', '), restriction, status]);
+      const vid = venueId(g(r, 'venue'));
+      const roomRaw = g(r, 'room');
+      const room = roomRaw ? roomOf(vid, roomRaw) : '';
+      if (roomRaw && !room) {
+        if (rooms.has(vid)) unresolved.push(`Schedule row ${i + 2} ("${title}"): "${roomRaw}" is not a room at ${venues.find(v => v.id === vid)?.name}`);
+        else { const list = rooms.get(vid) ?? []; list.push({ name: roomRaw, capacity: 0 }); }
+      }
+      const seats = (k: string) => g(r, k).replace(/[^\d]/g, '');
+      events.push([id, String(day), start, end, kind, title, vid, filmId ?? '', guests.join(', '), restriction, status, room ?? '', seats('sold'), seats('held')]);
       eventKey.set(norm(id), id); eventKey.set(norm(title), eventKey.get(norm(title)) ?? id);
       eventKey.set(norm(`${title} ${day} ${start}`), id);
     });
@@ -364,7 +489,8 @@ export function buildTables(meta: FestivalMeta, uploads: Upload[]): BuildResult 
     body(u.table).forEach((r, i) => {
       const [pid] = personId(g(r, 'person')); const eid = eventId(g(r, 'event'));
       if (!pid || !eid) { unresolved.push(`Tickets row ${i + 2}: ${!pid ? `unknown person "${g(r, 'person')}"` : `unknown event "${g(r, 'event')}"`}`); return; }
-      tickets.push([g(r, 'id') || `t-${String(tickets.length + 1).padStart(3, '0')}`, pid, eid]);
+      const price = g(r, 'price').replace(/[^\d.]/g, '');
+      tickets.push([g(r, 'id') || `t-${String(tickets.length + 1).padStart(3, '0')}`, pid, eid, g(r, 'type'), price]);
       if (!passes.some(p => p[0] === pid)) passes.push([pid, 'single_ticket', ALL]);
     });
   }
@@ -418,7 +544,7 @@ export function buildTables(meta: FestivalMeta, uploads: Upload[]): BuildResult 
     tables: {
       Festival: [T('Festival'), ['Name', meta.name], ...dates.map((d, i) => [`Day ${i + 1} date`, d])],
       'Schedule grid': [T('Schedule grid'), ...events],
-      Venues: [T('Venues'), ...venues.map(v => [v.id, v.name, String(v.capacity), v.address])],
+      Venues: [T('Venues'), ...venues.map(v => [v.id, v.name, String(v.capacity), v.address, (rooms.get(v.id) ?? []).map(x => `${x.name}: ${x.capacity}`).join('; ')])],
       'Travel times': travel,
       Films: [T('Films'), ...films],
       People: [T('People'), ...people],

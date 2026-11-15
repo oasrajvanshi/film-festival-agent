@@ -1,5 +1,5 @@
-Venue ID,Name,Capacity,Address
-v-harbor,Harbor Theater,400,12 Pier Road
-v-canal,Canal Street Cinema,180,88 Canal Street
-v-pier9,Pier 9 Hall,250,Pier 9
-v-river,Riverside Studio,120,3 Riverside Walk
+Venue ID,Name,Capacity,Address,Rooms
+v-harbor,Harbor Theater,400,12 Pier Road,
+v-canal,Canal Street Cinema,180,88 Canal Street,
+v-pier9,Pier 9 Hall,250,Pier 9,
+v-river,Riverside Studio,120,3 Riverside Walk,

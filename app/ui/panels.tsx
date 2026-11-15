@@ -85,7 +85,7 @@ export function Overview({ s, go }: P) {
               <div className="ic"><Icon name={e.kind === 'panel' ? 'users' : e.kind === 'qa' ? 'chat' : 'film'} size={16} /></div>
               <div style={{ minWidth: 0 }}>
                 <div className="t">{e.title}</div>
-                <div className="d">{fmt(e.start)} · {venueName(e.venueId)}</div>
+                <div className="d">{fmt(e.start)} · {venueName(e.venueId)}{e.room ? `, ${e.room}` : ''}{e.seatsSold !== undefined ? ` · ${e.seatsSold} sold` : ''}</div>
               </div>
             </div>
           ))}
