@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Harbor Lights Mood Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Condensed:wght@400..700&family=Brygada+1918:ital,wght@0,400..700;1,400..700&family=Familjen+Grotesk:wght@400..700&family=Courier+Prime&family=Geist:wght@400..700&family=Geist+Mono:wght@400;500&family=Hanken+Grotesk:wght@400..700&family=Young+Serif&display=swap">
+<style>
+/* Harbor Lights mood board: what was approved and what was made after.
+   Layout: a long dark editorial board. Photos and stills as a collage,
+   then colour, type, the approved UI concepts, live UI parts and the
+   finished screens. */
+:root {
+  --umber: #110908; --umber-2: #1A110E; --umber-3: #23170F; --line: rgba(236, 226, 208, .12);
+  --cream: #EFE5D3; --text: #D9CDB9; --muted: #A08D79; --amber: #C99863; --amber-2: #E3B784; --rust: #B0573A;
+  --o-bg: #0C0A09; --o-surface: #1B1816; --o-raised: #2C2724; --o-ink: #F2EDE6; --o-muted: #8E8478; --o-accent: #D49A5C; --o-red: #E8684B; --o-green: #93B27E;
+  --display: "Libre Caslon Condensed", Georgia, serif; --title: "Brygada 1918", Georgia, serif; --ui: "Familjen Grotesk", Arial, sans-serif;
+  --geist: "Geist", Arial, sans-serif; --mono: "Courier Prime", monospace; --gmono: "Geist Mono", monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--umber); color: var(--text); font: 15px/1.5 var(--ui); }
+body::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 50; opacity: .1; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+img { display: block; max-width: 100%; }
+.wrap { max-width: 1400px; margin: 0 auto; padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); }
+section { padding-block: 72px 24px; }
+.label { font-family: var(--mono); font-size: 13px; color: var(--amber-2); }
+h2 { margin: 6px 0 28px; font-family: var(--display); font-weight: 600; font-size: clamp(44px, 5.4vw, 82px); line-height: .9; color: var(--cream); }
+h3 { margin: 0; font-family: var(--title); font-weight: 500; font-size: 20px; color: var(--cream); }
+p { margin: 0; }
+
+/* hero */
+.hero { position: relative; min-height: 92vh; display: grid; grid-template-columns: 1.1fr 1fr; gap: 3vw; align-items: end; padding-block: 64px 48px; }
+.hero h1 { margin: 0; font-family: var(--display); font-weight: 600; color: var(--cream); font-size: clamp(80px, 12vw, 190px); line-height: .86; letter-spacing: -.01em; padding-bottom: .12em; }
+.hero .sub { margin-top: 18px; font-family: var(--title); font-style: italic; font-size: 22px; color: var(--text); }
+.hero .meta { margin-top: 26px; display: flex; gap: 22px; flex-wrap: wrap; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.stack { position: relative; height: min(82vh, 760px); }
+.stack figure { position: absolute; margin: 0; border-radius: 6px; overflow: hidden; box-shadow: 0 40px 80px rgba(0, 0, 0, .6); }
+.stack figure img { width: 100%; height: 100%; object-fit: cover; }
+.stack .a { width: 52%; aspect-ratio: 9 / 16; left: 0; top: 0; transform: rotate(-3deg); }
+.stack .b { width: 46%; aspect-ratio: 9 / 16; right: 0; top: 8%; transform: rotate(2.5deg); }
+.stack .c { width: 40%; aspect-ratio: 9 / 16; left: 30%; bottom: -4%; transform: rotate(-1deg); z-index: 2; }
+.stack .tag { position: absolute; left: 10px; bottom: 10px; font-family: var(--mono); font-size: 12px; background: var(--cream); color: var(--umber); padding: 2px 8px; border-radius: 4px; }
+
+/* palette */
+.pal { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.pal-set { border-radius: 18px; overflow: hidden; background: var(--umber-2); border: 1px solid var(--line); }
+.pal-set header { padding: 16px 18px 6px; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.pal-set header span { font-size: 13px; color: var(--muted); }
+.chips { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0; padding: 12px 18px 18px; gap: 8px; }
+.chip { display: grid; gap: 8px; font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+.chip i { display: block; aspect-ratio: 3 / 4; border-radius: 10px; border: 1px solid rgba(255, 255, 255, .06); }
+.chip b { font-family: var(--ui); font-weight: 600; color: var(--text); font-size: 12.5px; }
+
+/* type */
+.types { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.type { padding: 24px 22px; border-radius: 18px; background: var(--umber-2); border: 1px solid var(--line); display: grid; gap: 14px; align-content: start; }
+.type .big { color: var(--cream); line-height: .95; }
+.type .row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; }
+.type .row b { color: var(--text); font-weight: 600; }
+.type.on { border-color: rgba(201, 152, 99, .55); }
+.badge { font-family: var(--mono); font-size: 11.5px; padding: 2px 8px; border-radius: 6px; background: rgba(201, 152, 99, .18); color: var(--amber-2); width: fit-content; }
+.scale { margin-top: 18px; display: grid; gap: 10px; padding: 24px; border-radius: 18px; background: var(--umber-2); border: 1px solid var(--line); }
+.scale div { display: grid; grid-template-columns: 170px 1fr; gap: 18px; align-items: baseline; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
+.scale div:last-child { border-bottom: 0; padding-bottom: 0; }
+.scale span { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+/* approved concepts */
+.concepts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+.concepts figure { margin: 0; display: grid; gap: 10px; }
+.concepts img { border-radius: 14px; aspect-ratio: 9 / 16; object-fit: cover; width: 100%; box-shadow: 0 24px 50px rgba(0, 0, 0, .45); }
+figcaption { font-size: 13.5px; color: var(--muted); display: flex; gap: 8px; align-items: baseline; }
+figcaption b { font-family: var(--mono); font-weight: 400; font-size: 12px; background: var(--umber-3); color: var(--cream); padding: 1px 7px; border-radius: 5px; }
+
+/* stills wall */
+.wall { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 6px; grid-auto-flow: dense; }
+.wall figure { margin: 0; position: relative; overflow: hidden; border-radius: 4px; }
+.wall img { width: 100%; aspect-ratio: 1; object-fit: cover; transition: transform .5s ease; }
+.wall figure:hover img { transform: scale(1.06); }
+.wall figure span { position: absolute; left: 6px; bottom: 5px; right: 6px; font-family: var(--title); font-size: 12.5px; color: #fff; text-shadow: 0 1px 6px rgba(0, 0, 0, .8); opacity: 0; transition: opacity .3s; }
+.wall figure:hover span { opacity: 1; }
+.wall .wide { grid-column: span 2; grid-row: span 2; }
+
+/* live parts */
+.parts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.part { padding: 22px; border-radius: 18px; background: var(--umber-2); border: 1px solid var(--line); display: grid; gap: 16px; align-content: start; }
+.part > small { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.part.ops { background: var(--o-bg); font-family: var(--geist); border-color: rgba(255, 255, 255, .06); }
+.part.wide { grid-column: span 2; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { display: inline-flex; align-items: center; min-height: 46px; padding: 0 22px; border-radius: 999px; font-weight: 600; font-size: 14.5px; border: 1px solid rgba(236, 226, 208, .22); color: var(--cream); background: rgba(30, 20, 16, .65); }
+.btn.primary { background: var(--cream); color: var(--umber); border-color: var(--cream); }
+.btn.amber { background: var(--amber); color: var(--umber); border-color: var(--amber); }
+.role { display: flex; align-items: center; gap: 14px; min-height: 60px; padding: 0 20px; border-radius: 999px; border: 1px solid rgba(236, 226, 208, .22); background: rgba(30, 20, 16, .65); color: var(--cream); font-weight: 600; }
+.role.on { background: var(--cream); color: var(--umber); }
+.role small { display: block; font-weight: 400; font-size: 12px; color: var(--muted); }
+.role.on small { color: #5B4A3D; }
+.role svg { width: 22px; height: 22px; flex: none; }
+.days { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.days span { display: grid; padding: 10px 12px; border-radius: 14px; background: var(--o-surface); color: var(--o-muted); font-size: 12px; }
+.days span b { color: var(--o-ink); font-size: 15px; }
+.days span.on { background: var(--o-ink); color: #5E554C; }
+.days span.on b { color: var(--o-bg); }
+.sec { background: var(--o-surface); border-radius: 18px; padding: 6px 0 4px; }
+.sec header { display: flex; gap: 10px; align-items: center; padding: 10px 14px; color: var(--o-ink); font-weight: 600; font-size: 15px; }
+.sec header i { width: 28px; height: 28px; border-radius: 9px; background: rgba(232, 104, 75, .13); }
+.pill { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 8px; border-radius: 6px; font-size: 12px; font-weight: 500; }
+.pill.red { background: rgba(232, 104, 75, .13); color: var(--o-red); }
+.pill.amber { background: rgba(212, 154, 92, .13); color: var(--o-accent); }
+.pill.green { background: rgba(147, 178, 126, .13); color: var(--o-green); }
+.pill.grey { background: var(--o-raised); color: var(--o-muted); }
+.srow { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-top: 1px solid rgba(255, 255, 255, .05); }
+.srow .bar { width: 4px; align-self: stretch; border-radius: 4px; background: var(--o-accent); }
+.srow .bar.red { background: var(--o-red); }
+.srow div { flex: 1; display: grid; }
+.srow b { color: var(--o-ink); font-size: 15px; }
+.srow small { color: var(--o-muted); font-size: 12.5px; }
+.sched { display: grid; grid-template-columns: 44px 44px 1fr auto; gap: 12px; align-items: center; padding: 10px 14px; border-top: 1px solid rgba(255, 255, 255, .05); }
+.sched.risk { background: rgba(232, 104, 75, .13); }
+.sched.moved { background: rgba(212, 154, 92, .13); }
+.sched .tm { font-family: var(--gmono); font-size: 12.5px; color: var(--o-ink); }
+.sched .tm s { display: block; color: #625951; font-size: 11px; }
+.sched img { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; }
+.sched b { color: var(--o-ink); font-size: 14.5px; display: block; }
+.sched small { color: var(--o-muted); font-size: 12.5px; }
+.rec { background: var(--o-surface); border-radius: 16px; overflow: hidden; }
+.rec p { padding: 18px; font-size: 16px; font-weight: 500; line-height: 1.45; color: var(--o-ink); border-bottom: 1px solid rgba(255, 255, 255, .06); }
+.rec ul { list-style: none; margin: 0; padding: 8px 14px; display: grid; gap: 4px; }
+.rec li { display: flex; gap: 12px; padding: 9px 4px; font-size: 14.5px; color: var(--o-ink); }
+.rec li i { width: 20px; height: 20px; border-radius: 6px; background: var(--o-ink); display: grid; place-items: center; flex: none; margin-top: 1px; }
+.rec li i svg { width: 13px; height: 13px; color: var(--o-bg); }
+.rec footer { padding: 12px 14px 14px; border-top: 1px solid rgba(255, 255, 255, .06); }
+.rec footer span { display: grid; place-items: center; height: 40px; border-radius: 8px; background: var(--o-ink); color: var(--o-bg); font-weight: 600; font-size: 14px; }
+.ev { position: relative; height: 104px; border-radius: 8px; background: #1F1B19; border: 1px solid #29241F; padding: 9px 10px 9px 56px; overflow: hidden; }
+.ev::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--bar); }
+.ev img { position: absolute; left: 12px; top: 9px; width: 36px; height: 36px; border-radius: 6px; object-fit: cover; }
+.ev b { color: var(--o-ink); font-size: 13px; display: block; }
+.ev span { font-family: var(--gmono); font-size: 11.5px; color: #CBC2B7; }
+.ev.changed { border-color: var(--o-accent); background: #2E2318; }
+.ev.risk { border-color: var(--o-red); background: #2C1A16; }
+.ev em { font-style: normal; font-size: 11.5px; color: var(--o-accent); display: block; margin-top: 4px; }
+.evs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.card { padding: 14px 16px; border-radius: 16px; background: rgba(30, 20, 16, .7); border: 1px solid var(--line); }
+.card.changed { border-color: rgba(201, 152, 99, .7); background: linear-gradient(180deg, rgba(201, 152, 99, .16), rgba(30, 20, 16, .7)); }
+.card .row { display: flex; gap: 12px; align-items: center; }
+.card img { width: 54px; height: 54px; border-radius: 10px; object-fit: cover; }
+.card .t { font-family: var(--title); font-size: 18px; color: var(--cream); display: block; }
+.card .m { font-size: 13px; color: var(--muted); }
+.card .note { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); color: var(--amber-2); font-size: 13.5px; }
+.icons { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; }
+.icons span { aspect-ratio: 1; border-radius: 14px; background: var(--umber-3); display: grid; place-items: center; color: var(--amber-2); }
+.icons svg { width: 26px; height: 26px; }
+
+/* screens */
+.screens { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 18px; align-items: start; }
+.screens .col { display: grid; gap: 18px; }
+.screens img { border-radius: 12px; border: 1px solid var(--line); box-shadow: 0 30px 60px rgba(0, 0, 0, .5); width: 100%; }
+footer.end { padding-block: 80px 60px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; font-family: var(--mono); font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); margin-top: 60px; }
+
+@media (max-width: 1000px) {
+  .hero { grid-template-columns: 1fr; min-height: 0; }
+  .stack { height: 70vh; }
+  .pal, .types, .parts, .screens { grid-template-columns: 1fr; }
+  .part.wide { grid-column: auto; }
+  .concepts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wall { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .chips { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 560px) { .wall { grid-template-columns: repeat(3, minmax(0, 1fr)); } .scale div { grid-template-columns: 1fr; gap: 4px; } .evs { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="hero">
+    <div>
+      <p class="label">Mood board · approved and final</p>
+      <h1>Harbor<br>Lights</h1>
+      <p class="sub">A film festival run by an agent. Umber dark, one amber light, real film grain.</p>
+      <div class="meta"><span>Portland, Maine</span><span>April 15 to 17, 2027</span><span>40 films · 4 venues</span></div>
+    </div>
+    <div class="stack" aria-hidden="true">
+      <figure class="a"><img src="round4/l1-stairs.jpg" alt=""><span class="tag">L1</span></figure>
+      <figure class="b"><img src="round4/l2-projector.jpg" alt=""><span class="tag">L2</span></figure>
+      <figure class="c"><img src="round4/s2-chair.jpg" alt=""><span class="tag">S1</span></figure>
+    </div>
+  </header>
+
+  <section>
+    <p class="label">01 · Colour</p>
+    <h2>Umber, cream, one amber light</h2>
+    <div class="pal">
+      <div class="pal-set">
+        <header><h3>Cinema: attendee, staff, site</h3><span>sampled from your references</span></header>
+        <div class="chips">
+          <div class="chip"><i style="background:#110908"></i><b>Umber</b>#110908</div>
+          <div class="chip"><i style="background:#23170F"></i><b>Smoke</b>#23170F</div>
+          <div class="chip"><i style="background:#713E28"></i><b>Rust</b>#713E28</div>
+          <div class="chip"><i style="background:#C99863"></i><b>Amber</b>#C99863</div>
+          <div class="chip"><i style="background:#D0BD99"></i><b>Linen</b>#D0BD99</div>
+          <div class="chip"><i style="background:#EFE5D3"></i><b>Cream</b>#EFE5D3</div>
+        </div>
+      </div>
+      <div class="pal-set">
+        <header><h3>Operations: the festival team</h3><span>dark, to-B, colour only for state</span></header>
+        <div class="chips">
+          <div class="chip"><i style="background:#0C0A09"></i><b>Page</b>#0C0A09</div>
+          <div class="chip"><i style="background:#1B1816"></i><b>Card</b>#1B1816</div>
+          <div class="chip"><i style="background:#F2EDE6"></i><b>Ink</b>#F2EDE6</div>
+          <div class="chip"><i style="background:#D49A5C"></i><b>Changed</b>#D49A5C</div>
+          <div class="chip"><i style="background:#E8684B"></i><b>Urgent</b>#E8684B</div>
+          <div class="chip"><i style="background:#93B27E"></i><b>Done</b>#93B27E</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="label">02 · Type · your picks F6, F8, F11</p>
+    <h2>Classic, a little unusual</h2>
+    <div class="types">
+      <div class="type on"><span class="badge">F8 · display</span><div class="big" style="font-family:var(--display);font-weight:600;font-size:64px">Harbor Lights</div><p style="font-family:'Hanken Grotesk'">Libre Caslon Condensed: the wordmark and every big title.</p><div class="row"><b>Libre Caslon Condensed</b><span>Hanken Grotesk</span></div></div>
+      <div class="type on"><span class="badge">F6 · titles and app text</span><div class="big" style="font-family:var(--title);font-size:48px">Wild Tide <i>3:15 pm</i></div><p>Brygada 1918 for film titles, Familjen Grotesk for everything you read in the apps.</p><div class="row"><b>Brygada 1918</b><span>Familjen Grotesk</span></div></div>
+      <div class="type on"><span class="badge">F11 · the team tool</span><div class="big" style="font-family:'Young Serif';font-size:44px">Needs you</div><p style="font-family:var(--geist)">Geist runs the operations tool: calm, even, built for tables and checklists.</p><div class="row"><b>Young Serif</b><span>Geist</span></div></div>
+    </div>
+    <div class="scale">
+      <div><span>Display · Caslon Condensed</span><b style="font-family:var(--display);font-weight:600;font-size:56px;color:var(--cream);line-height:.9">The agent sees the snow</b></div>
+      <div><span>Title · Brygada 1918</span><b style="font-family:var(--title);font-weight:500;font-size:26px;color:var(--cream)">Pavel Kettering is running late</b></div>
+      <div><span>Text · Familjen Grotesk</span><span style="font-family:var(--ui);font-size:16px;color:var(--text)">Now starts at 3:15 pm (was 3:00). Your seat is held.</span></div>
+      <div><span>Team tool · Geist</span><span style="font-family:var(--geist);font-size:15px;color:var(--text)">Hold the 3:00 pm starts by 15 min, and tell the 21 people who planned to go</span></div>
+      <div><span>Times · Courier Prime</span><span style="font-family:var(--mono);font-size:16px;color:var(--amber-2)">Fri 16 · 12:30 → 13:15 · Riverside Studio</span></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="label">03 · Approved concepts · U1 to U4</p>
+    <h2>Interface on the photograph</h2>
+    <div class="concepts">
+      <figure><img src="round5/u1-onboarding.jpg" alt="Onboarding concept"><figcaption><b>U1</b>Onboarding, role choice</figcaption></figure>
+      <figure><img src="round5/u2-agenda.jpg" alt="Agenda concept"><figcaption><b>U2</b>Attendee agenda</figcaption></figure>
+      <figure><img src="round5/u3-snow-alert.jpg" alt="Snow alert concept"><figcaption><b>U3</b>Snow alert</figcaption></figure>
+      <figure><img src="round5/u4-team-mobile.jpg" alt="Team mobile concept"><figcaption><b>U4</b>Team mobile, guest late</figcaption></figure>
+    </div>
+  </section>
+
+  <section>
+    <p class="label">04 · A still for every film</p>
+    <h2>Forty films, forty frames</h2>
+    <div class="wall" id="wall" data-lve-skip></div>
+  </section>
+
+  <section>
+    <p class="label">05 · Interface parts, live</p>
+    <h2>Built from these</h2>
+    <div class="parts" data-lve-skip>
+      <div class="part">
+        <small>Buttons</small>
+        <div class="btns"><span class="btn primary">Continue</span><span class="btn amber">Recommendation</span><span class="btn">See the original</span></div>
+        <small>Role choice</small>
+        <div class="role on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8a2 2 0 0 0 0 4 2 2 0 0 1 0 4v2h18v-2a2 2 0 0 1 0-4 2 2 0 0 0 0-4V6H3z"/><path d="M14 6v2M14 11v2M14 16v2"/></svg><span>Attendee<small>Your agenda, kept up to date</small></span></div>
+        <div class="role"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3.5 10h17v9.5h-17z"/><path d="m3.5 10-.6-3.2 15.8-3 .6 3.2"/></svg><span>Festival team<small>The live plan and decisions</small></span></div>
+      </div>
+
+      <div class="part ops">
+        <small>Needs you · team tool</small>
+        <p style="font-size:21px;font-weight:500;color:var(--o-muted);line-height:1.3"><b style="color:var(--o-ink);font-weight:600">2 things need you.</b> The agent has a plan for each.</p>
+        <div class="days"><span class="on"><b>Day 1</b>Thu 15</span><span><b>Day 2</b>Fri 16</span><span><b>Day 3</b>Sat 17</span></div>
+        <div class="sec"><header><i></i>Needs you <span class="pill red">2</span></header>
+          <div class="srow"><span class="bar"></span><div><b>Snow coming in 50 min</b><small>The agent has a plan</small></div><span class="pill amber">20 min</span></div>
+          <div class="srow"><span class="bar red"></span><div><b>Pavel Kettering is running late</b><small>The agent has a plan</small></div><span class="pill red">45 min</span></div>
+        </div>
+      </div>
+
+      <div class="part ops">
+        <small>Recommendation · one sentence, then a checklist</small>
+        <div class="rec">
+          <p>Snow is expected from 2:00 pm to 7:00 pm, and the Harbor Loop shuttle is already 12 minutes late.</p>
+          <ul>
+            <li><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></i>Send the snow notice to 66 pass holders</li>
+            <li><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></i>Skip the extra bus for now, keep watching the shuttle</li>
+            <li><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></i>Hold the 3:00 pm starts by 15 min, and tell the 21 people who planned to go</li>
+          </ul>
+          <footer><span>Approve 3</span></footer>
+        </div>
+      </div>
+
+      <div class="part ops wide">
+        <small>Calendar blocks · type, change, risk</small>
+        <div class="evs">
+          <div class="ev" style="--bar:#A8977F"><img src="../../public/hl/ev/f-24.jpg" alt=""><b>Silver Water</b><span>12:30 to 2:17 pm</span></div>
+          <div class="ev changed" style="--bar:#A8977F"><img src="../../public/hl/ev/f-02.jpg" alt=""><b>Wild Tide</b><span>3:15 to 4:32 pm</span> <span class="pill amber" style="font-family:var(--geist)">+15 min</span></div>
+          <div class="ev risk" style="--bar:var(--o-accent)"><img src="../../public/hl/ev/talk-stage.jpg" alt=""><b>Selling at Markets</b><span>4:00 to 5:00 pm</span><em>Yara Hollis opens, Pavel Kettering joins later</em></div>
+        </div>
+        <small>Schedule rows · phone</small>
+        <div class="sec">
+          <div class="sched moved"><span class="tm"><s>3:00</s>3:15</span><img src="../../public/hl/ev/f-13.jpg" alt=""><span><b>Late Country</b><small>Harbor Theater</small></span><span class="pill amber">+15</span></div>
+          <div class="sched risk"><span class="tm">4:00</span><img src="../../public/hl/ev/talk-stage.jpg" alt=""><span><b>Selling at Markets</b><small>Pier 9 Hall</small></span><span class="pill red">At risk</span></div>
+          <div class="sched"><span class="tm">5:30</span><img src="../../public/hl/ev/f-19.jpg" alt=""><span><b>Last Light</b><small>Harbor Theater</small></span></div>
+        </div>
+      </div>
+
+      <div class="part">
+        <small>Attendee card · one line on what changed</small>
+        <div class="card changed"><div class="row"><img src="../../public/hl/ev/f-02.jpg" alt=""><div><span class="t">Wild Tide</span><span class="m">Riverside Studio</span></div></div><div class="note">Now starts at 3:15 pm (was 3:00). Your seat is held.</div></div>
+        <div class="card"><div class="row"><img src="../../public/hl/ev/f-30.jpg" alt=""><div><span class="t">Quiet Animals</span><span class="m">Canal Street Cinema</span></div></div></div>
+        <small>Status pills</small>
+        <div class="btns"><span class="pill red">Urgent</span><span class="pill amber">Due soon</span><span class="pill green">Approved</span><span class="pill grey">Message</span></div>
+        <small>Line icons</small>
+        <div class="icons">
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 8a2 2 0 0 0 0 4 2 2 0 0 1 0 4v2h18v-2a2 2 0 0 1 0-4 2 2 0 0 0 0-4V6H3z"/></svg></span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"/></svg></span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4.5" y="4" width="15" height="13" rx="2.5"/><path d="M4.5 11h15M8 17v2.5M16 17v2.5"/></svg></span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 5.5h16v10H9l-5 4z"/></svg></span>
+          <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="4.5" width="14" height="16" rx="2"/><path d="M9 3h6v3H9zM8.5 11h7M8.5 15h5"/></svg></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <p class="label">06 · Where it ended up</p>
+    <h2>The finished screens</h2>
+    <div class="screens">
+      <div class="col">
+        <img src="screens/21-team-recommendation.jpg" alt="Festival team recommendation, desktop">
+        <img src="screens/01-site-hero.jpg" alt="Product site">
+        <img src="screens/03-site-the-agent-rewrites-the-schedule.jpg" alt="Product site, the agent rewrites the schedule">
+        <img src="screens/20-team-calendar-with-alerts.jpg" alt="Festival team calendar with alerts">
+      </div>
+      <div class="col">
+        <img src="screens/30-attendee-agenda.jpg" alt="Attendee agenda">
+        <img src="screens/14-onboarding-attendee-your-festival.jpg" alt="Attendee onboarding">
+      </div>
+      <div class="col">
+        <img src="screens/40-staff-shift.jpg" alt="Staff shift">
+        <img src="screens/10-role-picker.jpg" alt="Role picker">
+      </div>
+    </div>
+  </section>
+
+  <footer class="end"><span>Harbor Lights · mood board</span><span>Images made in Lovart · fonts from Google Fonts, all open source</span></footer>
+</div>
+
+<script>
+(function () {
+  var titles = ['Salt Houses','Wild Tide','Borrowed Tide','Borrowed Season','Quiet Gods','Bright Kingdom','Open Gods','Last Gods','Lost Animals','Far Rooms','Last Orchard','Low Tide','Late Country','Last Harbor','Salt Bridges','Silver Gods','Second Country','Last Rooms','Last Light','Late Letters','Hollow Water','Open Bridges','Borrowed Water','Silver Water','Paper Bridges','Last Fields','Northern Signal','Hollow Season','Second Kingdom','Quiet Animals','Paper Animals','Iron Country','Hollow Harbor','Late Tide','Wild Weather','Bright Weather','Small Weather','Night Bridges','Wild Shore','Silver Rooms'];
+  var extra = [['talk-stage','Panels'],['talk-speaker','Talks'],['talk-qa','Q&A'],['market','Industry market'],['reception','Reception']];
+  var wide = { 'f-02': 1, 'f-19': 1, 'f-13': 1 };
+  var wall = document.getElementById('wall');
+  function add(id, name) {
+    var f = document.createElement('figure');
+    if (wide[id]) f.className = 'wide';
+    var img = document.createElement('img'); img.src = '../../public/hl/ev/' + id + '.jpg'; img.alt = name; img.loading = 'lazy';
+    var s = document.createElement('span'); s.textContent = name;
+    f.appendChild(img); f.appendChild(s); wall.appendChild(f);
+  }
+  titles.forEach(function (t, i) { add('f-' + String(i + 1).padStart(2, '0'), t); });
+  extra.forEach(function (e) { add(e[0], e[1]); });
+})();
+</script>
+<script src="live-editor.js" defer></script>
+</body>
+</html>
