@@ -102,16 +102,16 @@ export function accessCode(kind: ProfileKind, id: string, festivalName: string):
   return `${PROFILES.find(p => p.kind === kind)!.prefix}-${out}`;
 }
 
-export interface Who { kind: ProfileKind; id: string; name: string; detail: string; code: string }
+export interface Who { kind: ProfileKind; id: string; name: string; detail: string; code: string; email?: string; contact?: string }
 
 /** Everyone who can sign in, with their code. Only organizers ever see this list. */
 export function directory(f: Festival): Who[] {
   const people: Who[] = f.people.map(p => {
     const kind = profileOf(p);
     const detail = p.role === 'festival_staff' || p.role === 'volunteer' ? `${p.role === 'volunteer' ? 'Volunteer' : 'Staff'} · ${(p.staffRole ?? '').replace(/_/g, ' ')}` : p.role[0].toUpperCase() + p.role.slice(1);
-    return { kind, id: p.id, name: p.name, detail, code: accessCode(kind, p.id, f.name) };
+    return { kind, id: p.id, name: p.name, detail, code: accessCode(kind, p.id, f.name), email: p.email };
   });
-  const vendors: Who[] = deriveVendors(f).map(v => ({ kind: 'vendor', id: v.id, name: v.name, detail: v.service, code: accessCode('vendor', v.id, f.name) }));
+  const vendors: Who[] = deriveVendors(f).map(v => ({ kind: 'vendor', id: v.id, name: v.name, detail: v.service, code: accessCode('vendor', v.id, f.name), email: v.email, contact: v.contact }));
   return [...people, ...vendors];
 }
 
@@ -119,4 +119,26 @@ export function directory(f: Festival): Who[] {
 export function signIn(f: Festival, kind: ProfileKind, code: string): Who | null {
   const clean = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
   return directory(f).find(w => w.kind === kind && w.code.replace('-', '') === clean) ?? null;
+}
+
+// ------------------------------------------------------------------ code by email
+const normName = (x: string) => x.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+const normEmail = (x: string) => x.trim().toLowerCase();
+
+export type CodeLookup = { ok: true; who: Who } | { ok: false; reason: 'bad_email' | 'not_found' | 'name_mismatch' };
+
+/**
+ * Before a code is emailed, check the name and email against the festival's
+ * own people list for the chosen profile. Vendors can give the company name
+ * or their contact's name. Nothing is sent unless both match one person.
+ */
+export function lookupForCode(f: Festival, kind: ProfileKind, name: string, email: string): CodeLookup {
+  const e = normEmail(email);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return { ok: false, reason: 'bad_email' };
+  const hit = directory(f).find(w => w.kind === kind && normEmail(w.email ?? '') === e);
+  if (!hit) return { ok: false, reason: 'not_found' };
+  const n = normName(name);
+  const names = [hit.name, hit.contact ?? ''].map(normName).filter(Boolean);
+  if (!n || !names.includes(n)) return { ok: false, reason: 'name_mismatch' };
+  return { ok: true, who: hit };
 }

@@ -4,12 +4,12 @@
 // personal views (staff, guest, attendee, vendor). Each view reads only the
 // signed-in person's own records.
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import qrcode from 'qrcode-generator';
 import type { AgentStore } from './useAgent';
 import { Icon } from './icons';
 import { Ask, Scan } from './panels';
-import { PROFILES, deriveVendors, directory, signIn, type ProfileKind, type Who } from '../../src/access/profiles';
+import { PROFILES, deriveVendors, directory, lookupForCode, signIn, type ProfileKind, type Who } from '../../src/access/profiles';
 import { clock as fmt } from '../../src/core/time';
 import { PASS_LABELS, qrFor } from '../../src/rules/access';
 import type { DayNumber, FestivalEvent } from '../../src/core/types';
@@ -31,27 +31,57 @@ const dayLabel = (date: string) => new Date(`${date}T12:00:00`).toLocaleDateStri
 export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
   const f = s.agent.f;
   const [kind, setKind] = useState<ProfileKind | null>(null);
+  const [mode, setMode] = useState<'email' | 'code'>('email');
   const [code, setCode] = useState('');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<{ tone: 'ok' | 'info'; text: ReactNode } | null>(null);
   const [err, setErr] = useState('');
   const demoOrg = useMemo(() => directory(f).find(w => w.kind === 'organizer'), [f]);
   const pick = PROFILES.find(p => p.kind === kind);
+  const choose = (k: ProfileKind | null) => { setKind(k); setMode('email'); setErr(''); setNote(null); setCode(''); };
   const go = () => {
     if (!kind) return;
     const w = signIn(f, kind, code);
     if (!w) { setErr(`That code doesn't open the ${pick!.label} profile. Check it and try again.`); return; }
     writeWho(w); onIn(w);
   };
+  const sendCode = async () => {
+    if (!kind) return;
+    setErr(''); setNote(null);
+    const r = lookupForCode(f, kind, name, email);
+    if (!r.ok) {
+      setErr(r.reason === 'bad_email' ? 'Please enter a full email address.'
+        : r.reason === 'name_mismatch' ? `That email is on the ${pick!.label} list, but the name doesn't match. Use your name as the festival has it.`
+        : `We couldn't find that email on the ${f.name} ${pick!.label} list. Check the spelling, or that you picked the right profile.`);
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await fetch('/api/send-code', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: r.who.contact && kind === 'vendor' ? name : r.who.name, email, code: r.who.code, festival: f.name, profile: pick!.label }) });
+      const b = await res.json().catch(() => ({}));
+      if (b.sent) setNote({ tone: 'ok', text: <>Checked against the festival list. Your code is on its way. In test mode it goes to the team inbox, not {email}.</> });
+      else setNote({ tone: 'info', text: <>Checked against the festival list. Email isn't connected yet, so here is the code it would send: <b>{r.who.code}</b></> });
+      setMode('code');
+    } catch {
+      setNote({ tone: 'info', text: <>Checked against the festival list. Email couldn't be reached, so here is the code: <b>{r.who.code}</b></> });
+      setMode('code');
+    }
+    setBusy(false);
+  };
   return (
     <div className="ob ob-welcome">
       <div className="ob-poster signin">
-        <div className="ob-mast display" style={{ fontSize: 'clamp(36px, 6.4vw, 78px)' }}>Usher</div>
+        <div className="ob-mast display" style={{ fontSize: 'clamp(36px, 6.4vw, 78px)', marginBottom: 4 }}>Usher</div>
+        <div className="signin-fest">{f.name}</div>
         {!kind ? (
           <>
-            <p className="signin-kicker">Usher your festival with ease</p>
-            <p className="signin-lede">Who's signing in to {f.name}?</p>
+            <p className="signin-lede">Who's signing in?</p>
             <div className="profile-grid">
               {PROFILES.map(p => (
-                <button key={p.kind} className="profile-card" onClick={() => { setKind(p.kind); setErr(''); setCode(''); }}>
+                <button key={p.kind} className="profile-card" onClick={() => choose(p.kind)}>
                   <span className="pc-ic"><Icon name={p.icon} size={22} /></span>
                   <span className="pc-name display">{p.label}</span>
                   <span className="pc-blurb">{p.blurb}</span>
@@ -61,19 +91,32 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
           </>
         ) : (
           <div className="code-box">
-            <button className="ghost small" onClick={() => setKind(null)}>← All profiles</button>
+            <button className="ghost small" onClick={() => choose(null)}>← All profiles</button>
             <h2 className="display">{pick!.label}</h2>
-            <p className="muted" style={{ marginTop: 0 }}>Enter the access code the festival sent you. It starts with {pick!.prefix}.</p>
-            <input autoFocus className="code-input" placeholder={`${pick!.prefix}-XXXX`} value={code} maxLength={9}
-              onChange={e => { setCode(e.target.value.toUpperCase()); setErr(''); }} onKeyDown={e => e.key === 'Enter' && go()} />
-            {err && <div className="issues bad" role="alert">{err}</div>}
-            <button className="primary big" style={{ marginTop: 14 }} disabled={code.replace(/[^A-Z0-9]/gi, '').length < 7} onClick={go}>
-              <Icon name="key" size={16} /> Open my profile
-            </button>
+            {mode === 'email' ? <>
+              <p className="muted" style={{ marginTop: 0 }}>Enter your name and email as the festival has them. Usher checks them against the {pick!.label.toLowerCase()} list, then emails your access code.</p>
+              <label className="field">{kind === 'vendor' ? 'Your name or company' : 'Full name'}<input autoFocus value={name} autoComplete="name" onChange={e => { setName(e.target.value); setErr(''); }} /></label>
+              <label className="field">Email<input type="email" value={email} autoComplete="email" onChange={e => { setEmail(e.target.value); setErr(''); }} onKeyDown={e => e.key === 'Enter' && name && email && sendCode()} /></label>
+              {err && <div className="issues bad" role="alert">{err}</div>}
+              <button className="primary big" style={{ marginTop: 14 }} disabled={!name.trim() || !email.trim() || busy} onClick={sendCode}>
+                <Icon name="send" size={16} /> {busy ? 'Checking…' : 'Email me my code'}
+              </button>
+              <button className="ghost small" style={{ marginTop: 10 }} onClick={() => { setMode('code'); setErr(''); }}>I already have a code</button>
+            </> : <>
+              {note && <div className={`issues ${note.tone === 'ok' ? 'ok' : ''}`} role="status">{note.text}</div>}
+              <p className="muted" style={{ marginTop: 0 }}>Enter your access code. It starts with {pick!.prefix}.</p>
+              <input autoFocus className="code-input" placeholder={`${pick!.prefix}-XXXX`} value={code} maxLength={9}
+                onChange={e => { setCode(e.target.value.toUpperCase()); setErr(''); }} onKeyDown={e => e.key === 'Enter' && go()} />
+              {err && <div className="issues bad" role="alert">{err}</div>}
+              <button className="primary big" style={{ marginTop: 14 }} disabled={code.replace(/[^A-Z0-9]/gi, '').length < 7} onClick={go}>
+                <Icon name="key" size={16} /> Open my profile
+              </button>
+              <button className="ghost small" style={{ marginTop: 10 }} onClick={() => { setMode('email'); setErr(''); setNote(null); }}>Email me a code instead</button>
+            </>}
           </div>
         )}
         <p className="muted signin-foot">
-          Each profile sees only its own information. Organizers find everyone's codes under Access codes.
+          Each profile sees only its own information. Codes are only sent to people on the festival's list.
           {demoOrg && <> Demo organizer code: <b>{demoOrg.code}</b>.</>}
         </p>
       </div>
@@ -101,12 +144,13 @@ export function AccessCodes({ s, onViewAs }: { s: AgentStore; onViewAs: (w: Who)
         <input placeholder="Search" value={q} onChange={e => setQ(e.target.value)} style={{ flex: '1 1 160px' }} />
       </div>
       <table className="stackable">
-        <thead><tr><th>Name</th><th>Role</th><th>Code</th><th /></tr></thead>
+        <thead><tr><th>Name</th><th>Role</th><th>Email</th><th>Code</th><th /></tr></thead>
         <tbody>
           {rows.slice(0, 80).map(w => (
             <tr key={w.id}>
               <td data-label="Name">{w.name}</td>
               <td data-label="Role" className="muted">{w.detail}</td>
+              <td data-label="Email" className="muted">{w.email}</td>
               <td data-label="Code"><code className="code-chip">{w.code}</code></td>
               <td>{w.kind !== 'organizer' && <button className="small" onClick={() => onViewAs(w)}><Icon name="eye" size={14} />View as</button>}</td>
             </tr>

@@ -57,6 +57,9 @@ The model step uses **Groq** (free API key at [console.groq.com](https://console
 | `GROQ_API_KEY` | none | Your Groq key. Set it in Vercel or a local `.env`; never commit it. |
 | `GROQ_MODEL` | `openai/gpt-oss-120b` | Any Groq chat model |
 | `OLLAMA_API_KEY` | none | Your Ollama Cloud key. Set it in Vercel or a local `.env`; never commit it. |
+| `RESEND_API_KEY` | none | Resend key for emailing access codes. Never commit it. |
+| `USHER_TEST_EMAIL` | none | Test mode: every access-code email goes to this one inbox (the team's own) instead of the address typed in. Codes are only emailed when both this and `RESEND_API_KEY` are set; otherwise the sign-in screen shows the code (demo mode). |
+| `RESEND_FROM` | `Usher <onboarding@resend.dev>` | Sender address. |
 | `OLLAMA_MODEL` | `gpt-oss:120b` | Any Ollama chat model |
 | `OLLAMA_HOST` | `https://ollama.com` | Use `http://localhost:11434` for a local Ollama |
 

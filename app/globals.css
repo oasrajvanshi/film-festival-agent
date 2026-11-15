@@ -535,3 +535,9 @@ button.big { min-height: 48px; padding: 10px 22px; font-size: 15px; border-radiu
 }
 @media (max-width: 420px) { .profile-grid { grid-template-columns: 1fr; } .profile-card { flex-direction: row; align-items: center; flex-wrap: wrap; } .pc-blurb { flex-basis: 100%; } }
 .ob-card h3.ob-sub { color: var(--ink); margin: 22px 0 4px; padding-top: 18px; border-top: 1px solid var(--line); font-family: var(--display); text-transform: uppercase; letter-spacing: .02em; font-size: 18px; }
+.signin-fest { font-family: var(--sans); font-size: 15px; font-weight: 600; color: var(--muted); margin: 0 0 22px; letter-spacing: .02em; }
+.signin .signin-lede { margin-left: 0; }
+.code-box .field { display: grid; gap: 6px; margin-top: 10px; }
+.issues.ok { border-color: var(--ok); background: var(--ok-bg); color: var(--ok); }
+.ob-poster.signin > p { margin-left: 0; }
+.code-box .issues + p { margin-top: 12px; }
