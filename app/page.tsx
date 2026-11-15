@@ -1,5 +1,5 @@
 'use client';
-// Festival Agent: the product's own website. One story, told by scrolling:
+// Usher: the product's own website. One story, told by scrolling:
 // changes travel by hand today; the forecast changes; the agent redraws the
 // calendar; a person approves once; everyone's phone is right.
 
@@ -183,7 +183,7 @@ export default function Site() {
       </div>
 
       <nav className="s-nav" aria-label="Site">
-        <span className="wordmark">Festival Agent</span>
+        <span className="wordmark">Usher</span>
         <span className="spacer" />
         <a className="navlink" href="#story" onClick={go('#story')}>How the agent works</a>
         <a className="btn small primary" href="/app">Try the live demo</a>
@@ -193,7 +193,7 @@ export default function Site() {
       <header className="s-hero">
         <div className="s-hero-bg" data-hero-bg style={{ backgroundImage: 'url(/hl/projector.jpg)' }} />
         <div className="s-hero-copy">
-          <p className="s-kicker" data-hero-fade>An AI operations agent for film festivals</p>
+          <p className="s-kicker" data-hero-fade>Usher your festival with ease</p>
           <h1 className="s-h1" data-split>An agent that re-plans your festival.</h1>
           <p className="s-lead" data-hero-fade>When snow hits or a guest runs late, the agent works out who is affected, rewrites the schedule, and emails every attendee, guest and volunteer their own next step. You approve it in one tap.</p>
           <div className="s-ctas" data-hero-fade>
@@ -312,7 +312,7 @@ export default function Site() {
           <a className="btn" href="/start/team">As the festival team</a>
           <a className="btn" href="/start/staff">As staff</a>
         </div>
-        <div className="s-credit"><span>Festival Agent · Group Blue</span><span>A prototype. Everyone in it is made up.</span></div>
+        <div className="s-credit"><span>Usher · Group Blue</span><span>A prototype. Everyone in it is made up.</span></div>
       </footer>
     </div>
   );

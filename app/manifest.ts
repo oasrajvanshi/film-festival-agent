@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Festival Agent',
-    short_name: 'Festival',
+    name: 'Usher',
+    short_name: 'Usher',
     description: 'Run festival day from your phone: approvals, door scans, schedule changes and alerts.',
     start_url: '/legacy',
     display: 'standalone',
