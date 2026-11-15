@@ -2,8 +2,8 @@ import './hl.css';
 import type { ReactNode } from 'react';
 
 export const metadata = {
-  title: 'Harbor Lights',
-  description: 'Harbor Lights Film Festival: agenda for attendees, shifts for staff, and the live plan for the festival team.',
+  title: 'Usher',
+  description: 'Usher your festival with ease. Agenda for attendees, shifts for staff, and the live plan for the festival team (Harbor Lights Film Festival demo).',
 };
 
 export const viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#120B09' };
