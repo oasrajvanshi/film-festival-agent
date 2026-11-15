@@ -12,6 +12,8 @@ import { channels, codeHtml, digestHtml, sendEmail, sendPush, sendSms, vapid, ty
 import { PROFILES, lookupForCode, type ProfileKind } from '../../../src/access/profiles';
 import { FestivalAgent } from '../../../src/agent/agent';
 import type { VendorAlert } from '../../../src/agent/vendors';
+import { fetchSheetTables, sheetIdFrom, tablesToFestival } from '../../../src/data/sheet';
+import { fetchWorkbook, rebuildFromTabs, type SheetMapping } from '../../../src/onboard/workbook';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -223,6 +225,32 @@ export async function POST(req: Request) {
     rec.version++;
     await saveFest(kv, rec);
     return json(viewFor(rec, s));
+  }
+
+  if (action === 'sheet-sync') {
+    // Re-read the festival's Google Sheet and run the agent on what changed.
+    // Organizer devices ask every minute; the server does it at most once a minute.
+    const setup = rec.setup as FestRecord['setup'] & { sheetMapping?: SheetMapping; lastSheetSync?: number };
+    const id = setup.sheetUrl ? sheetIdFrom(setup.sheetUrl) : null;
+    if (!id) return json({ synced: false, reason: 'no_sheet' });
+    if (!b.force && setup.lastSheetSync && Date.now() - setup.lastSheetSync < 55_000) return json({ synced: false, reason: 'recent', version: rec.version });
+    setup.lastSheetSync = Date.now();
+    await saveFest(kv, rec);
+    try {
+      const res = setup.sheetMapping ? rebuildFromTabs(setup.sheetMapping, await fetchWorkbook(id)) : tablesToFestival(await fetchSheetTables(id));
+      if (!res.festival) return json({ synced: false, reason: 'errors', errors: res.errors.slice(0, 5) });
+      const agent = agentFor(rec);
+      const r = await agent.onSheetSync(res.festival, 'Google Sheet (auto-sync)');
+      rec.state.agent = agent.snapshot();
+      rec.state.sheet = { ...rec.state.sheet, source: 'sheet', sheet: setup.sheetUrl, loadedAt: new Date().toISOString(), errors: [], warnings: res.warnings ?? [],
+        message: r.changes.length ? `${r.changes.length} schedule change(s) found in the sheet.` : 'Sheet checked: no schedule changes.' };
+      rec.version++;
+      deliverNew(kv, rec, origin);
+      await saveFest(kv, rec);
+      return json({ synced: true, changes: r.changes.length, version: rec.version });
+    } catch (e) {
+      return json({ synced: false, reason: 'fetch', error: (e as Error).message });
+    }
   }
 
   if (action === 'push-subscribe') {

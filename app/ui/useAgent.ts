@@ -13,6 +13,7 @@ import type { LlmClient, ChatMessage } from '../../src/llm/ollama';
 import type { Festival } from '../../src/core/types';
 import type { ScanResult } from '../../src/rules/access';
 import type { ProfileKind, Who } from '../../src/access/profiles';
+import { rebuildFromTabs, type SheetMapping } from '../../src/onboard/workbook';
 
 export const DEFAULT_SHEET = 'https://docs.google.com/spreadsheets/d/18Pp1GAMQz__QzyvKYlddcR-agiG1p7rH5QJq8NV9lNM/edit';
 
@@ -26,7 +27,7 @@ const TOKEN_KEY = 'ffa-token-v1';
 const SAMPLE_CLOCK = '2027-04-15T09:00';
 
 /** What the festival chose during onboarding. */
-export interface Setup { festivalName: string; city: string; approver: string; channels: string[]; onboardedAt: string; sheetUrl?: string }
+export interface Setup { festivalName: string; city: string; approver: string; channels: string[]; onboardedAt: string; sheetUrl?: string; sheetMapping?: SheetMapping }
 const ls = {
   get<T>(k: string): T | null { try { const r = localStorage.getItem(k); return r ? JSON.parse(r) as T : null; } catch { return null; } },
   set(k: string, v: unknown) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, JSON.stringify(v)); } catch { /* private mode */ } },
@@ -176,6 +177,29 @@ export function useAgent() {
     return () => clearInterval(t);
   }, [mode, who, pull]);
 
+  // Auto-sync: while an organizer has Usher open, re-read the festival's Google Sheet every minute.
+  useEffect(() => {
+    if (mode === 'loading' || who?.kind !== 'organizer') return;
+    const tick = async () => {
+      const setup = readSetup();
+      if (document.hidden || !setup?.sheetUrl || saving.current) return;
+      if (modeRef.current === 'shared') {
+        const r = await api<{ synced: boolean; changes?: number; version?: number }>('POST', { action: 'sheet-sync', f: fidRef.current });
+        if (r.ok && (r.body.version ?? 0) > serverVersion.current) await pull();
+        return;
+      }
+      if (!setup.sheetMapping) { await loadSheetRef.current?.(setup.sheetUrl, 'sync'); return; }
+      const t = await fetch(`/api/festival?tabs=1&sheet=${encodeURIComponent(setup.sheetUrl)}`).then(x => x.json()).catch(() => null);
+      if (!t?.tabs) return;
+      const res = rebuildFromTabs(setup.sheetMapping, t.tabs);
+      if (!res.festival) return;
+      const out = await agentRef.current!.onSheetSync(res.festival, 'Google Sheet (auto-sync)');
+      if (out.changes.length) commit();
+    };
+    const id = setInterval(tick, 60_000);
+    return () => clearInterval(id);
+  }, [mode, who, pull]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     agentRef.current!.setLlm(useModel && llmInfo.available ? remoteLlm : null);
   }, [useModel, llmInfo.available, version]);
@@ -302,6 +326,9 @@ export function useAgent() {
     commit();
     return message;
   }, [commit, startAgent]);
+
+  const loadSheetRef = useRef(loadSheet);
+  loadSheetRef.current = loadSheet;
 
   // ---------------------------------------------------------------- sign in
   const requestCode = useCallback(async (kind: ProfileKind, name: string, email: string) => {

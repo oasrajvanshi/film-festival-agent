@@ -10,6 +10,7 @@ import type { Festival } from '../../src/core/types';
 import { parseCsv, tablesToFestival } from '../../src/data/sheet';
 import { buildTables, guessKind, KIND_ORDER, KINDS, matchColumns, summarizeNotes, type Kind, type Upload } from '../../src/onboard/mapping';
 import { clock } from '../../src/core/time';
+import { tabsToUploads } from '../../src/onboard/workbook';
 import type { GuestClash, VenueClash } from '../../src/agent/conflicts';
 
 const STEPS = ['Festival & data', 'Matching', 'Check', 'Team'] as const;
@@ -40,6 +41,7 @@ export default function Onboarding() {
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [sheetFest, setSheetFest] = useState<Festival | null>(null);
   const [sheetUrl, setSheetUrl] = useState('');
+  const [fromSheet, setFromSheet] = useState(false);
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
   const [approver, setApprover] = useState('Operations lead');
@@ -68,9 +70,14 @@ export default function Onboarding() {
     try {
       const r = await fetch(`/api/festival?sheet=${encodeURIComponent(sheetUrl)}`);
       const b = await r.json();
-      if (!r.ok || b.error) throw new Error(b.error ?? `HTTP ${r.status}`);
-      if (!b.festival) throw new Error((b.errors ?? []).slice(0, 3).join(' · ') || 'The sheet has errors.');
-      setSheetFest(b.festival); setUploads([]); setStep(2);
+      if (r.ok && !b.error && b.festival) { setSheetFest(b.festival); setUploads([]); setStep(2); setBusy(''); return; }
+      // Not in Usher's own layout: read every tab and match it like uploaded files.
+      const t = await fetch(`/api/festival?tabs=1&sheet=${encodeURIComponent(sheetUrl)}`);
+      const tb = await t.json() as { tabs?: { name: string; table: string[][] }[]; error?: string };
+      if (!t.ok || tb.error || !tb.tabs?.length) throw new Error(tb.error ?? b.error ?? 'The sheet has no tabs Usher can read.');
+      setSheetFest(null); setFromSheet(true);
+      setUploads(tabsToUploads(tb.tabs));
+      setStep(1);
     } catch (e) { setError((e as Error).message); }
     setBusy('');
   };
@@ -121,7 +128,9 @@ export default function Onboarding() {
     setBusy('Going live…'); setError('');
     try {
       await s.goLive(structuredClone(built.festival), sheetFest ? 'Google Sheet' : `${uploads.length} uploaded files`,
-        { festivalName: built.festival.name || meta.name, city: meta.city, approver, channels, onboardedAt: new Date().toISOString(), sheetUrl: sheetFest ? sheetUrl : undefined });
+        { festivalName: built.festival.name || meta.name, city: meta.city, approver, channels, onboardedAt: new Date().toISOString(),
+          ...(sheetFest || fromSheet ? { sheetUrl } : {}),
+          ...(fromSheet ? { sheetMapping: { meta, tabs: uploads.map(u => ({ name: u.name, kind: u.kind, columns: u.columns })) } } : {}) });
       location.href = '/#today';
     } catch (e) { setError((e as Error).message); setBusy(''); }
   };
