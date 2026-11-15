@@ -577,3 +577,21 @@ export function summarizeNotes(lines: string[]): string[] {
   if (noEnd) out.unshift(`${noEnd} event${noEnd === 1 ? ' has' : 's have'} no end time, so Usher worked ${noEnd === 1 ? 'it' : 'them'} out from the running time.`);
   return out;
 }
+
+/**
+ * First and last date found in the schedule files, as YYYY-MM-DD, so setup can
+ * fill in (or correct) the festival dates instead of silently dropping events.
+ */
+export function scheduleDateRange(uploads: Upload[], yearHint = String(new Date().getFullYear() + 1)): { first: string; last: string; rows: number } | null {
+  const found: string[] = [];
+  for (const u of uploads.filter(x => x.kind === 'schedule')) {
+    const g = getter(u);
+    for (const r of body(u.table)) {
+      const iso = isoDate(g(r, 'date'), yearHint);
+      if (iso && /^\d{4}-\d{2}-\d{2}$/.test(iso) && !Number.isNaN(Date.parse(`${iso}T12:00:00Z`))) found.push(iso);
+    }
+  }
+  if (!found.length) return null;
+  found.sort();
+  return { first: found[0], last: found[found.length - 1], rows: found.length };
+}

@@ -4,6 +4,7 @@
 import type { Festival, FestivalEvent } from '../core/types';
 import type { LlmClient } from '../llm/ollama';
 import { AuditLog } from './log';
+import { clock } from '../core/time';
 import { gateFor, type Action, type QueueItem } from './approvals';
 import { diffSchedules, planPropagation, describeChange } from './propagate';
 import { findGuestClashes, findOrphanedQas, otherFlags } from './conflicts';
@@ -18,11 +19,15 @@ import { assessWeather, planWeather, riskSummary, type WeatherHour, type Weather
 
 export interface Delivery { actionId: string; personId: string; channel: string; subject: string; body: string; at: string }
 
+export interface SortedFlag { id: string; title: string; by: string; at: string; how: string }
+
 export class FestivalAgent {
   log: AuditLog;
   queue: QueueItem[] = [];
   outbox: Delivery[] = [];
   flags: Action[] = [];
+  /** Flags a person has sorted out. Their ids are never raised again. */
+  sorted: SortedFlag[] = [];
   changeFeed: string[] = [];
   private runs = 0;
 
@@ -49,7 +54,11 @@ export class FestivalAgent {
   }
 
   private execute(a: Action) {
-    if (a.kind === 'flag') { this.flags.push(a); return; }
+    if (a.kind === 'flag') {
+      // A flag someone already sorted out, or one already showing, is not raised again.
+      if (!this.sorted.some(x => x.id === a.id) && !this.flags.some(x => x.id === a.id)) this.flags.push(a);
+      return;
+    }
     if (a.kind === 'update_website') {
       const p = a.payload as { after: FestivalEvent | null };
       this.changeFeed.push(`Website updated: ${a.rationale}`);
@@ -197,15 +206,44 @@ export class FestivalAgent {
     return { venues: venueView(this.f, at), redirects: suggestRedirects(this.f, at) };
   }
 
+  // --- People sorting out flags ------------------------------------------
+
+  /** A person marks a flag as sorted. It leaves Needs attention and is not raised again. */
+  resolveFlag(id: string, by: string, how = 'Marked as sorted') {
+    const fl = this.flags.find(x => x.id === id);
+    if (!fl) return null;
+    this.flags = this.flags.filter(x => x.id !== id);
+    const done: SortedFlag = { id, title: fl.title, by, at: this.now(), how };
+    this.sorted.push(done);
+    this.log.add(this.run('sorted'), 'act', `${by} sorted out "${fl.title}": ${how}`, { flagId: id });
+    return done;
+  }
+
+  /** Give an uncovered shift to a volunteer who is free, tell them, and close the flag. */
+  assignCover(flagId: string, coverName: string, by: string) {
+    const fl = this.flags.find(x => x.id === flagId);
+    const gap = fl?.payload as { shiftId?: string; personName?: string } | undefined;
+    const shift = this.f.shifts.find(s => s.id === gap?.shiftId);
+    const cover = this.f.people.find(p => p.name === coverName && p.role === 'volunteer');
+    if (!fl || !shift || !cover) return null;
+    shift.personId = cover.id;
+    const venue = this.f.venues.find(v => v.id === shift.venueId)?.name ?? shift.venueId;
+    const when = `${new Date(`${shift.start.slice(0, 10)}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })}, ${clock(shift.start)}–${clock(shift.end)}`;
+    this.outbox.push({ actionId: `cover-${shift.id}`, personId: cover.id, channel: 'volunteer brief', subject: 'New shift',
+      body: `You're now covering ${gap?.personName ?? 'a'}'s shift: ${shift.task} at ${venue}, ${when}. Thank you!`, at: this.now() });
+    return this.resolveFlag(flagId, by, `${cover.name} now covers the shift (was ${gap?.personName ?? 'unassigned'})`);
+  }
+
   // --- Persistence (the dashboard keeps state in the browser) -----------
 
   snapshot() {
-    return { f: this.f, queue: this.queue, outbox: this.outbox, flags: this.flags, changeFeed: this.changeFeed, log: this.log.entries, runs: this.runs };
+    return { f: this.f, queue: this.queue, outbox: this.outbox, flags: this.flags, sorted: this.sorted, changeFeed: this.changeFeed, log: this.log.entries, runs: this.runs };
   }
 
   static restore(s: ReturnType<FestivalAgent['snapshot']>, llm: LlmClient | null, now: () => string) {
     const a = new FestivalAgent(s.f, llm, now);
     a.queue = s.queue; a.outbox = s.outbox; a.flags = s.flags; a.changeFeed = s.changeFeed; a.runs = s.runs;
+    a.sorted = s.sorted ?? [];
     a.log.restore(s.log);
     return a;
   }

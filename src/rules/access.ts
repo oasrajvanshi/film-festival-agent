@@ -47,10 +47,11 @@ function checksum(s: string): string {
   return h.toString(36).toUpperCase();
 }
 export function qrFor(personId: string): string {
-  return `HLFF1.${personId}.${checksum(personId)}`;
+  return `USH1.${personId}.${checksum(personId)}`;
 }
 export function parseQr(code: string): string | null {
-  const m = /^HLFF1\.(p-\d{3})\.([0-9A-Z]+)$/.exec(code.trim());
+  // USH1 is Usher's prefix; HLFF1 codes from the first prototype still scan.
+  const m = /^(?:USH1|HLFF1)\.([A-Za-z0-9_-]+)\.([0-9A-Z]+)$/.exec(code.trim());
   if (!m || checksum(m[1]) !== m[2]) return null;
   return m[1];
 }

@@ -27,10 +27,14 @@ export async function GET(req: Request) {
       if (!hit) return Response.json({ error: `Couldn't find "${city}"` }, { status: 404 });
       lat = hit.latitude; lon = hit.longitude; place = `${hit.name}${hit.country ? `, ${hit.country}` : ''}`;
     }
-    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=${VARS}&forecast_days=1&timezone=auto`, { cache: 'no-store' });
+    // Within the 16-day forecast window, ask for that very day; further out, today's weather stands in as a preview.
+    const ahead = Math.round((Date.parse(`${date}T12:00:00Z`) - Date.now()) / 864e5);
+    const exact = ahead >= 0 && ahead <= 15;
+    const when = exact ? `start_date=${date}&end_date=${date}` : 'forecast_days=1';
+    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&hourly=${VARS}&${when}&timezone=auto`, { cache: 'no-store' });
     if (!r.ok) throw new Error(`Open-Meteo ${r.status}`);
     const j = await r.json() as { hourly: Parameters<typeof fromOpenMeteo>[0] };
-    return Response.json({ source: `Open-Meteo, ${place} (today's real forecast)`, hours: fromOpenMeteo(j.hourly, date) });
+    return Response.json({ source: `Open-Meteo, ${place} (${exact ? `forecast for ${date}` : "today's weather as a preview"})`, exact, hours: fromOpenMeteo(j.hourly, date) });
   } catch (e) {
     return Response.json({ error: (e as Error).message }, { status: 502 });
   }

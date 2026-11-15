@@ -114,7 +114,8 @@ export default function App() {
           : alerts === 'unsupported' ? <span className="muted">Not available here. On iPhone, add the app to your Home Screen first.</span>
           : <button className="small primary" onClick={enableAlerts}><Icon name="bolt" size={14} /> Turn on alerts</button>}
       </div>
-      <button className="block" onClick={signOut}><Icon name="logout" size={16} /> Sign out</button>
+      <button className="block" onClick={() => { location.href = '/onboarding'; }}><Icon name="film" size={16} /> Set up a new festival</button>
+      <button className="block" style={{ marginTop: 8 }} onClick={signOut}><Icon name="logout" size={16} /> Sign out</button>
       <button className="block" style={{ marginTop: 8 }} onClick={() => { if (armed) { s.reset(); setArmed(false); setSheet(null); } else { setArmed(true); setTimeout(() => setArmed(false), 4000); } }}>
         {armed ? 'Tap again to reset everything' : 'Reset demo'}
       </button>

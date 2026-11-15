@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useAgent, writeSetup } from '../ui/useAgent';
+import { readSetup, useAgent, writeSetup } from '../ui/useAgent';
 import { writeWho } from '../ui/profiles';
 import { Icon } from '../ui/icons';
 import { FestivalAgent } from '../../src/agent/agent';
 import { GATE_POLICY, type ActionKind } from '../../src/agent/approvals';
 import type { Festival } from '../../src/core/types';
 import { parseCsv, tablesToFestival } from '../../src/data/sheet';
-import { buildTables, guessKind, KIND_ORDER, KINDS, matchColumns, summarizeNotes, type Kind, type Upload } from '../../src/onboard/mapping';
+import { buildTables, guessKind, KIND_ORDER, KINDS, matchColumns, scheduleDateRange, summarizeNotes, type Kind, type Upload } from '../../src/onboard/mapping';
 import { clock } from '../../src/core/time';
 import type { GuestClash, VenueClash } from '../../src/agent/conflicts';
 
@@ -36,7 +36,12 @@ export default function Onboarding() {
   const s = useAgent();
   const [step, setStep] = useState(0);
   const [started, setStarted] = useState(false);
-  const [meta, setMeta] = useState<Meta>({ name: 'Harbor Lights Film Festival', startDate: '2027-04-15', days: 3, city: 'New York' });
+  // A new organizer starts from blank fields; dates are filled in from the schedule once it arrives.
+  const [meta, setMeta] = useState<Meta>({ name: '', startDate: '', days: 1, city: '' });
+  const [dateNote, setDateNote] = useState('');
+  const [leaving, setLeaving] = useState(false);
+  const [current, setCurrent] = useState<string | null>(null);
+  useEffect(() => { setCurrent(readSetup()?.festivalName ?? null); }, []);
   const [uploads, setUploads] = useState<Upload[]>([]);
   const [sheetFest, setSheetFest] = useState<Festival | null>(null);
   const [sheetUrl, setSheetUrl] = useState('');
@@ -48,19 +53,30 @@ export default function Onboarding() {
   const [openFiles, setOpenFiles] = useState<Record<string, boolean>>({});
   const fileRef = useRef<HTMLInputElement>(null);
 
+  /** CSV and text files as they are; each sheet of an Excel workbook becomes its own file. */
+  const readFiles = async (list: File[]) => {
+    const out: { name: string; text: string }[] = [];
+    for (const f of list) {
+      if (/\.xlsx$/i.test(f.name)) {
+        try { out.push(...await excelToCsv(f)); } catch { setError(`Couldn't read ${f.name}. Try saving it again from Excel, or download each sheet as CSV.`); }
+      } else out.push({ name: f.name, text: await f.text() });
+    }
+    return out;
+  };
   const addFiles = async (files: { name: string; text: string }[]) => {
-    const next = files.filter(f => f.name.toLowerCase().endsWith('.csv') || f.name.toLowerCase().endsWith('.txt')).map(f => {
+    const next = files.filter(f => /\.(csv|txt)$/i.test(f.name)).map(f => {
       const table = parseCsv(f.text.replace(/^﻿/, ''));
       const { kind } = guessKind(f.name, table[0] ?? []);
       return { name: f.name, table, kind, columns: matchColumns(kind, table[0] ?? []) };
     });
-    if (!next.length) { setError('Please choose CSV files. In Excel or Google Sheets, use File, then Download, then CSV.'); return; }
+    if (!next.length) { setError('Please choose CSV or Excel (.xlsx) files. From Google Sheets, use File, then Download, then CSV.'); return; }
     setError(''); setSheetFest(null);
     setUploads(u => [...u.filter(x => !next.some(n => n.name === x.name)), ...next]);
   };
   const useSamples = async () => {
     setBusy('Loading sample files…');
     const files = await Promise.all(SAMPLES.map(async name => ({ name, text: await (await fetch(`/samples/${name}`)).text() })));
+    setMeta(m => ({ ...m, name: m.name || 'Harbor Lights Film Festival', city: m.city || 'New York' }));
     await addFiles(files); setBusy('');
   };
   const useSheet = async () => {
@@ -74,6 +90,21 @@ export default function Onboarding() {
     } catch (e) { setError((e as Error).message); }
     setBusy('');
   };
+
+  // Festival dates follow the schedule: filled in when blank, corrected when the schedule runs outside them.
+  useEffect(() => {
+    const r = scheduleDateRange(uploads, meta.startDate.slice(0, 4) || undefined);
+    if (!r) return;
+    const span = daysBetween(r.first, r.last);
+    if (Math.round((Date.parse(`${r.last}T12:00:00Z`) - Date.parse(`${r.first}T12:00:00Z`)) / DAY_MS) + 1 > MAX_DAYS) return;
+    const end = endDate(meta);
+    if (meta.startDate && r.first >= meta.startDate && r.last <= end) return;
+    const fmt = (d: string) => new Date(`${d}T12:00:00Z`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+    setDateNote(meta.startDate
+      ? `Your schedule runs ${fmt(r.first)} to ${fmt(r.last)}, so the dates now match it. Change them if that's wrong.`
+      : `Dates filled in from your schedule: ${fmt(r.first)} to ${fmt(r.last)}. Change them if that's wrong.`);
+    setMeta(m => ({ ...m, startDate: r.first, days: span }));
+  }, [uploads]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Matching: reveal files one by one, like the agent reading them.
   useEffect(() => {
@@ -114,6 +145,14 @@ export default function Onboarding() {
     return <b>{fl.title}</b>;
   };
 
+  // Nothing goes live without events; rows outside the festival dates are called out, not folded away.
+  const outside = built ? built.unresolved.filter(x => /not a festival day/.test(x)).length : 0;
+  const mustFix = built ? [
+    ...(built.festival && built.festival.events.length === 0 ? ['No events came through from your schedule. Go back to step 1 and check that the festival dates match the dates in your schedule.'] : []),
+    ...built.errors,
+  ] : [];
+  const ready = !!built?.festival && mustFix.length === 0;
+
   const goodToKnow = useMemo(() => (built ? summarizeNotes([...built.unresolved, ...built.warnings, ...built.notes]) : []), [built]);
 
   const goLive = () => {
@@ -127,7 +166,7 @@ export default function Onboarding() {
   const canNext = [
     !!meta.name && /^\d{4}-\d{2}-\d{2}$/.test(meta.startDate) && (uploads.length > 0 || !!sheetFest),
     uploads.length > 0 && uploads.some(u => u.kind === 'schedule'),
-    !!built?.festival,
+    ready,
     !!approver,
   ][step];
   const next = () => setStep(n => Math.min(STEPS.length - 1, sheetFest && n === 0 ? 2 : n + 1));
@@ -169,8 +208,17 @@ export default function Onboarding() {
       <header className="ob-head">
         <div className="brand-mark"><Icon name="film" size={18} /></div>
         <div className="ob-title display">Usher</div>
-        <a className="ob-link" href="/">Exit</a>
+        {uploads.length || meta.name || sheetFest
+          ? <button className="ob-link" onClick={() => setLeaving(true)}>Exit</button>
+          : <a className="ob-link" href="/">Exit</a>}
       </header>
+      {leaving && (
+        <div className="ob-leave" role="alertdialog" aria-label="Leave setup">
+          <span>Leave setup? What you've entered and uploaded here won't be kept.</span>
+          <button className="small" onClick={() => setLeaving(false)}>Keep going</button>
+          <a className="small ob-leave-go" href="/">Leave</a>
+        </div>
+      )}
       <nav className="ob-strip" aria-label="Steps">
         {STEPS.map((t, i) => (
           <button key={t} className={`frame ${i === step ? 'on' : ''} ${i < step ? 'done' : ''}`} disabled={i > step} onClick={() => setStep(i)}>
@@ -184,23 +232,24 @@ export default function Onboarding() {
           <section className="ob-card">
             <h2 className="display">Tell us about your festival</h2>
             <p className="muted">The basics, then your schedule. Usher works out the rest.</p>
-            <label className="field">Festival name<input value={meta.name} onChange={e => setMeta({ ...meta, name: e.target.value })} /></label>
+            <label className="field">Festival name<input value={meta.name} placeholder="e.g. Prairie Light Film Festival" onChange={e => setMeta({ ...meta, name: e.target.value })} /></label>
             <div className="ob-two">
-              <label className="field">First day<input type="date" value={meta.startDate} onChange={e => setMeta({ ...meta, startDate: e.target.value })} /></label>
-              <label className="field">Last day<input type="date" value={endDate(meta)} min={meta.startDate} onChange={e => setMeta({ ...meta, days: daysBetween(meta.startDate, e.target.value) })} /></label>
+              <label className="field">First day<input type="date" value={meta.startDate} onChange={e => { setDateNote(''); setMeta({ ...meta, startDate: e.target.value }); }} /></label>
+              <label className="field">Last day<input type="date" value={endDate(meta)} min={meta.startDate} disabled={!meta.startDate} onChange={e => { setDateNote(''); setMeta({ ...meta, days: daysBetween(meta.startDate, e.target.value) }); }} /></label>
             </div>
-            <label className="field">City<input value={meta.city} onChange={e => setMeta({ ...meta, city: e.target.value })} placeholder="e.g. New York" /></label>
+            {dateNote ? <p className="muted ob-hint">{dateNote}</p> : !meta.startDate && <p className="muted ob-hint">Or skip the dates: Usher reads them from your schedule.</p>}
+            <label className="field">City<input value={meta.city} onChange={e => setMeta({ ...meta, city: e.target.value })} placeholder="e.g. Chicago (used for weather)" /></label>
             <h3 className="ob-sub">Bring your data</h3>
             <p className="muted">Use the files you already have. Column names don’t need to match anything; the agent works them out.</p>
             <div className={`drop ${uploads.length ? 'has' : ''}`}
               onDragOver={e => e.preventDefault()}
-              onDrop={async e => { e.preventDefault(); await addFiles(await Promise.all([...e.dataTransfer.files].map(async f => ({ name: f.name, text: await f.text() })))); }}
+              onDrop={async e => { e.preventDefault(); await addFiles(await readFiles([...e.dataTransfer.files])); }}
               onClick={() => fileRef.current?.click()}>
               <Icon name="sheet" size={28} />
-              <div><strong>Drop CSV files here</strong> or tap to choose</div>
+              <div><strong>Drop CSV or Excel files here</strong> or tap to choose</div>
               <div className="muted">Schedule, venues, films, people, tickets, shifts, FAQ — any or all</div>
-              <input ref={fileRef} type="file" accept=".csv,text/csv" multiple hidden
-                onChange={async e => { await addFiles(await Promise.all([...(e.target.files ?? [])].map(async f => ({ name: f.name, text: await f.text() })))); e.target.value = ''; }} />
+              <input ref={fileRef} type="file" accept=".csv,text/csv,.xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" multiple hidden
+                onChange={async e => { await addFiles(await readFiles([...(e.target.files ?? [])])); e.target.value = ''; }} />
             </div>
             <div className="ob-or"><span>or</span></div>
             <div className="ob-two">
@@ -228,7 +277,7 @@ export default function Onboarding() {
         {step === 1 && (
           <section className="ob-card wide">
             <h2 className="display">The agent read your files</h2>
-            <p className="muted">It worked out what each file is and which column means what. Check anything marked <span className="chip warn">check</span>.</p>
+            <p className="muted">It worked out what each file is and which column means what. Where it says <span className="chip warn">check</span>, that's its best guess: press Looks right, or pick the right column. Then continue.</p>
             {uploads.slice(0, revealed).map(u => {
               const headers = u.table[0] ?? [];
               const fields = KINDS[u.kind].fields;
@@ -267,6 +316,7 @@ export default function Onboarding() {
                               <Icon name="send" size={12} />
                               <span className="to">{f.label}</span>
                               <span className={`chip ${st === 'muted' ? '' : st}`}>{st === 'ok' ? 'sure' : st === 'warn' ? 'check' : st === 'bad' ? 'missing' : 'optional'}</span>
+                              {st === 'warn' && <button className="small" onClick={() => setCol(f.key, c.header ?? '')}>Looks right</button>}
                               <select value={c.header ?? ''} onChange={e => setCol(f.key, e.target.value)} aria-label={`Column for ${f.label}`}>
                                 <option value="">Not in this file</option>
                                 {headers.map(h => <option key={h} value={h}>{h}</option>)}
@@ -287,8 +337,8 @@ export default function Onboarding() {
 
         {step === 2 && built && (
           <section className="ob-card wide">
-            <h2 className="display">{built.festival ? 'Everything checks out' : 'A few things to fix'}</h2>
-            {built.festival && <>
+            <h2 className="display">{ready ? (outside ? 'Almost there' : 'Everything checks out') : 'A few things to fix'}</h2>
+            {built.festival && built.festival.events.length > 0 && <>
               <div className="stats">
                 {[['Events', built.festival.events.length], ['Films', built.festival.films.length], ['Venues', built.festival.venues.length], ['People', built.festival.people.length]].map(([k, v]) => (
                   <div className="stat" key={k as string}><div className="k">{k}</div><div className="v">{v}</div></div>
@@ -296,7 +346,10 @@ export default function Onboarding() {
               </div>
               <p className="muted">Also {built.festival.tickets.length} tickets, {built.festival.bookings.length} saved events, {built.festival.shifts.length} volunteer shifts and {built.festival.docs.reduce((a, d) => a + d.sections.length, 0)} FAQ answers.</p>
             </>}
-            {built.errors.length > 0 && <div className="issues bad"><h3>Must fix ({built.errors.length})</h3>{built.errors.slice(0, 12).map((e, i) => <div key={i}>{e}</div>)}<p className="muted">Fix these in your file and upload it again, or go back and change a column match.</p></div>}
+            {mustFix.length > 0 && <div className="issues bad"><h3>Must fix ({mustFix.length})</h3>{mustFix.slice(0, 12).map((e, i) => <div key={i}>{e}</div>)}<p className="muted">Fix these in your file and upload it again, or go back and change the dates or a column match.</p>
+              <button className="small" onClick={() => setStep(0)}>Back to step 1</button></div>}
+            {ready && outside > 0 && <div className="issues warn"><h3>Outside your dates</h3><div>{outside} schedule {outside === 1 ? 'row falls' : 'rows fall'} outside your festival dates and {outside === 1 ? 'was' : 'were'} left out.</div>
+              <button className="small" style={{ marginTop: 8 }} onClick={() => setStep(0)}>Check the dates</button></div>}
             {preview && preview.flags.length > 0 && (
               <div className="issues warn"><h3>Needs a person ({preview.flags.length})</h3>
                 {preview.flags.slice(0, 8).map(fl => <div key={fl.id}>{shortFlag(fl)}</div>)}
@@ -324,6 +377,7 @@ export default function Onboarding() {
               ))}
             </div>
             <p className="muted" style={{ fontSize: 12.5 }}>These rules are fixed so the model can never decide on its own to contact the public.</p>
+            {current && current !== (built?.festival?.name || meta.name) && <p className="chip warn" style={{ whiteSpace: 'normal' }}>Going live replaces {current} on this device.</p>}
             <h3>Channels and watchers</h3>
             <div className="toggles">
               {CHANNELS.map(c => (
@@ -341,8 +395,25 @@ export default function Onboarding() {
         <span className="muted">{step + 1} of {STEPS.length}</span>
         {step < STEPS.length - 1
           ? <button className="primary" disabled={!canNext} onClick={next}>Continue</button>
-          : <button className="primary" disabled={!built?.festival} onClick={goLive}>Go live <Icon name="send" size={16} /></button>}
+          : <button className="primary" disabled={!ready} onClick={goLive}>Go live <Icon name="send" size={16} /></button>}
       </footer>
     </div>
   );
+}
+
+/** Each sheet of an .xlsx workbook as CSV text, named "<file> - <sheet>.csv". Loaded only when needed. */
+async function excelToCsv(file: File): Promise<{ name: string; text: string }[]> {
+  const { default: readXlsx } = await import('read-excel-file/browser');
+  const sheets = await readXlsx(file);
+  const base = file.name.replace(/\.xlsx$/i, '');
+  const cell = (v: unknown): string => {
+    if (v instanceof Date) {
+      const iso = v.toISOString();
+      if (v.getUTCFullYear() < 1901) return iso.slice(11, 16); // a time on its own
+      return iso.slice(11, 16) === '00:00' ? iso.slice(0, 10) : `${iso.slice(0, 10)} ${iso.slice(11, 16)}`;
+    }
+    return v == null ? '' : String(v);
+  };
+  const csv = (rows: unknown[][]) => rows.map(r => r.map(v => { const t = cell(v); return /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t; }).join(',')).join('\n');
+  return sheets.filter(s => s.data.length > 1).map(s => ({ name: sheets.length > 1 ? `${base} - ${s.sheet}.csv` : `${base}.csv`, text: csv(s.data as unknown[][]) }));
 }

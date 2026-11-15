@@ -27,7 +27,7 @@ function useLookups(s: AgentStore) {
 }
 
 // ------------------------------------------------------------------ Overview
-export function Overview({ s, go }: P) {
+export function Overview({ s, go, user }: P) {
   const a = s.agent;
   const f = a.f;
   const crowd = a.crowd(s.clock);
@@ -94,12 +94,7 @@ export function Overview({ s, go }: P) {
         <div className="card">
           <div className="section-title"><h2>Needs attention</h2>{a.flags.length > 0 && <span className="chip bad">{a.flags.length}</span>}</div>
           {a.flags.length === 0 && <div className="empty-note">No clashes or risks flagged.</div>}
-          {[...a.flags].reverse().map(fl => (
-            <div className="item" key={fl.id}>
-              <div className="ic bad"><Icon name="alert" size={16} /></div>
-              <div style={{ minWidth: 0 }}><div className="t">{fl.title}</div><div className="d">{fl.rationale}</div></div>
-            </div>
-          ))}
+          <FlagList s={s} user={user} go={go} />
           <h3>Recent schedule changes</h3>
           {a.changeFeed.length === 0 && <div className="empty-note">None yet. Edit the schedule to see the agent work.</div>}
           {[...a.changeFeed].reverse().slice(0, 6).map((c, i) => (
@@ -111,6 +106,57 @@ export function Overview({ s, go }: P) {
   );
 }
 
+// ------------------------------------------------------------------ Flags
+/** Needs attention: one short line per flag; tap for the detail and a way to sort it out. */
+function FlagList({ s, user, go }: P) {
+  const a = s.agent;
+  const [open, setOpen] = useState<string | null>(null);
+  const [showSorted, setShowSorted] = useState(false);
+  const act = (fn: () => unknown) => { fn(); setOpen(null); s.commit(); };
+  return (
+    <>
+      {[...a.flags].reverse().map(fl => {
+        const isOpen = open === fl.id;
+        const cover = fl.id.startsWith('shift-') ? ((fl.payload as { cover?: string[] } | undefined)?.cover ?? []) : [];
+        const toSchedule = /^(clash|room|seats|arrival|orphan)-/.test(fl.id);
+        return (
+          <div className={`item flag-item ${isOpen ? 'open' : ''}`} key={fl.id}>
+            <div className="ic bad"><Icon name="alert" size={16} /></div>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <button className="flag-line" aria-expanded={isOpen} onClick={() => setOpen(isOpen ? null : fl.id)}>
+                <span className="t">{fl.title}</span><span className="muted flag-more">{isOpen ? 'Less' : 'Details'}</span>
+              </button>
+              {isOpen && (
+                <div className="flag-body">
+                  <div className="d">{fl.rationale}</div>
+                  <div className="row" style={{ marginTop: 10 }}>
+                    {cover.map(name => (
+                      <button key={name} className="small primary" onClick={() => act(() => a.assignCover(fl.id, name, user))}>Give shift to {name}</button>
+                    ))}
+                    {toSchedule && <button className="small" onClick={() => go('schedule')}><Icon name="calendar" size={14} />Fix in schedule</button>}
+                    <button className="small" onClick={() => act(() => a.resolveFlag(fl.id, user))}><Icon name="check" size={14} />Mark as sorted</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
+      {a.sorted.length > 0 && (
+        <div className="sorted-note">
+          <button className="ghost small" onClick={() => setShowSorted(!showSorted)}>{showSorted ? 'Hide' : 'Show'} {a.sorted.length} sorted</button>
+          {showSorted && [...a.sorted].reverse().map(x => (
+            <div className="item is-off" key={x.id}>
+              <div className="ic ok"><Icon name="check" size={16} /></div>
+              <div style={{ minWidth: 0 }}><div className="t">{x.title}</div><div className="d">{x.how} · {x.by}</div></div>
+            </div>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
 // ------------------------------------------------------------------ Weather
 /** Pull a forecast (real or a demo scenario) and let the agent plan around it. */
 export function WeatherCard({ s, go, compact }: P & { compact?: boolean }) {
@@ -118,6 +164,11 @@ export function WeatherCard({ s, go, compact }: P & { compact?: boolean }) {
   const [note, setNote] = useState<string | null>(null);
   const date = s.clock.slice(0, 10);
   const city = (typeof window !== 'undefined' && readSetup()?.city) || 'New York';
+  // Forecasts reach about 16 days ahead. Further out, today's real weather is played on the festival day as a preview.
+  const daysAway = Math.round((Date.parse(`${date}T12:00:00Z`) - Date.now()) / 864e5);
+  const preview = daysAway > 15;
+  const realFrom = new Date(Date.parse(`${date}T12:00:00Z`) - 16 * 864e5).toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' });
+  const dayLabel = new Date(`${date}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
   const run = async (scenario?: string) => {
     setBusy(true); setNote(null);
     try {
@@ -125,12 +176,14 @@ export function WeatherCard({ s, go, compact }: P & { compact?: boolean }) {
       const r = await fetch(`/api/weather?${qs}`, { cache: 'no-store' });
       const j = await r.json() as { source?: string; hours?: WeatherHour[]; error?: string };
       if (!r.ok || !j.hours) throw new Error(j.error ?? `HTTP ${r.status}`);
-      const out = await s.agent.onWeather(j.hours, j.source ?? 'Forecast');
+      const label = !scenario && preview ? `Preview: today's weather in ${city}, played on ${dayLabel}` : j.source ?? 'Forecast';
+      const out = await s.agent.onWeather(j.hours, label);
       s.commit();
       const waiting = out.actions.filter(x => x.kind === 'notify_people');
-      setNote(!out.risks.length ? `${j.source}: no weather risks during festival hours.`
+      const tail = !scenario && preview ? ` Your festival is ${daysAway} days away, so this used today's real weather in ${city} as a preview. Real forecasts for ${dayLabel} start around ${realFrom}.` : '';
+      setNote((!out.risks.length ? `${label}: no weather risks during festival hours.`
         : !out.fresh.length ? `${out.risks.map(riskSummary).join('; ')}. Already handled.`
-        : `${out.fresh.map(riskSummary).join('; ')}. Staff and volunteers told. ${waiting.reduce((n, x) => n + (x.messages?.length ?? 0), 0)} personal updates are waiting for your approval.`);
+        : `${out.fresh.map(riskSummary).join('; ')}. Staff and volunteers told. ${waiting.reduce((n, x) => n + (x.messages?.length ?? 0), 0)} personal updates are waiting for your approval.`) + tail);
     } catch (e) { setNote(`Couldn't get the forecast: ${(e as Error).message}`); }
     setBusy(false);
   };
@@ -140,7 +193,7 @@ export function WeatherCard({ s, go, compact }: P & { compact?: boolean }) {
       <div className="section-title"><h2><Icon name="cloud" size={18} /> Weather watch</h2><span className="muted" style={{ fontSize: 12 }}>Open-Meteo, no key needed</span></div>
       {!compact && <p className="muted" style={{ margin: 0 }}>The agent checks the forecast for {city}, finds risky hours, tells staff and volunteers on shift, and drafts a personal note for everyone with tickets or plans in that window. Those notes wait for your approval.</p>}
       <div className="row">
-        <button className="primary" disabled={busy} onClick={() => run()}>Check today's forecast</button>
+        <button className="primary" disabled={busy} onClick={() => run()}>{preview ? `Preview with today's ${city} weather` : `Check the forecast for ${dayLabel}`}</button>
         {scenarios.map(([k, l]) => <button key={k} disabled={busy} onClick={() => run(k)}>Try: {l}</button>)}
       </div>
       {busy && <div className="muted">Checking the forecast…</div>}
@@ -482,7 +535,7 @@ export function Evaluation({ s }: P) {
   return (
     <div className="card stack">
       <h2>Evaluation: the proposal's four tests</h2>
-      <p className="muted">Runs on a fresh copy of the scripted festival day, without the model, so results are repeatable. It doesn't touch the dashboard state.</p>
+      <p className="muted">These tests check Usher itself, not your festival. They run on the built-in Harbor Lights sample day, without the model, so results are repeatable. Your festival and dashboard are not touched.</p>
       <div><button className="primary" disabled={busy} onClick={async () => { setBusy(true); setRes(await runAll(null)); setBusy(false); }}>{busy ? 'Running…' : 'Run all four'}</button></div>
       {res?.map(r => (
         <div key={r.suite} className="card">
@@ -500,7 +553,10 @@ export function Evaluation({ s }: P) {
 
 // ------------------------------------------------------------------ Data source
 export function Data({ s }: P) {
-  const [url, setUrl] = useState(s.sheet.sheet ?? DEFAULT_SHEET);
+  const fromSheet = s.sheet.source === 'sheet';
+  const [url, setUrl] = useState(fromSheet ? s.sheet.sheet ?? '' : s.sheet.source === 'built-in' ? DEFAULT_SHEET : '');
+  const isLink = /^https?:\/\//.test(url);
+  const source = fromSheet ? 'Google Sheet' : s.sheet.source === 'onboarding' ? `Set up from ${s.sheet.sheet ?? 'your files'}` : 'Harbor Lights sample festival';
   const [busy, setBusy] = useState<string | null>(null);
   const run = async (mode: 'replace' | 'sync') => { setBusy(mode); await s.loadSheet(url, mode); setBusy(null); };
   const f = s.agent.f;
@@ -508,14 +564,16 @@ export function Data({ s }: P) {
     <div className="grid2">
       <div className="card stack">
         <h2>Festival data</h2>
-        <p>Source: <strong>{s.sheet.source === 'sheet' ? 'Google Sheet' : 'built-in mock festival'}</strong>
+        <p>Source: <strong>{source}</strong>
           {s.sheet.loadedAt && <span className="muted"> · last read {s.sheet.loadedAt}</span>}</p>
-        <p className="muted">Staff keep the festival in a Google Sheet. The sheet must be shared as "anyone with the link can view". Edits made in this dashboard's grid are not written back to the sheet.</p>
-        <label className="stack"><span>Sheet link</span><input value={url} onChange={e => setUrl(e.target.value)} /></label>
+        <p className="muted">{fromSheet
+          ? 'Staff keep the festival in a Google Sheet. The sheet must be shared as "anyone with the link can view". Edits made in this dashboard\'s grid are not written back to the sheet.'
+          : 'To keep the festival in step with a Google Sheet instead, paste its link. The sheet must be shared as "anyone with the link can view". Loading it replaces what is loaded now.'}</p>
+        <label className="stack"><span>Sheet link</span><input value={url} placeholder="Paste a Google Sheet link" onChange={e => setUrl(e.target.value)} /></label>
         <div className="row">
-          <button className="primary" disabled={!!busy} onClick={() => run('sync')}>{busy === 'sync' ? 'Checking…' : s.sheet.source === 'sheet' ? 'Check sheet for changes' : 'Load from sheet'}</button>
+          <button className="primary" disabled={!!busy || !isLink} onClick={() => run('sync')}>{busy === 'sync' ? 'Checking…' : fromSheet ? 'Check sheet for changes' : 'Load from sheet'}</button>
           {s.sheet.source === 'sheet' && <button disabled={!!busy} onClick={() => run('replace')}>{busy === 'replace' ? 'Loading…' : 'Start over from sheet'}</button>}
-          <a href={url} target="_blank" rel="noreferrer">Open sheet</a>
+          {isLink && <a href={url} target="_blank" rel="noreferrer">Open sheet</a>}
         </div>
         {s.sheet.message && <div className="msg" style={{ borderColor: s.sheet.errors.length ? 'var(--bad)' : 'var(--ok)' }}>{s.sheet.message}</div>}
         {s.sheet.errors.length > 0 && <div className="msg" style={{ borderColor: 'var(--bad)' }}>
@@ -529,7 +587,7 @@ export function Data({ s }: P) {
       <div className="card">
         <h2>What's loaded</h2>
         <table><tbody>
-          <tr><td>Festival</td><td>{f.name}, {f.dates[1]} to {f.dates[3]}</td></tr>
+          <tr><td>Festival</td><td>{f.name}, {f.dates[1]} to {f.dates[festivalDays(f).at(-1)!]}</td></tr>
           <tr><td>Events</td><td>{f.events.length} ({f.events.filter(e => e.kind === 'screening').length} screenings, {f.events.filter(e => e.kind === 'panel').length} panels)</td></tr>
           <tr><td>Films</td><td>{f.films.length}</td></tr>
           <tr><td>Venues</td><td>{f.venues.length}</td></tr>
