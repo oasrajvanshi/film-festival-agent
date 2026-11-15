@@ -38,7 +38,6 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<{ tone: 'ok' | 'info'; text: ReactNode } | null>(null);
   const [err, setErr] = useState('');
-  const demoOrg = useMemo(() => directory(f).find(w => w.kind === 'organizer'), [f]);
   const pick = PROFILES.find(p => p.kind === kind);
   const choose = (k: ProfileKind | null) => { setKind(k); setMode('email'); setErr(''); setNote(null); setCode(''); };
   const go = () => {
@@ -117,7 +116,6 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
         )}
         <p className="muted signin-foot">
           Each profile sees only its own information. Codes are only sent to people on the festival's list.
-          {demoOrg && <> Demo organizer code: <b>{demoOrg.code}</b>.</>}
         </p>
       </div>
     </div>
