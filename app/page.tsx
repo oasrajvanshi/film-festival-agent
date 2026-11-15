@@ -146,7 +146,6 @@ export default function App() {
             ))}
           </nav>
         ))}
-        <div className="side-foot"><a href="/onboarding" style={{ color: 'inherit' }} onClick={() => writeSetup(null)}>Set up a new festival</a><br />Usher · Group Blue prototype · made-up data</div>
       </aside>
 
       <div className="main">
