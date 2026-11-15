@@ -116,12 +116,14 @@ export default function Onboarding() {
 
   const goodToKnow = useMemo(() => (built ? summarizeNotes([...built.unresolved, ...built.warnings, ...built.notes]) : []), [built]);
 
-  const goLive = () => {
+  const goLive = async () => {
     if (!built?.festival) return;
-    s.loadFestival(structuredClone(built.festival), sheetFest ? 'Google Sheet' : `${uploads.length} uploaded files`);
-    writeSetup({ festivalName: built.festival.name || meta.name, city: meta.city, approver, channels, onboardedAt: new Date().toISOString() });
-    writeWho({ kind: 'organizer', id: 'setup', name: approver || 'Organizer', detail: 'Set up the festival', code: '' });
-    location.href = '/#today';
+    setBusy('Going live…'); setError('');
+    try {
+      await s.goLive(structuredClone(built.festival), sheetFest ? 'Google Sheet' : `${uploads.length} uploaded files`,
+        { festivalName: built.festival.name || meta.name, city: meta.city, approver, channels, onboardedAt: new Date().toISOString(), sheetUrl: sheetFest ? sheetUrl : undefined });
+      location.href = '/#today';
+    } catch (e) { setError((e as Error).message); setBusy(''); }
   };
 
   const canNext = [
@@ -154,7 +156,7 @@ export default function Onboarding() {
           <p>Connect your schedule, people and passes. The agent watches for changes and disruptions, works out who is affected, and drafts each person a recommendation. Your team approves anything that goes out.</p>
           <div className="row">
             <button className="primary big" onClick={() => setStarted(true)}>Set up a festival <Icon name="send" size={16} /></button>
-            <a className="ob-link" href="/" onClick={() => { writeWho(null); writeSetup({ festivalName: 'Harbor Lights Film Festival', city: 'New York', approver: 'Operations lead', channels: ['push', 'email'], onboardedAt: new Date().toISOString() }); }}>Or explore a sample festival</a>
+            <a className="ob-link" href="/" onClick={async e => { e.preventDefault(); await s.openSample(); location.href = '/'; }}>Or explore a sample festival</a>
           </div>
           <ol className="ob-steps-preview">
             {STEPS.map((t, i) => <li key={t}><span>{String(i + 1).padStart(2, '0')}</span>{t}</li>)}

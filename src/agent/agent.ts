@@ -16,6 +16,9 @@ import { suggestRedirects, venueView } from './crowd';
 import { polishMessages } from './phrase';
 import { assessWeather, planWeather, riskSummary, type WeatherHour, type WeatherRisk } from './weather';
 
+/** What a person decided before, so the agent can remind them next time. */
+export interface Decision { actionId: string; kind: string; title: string; status: 'approved' | 'rejected'; by: string; at: string; note?: string; recipients: number }
+
 export interface Delivery { actionId: string; personId: string; channel: string; subject: string; body: string; at: string }
 
 export class FestivalAgent {
@@ -24,6 +27,7 @@ export class FestivalAgent {
   outbox: Delivery[] = [];
   flags: Action[] = [];
   changeFeed: string[] = [];
+  memory: Decision[] = [];
   private runs = 0;
 
   constructor(public f: Festival, private llm: LlmClient | null = null, private now: () => string = () => new Date().toISOString()) {
@@ -200,12 +204,13 @@ export class FestivalAgent {
   // --- Persistence (the dashboard keeps state in the browser) -----------
 
   snapshot() {
-    return { f: this.f, queue: this.queue, outbox: this.outbox, flags: this.flags, changeFeed: this.changeFeed, log: this.log.entries, runs: this.runs };
+    return { f: this.f, queue: this.queue, outbox: this.outbox, flags: this.flags, changeFeed: this.changeFeed, log: this.log.entries, runs: this.runs, memory: this.memory };
   }
 
-  static restore(s: ReturnType<FestivalAgent['snapshot']>, llm: LlmClient | null, now: () => string) {
+  static restore(s: Omit<ReturnType<FestivalAgent['snapshot']>, 'memory'> & { memory?: Decision[] }, llm: LlmClient | null, now: () => string) {
     const a = new FestivalAgent(s.f, llm, now);
     a.queue = s.queue; a.outbox = s.outbox; a.flags = s.flags; a.changeFeed = s.changeFeed; a.runs = s.runs;
+    a.memory = s.memory ?? [];
     a.log.restore(s.log);
     return a;
   }
@@ -222,7 +227,14 @@ export class FestivalAgent {
     if (!item) throw new Error(`No pending action ${actionId}`);
     item.status = status; item.decidedBy = by; item.decidedAt = this.now(); item.note = note;
     this.log.add(item.runId, 'approval', `${status === 'approved' ? 'Approved' : 'Rejected'} by ${by}: ${item.action.title}`, { actionId, note });
+    this.memory.push({ actionId, kind: item.action.kind, title: item.action.title, status, by, at: this.now(), note, recipients: item.action.messages?.length ?? 0 });
+    if (this.memory.length > 200) this.memory = this.memory.slice(-200);
     if (status === 'approved') { this.execute(item.action); item.status = 'done'; }
     return item;
+  }
+
+  /** Earlier decisions on the same kind of action, newest first. */
+  pastDecisions(a: { id: string; kind: string }, n = 3): Decision[] {
+    return this.memory.filter(d => d.kind === a.kind && d.actionId !== a.id).slice(-n).reverse();
   }
 }

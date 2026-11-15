@@ -4,23 +4,17 @@
 // personal views (staff, guest, attendee, vendor). Each view reads only the
 // signed-in person's own records.
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import qrcode from 'qrcode-generator';
-import type { AgentStore } from './useAgent';
+import { readWho, writeWho, type AgentStore } from './useAgent';
 import { Icon } from './icons';
-import { Ask, Scan } from './panels';
+import { Ask } from './panels';
 import { PROFILES, deriveVendors, directory, lookupForCode, signIn, type ProfileKind, type Who } from '../../src/access/profiles';
 import { clock as fmt } from '../../src/core/time';
-import { PASS_LABELS, qrFor } from '../../src/rules/access';
+import { PASS_LABELS, qrFor, type ScanResult } from '../../src/rules/access';
 import type { DayNumber, FestivalEvent } from '../../src/core/types';
 
-const WHO_KEY = 'ffa-who-v1';
-export function readWho(): Who | null {
-  try { const r = localStorage.getItem(WHO_KEY); return r ? JSON.parse(r) as Who : null; } catch { return null; }
-}
-export function writeWho(w: Who | null) {
-  try { if (w) localStorage.setItem(WHO_KEY, JSON.stringify(w)); else localStorage.removeItem(WHO_KEY); } catch { /* private mode */ }
-}
+export { readWho, writeWho };
 
 const noop = () => {};
 const dayOf = (iso: string, dates: Record<DayNumber, string>): DayNumber =>
@@ -30,6 +24,7 @@ const dayLabel = (date: string) => new Date(`${date}T12:00:00`).toLocaleDateStri
 // ------------------------------------------------------------------ sign in
 export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
   const f = s.agent.f;
+  const festName = s.festivalName;
   const [kind, setKind] = useState<ProfileKind | null>(null);
   const [mode, setMode] = useState<'email' | 'code'>('email');
   const [code, setCode] = useState('');
@@ -40,8 +35,16 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
   const [err, setErr] = useState('');
   const pick = PROFILES.find(p => p.kind === kind);
   const choose = (k: ProfileKind | null) => { setKind(k); setMode('email'); setErr(''); setNote(null); setCode(''); };
-  const go = () => {
+  const go = async () => {
     if (!kind) return;
+    if (s.shared) {
+      setBusy(true);
+      const r = await s.verifyCode(kind, code).catch(() => ({ ok: false as const, reason: 'offline' }));
+      setBusy(false);
+      if (r.ok) { onIn(r.who); return; }
+      setErr(r.reason === 'too_many' ? 'Too many tries. Wait 15 minutes, or ask for a new code.' : `That code doesn't open the ${pick!.label} profile. Check it and try again.`);
+      return;
+    }
     const w = signIn(f, kind, code);
     if (!w) { setErr(`That code doesn't open the ${pick!.label} profile. Check it and try again.`); return; }
     writeWho(w); onIn(w);
@@ -49,6 +52,22 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
   const sendCode = async () => {
     if (!kind) return;
     setErr(''); setNote(null);
+    if (s.shared) {
+      setBusy(true);
+      const r = await s.requestCode(kind, name, email).catch(() => ({ ok: false, reason: 'offline' } as { ok: boolean; reason?: string; sent?: boolean; code?: string }));
+      setBusy(false);
+      if (!r.ok) {
+        setErr(r.reason === 'bad_email' ? 'Please enter a full email address.'
+          : r.reason === 'name_mismatch' ? `That email is on the ${pick!.label} list, but the name doesn't match. Use your name as the festival has it.`
+          : r.reason === 'offline' ? 'Usher couldn’t be reached. Check your connection and try again.'
+          : `We couldn't find that email on the ${festName} ${pick!.label} list. Check the spelling, or that you picked the right profile.`);
+        return;
+      }
+      setNote(r.sent ? { tone: 'ok', text: <>Checked against the festival list. Your code is on its way. In test mode it goes to the team inbox, not {email}.</> }
+        : { tone: 'info', text: <>Checked against the festival list. Email isn't connected yet, so here is the code it would send: <b>{r.code}</b></> });
+      setMode('code');
+      return;
+    }
     const r = lookupForCode(f, kind, name, email);
     if (!r.ok) {
       setErr(r.reason === 'bad_email' ? 'Please enter a full email address.'
@@ -74,7 +93,7 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
     <div className="ob ob-welcome">
       <div className="ob-poster signin">
         <div className="ob-mast display" style={{ fontSize: 'clamp(36px, 6.4vw, 78px)', marginBottom: 4 }}>Usher</div>
-        <div className="signin-fest">{f.name}</div>
+        <div className="signin-fest">{festName}</div>
         {!kind ? (
           <>
             <p className="signin-lede">Who's signing in?</p>
@@ -104,10 +123,10 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
             </> : <>
               {note && <div className={`issues ${note.tone === 'ok' ? 'ok' : ''}`} role="status">{note.text}</div>}
               <p className="muted" style={{ marginTop: 0 }}>Enter your access code. It starts with {pick!.prefix}.</p>
-              <input autoFocus className="code-input" placeholder={`${pick!.prefix}-XXXX`} value={code} maxLength={9}
+              <input autoFocus className="code-input" placeholder={`${pick!.prefix}-XXXXXX`} value={code} maxLength={11}
                 onChange={e => { setCode(e.target.value.toUpperCase()); setErr(''); }} onKeyDown={e => e.key === 'Enter' && go()} />
               {err && <div className="issues bad" role="alert">{err}</div>}
-              <button className="primary big" style={{ marginTop: 14 }} disabled={code.replace(/[^A-Z0-9]/gi, '').length < 7} onClick={go}>
+              <button className="primary big" style={{ marginTop: 14 }} disabled={code.replace(/[^A-Z0-9]/gi, '').length < 7 || busy} onClick={go}>
                 <Icon name="key" size={16} /> Open my profile
               </button>
               <button className="ghost small" style={{ marginTop: 10 }} onClick={() => { setMode('email'); setErr(''); setNote(null); }}>Email me a code instead</button>
@@ -125,14 +144,24 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
 // ------------------------------------------------------------------ organizer: codes
 export function AccessCodes({ s, onViewAs }: { s: AgentStore; onViewAs: (w: Who) => void }) {
   const f = s.agent.f;
-  const all = useMemo(() => directory(f), [f, s.version]); // eslint-disable-line react-hooks/exhaustive-deps
+  const local = useMemo(() => (s.shared ? [] : directory(f)), [f, s.version, s.shared]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [server, setServer] = useState<Who[] | null>(null);
+  useEffect(() => {
+    if (!s.shared) return;
+    s.call<{ people: Who[] }>('codes', {}, 'GET').then(r => r.ok && setServer(r.body.people)).catch(() => {});
+  }, [s.shared, s.version]); // eslint-disable-line react-hooks/exhaustive-deps
+  const all = s.shared ? server ?? [] : local;
+  const link = typeof window !== 'undefined' && s.fid ? `${location.origin}/?f=${s.fid}` : '';
   const [kind, setKind] = useState<ProfileKind>('staff');
   const [q, setQ] = useState('');
   const rows = all.filter(w => w.kind === kind && (!q || `${w.name} ${w.detail} ${w.code}`.toLowerCase().includes(q.toLowerCase())));
   return (
     <div className="card stack">
       <div className="section-title"><h2>Access codes</h2><span className="muted" style={{ fontSize: 12 }}>{all.length} people and vendors</span></div>
-      <p className="muted" style={{ margin: 0 }}>Each person gets one code for their own profile. Send it with their pass. A code only opens the profile it was made for. Use "View as" to see exactly what someone sees.</p>
+      <p className="muted" style={{ margin: 0 }}>Each person gets one code for their own profile. A code only opens the profile it was made for. Use "View as" to see exactly what someone sees.</p>
+      {link && <div className="row" style={{ alignItems: 'center' }}><span className="muted">Link for your team and guests:</span> <code className="code-chip">{link}</code>
+        <button className="small" onClick={() => navigator.clipboard?.writeText(link)}>Copy</button></div>}
+      {s.shared && !server && <div className="muted">Loading codes…</div>}
       <div className="row">
         {PROFILES.map(p => (
           <button key={p.kind} className={`small ${p.kind === kind ? 'primary' : ''}`} onClick={() => setKind(p.kind)}>
@@ -197,11 +226,12 @@ export function PersonalApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who
       <main className="me-body" key={who.id}>
         {tab === 'home' && who.kind === 'staff' && <StaffHome s={s} who={who} />}
         {tab === 'home' && (who.kind === 'guest' || who.kind === 'attendee') && <PersonHome s={s} who={who} go={setTab} />}
-        {tab === 'home' && who.kind === 'vendor' && <VendorHome s={s} who={who} />}
+        {tab === 'home' && who.kind === 'vendor' && <><VendorHome s={s} who={who} /><VendorReport s={s} who={who} /></>}
         {tab === 'pass' && <PassCard s={s} who={who} />}
-        {tab === 'scan' && <Scan {...P} />}
+        {tab === 'scan' && <StaffScan s={s} />}
         {tab === 'ask' && <Ask {...P} />}
         {tab === 'updates' && (who.kind === 'vendor' ? <VendorChanges s={s} who={who} /> : <Inbox s={s} who={who} />)}
+        {!viewAs && <Feedback s={s} compact />}
       </main>
     </div>
   );
@@ -398,3 +428,142 @@ function VendorChanges({ s, who }: { s: AgentStore; who: Who }) {
   );
 }
 
+
+// ------------------------------------------------------------------ staff: door scan
+/** Staff scan a pass: type or paste the code, or use the camera where the browser can read QR codes. */
+function StaffScan({ s }: { s: AgentStore }) {
+  const f = s.agent.f;
+  const day = dayOf(s.clock, f.dates);
+  const events = f.events.filter(e => e.day === day && e.status === 'scheduled').sort((a, b) => a.start.localeCompare(b.start));
+  const soon = events.find(e => e.end >= s.clock) ?? events[0];
+  const [eid, setEid] = useState(soon?.id ?? '');
+  const [qr, setQr] = useState('');
+  const [res, setRes] = useState<ScanResult | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [cam, setCam] = useState<'off' | 'on' | 'none'>('off');
+  const video = useRef<HTMLVideoElement>(null);
+  const check = async (code: string) => {
+    if (!code.trim() || !eid) return;
+    setBusy(true); setRes(await s.scan(code.trim(), eid)); setBusy(false); setQr('');
+  };
+  useEffect(() => {
+    if (cam !== 'on') return;
+    const BD = (window as unknown as { BarcodeDetector?: new (o: { formats: string[] }) => { detect: (v: HTMLVideoElement) => Promise<{ rawValue: string }[]> } }).BarcodeDetector;
+    if (!BD) { setCam('none'); return; }
+    let stream: MediaStream | null = null; let stop = false; let last = '';
+    (async () => {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        if (!video.current) return;
+        video.current.srcObject = stream; await video.current.play();
+        const det = new BD({ formats: ['qr_code'] });
+        while (!stop) {
+          const hits = await det.detect(video.current).catch(() => []);
+          const v = hits[0]?.rawValue;
+          if (v && v !== last) { last = v; await check(v); }
+          await new Promise(r => setTimeout(r, 350));
+        }
+      } catch { setCam('none'); }
+    })();
+    return () => { stop = true; stream?.getTracks().forEach(t => t.stop()); };
+  }, [cam, eid]); // eslint-disable-line react-hooks/exhaustive-deps
+  return (
+    <div className="grid2">
+      <div className="card stack">
+        <h2>Door scan</h2>
+        <label className="field">Event at your door
+          <select value={eid} onChange={e => setEid(e.target.value)}>
+            {events.map(e => <option key={e.id} value={e.id}>{fmt(e.start)} {e.title}</option>)}
+          </select>
+        </label>
+        {cam === 'on' ? <video ref={video} muted playsInline style={{ width: '100%', borderRadius: 10, background: '#000' }} />
+          : <button onClick={() => setCam('on')}><Icon name="scan" size={16} /> Scan with camera</button>}
+        {cam === 'none' && <div className="muted">This browser can’t read QR codes with the camera. Type the code under the QR instead.</div>}
+        <label className="field">Or type the code under the QR
+          <input value={qr} placeholder="e.g. HLFF1.p-012.ABC" onChange={e => setQr(e.target.value)} onKeyDown={e => e.key === 'Enter' && check(qr)} />
+        </label>
+        <button className="primary" disabled={!qr.trim() || busy} onClick={() => check(qr)}>{busy ? 'Checking…' : 'Check'}</button>
+      </div>
+      <div className="card">
+        {res ? <div className={`scan ${res.allowed ? 'ok' : 'bad'}`}>{res.allowed ? 'ALLOW' : 'DENY'}<div style={{ fontSize: 14, fontWeight: 400, marginTop: 8 }}>{res.personName && <>{res.personName} · </>}{res.reason}</div></div>
+          : <p className="muted">Scan a pass to see green or red. Passes are checked on the festival’s server, so your phone never holds anyone else’s details.</p>}
+      </div>
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------ vendor: report a problem
+function VendorReport({ s, who }: { s: AgentStore; who: Who }) {
+  const f = s.agent.f;
+  const v = useMemo(() => deriveVendors(f).find(x => x.id === who.id), [f, s.version, who.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [type, setType] = useState<'print_delay' | 'vendor_cancel'>(who.id === 'v-print' ? 'print_delay' : 'vendor_cancel');
+  const films = f.films.filter(fl => (v?.deliveries ?? []).some(d => d.eventId && f.events.find(e => e.id === d.eventId)?.filmId === fl.id));
+  const [filmId, setFilmId] = useState(films[0]?.id ?? '');
+  const days = Object.keys(f.dates).map(Number).filter(n => n >= 1);
+  const [day, setDay] = useState(days[0] ?? 1);
+  const [eta, setEta] = useState('14:00');
+  const [note, setNote] = useState('');
+  const [msg, setMsg] = useState('');
+  const send = async () => {
+    setMsg('Sending…');
+    const r = await s.call<{ actions?: number; error?: string }>('vendor-report', { type, filmId, newEta: `${f.dates[day]}T${eta}`, day, service: v?.service, note });
+    setMsg(r.ok ? 'Sent to the festival team. They’ll see it right away and get back to you.' : r.body.error ?? 'Couldn’t send. Try again.');
+    if (r.ok) setNote('');
+  };
+  if (!s.shared) return null;
+  return (
+    <div className="card stack">
+      <h2>Report a problem</h2>
+      <div className="row">
+        {who.id === 'v-print' && <button className={`small ${type === 'print_delay' ? 'primary' : ''}`} onClick={() => setType('print_delay')}>A print will be late</button>}
+        <button className={`small ${type === 'vendor_cancel' ? 'primary' : ''}`} onClick={() => setType('vendor_cancel')}>We can’t make a day</button>
+      </div>
+      {type === 'print_delay' ? <>
+        <label className="field">Film<select value={filmId} onChange={e => setFilmId(e.target.value)}>{films.map(fl => <option key={fl.id} value={fl.id}>{fl.title}</option>)}</select></label>
+        <div className="row">
+          <label className="field">Day<select value={day} onChange={e => setDay(+e.target.value)}>{days.map(d => <option key={d} value={d}>{dayLabel(f.dates[d])}</option>)}</select></label>
+          <label className="field">New arrival<input type="time" value={eta} onChange={e => setEta(e.target.value)} /></label>
+        </div>
+      </> : <label className="field">Day<select value={day} onChange={e => setDay(+e.target.value)}>{days.map(d => <option key={d} value={d}>{dayLabel(f.dates[d])}</option>)}</select></label>}
+      <label className="field">Anything else<input value={note} onChange={e => setNote(e.target.value)} placeholder="Optional" /></label>
+      <button className="primary" onClick={send}><Icon name="send" size={16} /> Send to the festival</button>
+      {msg && <div className="muted" role="status">{msg}</div>}
+    </div>
+  );
+}
+
+// ------------------------------------------------------------------ feedback from testers
+export function Feedback({ s, compact }: { s: AgentStore; compact?: boolean }) {
+  const [open, setOpen] = useState(!compact);
+  const [text, setText] = useState('');
+  const [rating, setRating] = useState(0);
+  const [msg, setMsg] = useState('');
+  const [items, setItems] = useState<{ at: string; role: string; name: string; rating: number | null; text: string }[] | null>(null);
+  const organizer = s.who?.kind === 'organizer' && !compact;
+  useEffect(() => {
+    if (organizer && s.shared) s.call<{ items: typeof items }>('feedback', {}, 'GET').then(r => r.ok && setItems(r.body.items)).catch(() => {});
+  }, [organizer, s.shared, msg]); // eslint-disable-line react-hooks/exhaustive-deps
+  if (!s.shared) return compact ? null : <div className="card"><h2>Feedback</h2><div className="empty-note">Feedback is collected once shared storage is connected.</div></div>;
+  const send = async () => {
+    const r = await s.call('feedback', { text, rating });
+    setMsg(r.ok ? 'Thanks! The festival team will read this.' : 'Couldn’t send. Try again.');
+    if (r.ok) { setText(''); setRating(0); }
+  };
+  if (compact && !open) return <p style={{ textAlign: 'center' }}><button className="ghost small" onClick={() => setOpen(true)}>Tell us how Usher is working for you</button></p>;
+  return (
+    <div className="card stack">
+      <h2>{organizer ? 'Feedback from testers' : 'How is Usher working for you?'}</h2>
+      <div className="row">{[1, 2, 3, 4, 5].map(n => <button key={n} className={`small ${rating === n ? 'primary' : ''}`} onClick={() => setRating(n)}>{n}</button>)}<span className="muted">1 is poor, 5 is great</span></div>
+      <textarea rows={3} value={text} onChange={e => setText(e.target.value)} placeholder="What was easy, what was confusing, what’s missing?" />
+      <button className="primary" disabled={!text.trim()} onClick={send}>Send feedback</button>
+      {msg && <div className="muted" role="status">{msg}</div>}
+      {organizer && items && <>
+        <h3>{items.length} response{items.length === 1 ? '' : 's'}{items.some(i => i.rating) ? `, average ${(items.filter(i => i.rating).reduce((a, i) => a + (i.rating ?? 0), 0) / items.filter(i => i.rating).length).toFixed(1)} of 5` : ''}</h3>
+        {items.map((i, k) => (
+          <div className="item" key={k}><div className="ic info"><Icon name="chat" size={16} /></div>
+            <div style={{ minWidth: 0 }}><div className="t">{i.rating ? `${i.rating}/5 · ` : ''}{i.role}{i.name ? ` · ${i.name}` : ''}</div><div className="d">{i.text}</div><div className="d muted">{new Date(i.at).toLocaleString()}</div></div></div>
+        ))}
+      </>}
+    </div>
+  );
+}
