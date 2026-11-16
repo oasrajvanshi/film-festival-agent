@@ -271,7 +271,10 @@ export default function Site() {
           </div>
         ))}
         <div className="s-hero-copy">
-          <h1 className="s-h1 s-h1-hero" data-split>{'Usher: the best film festival\nchange management agent.'}</h1>
+          <h1 className="s-h1 s-h1-hero" aria-label="Usher, the best film festival change management agent">
+            <span className="s-wordmark" data-split>Usher</span>
+            <span className="s-h1-sub" data-split>{'The best film festival\nchange management agent.'}</span>
+          </h1>
           <p className="s-lead" data-hero-fade><q className="s-quote">Don&apos;t worry. I&apos;ll take care of everything.</q> That&apos;s what Usher says when a print arrives late, a guest misses their flight or snow slows the city down. It tracks your schedule and tells everyone affected by a change what to do next.</p>
           <div className="s-ctas" data-hero-fade>
             <a className="btn" href="#story" onClick={go('#story')}>See how it works</a>
