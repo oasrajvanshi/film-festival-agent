@@ -94,7 +94,8 @@ export function Overview({ s, user, go }: P) {
       {(() => {
         const waiting = s.agent.queue.filter(q => q.status === 'pending').length;
         const flagged = s.agent.flags.length;
-        if (!waiting && !flagged) return null;
+        // A calm day shows only the festival and its calendar.
+        if (!problems || (!waiting && !flagged)) return null;
         return (
           <button className="needs-row" onClick={() => go('approvals')}>
             <Icon name="inbox" size={16} />

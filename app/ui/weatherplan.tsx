@@ -373,15 +373,8 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
 
   return (
     <>
-      {/* With two or more problems, they sit in one frame; one button above them covers them all. */}
-      <div className={`wx-alerts${allRec ? ' framed' : ''}${openId === 'all' ? ' all-open' : ''}`}>
-        {allRec && (
-          <div className="wx-frame-head">
-            <button className={`wx-all-btn${openId === 'all' ? ' on' : ''}`} onClick={() => show(openId === 'all' ? null : 'all')}>
-              <Icon name="sparkle" size={15} /> {openId === 'all' ? 'Close preview' : 'Fix them all'}
-            </button>
-          </div>
-        )}
+      {/* Each problem on its own; with two or more, one button under them all fixes them together. */}
+      <div className={`wx-alerts${openId === 'all' ? ' all-open' : ''}`}>
         {shown.map(({ al, rec }) => {
           const isOpen = open?.al.id === al.id;
           return (
@@ -396,6 +389,13 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
             </div>
           );
         })}
+        {allRec && (
+          <div className="wx-all-foot">
+            <button className={`wx-all-btn${openId === 'all' ? ' on' : ''}`} onClick={() => show(openId === 'all' ? null : 'all')}>
+              <Icon name="sparkle" size={15} /> {openId === 'all' ? 'Close preview' : 'Fix them all'}
+            </button>
+          </div>
+        )}
       </div>
 
       {open && (() => {

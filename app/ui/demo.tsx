@@ -1,4 +1,5 @@
 'use client';
+import { IPhone } from './phoneframe';
 // Demo-day toolbar, shown only with ?demo=1 (and remembered on this device
 // until ?demo=0). It switches between the desktop view and a phone frame, and
 // between the five profiles, by viewing the festival as a sample person of
@@ -78,7 +79,7 @@ export function DemoShell({ demo, signedIn = true, children }: { demo: Demo; sig
         {!signedIn && <span className="demo-hint">Sign in as organizer to switch profiles</span>}
       </div>
       {phone
-        ? <div className="demo-stage"><div className="demo-device"><iframe key={src} src={src} title={`Usher on a phone, ${demo.kind}`} /></div></div>
+        ? <IPhone key={src} src={src} title={`Usher on a phone, ${demo.kind}`} />
         : <div className="demo-body">{children}</div>}
     </div>
   );

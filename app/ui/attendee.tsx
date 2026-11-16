@@ -183,32 +183,34 @@ function PlanView({ s, who, plans, day, change }: { s: AgentStore; who: Who; pla
     return null;
   })();
 
+  // The plan as a phone calendar's schedule list: hour headings, one row per event
+  // (time, venue colour, picture, title, venue, guests), and what to do between them.
   const rows: ReactElement[] = [];
+  const hourLabel = (iso: string) => { const h = Number(iso.slice(11, 13)); return `${h % 12 || 12} ${h < 12 ? 'am' : 'pm'}`; };
+  let lastHour = '';
   mine.forEach((p, i) => {
     const prev = mine[i - 1];
+    const hour = hourLabel(p.e.start);
+    if (hour !== lastHour) { rows.push(<h4 className="msch-h" key={`h-${p.e.id}`}>{hour}</h4>); lastHour = hour; }
     if (prev) {
       const trip = walk(f, prev.e.venueId, p.e.venueId);
       const gap = tod(p.e.start) - tod(prev.e.end);
       const inWeather = weather && tod(p.e.start) - trip >= tod(weather.risk.from) - 30 && tod(p.e.start) - trip <= tod(weather.risk.to);
       const pick = gap >= 100 ? pickFor(prev.e.end, p.e.start) : null;
       if (pick) rows.push(
-        <div className="at-row at-free" key={`free-${p.e.id}`}>
-          <div className="at-pick">
-            <small>Free {fmt(prev.e.end)} to {fmt(p.e.start)} · a pick that fits</small>
-            <div className="at-pick-row">
-              <EventThumb e={pick} size={40} />
-              <span><b>{pick.title}</b><em>{fmt(pick.start)} · {venueName(f, pick.venueId)}</em></span>
-              <button className="small" onClick={() => change(pick.id, null)}>Add</button>
-            </div>
+        <div className="apl-pick" key={`free-${p.e.id}`}>
+          <small>Free {fmt(prev.e.end)} to {fmt(p.e.start)} · a pick that fits</small>
+          <div className="apl-pick-row">
+            <EventThumb e={pick} size={36} />
+            <span><b>{pick.title}</b><em>{fmt(pick.start)} · {venueName(f, pick.venueId)}</em></span>
+            <button className="small" onClick={() => change(pick.id, null)}>Add</button>
           </div>
         </div>,
       );
-      if (gap >= 0) rows.push(
-        <div className={`at-trip${inWeather ? ' wx' : ''}`} key={`trip-${p.e.id}`}>
-          <span className="at-trip-ic">{trip ? '→' : '•'}</span>
-          {trip
-            ? <span>{trip} min to {venueName(f, p.e.venueId)} · leave by {fmt(hm(f.dates[day], tod(p.e.start) - trip - (inWeather ? weather!.risk.extraTravelMin : 0) - 5))}{inWeather ? <em> · {weather!.label.toLowerCase()} adds {weather!.risk.extraTravelMin} min, take the shuttle</em> : null}</span>
-            : <span>Same venue, stay in your seat</span>}
+      if (gap >= 0 && trip) rows.push(
+        <div className={`apl-trip${inWeather ? ' wx' : ''}`} key={`trip-${p.e.id}`}>
+          {trip} min to {venueName(f, p.e.venueId)} · leave by {fmt(hm(f.dates[day], tod(p.e.start) - trip - (inWeather ? weather!.risk.extraTravelMin : 0) - 5))}
+          {inWeather ? <em> · {weather!.label.toLowerCase()} adds {weather!.risk.extraTravelMin} min, take the shuttle</em> : null}
         </div>,
       );
     }
@@ -216,40 +218,31 @@ function PlanView({ s, who, plans, day, change }: { s: AgentStore; who: Who; pla
     const off = p.e.status === 'cancelled';
     const clash = prev && p.e.status === 'scheduled' && prev.e.status === 'scheduled' && tod(p.e.start) < tod(prev.e.end) ? prev : null;
     const risky = decision?.p.e.id === p.e.id;
+    const note = off ? 'Cancelled' : clash ? `Overlaps ${clash.e.title}` : w && p.why === 'Ticket' ? 'Seat held' : '';
     rows.push(
-      <div className={`at-row${w ? ' moved' : ''}${off ? ' off' : ''}${risky ? ' risk' : ''}`} key={p.e.id} style={{ ['--vc' as string]: venueTone(f, p.e.venueId) }}>
-        <div className="at-card">
-          <button className="at-card-main" onClick={() => { opened(); setOpen(p.e); }}>
-            <div className="at-time">{w && <s>{fmt(w)}</s>}<span>{fmt(p.e.start)}</span><small>{fmt(p.e.end)}</small></div>
-            <EventThumb e={p.e} size={40} />
-            <div className="at-card-txt">
-              <b>{p.e.title}</b>
-              <em>{venueName(f, p.e.venueId)}{p.e.room ? `, ${p.e.room}` : ''} · {p.why}</em>
-            </div>
-            {p.e.guestIds.length > 0 && <Faces s={s} ids={p.e.guestIds} size={20} max={3} />}
-          </button>
-          {/* The row already shows the old time crossed out; a ticket also keeps its seat. */}
-          {w && p.why === 'Ticket' && <p className="at-note"><Icon name="check" size={14} /> Your seat is held.</p>}
-          {clash && (
-            <div className="at-note warn">
-              <span>Overlaps with {clash.e.title}. Keep one:</span>
-              <div className="at-keep">
-                {clash.why === 'Saved' && <button className="small" onClick={() => change(null, clash.e.id)}>Keep this one</button>}
-                {p.why === 'Saved' && <button className="small ghost" onClick={() => change(null, p.e.id)}>Keep {clash.e.title}</button>}
-              </div>
-            </div>
-          )}
-          {off && (
-            <div className="at-note bad">
-              <span><Icon name="x" size={14} /> Cancelled. Pick another that fits your day:</span>
-              {swaps(p.e).map(e => (
-                <button key={e.id} className="at-swap" onClick={() => change(e.id, p.e.id)}>
-                  <EventThumb e={e} size={32} /><span><b>{e.title}</b><em>{fmt(e.start)} · {venueName(f, e.venueId)}</em></span><i>Swap</i>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+      <button key={p.e.id} className={`msch-ev${w ? ' moved' : ''}${off ? ' off' : ''}${risky ? ' risk' : ''}${clash ? ' clash' : ''}`}
+        style={{ ['--vc' as string]: venueTone(f, p.e.venueId) }} onClick={() => { opened(); setOpen(p.e); }}>
+        <span className="msch-time">{w && <s>{fmt(w)}</s>}<b>{fmt(p.e.start)}</b><small>{fmt(p.e.end)}</small></span>
+        <EventThumb e={p.e} size={40} />
+        <span className="msch-txt">
+          <b>{p.e.title}</b>
+          <span>{venueName(f, p.e.venueId)}{p.e.room ? `, ${p.e.room}` : ''} · {p.why}</span>
+          {note && <em>{note}</em>}
+        </span>
+        {p.e.guestIds.length > 0 && <Faces s={s} ids={p.e.guestIds} size={20} max={3} />}
+      </button>,
+    );
+    if (clash) rows.push(
+      <div className="apl-act" key={`keep-${p.e.id}`}>
+        <span>Keep one</span>
+        {clash.why === 'Saved' && <button className="small" onClick={() => change(null, clash.e.id)}>{p.e.title}</button>}
+        {p.why === 'Saved' && <button className="small" onClick={() => change(null, p.e.id)}>{clash.e.title}</button>}
+      </div>,
+    );
+    if (off) rows.push(
+      <div className="apl-act swap" key={`swap-${p.e.id}`}>
+        <span>Swap for</span>
+        {swaps(p.e).map(e => <button key={e.id} className="small" onClick={() => change(e.id, p.e.id)}>{e.title} · {fmt(e.start)}</button>)}
       </div>,
     );
   });
@@ -267,7 +260,7 @@ function PlanView({ s, who, plans, day, change }: { s: AgentStore; who: Who; pla
         <b>{new Date(`${f.dates[day]}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</b>
         <span>{mine.length ? `${mine.length} on your plan` : 'Nothing planned'}</span>
       </div>
-      {mine.length === 0 ? <div className="at-empty">Nothing on your plan this day.</div> : <div className="at-list">{rows}</div>}
+      {mine.length === 0 ? <div className="at-empty">Nothing on your plan this day.</div> : <div className="msch apl">{rows}</div>}
 
       {open && (
         <div className="at-sheet-wrap" onClick={settled(() => setOpen(null))}>

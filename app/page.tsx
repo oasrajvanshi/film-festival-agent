@@ -101,6 +101,8 @@ export default function Site() {
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     gsap.registerPlugin(ScrollTrigger);
+    // Development only: lets a test browser run the timelines at real speed in a background tab.
+    if (process.env.NODE_ENV !== 'production') (window as unknown as { __gsap?: typeof gsap }).__gsap = gsap;
     const stopSnow = snowfield(root.current!.querySelector<HTMLCanvasElement>('[data-snowfield]'), reduce);
 
     const ctx = gsap.context(() => {
@@ -142,32 +144,31 @@ export default function Site() {
       if (phone) ScrollTrigger.config({ ignoreMobileResize: true });
       gsap.set(q('[data-cal="hero"]'), { rotateX: phone ? 0 : 24, rotateZ: phone ? 0 : -6 });
       intro.fromTo(q('.s-hero .split-word'), { yPercent: 110 }, { yPercent: 0, duration: 1.05, stagger: 0.05, ease: 'power4.out' }, seen ? 0.1 : 1.75);
-      if (phone) {
-        // Tied to the scroll position (never pinned): the film strips part and fade as the quote rises,
-        // then each part floats up into place. Scrolling back plays it in reverse.
-        const quote = q('[data-hero-fade]')[0];
-        gsap.to(q('[data-film="top"]'), { yPercent: -60, autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: quote, start: 'top 100%', end: 'top 62%', scrub: 0.6 } });
-        gsap.to(q('[data-film="bottom"]'), { yPercent: 60, autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: quote, start: 'top 100%', end: 'top 62%', scrub: 0.6 } });
-        gsap.to(h1, { scale: 0.94, y: -24, ease: 'none', transformOrigin: '0% 50%', scrollTrigger: { trigger: hero, start: 'top top', end: '+=55%', scrub: 0.6 } });
-        const rise = (el: Element) => gsap.fromTo(el, { autoAlpha: 0, y: 46 }, { autoAlpha: 1, y: 0, ease: 'none', scrollTrigger: { trigger: el, start: 'top 96%', end: 'top 70%', scrub: 0.6 } });
-        q('[data-hero-fade]').forEach(rise);
-        rise(q('.s-hero-cal')[0]);
-        q('[data-hero-float]').forEach(rise);
-      } else {
+      // The hero: the headline first, then everything else in one move, on its own clock
+      // (or straight away if you start scrolling). No pinning: one scroll always reaches the next section.
+      gsap.set(q('[data-hero-fade]'), { autoAlpha: 0, y: 24 });
+      gsap.set(q('.s-hero-stage'), { autoAlpha: 0, y: phone ? 30 : 60 });
+      gsap.set(q('[data-hero-float]'), { autoAlpha: 0, y: 18 });
+      const settle = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
+      if (!phone) {
         const r0 = h1.getBoundingClientRect();
         const toCentre = { x: innerWidth / 2 - (r0.left + r0.width / 2), y: innerHeight / 2 - (r0.top + r0.height / 2) };
         gsap.set(h1, { x: toCentre.x, y: toCentre.y, scale: 1.25, transformOrigin: '50% 50%', force3D: true });
-        gsap.set(q('[data-hero-fade]'), { autoAlpha: 0, y: 28 });
-        gsap.set(q('.s-hero-stage'), { autoAlpha: 0, y: 90 });
-        gsap.timeline({ scrollTrigger: { trigger: hero, start: 'top top', end: '+=110%', scrub: 0.8, pin: true, anticipatePin: 1 } })
-          .to(h1, { x: 0, y: 0, scale: 1, duration: 1, ease: 'power2.inOut' }, 0)
-          .to(q('.s-scrollcue'), { autoAlpha: 0, duration: 0.3 }, 0)
-          .to(q('[data-film="top"]'), { yPercent: -80, autoAlpha: 0, duration: 0.5, ease: 'power2.in' }, 0.3)
-          .to(q('[data-film="bottom"]'), { yPercent: 80, autoAlpha: 0, duration: 0.5, ease: 'power2.in' }, 0.3)
-          .to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.12, ease: 'power2.out' }, 0.5)
-          // the calendar after the words have settled, then the problems it is about
-          .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out' }, 0.95)
-          .fromTo(q('[data-hero-float]'), { y: 24, autoAlpha: 0, scale: 0.96 }, { y: 0, autoAlpha: 1, scale: 1, duration: 0.5, stagger: 0.25, ease: 'back.out(1.4)' }, 1.45);
+        settle.to(h1, { x: 0, y: 0, scale: 1, duration: 1, ease: 'power2.inOut' }, 0)
+          .to(q('[data-film="top"]'), { yPercent: -80, autoAlpha: 0, duration: 0.6, ease: 'power2.in' }, 0.1)
+          .to(q('[data-film="bottom"]'), { yPercent: 80, autoAlpha: 0, duration: 0.6, ease: 'power2.in' }, 0.1)
+          .to(q('.s-scrollcue'), { autoAlpha: 0, duration: 0.3 }, 0);
+      }
+      settle.to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.08 }, phone ? 0 : 0.55)
+        .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.8 }, phone ? 0.1 : 0.65)
+        .to(q('[data-hero-float]'), { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.1 }, phone ? 0.2 : 0.8);
+      intro.call(() => { settle.play(); }, [], (seen ? 0.1 : 1.75) + 1.9);
+      const early = () => { if (!settle.isActive() && settle.progress() === 0) settle.timeScale(1.4).play(); };
+      window.addEventListener('scroll', early, { once: true, passive: true });
+      if (phone) {
+        // The film strips part as the page starts to move (decoration only).
+        gsap.to(q('[data-film="top"]'), { yPercent: -60, autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: '+=40%', scrub: 0.6 } });
+        gsap.to(q('[data-film="bottom"]'), { yPercent: 60, autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: '+=40%', scrub: 0.6 } });
       }
       // Every starting state is set: now the hero may be seen (it was hidden so the finished layout never flashes first).
       root.current?.classList.add('ready');
@@ -186,32 +187,26 @@ export default function Site() {
       if (!phone) gsap.to(q('[data-hero-bg]'), { yPercent: 12, ease: 'none', scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
       gsap.to(q('[data-cal-wrap]'), { y: phone ? -8 : -14, rotateX: phone ? 0 : 3, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 2.4 });
 
-      const scene = (name: string) => {
-        const el = q(`[data-scene="${name}"]`)[0];
-        // Phones: no pinned scrubbing; the scene plays once, on its own clock, as it scrolls into view.
-        if (phone) return gsap.timeline({ defaults: { ease: 'power2.out' }, scrollTrigger: { trigger: el, start: 'top 72%', once: true } }).timeScale(2.2);
-        return gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: el, start: 'top top', end: 'bottom bottom', scrub: 1 } })
-          .to(el.querySelector('.s-progress i'), { scaleX: 1, duration: 10 }, 0);
-      };
+      // Every other section: one scroll brings it into view and all of it arrives together, once.
+      const arrive = (el: Element) => gsap.timeline({ defaults: { ease: 'power3.out' }, scrollTrigger: { trigger: el, start: 'top 70%', once: true } });
 
-      // --- 1. the problem: changes travel by hand, in pieces, late
-      const p = scene('problem');
-      const tools = phone ? [] : q('[data-tool]');
-      if (tools.length) p.fromTo(tools, { y: 60, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.2, stagger: 0.7, ease: 'power3.out' }, 0.3)
-        .fromTo(q('[data-tool] .edit, [data-tool] .clash, [data-tool] .row.u'), { backgroundColor: 'rgba(232, 104, 75, 0)' }, { backgroundColor: 'rgba(232, 104, 75, .18)', duration: 0.6, stagger: 0.15 }, 3.8)
-        .to(tools, { y: -30, autoAlpha: 0, duration: 1.4, stagger: 0.08, ease: 'power2.in' }, 7.6)
-        .to(q('.s-problem-copy'), { autoAlpha: 0, y: -40, duration: 1.2 }, 8.6);
+      // the two problems
+      q('.s-prob').forEach(sec => {
+        const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, scrollTrigger: { trigger: sec, start: 'top 85%', once: true } }).fromTo(sec.querySelectorAll('.s-prob-copy > *'), { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.06 }, 0);
+        if (!phone) tl.fromTo(sec.querySelectorAll('.s-prob-item'), { autoAlpha: 0, y: 36 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.06 }, 0.12);
+        const marks = sec.querySelectorAll('[data-tool] .edit, [data-tool] .clash, [data-tool] .row.u');
+        if (marks.length) tl.fromTo(marks, { backgroundColor: 'rgba(232, 104, 75, 0)' }, { backgroundColor: 'rgba(232, 104, 75, .18)', duration: 0.5, stagger: 0.08 }, 0.9);
+      });
 
-      // --- 2. the forecast changes: feeds converge on the agent, the agent finds who is affected
-      const t = scene('trigger');
+      // the watch: feeds go into Usher, what it found comes out, all in one short play
       q('[data-feed]').forEach(pth => { const len = (pth as unknown as SVGPathElement).getTotalLength(); gsap.set(pth, { strokeDasharray: len, strokeDashoffset: len }); });
-      t.fromTo(q('[data-trigger-copy] > *'), { autoAlpha: 0, y: 30, filter: 'blur(8px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 1, stagger: 0.3 }, 0.2)
-        .fromTo(q('[data-feed-in]'), { autoAlpha: 0, x: -30 }, { autoAlpha: 1, x: 0, duration: 0.8, stagger: 0.25 }, 1.4)
-        .to(q('[data-feed="in"]'), { strokeDashoffset: 0, duration: 2, stagger: 0.25 }, 1.8)
-        .fromTo(q('[data-node]'), { scale: 0.4, autoAlpha: 0, transformOrigin: '50% 50%' }, { scale: 1, autoAlpha: 1, duration: 1, ease: 'back.out(1.6)' }, 3.6)
-        .to(q('[data-feed="out"]'), { strokeDashoffset: 0, duration: 2, stagger: 0.2 }, 4.6)
-        .fromTo(q('[data-feed-out]'), { autoAlpha: 0, x: 30 }, { autoAlpha: 1, x: 0, duration: 0.8, stagger: 0.25 }, 5.2)
-      if (!phone) t.to(q('[data-trigger-copy], [data-feeds]'), { autoAlpha: 0, scale: 0.94, duration: 0.8 }, 9.2);
+      arrive(q('[data-scene="trigger"]')[0])
+        .fromTo(q('[data-trigger-copy] > *'), { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.06 }, 0)
+        .fromTo(q('[data-feed-in]'), { autoAlpha: 0, x: -24 }, { autoAlpha: 1, x: 0, duration: 0.6, stagger: 0.06 }, 0.15)
+        .to(q('[data-feed="in"]'), { strokeDashoffset: 0, duration: 0.7, ease: 'power2.inOut' }, 0.3)
+        .fromTo(q('[data-node]'), { scale: 0.6, autoAlpha: 0, transformOrigin: '50% 50%' }, { scale: 1, autoAlpha: 1, duration: 0.6 }, 0.6)
+        .to(q('[data-feed="out"]'), { strokeDashoffset: 0, duration: 0.7, ease: 'power2.inOut' }, 0.8)
+        .fromTo(q('[data-feed-out]'), { autoAlpha: 0, x: 24 }, { autoAlpha: 1, x: 0, duration: 0.6, stagger: 0.06 }, 0.95);
 
       // --- 3. the recommendation: the calendar turns to face you and redraws itself
       q('[data-reveal]').forEach(el => gsap.fromTo(el, { y: 40, autoAlpha: 0, filter: 'blur(8px)' }, { y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1, ease: 'power4.out', scrollTrigger: { trigger: el, start: 'top 85%', once: true } }));
@@ -295,39 +290,44 @@ export default function Site() {
         <div className="s-scrollcue" aria-hidden="true">Scroll<i /></div>
       </header>
 
-      {/* 1. the first problem: anything can go wrong */}
-      <section id="story" className="s-risk">
-        <div className="s-risk-copy" data-reveal>
-          <p className="s-mono">The problem</p>
+      {/* The two problems on one page, laid out the same way: label, headline, one line, then the facts. */}
+      <section id="story" className="s-probs">
+      <div className="s-prob s-risk">
+        <div className="s-prob-copy">
+          <p className="s-mono">Problem 1</p>
           <h2 className="s-h2">Anything can go wrong at a film festival.</h2>
+          <p className="s-lead">One change moves screenings, people and volunteer shifts within minutes.</p>
         </div>
-        <div className="s-risk-cards">
-          <article className="s-risk-card" data-reveal>
-            <div className="s-risk-img" style={{ backgroundImage: 'url(/hl/snow.jpg)' }}><span>Weather</span></div>
-            <div className="s-risk-txt">
-            <h3>Snow from 2:00 pm</h3>
-            <p>The shuttle runs late, screenings start with people still outside, and volunteers need new instructions.</p>
-            </div>
+        <div className="s-prob-row s-risk-cards">
+          <article className="s-prob-item s-risk-card">
+            <p className="s-risk-k"><i className="ap wx">❄</i>Weather · Thursday</p>
+            <h3>Snow from 2:00 to 7:00 pm</h3>
+            <ul>
+              <li><b>Harbor Loop shuttle</b> runs 12 min late</li>
+              <li><b>3 screenings</b> start with people still outside</li>
+              <li><b>3 door teams</b> need new instructions</li>
+            </ul>
           </article>
-          <article className="s-risk-card" data-reveal>
-            <div className="s-risk-img" style={{ backgroundImage: 'url(/hl/hall.jpg)' }}><span>Late guest</span></div>
-            <div className="s-risk-txt">
-            <h3>A guest is stuck on the bridge</h3>
-            <p>His 4:00 panel has no speaker, his 6:30 talk is at risk, and the other panelists don&apos;t know yet.</p>
-            </div>
+          <article className="s-prob-item s-risk-card">
+            <p className="s-risk-k"><i className="ap late">!</i>Late guest · 3:40 pm</p>
+            <h3>Pavel Kettering is stuck on the bridge</h3>
+            <ul>
+              <li><b>4:00 panel</b> has no speaker</li>
+              <li><b>6:30 talk</b> is at risk</li>
+              <li><b>2 other panelists</b> don&apos;t know yet</li>
+            </ul>
           </article>
         </div>
-      </section>
+      </div>
 
-      {/* 2. the second problem: every fix lives in a different place */}
-      <section className="s-pin s-problem" data-scene="problem">
-        <div className="s-sticky">
-          <div className="s-problem-copy">
+      <div className="s-prob s-problem">
+          <div className="s-prob-copy">
+            <p className="s-mono">Problem 2</p>
             <h2 className="s-h2">Decision-making tools and documents are scattered.</h2>
             <p className="s-lead">The schedule is in a spreadsheet, updates go out by email, volunteers read a Word brief and the team decides in a group chat. Each person ends up with a different version of the day.</p>
           </div>
-          <div className="s-tools" data-tools data-lve-skip aria-hidden="true">
-            <figure className="s-tool t-sheets" data-tool>
+          <div className="s-prob-row s-tools" data-tools data-lve-skip aria-hidden="true">
+            <figure className="s-prob-item s-tool t-sheets" data-tool>
               <figcaption><i className="ap sheets" />Google Sheets</figcaption>
               <div className="win">
                 <div className="win-bar"><b>Harbor Lights 2027 · Schedule</b></div>
@@ -342,7 +342,7 @@ export default function Site() {
               </div>
               <p className="s-pain">Guests get double-booked.</p>
             </figure>
-            <figure className="s-tool t-gmail" data-tool>
+            <figure className="s-prob-item s-tool t-gmail" data-tool>
               <figcaption><i className="ap gmail" />Gmail</figcaption>
               <div className="win">
                 <div className="row u"><b>Mara Quist</b><span>Pavel is running late, new ETA 4:20</span><em>2:58 pm</em></div>
@@ -352,7 +352,7 @@ export default function Site() {
               </div>
               <p className="s-pain">Updates arrive late, or reach the wrong people.</p>
             </figure>
-            <figure className="s-tool t-word" data-tool>
+            <figure className="s-prob-item s-tool t-word" data-tool>
               <figcaption><i className="ap word" />Word</figcaption>
               <div className="win">
                 <div className="page">
@@ -363,7 +363,7 @@ export default function Site() {
               </div>
               <p className="s-pain">Volunteers work from an outdated brief.</p>
             </figure>
-            <figure className="s-tool t-whatsapp" data-tool>
+            <figure className="s-prob-item s-tool t-whatsapp" data-tool>
               <figcaption><i className="ap whatsapp" />WhatsApp</figcaption>
               <div className="win">
                 <div className="wa-head"><b>Harbor Lights volunteers</b><span>83 members</span></div>
@@ -377,12 +377,11 @@ export default function Site() {
             </figure>
           </div>
           <div className="s-swipe" aria-hidden="true"><span data-dots>{[0, 1, 2, 3].map(i => <i key={i} className={i === 0 ? 'on' : ''} />)}</span>Swipe to see all four</div>
-          <div className="s-progress"><i /></div>
-        </div>
+      </div>
       </section>
 
       {/* 2. the trigger */}
-      <section className="s-pin s-trigger" data-scene="trigger">
+      <section className="s-trigger" data-section data-scene="trigger">
         <div className="s-sticky">
           <canvas className="s-snowfield" data-snowfield aria-hidden="true" />
           <div className="s-trigger-copy" data-trigger-copy>
@@ -409,13 +408,12 @@ export default function Site() {
               ))}
             </div>
           </div>
-          <div className="s-progress"><i /></div>
         </div>
       </section>
 
 
       {/* 3. the new plan, shown as the product itself */}
-      <section className="s-plan" id="plan">
+      <section className="s-plan" id="plan" data-section>
         <div className="s-plan-copy" data-reveal>
           <p className="s-mono">The new plan</p>
           <h2 className="s-h2">It suggests a new plan, and you decide.</h2>

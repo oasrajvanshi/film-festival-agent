@@ -1098,3 +1098,76 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
 }
 @media (max-width: 760px) { .dcal .ampm { display: none; } }
 @media (max-width: 760px) { .dcal.focus .dcal-body { overflow: hidden; } }
+
+/* ---------------------------------------------------------------- problems: separate cards, "Fix them all" under them on the right */
+.wx-alerts.all-open { box-shadow: none; border: 0; }
+.wx-all-foot { display: flex; justify-content: flex-end; padding-top: 2px; }
+.wx-all-foot .wx-all-btn { width: auto; }
+.today > .wx-alerts { margin-bottom: 14px; }
+@media (max-width: 760px) {
+  .wx-alerts { gap: 10px; }
+  .wx-alert { border-radius: 12px; }
+  .wx-alert-row { padding: 10px 10px 10px 12px; }
+  .wx-all-foot .wx-all-btn { width: auto; min-height: 32px; }
+  .today > .wx-alerts { margin-bottom: 10px; }
+}
+
+/* ---------------------------------------------------------------- attendee Plan: the phone schedule list (same rows the organizer's phone used) */
+.msch { display: grid; gap: 6px; }
+.msch-h { margin: 8px 0 0; font-family: var(--mono); font-size: 11.5px; font-weight: 400; color: var(--muted); }
+.msch-h:first-child { margin-top: 0; }
+.msch-ev { position: relative; width: 100%; min-height: 0; display: flex; gap: 10px; align-items: center; padding: 8px 10px 8px 14px; border-radius: 12px; text-align: left; color: var(--ink);
+  background: rgba(28, 19, 15, .62); border: 1px solid var(--line); overflow: hidden; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.msch-ev::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--vc); }
+.msch-ev:hover { background: rgba(40, 27, 21, .75); }
+.msch-ev .ev-thumb { border-radius: 8px; }
+.msch-time { display: grid; width: 62px; flex: none; font-family: var(--mono); }
+.msch-time b { font-size: 12px; font-weight: 500; color: var(--ink); white-space: nowrap; }
+.msch-time small, .msch-time s { font-size: 10.5px; color: var(--muted); white-space: nowrap; }
+.msch-txt { min-width: 0; flex: 1; display: grid; }
+.msch-txt b { font-size: 14px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.msch-txt > span { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.msch-txt em { font-style: normal; font-size: 12px; color: var(--accent); }
+.msch-ev .faces { flex: none; }
+.msch-ev.moved { border-color: var(--accent); background: rgba(212, 154, 92, .14); }
+.msch-ev.moved .msch-time b { color: var(--accent); }
+.msch-ev.risk { border-color: rgba(232, 104, 75, .6); }
+.msch-ev.risk::before { background: #E8684B; }
+.msch-ev.clash .msch-txt em { color: #e3b784; }
+.msch-ev.off { opacity: .6; } .msch-ev.off .msch-txt b { text-decoration: line-through; } .msch-ev.off .msch-txt em { color: #ef8a6f; }
+/* between rows: the walk, a pick for free time, and the one choice a row needs */
+.apl-trip { padding: 0 0 0 76px; font-size: 12px; line-height: 1.4; color: var(--muted); }
+.apl-trip em { font-style: normal; color: #e3b784; }
+.apl-act { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 0 0 2px 76px; font-size: 12px; color: var(--muted); }
+.apl-act button { min-height: 28px; padding: 3px 10px; font-size: 12px; }
+.apl-pick { border: 1px dashed var(--line-2); border-radius: 12px; padding: 8px 10px 8px 14px; display: grid; gap: 6px; background: rgba(28, 19, 15, .4); }
+.apl-pick small { font-size: 11.5px; color: var(--muted); }
+.apl-pick-row { display: flex; gap: 10px; align-items: center; }
+.apl-pick-row span { flex: 1; min-width: 0; display: grid; }
+.apl-pick-row b { font-size: 13px; } .apl-pick-row em { font-style: normal; font-size: 11.5px; color: var(--muted); }
+.apl-pick-row .ev-thumb { border-radius: 8px; }
+.apl-pick-row button { min-height: 28px; padding: 3px 12px; font-size: 12px; }
+
+/* attendee: a compact top, so the plan itself starts high on the screen */
+.at-days { gap: 6px; }
+.at-days button { grid-auto-flow: column; justify-content: center; align-items: baseline; gap: 6px; padding: 7px 4px; border-radius: 12px; }
+.at-days button b { font-size: 16px; }
+.at-days button span { font-size: 12px; }
+.at-days button i { top: 6px; right: 8px; width: 6px; height: 6px; }
+.at-decide { gap: 10px; padding: 9px 10px 9px 12px; border-radius: 12px; }
+.at-decide-ic { width: 26px; height: 26px; border-radius: 8px; }
+.at-decide b { font-size: 13.5px; line-height: 1.25; }
+.at-decide em { font-size: 11.5px; }
+.at-decide i { font-size: 12px; padding: 5px 11px; }
+.at-dayhead b { font-size: 15px; }
+.at-dayhead span { font-size: 12px; }
+
+/* ---------------------------------------------------------------- buttons on phones: smaller than on a computer */
+@media (max-width: 760px) {
+  body button { min-height: 36px; padding: 6px 13px; font-size: 13.5px; }
+  body button.small { min-height: 30px; padding: 4px 10px; font-size: 12.5px; }
+  body button.big, body button.big-btn { min-height: 42px; padding: 8px 18px; font-size: 14.5px; }
+  body .card button.primary:not(.small), body .approve-row button, body .ask-row button { min-height: 40px; }
+  body .wh-top button.primary { min-height: 40px; font-size: 14px; }
+  body .at-signout { min-height: 40px; }
+}

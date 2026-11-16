@@ -3,7 +3,7 @@
 // app shows in a phone frame: the same page loaded at phone width inside an
 // iframe, so the real mobile layout applies. The organizer can choose.
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Icon } from './icons';
 import '../demo.css';
 
@@ -20,6 +20,30 @@ export const isWide = () => typeof window !== 'undefined' && window.innerWidth >
 /** Tell the page around the frame something (sign-out, back to organizer, device change). */
 export function toParent(msg: Record<string, unknown>) {
   if (typeof window !== 'undefined' && window.parent !== window) window.parent.postMessage({ usher: msg }, location.origin);
+}
+
+/** Every phone view is an iPhone 16 Pro: a 402 x 874 point screen. */
+export const PHONE_W = 402, PHONE_H = 874;
+const BEZEL = 11;
+
+/** The phone itself: the page at exactly iPhone 16 Pro size, scaled down only to fit a short window. */
+export function IPhone({ src, title }: { src: string; title: string }) {
+  const [scale, setScale] = useState(1);
+  useEffect(() => {
+    const fit = () => setScale(Math.min(1, (window.innerHeight - 96) / (PHONE_H + BEZEL * 2), (window.innerWidth - 24) / (PHONE_W + BEZEL * 2)));
+    fit(); window.addEventListener('resize', fit);
+    return () => window.removeEventListener('resize', fit);
+  }, []);
+  const w = PHONE_W + BEZEL * 2, h = PHONE_H + BEZEL * 2;
+  return (
+    <div className="demo-stage">
+      <div style={{ width: w * scale, height: h * scale }}>
+        <div className="demo-device" style={{ width: w, height: h, padding: BEZEL, transform: `scale(${scale})`, transformOrigin: '0 0' }}>
+          <iframe src={src} title={title} width={PHONE_W} height={PHONE_H} />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function PhoneFrame({ src, title, onMessage, organizer, onDevice }: {
@@ -45,7 +69,7 @@ export function PhoneFrame({ src, title, onMessage, organizer, onDevice }: {
           </div>
         </div>
       )}
-      <div className="demo-stage"><div className="demo-device"><iframe src={src} title={title} /></div></div>
+      <IPhone src={src} title={title} />
     </div>
   );
 }
