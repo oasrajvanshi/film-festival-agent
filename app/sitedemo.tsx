@@ -79,8 +79,7 @@ export function PlanDemo() {
         {/* the recommendation: one sentence, then a checklist */}
         <aside className={`pd-rec${step >= 2 ? ' in' : ''}`}>
           <small className="pd-rec-k">Agent’s recommendation</small>
-          <b>Two problems, one plan</b>
-          <p>Start the storm screenings later and open Pavel’s panel with Yara Hollis.</p>
+          <p className="pd-what">Thunderstorms from 3:00 pm, and Pavel Kettering is stuck on the bridge.</p>
           <ul>
             {items.map((t, i) => <li key={t} className={step >= 3 + i ? 'on' : ''}><i>✓</i>{t}</li>)}
           </ul>

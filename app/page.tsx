@@ -135,21 +135,30 @@ export default function Site() {
       // scrolling brings it into place and lets the rest arrive.
       const hero = q('.s-hero')[0] as HTMLElement;
       const h1 = q('.s-hero .s-h1')[0] as HTMLElement;
-      const r0 = h1.getBoundingClientRect();
-      const toCentre = { x: innerWidth / 2 - (r0.left + r0.width / 2), y: innerHeight / 2 - (r0.top + r0.height / 2) - (phone ? 20 : 0) };
-      const big = phone ? 1.08 : 1.45;
-      gsap.set(h1, { x: toCentre.x, y: toCentre.y, scale: big, transformOrigin: '50% 50%' });
-      gsap.set(q('[data-hero-fade]'), { autoAlpha: 0, y: 28 });
-      gsap.set(q('.s-hero-stage'), { autoAlpha: 0, y: 90 });
+      // Phones: native scrolling only. The address bar resizing the page must not re-lay out scenes,
+      // and nothing is pinned or scrubbed; each part fades up once as it comes into view.
+      if (phone) ScrollTrigger.config({ ignoreMobileResize: true });
       gsap.set(q('[data-cal="hero"]'), { rotateX: phone ? 0 : 24, rotateZ: phone ? 0 : -6 });
       intro.fromTo(q('.s-hero .split-word'), { yPercent: 110 }, { yPercent: 0, duration: 1.05, stagger: 0.05, ease: 'power4.out' }, seen ? 0.1 : 1.75);
-      gsap.timeline({ scrollTrigger: { trigger: hero, start: 'top top', end: phone ? '+=65%' : '+=110%', scrub: 0.8, pin: true, anticipatePin: 1 } })
-        .to(h1, { x: 0, y: 0, scale: 1, duration: 1, ease: 'power2.inOut' }, 0)
-        .to(q('.s-scrollcue'), { autoAlpha: 0, duration: 0.3 }, 0)
-        .to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.12, ease: 'power2.out' }, 0.5)
-        // the calendar after the words have settled, then the problems it is about
-        .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out' }, 0.95)
-        .fromTo(q('[data-hero-float]'), { y: 24, autoAlpha: 0, scale: 0.96 }, { y: 0, autoAlpha: 1, scale: 1, duration: 0.5, stagger: 0.25, ease: 'back.out(1.4)' }, 1.45);
+      if (phone) {
+        const once = (els: Element[], delay = 0) => els.forEach((el, i) => gsap.fromTo(el, { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.7, delay: delay + i * 0.08, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 90%', once: true } }));
+        once(q('[data-hero-fade]'));
+        once(q('.s-hero-stage'));
+        once(q('[data-hero-float]'), 0.25);
+      } else {
+        const r0 = h1.getBoundingClientRect();
+        const toCentre = { x: innerWidth / 2 - (r0.left + r0.width / 2), y: innerHeight / 2 - (r0.top + r0.height / 2) };
+        gsap.set(h1, { x: toCentre.x, y: toCentre.y, scale: 1.45, transformOrigin: '50% 50%' });
+        gsap.set(q('[data-hero-fade]'), { autoAlpha: 0, y: 28 });
+        gsap.set(q('.s-hero-stage'), { autoAlpha: 0, y: 90 });
+        gsap.timeline({ scrollTrigger: { trigger: hero, start: 'top top', end: '+=110%', scrub: 0.8, pin: true, anticipatePin: 1 } })
+          .to(h1, { x: 0, y: 0, scale: 1, duration: 1, ease: 'power2.inOut' }, 0)
+          .to(q('.s-scrollcue'), { autoAlpha: 0, duration: 0.3 }, 0)
+          .to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.12, ease: 'power2.out' }, 0.5)
+          // the calendar after the words have settled, then the problems it is about
+          .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out' }, 0.95)
+          .fromTo(q('[data-hero-float]'), { y: 24, autoAlpha: 0, scale: 0.96 }, { y: 0, autoAlpha: 1, scale: 1, duration: 0.5, stagger: 0.25, ease: 'back.out(1.4)' }, 1.45);
+      }
 
       // hero: the calendar keeps showing what the product does, on a loop
       const heroCal = q('[data-cal="hero"]')[0];
@@ -162,7 +171,7 @@ export default function Site() {
         .to({}, { duration: 1.5 })
         // back to the original plan in one frame, so only the change forward is ever shown
         .call(() => resetHero(heroCal));
-      gsap.to(q('[data-hero-bg]'), { yPercent: 12, ease: 'none', scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
+      if (!phone) gsap.to(q('[data-hero-bg]'), { yPercent: 12, ease: 'none', scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
       gsap.to(q('[data-cal-wrap]'), { y: phone ? -8 : -14, rotateX: phone ? 0 : 3, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 2.4 });
 
       const scene = (name: string) => {
@@ -268,7 +277,6 @@ export default function Site() {
         <div className="s-risk-copy" data-reveal>
           <p className="s-mono">The problem</p>
           <h2 className="s-h2">Anything can go wrong at a film festival.</h2>
-          <p className="s-lead">And one thing going wrong moves everything around it.</p>
         </div>
         <div className="s-risk-cards">
           <article className="s-risk-card" data-reveal>

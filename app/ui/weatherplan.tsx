@@ -299,9 +299,9 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
   const SHORT: Record<AlertKind, string> = { guest: 'Late guest', storm: 'Storm', snow: 'Snow', heat: 'Heat' };
   const subOff = (off: Set<string>, id: string) => new Set([...off].filter(k => k.startsWith(`${id}:`)).map(k => k.slice(id.length + 1)));
   const allRec: Rec | null = shown.length >= 2 ? {
-    title: `${shown.length} problems, one plan`,
+    title: shown.map(x => x.rec.title).join(' · '),
     sub: `Day ${[...new Set(shown.map(x => x.al.day))].join(' and Day ')}`,
-    what: 'Usher fits its plans together, so the changes don’t clash with each other.',
+    what: '',
     items: shown.flatMap(({ al, rec }) => rec.items.map(i => ({ key: `${al.id}:${i.key}`, text: `${SHORT[al.kind]}: ${i.text}` }))),
     preview: off => {
       const cur = s.agent.f.events;
@@ -374,7 +374,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
           <div className={`wx-alert wx-all${openId === 'all' ? ' open' : ''}`}>
             <div className="wx-alert-row">
               <span className="wx-alert-ic"><Icon name="sparkle" size={18} /></span>
-              <div className="wx-alert-text"><b>Handle all {shown.length} at once</b><span>One plan for every problem below</span></div>
+              <div className="wx-alert-text"><b>Handle all {shown.length} at once</b><span>{shown.map(x => SHORT[x.al.kind]).join(', ')}</span></div>
               <button className={openId === 'all' ? '' : 'primary'} onClick={() => show(openId === 'all' ? null : 'all')}>
                 {openId === 'all' ? 'Close preview' : <><Icon name="sparkle" size={15} /> Overall recommendation</>}
               </button>
@@ -406,7 +406,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
               <button className="ghost small" aria-label="Close" onClick={() => show(null)}><Icon name="x" size={16} /></button>
             </div>
             <b className="rec-float-title">{open.rec.title}</b>
-            <p className="wx-what">{open.rec.what}</p>
+            {open.rec.what && <p className="wx-what">{open.rec.what}</p>}
             <ul className="wx-list">
               {open.rec.items.map(i => (
                 <li key={i.key}><label>
