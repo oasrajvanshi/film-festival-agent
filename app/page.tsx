@@ -147,12 +147,13 @@ export default function Site() {
         .fromTo(q('[data-node]'), { scale: 0.4, autoAlpha: 0, transformOrigin: '50% 50%' }, { scale: 1, autoAlpha: 1, duration: 1, ease: 'back.out(1.6)' }, 3.6)
         .to(q('[data-feed="out"]'), { strokeDashoffset: 0, duration: 2, stagger: 0.2 }, 4.6)
         .fromTo(q('[data-feed-out]'), { autoAlpha: 0, x: 30 }, { autoAlpha: 1, x: 0, duration: 0.8, stagger: 0.25 }, 5.2)
-        .to(q('[data-trigger-copy], [data-feeds]'), { autoAlpha: 0, scale: 0.94, duration: 1.4 }, 8.6);
+        .to(q('[data-trigger-copy], [data-feeds]'), { autoAlpha: matchMedia('(max-width: 760px)').matches ? 1 : 0, scale: 0.94, duration: 0.8 }, 9.2);
 
       // --- 3. the recommendation: the calendar turns to face you and redraws itself
+      const phone = matchMedia('(max-width: 760px)').matches;
       const r = scene('rec');
       const big = q('[data-cal="rec"]')[0];
-      r.fromTo(big, { rotateX: 62, rotateZ: -14, rotateY: 8, scale: 0.78, y: 120, autoAlpha: 0.3 }, { rotateX: 0, rotateZ: 0, rotateY: 0, scale: 1, y: 0, autoAlpha: 1, duration: 2.6, ease: 'power2.inOut' }, 0)
+      r.fromTo(big, phone ? { rotateX: 24, rotateZ: -4, scale: 0.92, y: 40, autoAlpha: 0.6 } : { rotateX: 62, rotateZ: -14, rotateY: 8, scale: 0.78, y: 120, autoAlpha: 0.3 }, { rotateX: 0, rotateZ: 0, rotateY: 0, scale: 1, y: 0, autoAlpha: 1, duration: phone ? 1.6 : 2.6, ease: 'power2.inOut' }, 0)
         .fromTo(q('[data-rec-alert]'), { y: -80, z: 200, autoAlpha: 0 }, { y: 0, z: 60, autoAlpha: 1, duration: 1, ease: 'power3.out' }, 2.4)
         .to(big.querySelectorAll('[data-snowband]'), { opacity: 1, duration: 0.8 }, 2.6)
         .to(big.querySelectorAll('[data-ghost]'), { opacity: 1, duration: 0.6 }, 3.6)
@@ -160,8 +161,8 @@ export default function Site() {
         .call(() => big.querySelectorAll('[data-move]').forEach(e => e.classList.add('hot')), [], 3.7)
         .fromTo(q('[data-chg]'), { autoAlpha: 0, x: 30 }, { autoAlpha: 1, x: 0, duration: 0.7, stagger: 0.5, ease: 'power3.out' }, 3.9)
         .add(swapGuest(big, true), 6.6)
-        .fromTo(q('[data-rec-step="2"]'), { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.8 }, 6.4)
-        .to(q('[data-rec-step="1"]'), { autoAlpha: 0, y: -20, duration: 0.6 }, 6.2);
+        .to(q('[data-rec-step="1"]'), { autoAlpha: 0, y: -20, duration: 0.5 }, 5.8)
+        .fromTo(q('[data-rec-step="2"]'), { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.7 }, 6.4);
 
       q('[data-reveal]').forEach(el => gsap.fromTo(el, { y: 40, autoAlpha: 0, filter: 'blur(8px)' }, { y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1, ease: 'power4.out', scrollTrigger: { trigger: el, start: 'top 85%', once: true } }));
       q('[data-split-scroll]').forEach(el => {

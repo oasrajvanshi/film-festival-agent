@@ -358,3 +358,13 @@
 .s-doc.d-sheet table { border-radius: 0 0 10px 10px; overflow: hidden; }
 .s-doc.d-phone b { color: #fff8ee; }
 .s-card.note { z-index: 2; }
+
+/* Phone: keep the whole plan scene on one screen, and keep the next section close */
+@media (max-width: 760px) {
+  .s-rec .s-sticky { padding-top: 64px; }
+  .s-rec-copy .s-lead { font-size: 15px; }
+  .s-rec-stage { height: 38svh; margin-top: 12px; }
+  .s-rec-list { gap: 6px; }
+  .s-pin { height: 180vh; }
+  .s-footer { min-height: 0; align-content: start; padding-top: 72px; gap: 24px; }
+}
