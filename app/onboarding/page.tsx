@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { readSetup, useAgent, writeSetup } from '../ui/useAgent';
 import { writeWho } from '../ui/profiles';
 import { Icon } from '../ui/icons';
+import '../mobile.css';
 import { FestivalAgent } from '../../src/agent/agent';
 import { GATE_POLICY, type ActionKind } from '../../src/agent/approvals';
 import type { Festival } from '../../src/core/types';

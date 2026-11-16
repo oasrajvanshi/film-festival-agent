@@ -1,0 +1,56 @@
+/* Usher on a phone. Every stakeholder runs Usher on their phone during the festival, so this file
+   tightens the app (all five profiles), onboarding and sign-in for one-handed use. It only uses the
+   theme tokens from globals.css, so it follows whatever look globals.css sets. */
+
+/* Form fields inside cards stack label over control, full width, everywhere. */
+.card .field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: var(--muted); }
+.card .field > input, .card .field > select, .card .field > textarea { width: 100%; color: var(--ink); }
+.card .row > .field { flex: 1 1 140px; min-width: 0; }
+
+/* Plan tags (Ticket, Saved, On stage) keep their pill shape on two-line rows. */
+.item .chip { align-self: center; flex: none; }
+
+/* The live volunteer brief, as a list instead of a block of text. */
+.brief-view { display: grid; gap: 2px; }
+.brief-head { font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+.brief-ev { display: grid; grid-template-columns: 72px 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+.brief-ev:first-of-type { border-top: none; }
+.brief-time { font-family: var(--mono, inherit); font-weight: 600; color: var(--accent); font-size: 14px; padding-top: 1px; }
+.brief-ev .t { font-weight: 600; }
+.brief-ev .d { color: var(--ink-2); font-size: 13px; }
+.brief-changes { margin-top: 8px; padding: 10px 12px; border-radius: 10px; background: var(--warn-bg); color: var(--warn); }
+.brief-changes h3 { margin: 0 0 4px; font-size: 13px; }
+.brief-changes ul, .brief-hand ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; }
+.brief-hand { margin-top: 10px; border-top: 1px solid var(--line); padding-top: 10px; }
+.brief-hand summary { cursor: pointer; font-weight: 600; min-height: 36px; display: flex; align-items: center; }
+.brief-hand ul { margin-top: 6px; color: var(--ink-2); }
+
+button.big-btn { min-height: 48px; justify-content: center; width: 100%; font-size: 15px; }
+
+@media (max-width: 860px) {
+  /* iPhone zooms the page into any field with text under 16px. Stop that. */
+  input, select, textarea { font-size: 16px !important; }
+  input, select { min-height: 44px; }
+
+  /* Headers: one line, never wrapping. */
+  .mobile-head h1 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .me-head { gap: 10px; }
+  .me-sub { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .me-head .chip { font-size: 11px; padding: 2px 8px; }
+
+  /* Main actions are thumb-sized and full width. */
+  .card button.primary:not(.small), .approve-row button { min-height: 46px; }
+  .approve-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+  .ask-row { flex-wrap: wrap; }
+  .ask-row input { flex: 1 1 100% !important; min-width: 0 !important; }
+  .ask-row button { width: 100%; min-height: 46px; justify-content: center; }
+
+  /* Small text links get a proper tap area. */
+  .ob-link { display: inline-flex; align-items: center; min-height: 44px; padding: 0 4px; }
+
+  /* Sign-in code field fills the width. */
+  .code-input { width: 100%; }
+
+  /* Hero blocks breathe a little less on a small screen. */
+  .hero h2 { overflow-wrap: anywhere; }
+}

@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import qrcode from 'qrcode-generator';
 import { readWho, writeWho, type AgentStore } from './useAgent';
 import { Icon } from './icons';
-import { Ask } from './panels';
+import { Ask, BriefView } from './panels';
 import { PROFILES, deriveVendors, directory, lookupForCode, signIn, type ProfileKind, type Who } from '../../src/access/profiles';
 import { clock as fmt } from '../../src/core/time';
 import { PASS_LABELS, qrFor, type ScanResult } from '../../src/rules/access';
@@ -279,7 +279,7 @@ function StaffHome({ s, who }: { s: AgentStore; who: Who }) {
       <div className="grid2">
         <div className="card">
           <h2>Live brief</h2>
-          <pre className="brief msg">{a.brief(who.id, s.clock)}</pre>
+          <BriefView s={s} personId={who.id} />
         </div>
         <div className="card">
           <h2>All your shifts</h2>
@@ -348,7 +348,7 @@ function PersonHome({ s, who, go }: { s: AgentStore; who: Who; go: (t: string) =
                   <div className="t">{p.e.title}</div>
                   <div className="d">{fmt(p.e.start)}–{fmt(p.e.end)} · {where(p.e)}</div>
                 </div>
-                <span className={`chip ${p.e.status === 'cancelled' ? 'bad' : p.why === 'You’re appearing' ? 'warn' : ''}`}>{p.e.status === 'cancelled' ? 'Cancelled' : p.why}</span>
+                <span className={`chip plan-chip ${p.e.status === 'cancelled' ? 'bad' : p.why === 'You’re appearing' ? 'warn' : ''}`}>{p.e.status === 'cancelled' ? 'Cancelled' : p.why === 'You’re appearing' ? 'On stage' : p.why}</span>
               </div>
             ))}
           </div>
@@ -477,12 +477,12 @@ function StaffScan({ s }: { s: AgentStore }) {
           </select>
         </label>
         {cam === 'on' ? <video ref={video} muted playsInline style={{ width: '100%', borderRadius: 10, background: '#000' }} />
-          : <button onClick={() => setCam('on')}><Icon name="scan" size={16} /> Scan with camera</button>}
+          : <button className="big-btn" onClick={() => setCam('on')}><Icon name="scan" size={18} /> Scan with camera</button>}
         {cam === 'none' && <div className="muted">This browser can’t read QR codes with the camera. Type the code under the QR instead.</div>}
         <label className="field">Or type the code under the QR
-          <input value={qr} placeholder="e.g. HLFF1.p-012.ABC" onChange={e => setQr(e.target.value)} onKeyDown={e => e.key === 'Enter' && check(qr)} />
+          <input value={qr} autoCapitalize="characters" autoCorrect="off" spellCheck={false} placeholder="e.g. USH1.p-012.ABC" onChange={e => setQr(e.target.value)} onKeyDown={e => e.key === 'Enter' && check(qr)} />
         </label>
-        <button className="primary" disabled={!qr.trim() || busy} onClick={() => check(qr)}>{busy ? 'Checking…' : 'Check'}</button>
+        <button className="primary big-btn" disabled={!qr.trim() || busy} onClick={() => check(qr)}>{busy ? 'Checking…' : 'Check'}</button>
       </div>
       <div className="card">
         {res ? <div className={`scan ${res.allowed ? 'ok' : 'bad'}`}>{res.allowed ? 'ALLOW' : 'DENY'}<div style={{ fontSize: 14, fontWeight: 400, marginTop: 8 }}>{res.personName && <>{res.personName} · </>}{res.reason}</div></div>

@@ -12,6 +12,7 @@ import { runAll, type SuiteResult } from '../../src/eval/scenarios';
 import { evalRandomFestivals } from '../../src/eval/fuzz';
 import type { Recommendation } from '../../src/agent/recommend';
 import { Icon } from './icons';
+import { buildBrief } from '../../src/agent/briefs';
 
 type P = { s: AgentStore; user: string; go: (page: 'today' | 'approvals' | 'scan' | 'schedule' | 'ask' | 'briefs' | 'feeds' | 'log' | 'eval' | 'data') => void };
 
@@ -334,7 +335,7 @@ export function Approvals({ s, user }: P) {
         {pending.length === 0 && <p className="muted">Nothing waiting.</p>}
         {pending.map(q => {
           const msgs = q.action.messages ?? [];
-          const shown = open[q.action.id] ? msgs : msgs.slice(0, 4);
+          const shown = open[q.action.id] ? msgs : msgs.slice(0, 2);
           return (
             <div key={q.action.id} className="card" style={{ marginBottom: 10 }}>
               <div className="row" style={{ justifyContent: 'space-between' }}>
@@ -353,10 +354,10 @@ export function Approvals({ s, user }: P) {
                   </div>
                 );
               })}
-              {msgs.length > 4 && <button className="small" onClick={() => setOpen({ ...open, [q.action.id]: !open[q.action.id] })}>{open[q.action.id] ? 'Show fewer' : `Show all ${msgs.length}`}</button>}
+              {msgs.length > 2 && <button className="small" onClick={() => setOpen({ ...open, [q.action.id]: !open[q.action.id] })}>{open[q.action.id] ? 'Show fewer' : `Show all ${msgs.length}`}</button>}
               <input placeholder="Note for next time (optional)" value={notes[q.action.id] ?? ''} onChange={e => setNotes({ ...notes, [q.action.id]: e.target.value })} style={{ marginTop: 8, width: '100%' }} />
-              <div className="row" style={{ marginTop: 8 }}>
-                <button className="primary" onClick={() => act(q.action.id, true)}>Approve and send</button>
+              <div className="row approve-row" style={{ marginTop: 8 }}>
+                <button className="primary" onClick={() => act(q.action.id, true)}>Approve and send{msgs.length > 1 ? ` (${msgs.length})` : ''}</button>
                 <button onClick={() => act(q.action.id, false)}>Reject</button>
               </div>
             </div>
@@ -432,6 +433,35 @@ export function Scan({ s }: P) {
 }
 
 // ------------------------------------------------------------------ Briefs
+/** A volunteer's live brief, laid out for a phone: the events at their door, any changes, then the handbook. */
+export function BriefView({ s, personId }: { s: AgentStore; personId: string }) {
+  const b = buildBrief(s.agent.f, personId, s.clock, s.agent.changeFeed);
+  const allPasses = Object.keys(PASS_LABELS).length;
+  if (!b.shift) return <div className="empty-note">{b.person.name}: no upcoming shift.</div>;
+  return (
+    <div className="brief-view">
+      <div className="brief-head">{b.shift.task} · {b.venueName} · {fmt(b.shift.start)}–{fmt(b.shift.end)}</div>
+      {b.events.length === 0 && <div className="muted">Nothing on at this venue during your shift.</div>}
+      {b.events.map(({ event, admits, note }) => (
+        <div className="brief-ev" key={event.id}>
+          <span className="brief-time">{fmt(event.start)}</span>
+          <div style={{ minWidth: 0 }}>
+            <div className="t">{event.title}{note && <span className="chip warn" style={{ marginLeft: 6 }}>{note}</span>}</div>
+            {admits.length > 0 && <div className="d">{admits.length >= allPasses ? 'Admits every pass and badge' : `Admits: ${admits.join(', ')}`}</div>}
+          </div>
+        </div>
+      ))}
+      {b.changes.length > 0 && <div className="brief-changes"><h3>Changes since your shift was set</h3><ul>{b.changes.map((c, i) => <li key={i}>{c}</li>)}</ul></div>}
+      {b.guidance.length > 0 && (
+        <details className="brief-hand">
+          <summary>Handbook for your role ({b.guidance.length})</summary>
+          <ul>{b.guidance.map((g, i) => { const k = g.indexOf(': '); return <li key={i}>{k > 0 && k < 40 ? <><b>{g.slice(0, k)}.</b> {g.slice(k + 2)}</> : g}</li>; })}</ul>
+        </details>
+      )}
+    </div>
+  );
+}
+
 export function Briefs({ s }: P) {
   const f = s.agent.f;
   const vols = f.people.filter(p => p.role === 'volunteer');
@@ -440,9 +470,9 @@ export function Briefs({ s }: P) {
     <div className="card stack">
       <h2>Live volunteer brief</h2>
       <p className="muted">Rebuilt from the current grid each time it's opened, with the handbook sections for the volunteer's role.</p>
-      <label className="row">Volunteer <select value={pid} onChange={e => setPid(e.target.value)}>
+      <label className="field">Volunteer <select value={pid} onChange={e => setPid(e.target.value)}>
         {vols.map(v => <option key={v.id} value={v.id}>{v.name} · {v.staffRole}</option>)}</select></label>
-      <pre className="brief msg">{s.agent.brief(pid, s.clock)}</pre>
+      <BriefView s={s} personId={pid} />
     </div>
   );
 }
@@ -462,8 +492,8 @@ export function Ask({ s }: P) {
     <div className="card stack">
       <h2>Ask the agent</h2>
       <p className="muted">Answers come only from the festival's official documents and schedule, with the source cited, or "I don't know".</p>
-      <div className="row">
-        <input style={{ flex: 1, minWidth: 220 }} value={q} onChange={e => setQ(e.target.value)} onKeyDown={e => e.key === 'Enter' && ask()} />
+      <div className="row ask-row">
+        <input style={{ flex: 1, minWidth: 220 }} aria-label="Your question" value={q} onChange={e => setQ(e.target.value)} onKeyDown={e => e.key === 'Enter' && ask()} />
         <button className="primary" disabled={busy} onClick={ask}>{busy ? 'Thinking…' : 'Ask'}</button>
       </div>
       {history.map((h, i) => (
