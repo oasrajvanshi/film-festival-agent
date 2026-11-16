@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { readSetup, useAgent, writeSetup } from '../ui/useAgent';
 import { writeWho } from '../ui/profiles';
+import { HeroPhoto } from '../ui/photos';
 import { Icon } from '../ui/icons';
 import '../mobile.css';
 import { FestivalAgent } from '../../src/agent/agent';
@@ -193,27 +194,8 @@ export default function Onboarding() {
   if (!started) {
     return (
       <div className="ob ob-hi">
+        <HeroPhoto k="hero" />
         <div className="ob-hi-card">
-          <svg className="ob-pal" viewBox="0 0 160 150" aria-hidden="true">
-            <defs>
-              <linearGradient id="ob-beam" x1="0" x2="1" y1="0" y2="0">
-                <stop offset="0" stopColor="#f6ddb0" stopOpacity=".75" />
-                <stop offset="1" stopColor="#f6ddb0" stopOpacity="0" />
-              </linearGradient>
-            </defs>
-            <path className="ob-pal-beam" d="M114 63 L160 40 Q166 65 160 90 L114 67 Z" fill="url(#ob-beam)" />
-            <g className="ob-pal-body">
-              <path d="M30 40h80a6 6 0 0 1 6 6v10a10 10 0 0 0 0 20v10a6 6 0 0 1-6 6H30a6 6 0 0 1-6-6V76a10 10 0 0 0 0-20V46a6 6 0 0 1 6-6z" />
-              <path className="ob-pal-perf" d="M88 44v48" />
-              <circle className="ob-pal-eye" cx="50" cy="62" r="3.6" />
-              <circle className="ob-pal-eye" cx="68" cy="62" r="3.6" />
-              <path className="ob-pal-smile" d="M52 73q7 6 14 0" />
-              <circle className="ob-pal-cheek" cx="44" cy="71" r="3.4" />
-              <circle className="ob-pal-cheek" cx="74" cy="71" r="3.4" />
-              <rect className="ob-pal-torch" x="104" y="60" width="12" height="10" rx="2.5" />
-            </g>
-            <ellipse className="ob-pal-shadow" cx="70" cy="126" rx="34" ry="5" />
-          </svg>
           <div className="ob-hi-name display">Usher</div>
           <p className="ob-hi-line">Usher your festival with ease.</p>
           <button className="primary big ob-hi-go" onClick={() => setStarted(true)}>Set up a festival</button>
