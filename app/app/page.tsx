@@ -14,7 +14,7 @@ import type { DayNumber } from '../../src/core/types';
 import { festivalDays } from '../../src/core/types';
 
 const PAGES = [
-  { id: 'today', label: 'Today', icon: 'home', group: 'Festival day' },
+  { id: 'today', label: 'Overview', icon: 'home', group: 'Festival day' },
   { id: 'here', label: "Who's here", icon: 'scan', group: 'Festival day' },
   { id: 'schedule', label: 'Schedule', icon: 'calendar', group: 'Festival day' },
   { id: 'ask', label: 'Ask', icon: 'chat', group: 'Festival day' },

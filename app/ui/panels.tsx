@@ -85,7 +85,6 @@ export function Overview({ s, user }: P) {
         onOpen={d => { setCalDay(d); setShowOriginal(false); }}
         onPreview={setPreview} onApplied={keepOriginal} />
 
-      <div className="card today-cal">
         <div className="cal-top">
           <div className="cal-days" role="tablist" aria-label="Festival day">
             {festivalDays(f).map(d => (
@@ -100,6 +99,7 @@ export function Overview({ s, user }: P) {
             </button>
           )}
         </div>
+      <div className="card today-cal">
         <DayCalendar s={s} day={calDay} events={calEvents} was={was} notes={notes} animate={!!preview} />
       </div>
 

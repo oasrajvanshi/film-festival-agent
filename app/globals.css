@@ -672,3 +672,30 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
   min-height: 34px; padding: 6px 14px; font-size: 13px; border-radius: 999px; background: #2a1a15; border: 1px solid rgba(232, 104, 75, .55); color: #f2a48f; box-shadow: 0 10px 24px rgba(0, 0, 0, .45); }
 .problem-trigger:hover button, .problem-trigger button:focus-visible { opacity: 1; pointer-events: auto; transform: none; }
 @media (hover: none) { .problem-trigger { width: 10px; bottom: calc(80px + env(safe-area-inset-bottom)); } .problem-trigger button { opacity: .3; pointer-events: auto; transform: none; left: 8px; bottom: 0; } }
+
+/* Onboarding Check: the whole festival as one small calendar, counts under it. */
+.ocal { margin: 14px 0 12px; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px 12px; background: rgba(246, 236, 220, .03); display: grid; gap: 10px; overflow-x: auto; }
+.ocal-hours { display: grid; grid-template-columns: 112px 1fr; min-width: 560px; }
+.ocal-hours div { position: relative; height: 14px; }
+.ocal-hours b { position: absolute; transform: translateX(-50%); font-family: var(--mono); font-weight: 400; font-size: 10px; color: var(--muted); }
+.ocal-day { display: grid; gap: 3px; min-width: 560px; }
+.ocal-dname { font-size: 12px; font-weight: 600; color: var(--ink); margin-bottom: 1px; }
+.ocal-row { display: grid; grid-template-columns: 112px 1fr; align-items: center; }
+.ocal-venue { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px; }
+.ocal-track { position: relative; height: 18px; border-radius: 4px; background: rgba(246, 236, 220, .04); }
+.ocal-tick { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(246, 236, 220, .06); }
+.ocal-ev { position: absolute; top: 1px; bottom: 1px; border-radius: 3px; padding: 0 4px; font-size: 9.5px; line-height: 16px; color: #1b120e; background: #c39367; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ocal-ev.k-panel, .ocal-ev.k-qa { background: #8fa0c4; }
+.ocal-ev.k-market, .ocal-ev.k-activity { background: #93B27E; }
+.ocal-ev.off { opacity: .35; text-decoration: line-through; }
+.ob-stats { margin-top: 0; }
+/* The problem button is always shown in the bottom-left corner; the recommendation sits above it. */
+.problem-trigger { width: auto; height: auto; left: 14px; bottom: 16px; }
+.problem-trigger button { position: static; opacity: 1; pointer-events: auto; transform: none; }
+.rec-float { bottom: 66px; max-height: calc(100vh - 380px); }
+@media (hover: none), (max-width: 760px) {
+  .problem-trigger { left: 10px; bottom: calc(84px + env(safe-area-inset-bottom)); }
+  .problem-trigger button { opacity: .85; }
+}
+@media (max-width: 760px) { .rec-float { bottom: calc(128px + env(safe-area-inset-bottom)); max-height: 50vh; } }
+.today > .cal-top { margin: 0 0 -12px; }

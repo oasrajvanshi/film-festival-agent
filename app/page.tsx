@@ -138,7 +138,7 @@ export default function Site() {
         .to(heroCal.querySelectorAll('[data-ghost], [data-snowband]'), { opacity: 0, duration: 0.5 }, '<');
       gsap.to(q('[data-hero-bg]'), { yPercent: 12, ease: 'none', scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
       gsap.to(q('[data-cal-wrap]'), { y: -14, rotateX: 3, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 2.4 });
-      gsap.to(q('[data-cal="hero"]'), { rotateX: 14, rotateZ: -3, y: -60, ease: 'none', scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
+      gsap.fromTo(q('[data-cal="hero"]'), { rotateX: 24, rotateZ: -6, y: 0 }, { rotateX: 14, rotateZ: -3, y: -60, ease: 'none', immediateRender: false, scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
 
       const scene = (name: string) => {
         const el = q(`[data-scene="${name}"]`)[0];
@@ -230,7 +230,7 @@ export default function Site() {
         <div className="s-hero-bg" data-hero-bg style={{ backgroundImage: `url(${PHOTOS.hero.src})` }} />
         <div className="s-hero-copy">
           <h1 className="s-h1" data-split>Usher helps you manage every unexpected change at your festival.</h1>
-          <p className="s-lead" data-hero-fade>Usher tracks your schedule, tells everyone affected by a change and gives each of them a recommendation. It flags clashes and checks passes, and your staff approve anything sent publicly.</p>
+          <p className="s-lead" data-hero-fade>It tracks your schedule and tells everyone affected by a change what to do next. Your staff approve anything sent publicly.</p>
           <div className="s-ctas" data-hero-fade>
             <a className="btn primary" href="/onboarding">Try the live demo</a>
             <a className="btn" href="#story" onClick={go('#story')}>See how it works</a>

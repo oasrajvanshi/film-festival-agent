@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { readSetup, useAgent, writeSetup } from '../ui/useAgent';
 import { writeWho } from '../ui/profiles';
 import { HeroPhoto } from '../ui/photos';
+import { OverviewCalendar } from '../ui/overviewcal';
 import { Icon } from '../ui/icons';
 import '../mobile.css';
 import { FestivalAgent } from '../../src/agent/agent';
@@ -280,7 +281,8 @@ export default function Onboarding() {
           <section className="ob-card wide">
             <h2 className="display">{ready ? (outside ? 'Almost there' : 'Everything checks out') : 'A few things to fix'}</h2>
             {built.festival && built.festival.events.length > 0 && <>
-              <div className="stats">
+              <OverviewCalendar f={built.festival} />
+              <div className="stats ob-stats">
                 {[['Events', built.festival.events.length], ['Films', built.festival.films.length], ['Venues', built.festival.venues.length], ['People', built.festival.people.length]].map(([k, v]) => (
                   <div className="stat" key={k as string}><div className="k">{k}</div><div className="v">{v}</div></div>
                 ))}
