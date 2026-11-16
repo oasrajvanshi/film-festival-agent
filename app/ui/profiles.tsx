@@ -9,6 +9,7 @@ import qrcode from 'qrcode-generator';
 import { readWho, writeWho, type AgentStore } from './useAgent';
 import { Icon } from './icons';
 import { Ask, BriefView } from './panels';
+import { MyArrival, ScanDesk } from './presence';
 import { PROFILES, deriveVendors, directory, lookupForCode, signIn, type ProfileKind, type Who } from '../../src/access/profiles';
 import { clock as fmt } from '../../src/core/time';
 import { PASS_LABELS, qrFor, type ScanResult } from '../../src/rules/access';
@@ -196,7 +197,7 @@ export function PersonalApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who
   const tabs: Tab[] = who.kind === 'staff'
     ? [{ id: 'home', label: 'My shift', icon: 'home' }, { id: 'scan', label: 'Door scan', icon: 'scan' }, { id: 'updates', label: 'Updates', icon: 'inbox' }, { id: 'ask', label: 'Ask', icon: 'chat' }]
     : who.kind === 'vendor'
-      ? [{ id: 'home', label: 'Deliveries', icon: 'truck' }, { id: 'updates', label: 'Changes', icon: 'inbox' }]
+      ? [{ id: 'home', label: 'Deliveries', icon: 'truck' }, { id: 'pass', label: 'Check-in', icon: 'ticket' }, { id: 'updates', label: 'Changes', icon: 'inbox' }]
       : [{ id: 'home', label: 'My festival', icon: 'home' }, { id: 'pass', label: 'My pass', icon: 'ticket' }, { id: 'updates', label: 'Updates', icon: 'inbox' }, { id: 'ask', label: 'Ask', icon: 'chat' }];
   const [tab, setTab] = useState('home');
   const f = s.agent.f;
@@ -228,8 +229,8 @@ export function PersonalApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who
         {tab === 'home' && who.kind === 'staff' && <StaffHome s={s} who={who} />}
         {tab === 'home' && (who.kind === 'guest' || who.kind === 'attendee') && <PersonHome s={s} who={who} go={setTab} />}
         {tab === 'home' && who.kind === 'vendor' && <><VendorHome s={s} who={who} /><VendorReport s={s} who={who} /></>}
-        {tab === 'pass' && <PassCard s={s} who={who} />}
-        {tab === 'scan' && <StaffScan s={s} />}
+        {tab === 'pass' && <><PassCard s={s} who={who} /><MyArrival s={s} who={who} /></>}
+        {tab === 'scan' && <ScanDesk s={s} event={<StaffScan s={s} />} />}
         {tab === 'ask' && <Ask {...P} />}
         {tab === 'updates' && (who.kind === 'vendor' ? <VendorChanges s={s} who={who} /> : <Inbox s={s} who={who} />)}
         {!viewAs && <Feedback s={s} compact />}
@@ -371,7 +372,7 @@ function PassCard({ s, who }: { s: AgentStore; who: Who }) {
       <div className="pass-top">
         <div className="eyebrow">{f.name}</div>
         <div className="display pass-name">{who.name}</div>
-        <div>{pass ? PASS_LABELS[pass.type] : 'Ticket holder'}{pass && pass.validDays.length < Object.keys(f.dates).length ? ` · Day ${pass.validDays.join(', ')}` : pass ? ' · All days' : ''}</div>
+        <div>{pass ? PASS_LABELS[pass.type] : who.kind === 'vendor' ? `Vendor · ${who.detail}` : 'Ticket holder'}{pass && pass.validDays.length < Object.keys(f.dates).length ? ` · Day ${pass.validDays.join(', ')}` : pass ? ' · All days' : ''}</div>
       </div>
       <div className="pass-qr" dangerouslySetInnerHTML={{ __html: svg }} />
       <div className="pass-foot"><code>{code}</code><span>Show this at the door. One code covers your pass and every ticket.</span></div>

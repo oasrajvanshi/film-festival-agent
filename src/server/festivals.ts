@@ -140,6 +140,8 @@ export function sliceFor(s: Snapshot, who: Who): Snapshot {
     bookings: mine(f.bookings),
     shifts: staff ? f.shifts : mine(f.shifts),
     checkIns: staff ? f.checkIns.map(c => ({ ...c, personId: '' })) : [],
+    // Your own arrivals only; nobody else's whereabouts leave the server.
+    arrivals: (f.arrivals ?? []).filter(a => a.personId === who.id),
   };
   return { f: sliced, queue: [], outbox: vendor ? [] : s.outbox.filter(d => d.personId === who.id), flags: [], sorted: [], changeFeed: s.changeFeed, log: [], runs: s.runs, memory: [] } as Snapshot;
 }
@@ -158,6 +160,9 @@ export function mergeSnapshots(stored: Snapshot, incoming: Snapshot): Snapshot {
   const out = structuredClone(incoming) as Snapshot & Record<string, unknown>;
   const ids = new Set(out.f.checkIns.map(c => c.id));
   out.f.checkIns.push(...stored.f.checkIns.filter(c => !ids.has(c.id)));
+  const arr = new Set((out.f.arrivals ?? []).map(a => a.id));
+  const moreArr = (stored.f.arrivals ?? []).filter(a => !arr.has(a.id));
+  if (moreArr.length) out.f.arrivals = [...(out.f.arrivals ?? []), ...moreArr].sort((a, b) => a.at.localeCompare(b.at));
   const logs = new Set(out.log.map(logKey));
   let seq = out.log.reduce((m, e) => Math.max(m, e.seq), 0);
   for (const e of stored.log) if (!logs.has(logKey(e))) out.log.push({ ...e, seq: ++seq });

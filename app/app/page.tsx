@@ -6,6 +6,7 @@ import { Approvals, Ask, Briefs, Data, Evaluation, Feeds, Grid, Log, Overview, S
 import { Icon } from '../ui/icons';
 import '../mobile.css';
 import { AccessCodes, Feedback, PersonalApp, SignIn } from '../ui/profiles';
+import { WhosHere } from '../ui/presence';
 import type { Who } from '../../src/access/profiles';
 import type { DayNumber } from '../../src/core/types';
 import { festivalDays } from '../../src/core/types';
@@ -13,6 +14,7 @@ import { festivalDays } from '../../src/core/types';
 const PAGES = [
   { id: 'today', label: 'Today', icon: 'home', group: 'Festival day' },
   { id: 'approvals', label: 'Approvals', icon: 'inbox', group: 'Festival day' },
+  { id: 'here', label: "Who's here", icon: 'users', group: 'Festival day' },
   { id: 'scan', label: 'Door scan', icon: 'scan', group: 'Festival day' },
   { id: 'schedule', label: 'Schedule', icon: 'calendar', group: 'Festival day' },
   { id: 'ask', label: 'Ask', icon: 'chat', group: 'Festival day' },
@@ -196,6 +198,7 @@ export default function App() {
           {page === 'today' && <Overview {...props} />}
           {page === 'schedule' && <Grid {...props} />}
           {page === 'approvals' && <Approvals {...props} />}
+          {page === 'here' && <WhosHere s={s} />}
           {page === 'scan' && <Scan {...props} />}
           {page === 'briefs' && <Briefs {...props} />}
           {page === 'ask' && <Ask {...props} />}

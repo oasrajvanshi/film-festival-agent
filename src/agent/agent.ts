@@ -15,6 +15,7 @@ import { planVoteForm } from './voting';
 import { buildBrief, briefText } from './briefs';
 import { suggestRedirects, venueView } from './crowd';
 import { polishMessages } from './phrase';
+import { checkArrival, dayAt, lateGuests, welcomeNote, type ArrivalResult } from './presence';
 import { assessWeather, planWeather, riskSummary, type WeatherHour, type WeatherRisk } from './weather';
 
 /** What a person decided before, so the agent can remind them next time. */
@@ -138,8 +139,8 @@ export class FestivalAgent {
   async onSheetSync(next: Festival, by = 'Google Sheet') {
     const runId = this.run('sync');
     this.log.add(runId, 'trigger', `Sheet sync from ${by}`);
-    const { events, checkIns: _c, ...rest } = next;
-    void _c;
+    const { events, checkIns: _c, arrivals: _a, ...rest } = next;
+    void _c; void _a;
     Object.assign(this.f, rest);
     return this.onGridEdit(events, by);
   }
@@ -153,7 +154,45 @@ export class FestivalAgent {
       ...clashes.map(k => ({ id: `clash-${k.guestId}-${k.a.id}-${k.b.id}`, kind: 'flag' as const, title: `Guest clash: ${k.guestName}`, rationale: k.summary, payload: k })),
       ...otherFlags(this.f).map(k => ({ ...k, kind: 'flag' as const })),
     ]);
+    this.sweepPresence();
     return clashes;
+  }
+
+  /**
+   * Flag guests who are on soon but haven't been scanned in, and clear those
+   * flags by themselves once the guest arrives or the event is over.
+   */
+  sweepPresence(at = this.now()) {
+    const late = lateGuests(this.f, at);
+    const still = new Set(late.map(k => k.id));
+    for (const fl of this.flags.filter(x => x.id.startsWith('noshow-') && !still.has(x.id))) {
+      const g = (fl.payload as { guestId?: string } | undefined)?.guestId;
+      const arr = (this.f.arrivals ?? []).find(a => a.personId === g && a.day === dayAt(this.f, at));
+      this.resolveFlag(fl.id, 'Usher', arr ? `Arrived at ${clock(arr.at)}` : 'Event is over');
+    }
+    const fresh = late.filter(k => !this.flags.some(x => x.id === k.id) && !this.sorted.some(x => x.id === k.id));
+    if (fresh.length) this.dispatch(this.run('presence'), fresh.map(k => ({ ...k, kind: 'flag' as const })));
+  }
+
+  /**
+   * Someone's QR was scanned at a venue entrance. The first scan of the day is
+   * their arrival: it's recorded, guests and vendors get a welcome note with
+   * what they have next, and any "not here yet" flag for them clears.
+   */
+  onArrival(qr: string, venueId: string, at: string, scannedBy = 'door'): ArrivalResult {
+    const runId = this.run('arrival');
+    const res = checkArrival(this.f, qr, at);
+    const day = dayAt(this.f, at);
+    const id = qr.trim().split('.')[1];
+    if (res.allowed && day != null && res.kind) {
+      const list = (this.f.arrivals ??= []);
+      list.push({ id: `a-${day}-${id}-${at.slice(11, 16).replace(':', '')}-${list.length + 1}`, personId: id, kind: res.kind, day, venueId, at, by: scannedBy, reentry: !!res.reentry });
+      const note = res.reentry ? null : welcomeNote(this.f, id, res.kind, venueId, res.next);
+      if (note) this.outbox.push({ actionId: `arrive-${day}-${id}`, personId: id, channel: 'app_push', subject: note.subject, body: note.body, at });
+    }
+    this.log.add(runId, 'act', `${res.allowed ? (res.reentry ? 'BACK IN' : 'ARRIVED') : 'DENY'} ${res.personName ?? 'unknown'} at ${venueId}: ${res.reason}`, { scannedBy, at });
+    this.sweepPresence(at);
+    return res;
   }
 
   onScan(qr: string, eventId: string, at: string, scannedBy = 'volunteer'): ScanResult {

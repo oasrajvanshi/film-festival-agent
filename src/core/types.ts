@@ -142,6 +142,23 @@ export interface Booking {
   eventId: string;
 }
 
+/**
+ * Someone arriving at the festival on a day, from a QR scan at any venue
+ * entrance. The first scan of a day is the arrival; later ones are re-entries.
+ */
+export interface Arrival {
+  id: string;
+  /** A person id, or a vendor id such as v-print. */
+  personId: string;
+  kind: 'attendee' | 'guest' | 'vendor' | 'staff' | 'organizer';
+  day: DayNumber;
+  venueId: string;
+  at: string;
+  /** Who scanned them in. */
+  by: string;
+  reentry: boolean;
+}
+
 export interface CheckIn {
   id: string;
   personId: string;
@@ -171,5 +188,7 @@ export interface Festival {
   shifts: Shift[];
   bookings: Booking[];
   checkIns: CheckIn[];
+  /** Who arrived on site each day. Filled by scans only, never by hand. */
+  arrivals?: Arrival[];
   docs: OfficialDoc[];
 }

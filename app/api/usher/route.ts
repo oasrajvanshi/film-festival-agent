@@ -9,7 +9,9 @@ import {
   newSession, people, readSession, saveFest, sliceFor, type FestRecord, type Session, type SharedState, type Snapshot,
 } from '../../../src/server/festivals';
 import { channels, codeHtml, digestHtml, sendEmail, sendPush, sendSms, vapid, type OutMsg } from '../../../src/server/deliver';
-import { PROFILES, lookupForCode, type ProfileKind } from '../../../src/access/profiles';
+import { PROFILES, directory, lookupForCode, type ProfileKind } from '../../../src/access/profiles';
+import { dayAt } from '../../../src/agent/presence';
+import type { Arrival } from '../../../src/core/types';
 import { FestivalAgent } from '../../../src/agent/agent';
 import type { VendorAlert } from '../../../src/agent/vendors';
 import { fetchSheetTables, sheetIdFrom, tablesToFestival } from '../../../src/data/sheet';
@@ -36,6 +38,14 @@ function viewFor(rec: FestRecord, s: Session) {
   return { version: rec.version, state, setup: organizer ? rec.setup : { festivalName: rec.setup.festivalName, city: rec.setup.city }, who: s.who, sample: rec.sample };
 }
 
+/** Add arrivals from the per-day list that the festival record doesn't have yet. */
+function unionArrivals(rec: FestRecord, extra: Arrival[]) {
+  const f = rec.state.agent.f;
+  const have = new Set((f.arrivals ?? []).map(a => a.id));
+  const missing = extra.filter(a => !have.has(a.id));
+  if (missing.length) f.arrivals = [...(f.arrivals ?? []), ...missing].sort((a, b) => a.at.localeCompare(b.at));
+}
+
 /** Run after the response where the platform allows it (Vercel), else in the background. */
 function later(fn: () => Promise<void>) {
   try { after(fn); } catch { void fn().catch(() => {}); }
@@ -58,12 +68,12 @@ function deliverNew(kv: Kv, rec: FestRecord, origin: string) {
     const jobs: Promise<unknown>[] = [];
     // Outbound messages to people: only those meant for attendees, guests and staff (not the website).
     const msgs: OutMsg[] = fresh.filter(d => d.channel !== 'website').map(d => {
-      const p = a.f.people.find(x => x.id === d.personId);
+      const p = a.f.people.find(x => x.id === d.personId) ?? directory(a.f).find(x => x.id === d.personId);
       return { personName: p?.name ?? d.personId, personEmail: p?.email ?? '', channel: d.channel, subject: d.subject, body: d.body };
     });
     if (msgs.length) {
       const byAction = [...new Set(fresh.map(d => d.actionId))].map(id => a.queue.find(q => q.action.id === id)?.action.title).filter(Boolean);
-      const title = byAction.length === 1 ? String(byAction[0]) : `${msgs.length} updates sent`;
+      const title = byAction.length === 1 ? String(byAction[0]) : msgs.length === 1 ? `${msgs[0].subject}: ${msgs[0].personName}` : `${msgs.length} updates sent`;
       if (want.has('email')) jobs.push(sendEmail(`[Usher test] ${title}`, digestHtml(fest, title, msgs)));
       if (want.has('sms')) jobs.push(sendSms(`Usher test (${fest}): ${title}. ${msgs.length} message${msgs.length === 1 ? '' : 's'} went out, e.g. to ${msgs[0].personName}: "${msgs[0].subject}"`));
     }
@@ -183,6 +193,27 @@ export async function POST(req: Request) {
     return json({ result: res, version: rec.version });
   }
 
+  if (action === 'arrive') {
+    if (s.who.kind !== 'staff' && s.who.kind !== 'organizer') return bad('Staff only.', 403);
+    const at = String(b.at ?? rec.state.clock);
+    const venueId = String(b.venueId ?? '');
+    if (!rec.state.agent.f.venues.some(v => v.id === venueId)) return bad('Pick the venue you are scanning at.');
+    const day = dayAt(rec.state.agent.f, at);
+    // Every arrival is also appended to that day's list on its own, so two doors
+    // scanning at the same moment never lose one. Pull in any the record missed.
+    const dayKey = `usher:arr:${fid}:${day}`;
+    if (day != null) unionArrivals(rec, await kv.list<Arrival>(dayKey, 5000));
+    const agent = agentFor(rec);
+    const res = agent.onArrival(String(b.qr ?? '').slice(0, 80), venueId, at, s.who.name);
+    const added = agent.f.arrivals?.at(-1);
+    if (res.allowed && added && day != null) await kv.push(dayKey, added, 5000);
+    rec.state.agent = agent.snapshot();
+    rec.version++;
+    deliverNew(kv, rec, origin);
+    await saveFest(kv, rec);
+    return json({ result: res, version: rec.version });
+  }
+
   if (action === 'vendor-report') {
     if (s.who.kind !== 'vendor') return bad('Vendors only.', 403);
     const type = String(b.type);
@@ -219,6 +250,7 @@ export async function POST(req: Request) {
   if (action === 'reset') {
     const agent = new FestivalAgent(structuredClone(rec.initial.festival), null, () => rec.initial.clock);
     agent.sweepClashes();
+    await Promise.all(Object.keys(rec.initial.festival.dates).map(d => kv.del(`usher:arr:${fid}:${d}`)));
     rec.state = { agent: agent.snapshot(), clock: rec.initial.clock, sheet: rec.state.sheet };
     rec.delivered = agent.outbox.map(deliveryKey);
     rec.flagsSeen = agent.flags.map(x => x.id);

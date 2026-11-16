@@ -6,6 +6,7 @@
 //  - local: with no storage, state stays in this browser's localStorage.
 // Model calls go through /api/llm (server-side key).
 
+import type { ArrivalResult } from '../../src/agent/presence';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FestivalAgent } from '../../src/agent/agent';
 import { buildFestival } from '../../src/data/seed';
@@ -357,6 +358,15 @@ export function useAgent() {
     return r.body.result;
   }, [commit, pull]);
 
+  /** A venue entrance scan: records that someone has arrived today. */
+  const arrive = useCallback(async (qr: string, venueId: string): Promise<ArrivalResult> => {
+    if (modeRef.current !== 'shared') { const res = agentRef.current!.onArrival(qr, venueId, clockRef.current, whoRef.current?.name ?? 'Door'); commit(); return res; }
+    const r = await api<{ result: ArrivalResult; error?: string }>('POST', { action: 'arrive', f: fidRef.current, qr, venueId, at: clockRef.current });
+    if (!r.ok) return { allowed: false, reason: r.body.error ?? 'Could not reach the server. Try again.' };
+    void pull();
+    return r.body.result;
+  }, [commit, pull]);
+
   /** Generic call for vendor reports, feedback, codes and push. */
   const call = useCallback(async <T = Record<string, unknown>>(action: string, body: Record<string, unknown> = {}, method: 'GET' | 'POST' = 'POST') => {
     const r = await api<T>(method, { action, f: fidRef.current ?? '', ...body });
@@ -366,7 +376,7 @@ export function useAgent() {
 
   return {
     agent: agentRef.current!, version, commit, clock, setClock, reset, llmInfo, useModel, setUseModel, sheet, loadSheet, goLive, openSample,
-    mode, shared: mode === 'shared', pub, who, fid: fidRef.current, notice, requestCode, verifyCode, signOut, scan, call, pull,
+    mode, shared: mode === 'shared', pub, who, fid: fidRef.current, notice, requestCode, verifyCode, signOut, scan, arrive, call, pull,
     festivalName: pub?.name ?? agentRef.current!.f.name,
   };
 }
