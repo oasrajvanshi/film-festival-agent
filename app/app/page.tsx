@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { readSetup, useAgent, writeSetup, writeWho } from '../ui/useAgent';
 import { Approvals, Ask, Briefs, Data, Evaluation, Feeds, Grid, Log, Overview, Scan } from '../ui/panels';
 import { Icon } from '../ui/icons';
+import '../mobile.css';
 import { AccessCodes, Feedback, PersonalApp, SignIn } from '../ui/profiles';
 import type { Who } from '../../src/access/profiles';
 import type { DayNumber } from '../../src/core/types';
