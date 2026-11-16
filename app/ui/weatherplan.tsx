@@ -25,6 +25,7 @@ import type { Action, OutboundMessage } from '../../src/agent/approvals';
 import type { DayNumber, FestivalEvent } from '../../src/core/types';
 import { addMinutes, clock as fmt, overlaps, toMinutes } from '../../src/core/time';
 import { Icon } from './icons';
+import { boardChanged } from './localkeys';
 
 export type WxKind = 'storm' | 'snow' | 'heat';
 const KINDS: { k: WxKind; label: string; icon: 'cloud' | 'alert' | 'clock' }[] = [
@@ -118,6 +119,7 @@ export function readAlerts(): WxAlert[] {
 function writeAlerts(list: WxAlert[]) {
   try { localStorage.setItem(ALERTS_KEY, JSON.stringify(list)); } catch { /* private mode */ }
   window.dispatchEvent(new Event(EVENT));
+  boardChanged();
 }
 /** Demo toolbar: the agent "sees" this on that day. */
 export function raiseAlert(kind: AlertKind, day: DayNumber) {
@@ -332,6 +334,8 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
     const o = id === 'all' && allRec ? { al: ALL, rec: allRec } : shown.find(x => x.al.id === id);
     if (o) onOpen(o.al.day);
     onPreview(o ? o.rec.preview(new Set()) : null);
+    // On a phone the recommendation sits in the page above the calendar: bring both into view.
+    if (o && matchMedia('(max-width: 760px)').matches) setTimeout(() => document.querySelector('.rec-float')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60);
   };
   const toggle = (k: string) => {
     const next = new Set(off);
@@ -386,7 +390,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
                 <span className="wx-alert-ic"><Icon name={al.kind === 'guest' ? 'clock' : 'alert'} size={18} /></span>
                 <div className="wx-alert-text"><b>{rec.title}</b><span>{rec.sub}</span></div>
                 <button className={isOpen ? '' : 'primary'} onClick={() => show(isOpen ? null : al.id)}>
-                  {isOpen ? 'Close preview' : <><Icon name="sparkle" size={15} /> Agent&apos;s recommendation</>}
+                  {isOpen ? 'Close' : <><Icon name="sparkle" size={15} /> <span className="lbl-long">Agent&apos;s recommendation</span><span className="lbl-short">Fix it</span></>}
                 </button>
               </div>
             </div>

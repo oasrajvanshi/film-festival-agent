@@ -6,7 +6,7 @@
 //  - local: with no storage, state stays in this browser's localStorage.
 // Model calls go through /api/llm (server-side key).
 
-import { clearFestivalLocal } from './localkeys';
+import { boardChanged, clearFestivalLocal, readBoard, writeBoard, type Board } from './localkeys';
 import type { ArrivalResult } from '../../src/agent/presence';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FestivalAgent } from '../../src/agent/agent';
@@ -90,8 +90,10 @@ export function useAgent() {
   const bump = () => setVersion(v => v + 1);
 
   /** Replace what this device holds with the server's copy. */
-  const hydrate = useCallback((b: { version: number; state: { agent: ReturnType<FestivalAgent['snapshot']>; clock: string; sheet: SheetStatus }; setup?: Partial<Setup> }) => {
+  const hydrate = useCallback((b: { version: number; state: { agent: ReturnType<FestivalAgent['snapshot']>; clock: string; sheet: SheetStatus; board?: Board }; setup?: Partial<Setup> }) => {
     agentRef.current = FestivalAgent.restore(b.state.agent, null, now);
+    // Alerts and the plan before the last approval are shared too, so every phone sees them.
+    writeBoard(b.state.board ?? { alerts: [], original: null, notes: {} });
     clockRef.current = b.state.clock || clockRef.current;
     setClockState(clockRef.current);
     if (b.state.sheet) { sheetRef.current = b.state.sheet; setSheet(b.state.sheet); }
@@ -102,9 +104,11 @@ export function useAgent() {
 
   const pull = useCallback(async () => {
     if (modeRef.current !== 'shared' || !fidRef.current || !whoRef.current) return;
+    // Our own change is still on its way to the server: don't read the old copy over it.
+    if (dirty.current || saving.current) return;
     const r = await api<{ version: number; state: never; setup: never }>('GET', { action: 'state', f: fidRef.current });
     if (r.status === 401) { setWho(null); return; }
-    if (r.ok) hydrate(r.body);
+    if (r.ok && !dirty.current && !saving.current) hydrate(r.body);
   }, [hydrate]);
 
   // ---------------------------------------------------------------- start up
@@ -210,7 +214,7 @@ export function useAgent() {
   const pushState = useCallback(async () => {
     while (dirty.current) {
       dirty.current = false;
-      const state = { agent: agentRef.current!.snapshot(), clock: clockRef.current, sheet: sheetRef.current };
+      const state = { agent: agentRef.current!.snapshot(), clock: clockRef.current, sheet: sheetRef.current, board: readBoard() };
       const r = await api<{ version: number; merged: boolean; state?: never }>('POST', { action: 'put', f: fidRef.current, baseVersion: serverVersion.current, state }).catch(() => null);
       if (!r || !r.ok) {
         if (r?.status === 401) { setWho(null); return; }
@@ -240,6 +244,12 @@ export function useAgent() {
     try { localStorage.setItem(KEY, JSON.stringify({ agent: agentRef.current!.snapshot(), clock: clockRef.current, sheet: sheetRef.current })); } catch { /* ignore */ }
     bump();
   }, [pushState]);
+  // The organizer raised or handled alerts, or approved a plan: save that too.
+  useEffect(() => {
+    const on = () => commit();
+    window.addEventListener('usher-board-dirty', on);
+    return () => window.removeEventListener('usher-board-dirty', on);
+  }, [commit]);
 
   const setClock = useCallback((c: string) => { clockRef.current = c; setClockState(c); commit(); }, [commit]);
 

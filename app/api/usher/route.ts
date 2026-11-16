@@ -9,7 +9,7 @@ import {
   newSession, people, readSession, saveFest, sliceFor, type FestRecord, type Session, type SharedState, type Snapshot,
 } from '../../../src/server/festivals';
 import { channels, codeHtml, digestHtml, sendEmail, sendPush, sendSms, vapid, type OutMsg } from '../../../src/server/deliver';
-import { PROFILES, directory, lookupForCode, type ProfileKind } from '../../../src/access/profiles';
+import { DEMO_PEOPLE, PROFILES, directory, lookupForCode, type ProfileKind } from '../../../src/access/profiles';
 import { dayAt } from '../../../src/agent/presence';
 import type { Arrival } from '../../../src/core/types';
 import { FestivalAgent } from '../../../src/agent/agent';
@@ -165,7 +165,7 @@ export async function POST(req: Request) {
     const key = Object.entries(rec.codes).find(([k, c]) => k.startsWith(`${kind}:`) && cleanCode(c) === code)?.[0];
     // Demo: any code opens the chosen profile. A real code opens its own person;
     // anything else opens the first person with that profile.
-    const who = (key ? people(rec).find(w => codeKey(w) === key) : undefined) ?? people(rec).find(w => w.kind === kind);
+    const who = (key ? people(rec).find(w => codeKey(w) === key) : undefined) ?? people(rec).find(w => w.kind === kind && DEMO_PEOPLE.includes(w.name)) ?? people(rec).find(w => w.kind === kind);
     if (!who) { await kv.set(rl, tries + 1, 900); return json({ ok: false, reason: 'no_match' }); }
     const token = await newSession(kv, fid, who);
     return json({ ok: true, token, who: { ...who, code: '' } });

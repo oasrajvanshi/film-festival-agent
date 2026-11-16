@@ -5,7 +5,7 @@
 // each kind. Real users never see it.
 
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
-import { directory, type ProfileKind, type Who } from '../../src/access/profiles';
+import { directory, type ProfileKind, type Who, DEMO_PEOPLE } from '../../src/access/profiles';
 import type { Festival } from '../../src/core/types';
 import '../demo.css';
 
@@ -47,7 +47,7 @@ export function useDemo(): Demo {
 export function demoPerson(f: Festival, kind: ProfileKind, clock: string): Who | null {
   if (kind === 'organizer') return null;
   const all = directory(f).filter(w => w.kind === kind);
-  const known = ['Yara Jessop', 'Tova Jessop', 'Bright Booth AV'];
+  const known = DEMO_PEOPLE;
   const pick = all.find(w => known.includes(w.name))
     ?? (kind === 'guest' ? all.find(w => f.events.some(e => e.guestIds.includes(w.id) && e.start.slice(0, 10) === clock.slice(0, 10))) : undefined)
     ?? all[0];

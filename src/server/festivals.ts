@@ -11,7 +11,7 @@ import type { Kv } from './kv';
 export type Snapshot = ReturnType<FestivalAgent['snapshot']>;
 export interface SheetStatus { source: string; sheet?: string; loadedAt?: string; errors: string[]; warnings: string[]; message?: string }
 export interface Setup { festivalName: string; city: string; approver: string; channels: string[]; onboardedAt: string; sheetUrl?: string; sheetMapping?: unknown }
-export interface SharedState { agent: Snapshot; clock: string; sheet: SheetStatus }
+export interface SharedState { agent: Snapshot; clock: string; sheet: SheetStatus; board?: { alerts: unknown[]; original: unknown[] | null; notes: Record<string, string> } }
 
 export interface FestRecord {
   id: string;

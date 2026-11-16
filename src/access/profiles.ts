@@ -147,3 +147,6 @@ export function lookupForCode(f: Festival, kind: ProfileKind, name: string, emai
   if (!n || !names.includes(n)) return { ok: false, reason: 'name_mismatch' };
   return { ok: true, who: hit };
 }
+
+/** The sample festival's people shown first (the demo, and any code in the demo): each has a full first day. */
+export const DEMO_PEOPLE = ['Mira Galloway', 'Tova Jessop', 'Bright Booth AV'];

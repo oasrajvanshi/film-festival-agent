@@ -172,7 +172,7 @@ export function WhosHere({ s, eventScan }: { s: AgentStore; eventScan?: ReactNod
         <div className="cal-days" role="tablist" aria-label="Day">
           {days.map(d => <button key={d} role="tab" aria-selected={d === day} className={d === day ? 'on' : ''} onClick={() => setDay(d)}>Day {d}</button>)}
         </div>
-        <span className="wh-sum"><b>{here}</b> of {rows.filter(r => !r.walkIn).length} here{lateCount ? <em> · {lateCount} guest{lateCount === 1 ? '' : 's'} running late</em> : null}
+        <span className="wh-sum"><span className="wh-sum-n"><b>{here}</b> of {rows.filter(r => !r.walkIn).length} here</span>{lateCount ? <em>{lateCount} guest{lateCount === 1 ? '' : 's'} running late</em> : null}
           <i className="wh-progress"><i style={{ width: `${Math.min(100, (here / Math.max(1, rows.filter(r => !r.walkIn).length)) * 100)}%` }} /></i>
         </span>
         <span style={{ flex: 1 }} />
@@ -206,7 +206,7 @@ export function WhosHere({ s, eventScan }: { s: AgentStore; eventScan?: ReactNod
               </div>
               {r.arrival
                 ? <span className="chip ok" title={`Scanned by ${r.arrival.by}`}>Here {fmt(r.arrival.at)} · {venueName(r.arrival.venueId)}</span>
-                : late(r) ? <span className="chip bad">Not here, on at {fmt(r.firstAt!)}</span>
+                : late(r) ? <span className="chip bad">Late · on {fmt(r.firstAt!)}</span>
                   : <span className="chip">{r.firstAt ? `Expected ${fmt(r.firstAt)}` : 'Expected'}</span>}
             </div>
           ))}

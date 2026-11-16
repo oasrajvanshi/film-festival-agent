@@ -149,7 +149,7 @@ function AppInner({ demo }: { demo: Demo | null }) {
       </div>
       <div className="field">More
         <div className="row">
-          {(['approvals', 'log', 'data', 'feedback'] as PageId[]).map(id => <button key={id} className="small" onClick={() => setPage(id)}>{PAGES.find(p => p.id === id)!.label}</button>)}
+          {(['log', 'data', 'feedback'] as PageId[]).map(id => <button key={id} className="small" onClick={() => setPage(id)}>{PAGES.find(p => p.id === id)!.label}</button>)}
         </div>
       </div>
       <button className="block" onClick={signOut}><Icon name="logout" size={16} /> Sign out</button>

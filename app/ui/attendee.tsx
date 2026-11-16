@@ -33,6 +33,15 @@ const readOriginal = (): FestivalEvent[] => { try { const v = localStorage.getIt
 const venueName = (f: Festival, id: string) => f.venues.find(v => v.id === id)?.name ?? id;
 const walk = (f: Festival, a: string, b: string) => (a === b ? 0 : f.travel?.[a]?.[b] ?? 20);
 
+// A sheet's backdrop closes it, but not on the same tap that opened it
+// (a touch can arrive as a second click on the backdrop drawn under the finger).
+let sheetOpenedAt = 0;
+const opened = () => { sheetOpenedAt = Date.now(); };
+const settled = (close: () => void) => () => { if (Date.now() - sheetOpenedAt > 400) close(); };
+
+const VENUE_TONES = ['#d49a5c', '#8fa0c4', '#93b27e', '#c97b9a', '#b9a36b', '#7fb0b5'];
+const venueTone = (f: AgentStore['agent']['f'], id: string) => VENUE_TONES[Math.max(0, f.venues.findIndex(v => v.id === id)) % VENUE_TONES.length];
+
 function MapIcon() {
   return <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 4 3 6.5v13.5L9 17.5l6 2.5 6-2.5V4l-6 2.5z" /><path d="M9 4v13.5M15 6.5V20" /></svg>;
 }
@@ -81,7 +90,7 @@ export function AttendeeApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who
           <div className="at-fest">{s.festivalName}</div>
           <div className="at-sub">{who.name}</div>
         </div>
-        <button className="at-me" onClick={() => setMe(true)} aria-label="Your pass" title="Your pass">{who.name.split(/\s+/).slice(0, 2).map(w => w[0]).join('')}</button>
+        <button className="at-me" onClick={() => { opened(); setMe(true); }} aria-label="Your pass" title="Your pass">{who.name.split(/\s+/).slice(0, 2).map(w => w[0]).join('')}</button>
       </header>
 
       {(tab === 'plan' || tab === 'map') && (
@@ -117,7 +126,7 @@ export function AttendeeApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who
       </nav>
 
       {me && (
-        <div className="at-sheet-wrap" onClick={() => setMe(false)}>
+        <div className="at-sheet-wrap" onClick={settled(() => setMe(false))}>
           <div className="at-sheet" onClick={e => e.stopPropagation()}>
             <i className="at-grab" />
             <Pass s={s} who={who} />
@@ -184,9 +193,8 @@ function PlanView({ s, who, plans, day, change }: { s: AgentStore; who: Who; pla
       const pick = gap >= 100 ? pickFor(prev.e.end, p.e.start) : null;
       if (pick) rows.push(
         <div className="at-row at-free" key={`free-${p.e.id}`}>
-          <div className="at-time"><span>{fmt(prev.e.end)}</span></div>
           <div className="at-pick">
-            <small>Free until {fmt(p.e.start)} · a pick that fits</small>
+            <small>Free {fmt(prev.e.end)} to {fmt(p.e.start)} · a pick that fits</small>
             <div className="at-pick-row">
               <EventThumb e={pick} size={40} />
               <span><b>{pick.title}</b><em>{fmt(pick.start)} · {venueName(f, pick.venueId)}</em></span>
@@ -209,19 +217,19 @@ function PlanView({ s, who, plans, day, change }: { s: AgentStore; who: Who; pla
     const clash = prev && p.e.status === 'scheduled' && prev.e.status === 'scheduled' && tod(p.e.start) < tod(prev.e.end) ? prev : null;
     const risky = decision?.p.e.id === p.e.id;
     rows.push(
-      <div className={`at-row${w ? ' moved' : ''}${off ? ' off' : ''}${risky ? ' risk' : ''}`} key={p.e.id}>
-        <div className="at-time">{w && <s>{fmt(w)}</s>}<span>{fmt(p.e.start)}</span><small>{fmt(p.e.end)}</small></div>
+      <div className={`at-row${w ? ' moved' : ''}${off ? ' off' : ''}${risky ? ' risk' : ''}`} key={p.e.id} style={{ ['--vc' as string]: venueTone(f, p.e.venueId) }}>
         <div className="at-card">
-          <button className="at-card-main" onClick={() => setOpen(p.e)}>
-            <EventThumb e={p.e} size={56} />
+          <button className="at-card-main" onClick={() => { opened(); setOpen(p.e); }}>
+            <div className="at-time">{w && <s>{fmt(w)}</s>}<span>{fmt(p.e.start)}</span><small>{fmt(p.e.end)}</small></div>
+            <EventThumb e={p.e} size={40} />
             <div className="at-card-txt">
               <b>{p.e.title}</b>
-              <em>{venueName(f, p.e.venueId)}{p.e.room ? `, ${p.e.room}` : ''}</em>
-              <Faces s={s} ids={p.e.guestIds} size={20} />
+              <em>{venueName(f, p.e.venueId)}{p.e.room ? `, ${p.e.room}` : ''} · {p.why}</em>
             </div>
-            <span className="at-why">{p.why}</span>
+            {p.e.guestIds.length > 0 && <Faces s={s} ids={p.e.guestIds} size={20} max={3} />}
           </button>
-          {w && <p className="at-note"><Icon name="clock" size={14} /> Now starts at {fmt(p.e.start)}.{p.why === 'Ticket' ? ' Your seat is held.' : ''}</p>}
+          {/* The row already shows the old time crossed out; a ticket also keeps its seat. */}
+          {w && p.why === 'Ticket' && <p className="at-note"><Icon name="check" size={14} /> Your seat is held.</p>}
           {clash && (
             <div className="at-note warn">
               <span>Overlaps with {clash.e.title}. Keep one:</span>
@@ -249,7 +257,7 @@ function PlanView({ s, who, plans, day, change }: { s: AgentStore; who: Who; pla
   return (
     <>
       {decision && (
-        <button className="at-decide" onClick={() => setDeciding(true)}>
+        <button className="at-decide" onClick={() => { opened(); setDeciding(true); }}>
           <span className="at-decide-ic"><Icon name="alert" size={16} /></span>
           <span><b>Your {fmt(decision.p.e.start)} {decision.p.e.kind === 'panel' ? 'panel' : 'screening'} is at risk</b><em>{weather!.label} from {fmt(weather!.risk.from)} · decide by {fmt(hm(f.dates[day], decision.leave - 15))}</em></span>
           <i>Decide</i>
@@ -262,7 +270,7 @@ function PlanView({ s, who, plans, day, change }: { s: AgentStore; who: Who; pla
       {mine.length === 0 ? <div className="at-empty">Nothing on your plan this day.</div> : <div className="at-list">{rows}</div>}
 
       {open && (
-        <div className="at-sheet-wrap" onClick={() => setOpen(null)}>
+        <div className="at-sheet-wrap" onClick={settled(() => setOpen(null))}>
           <div className="at-sheet" onClick={e => e.stopPropagation()}>
             <i className="at-grab" />
             <div className="at-ev-hero" style={{ backgroundImage: `url(${eventImage(open)})` }} />
@@ -276,7 +284,7 @@ function PlanView({ s, who, plans, day, change }: { s: AgentStore; who: Who; pla
       )}
 
       {deciding && decision && (
-        <div className="at-sheet-wrap" onClick={() => setDeciding(false)}>
+        <div className="at-sheet-wrap" onClick={settled(() => setDeciding(false))}>
           <div className="at-sheet" onClick={e => e.stopPropagation()}>
             <i className="at-grab" />
             <h2 className="at-h2">Keep your {fmt(decision.p.e.start)} {decision.p.e.kind === 'panel' ? 'panel' : 'screening'}?</h2>

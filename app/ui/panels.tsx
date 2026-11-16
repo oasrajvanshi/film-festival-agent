@@ -1,8 +1,9 @@
 'use client';
 
 import { DayCalendar } from './daycal';
+import { boardChanged } from './localkeys';
 import { ProblemTrigger, WeatherAlerts, useAlerts, type Preview } from './weatherplan';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { DEFAULT_SHEET, readSetup, type AgentStore } from './useAgent';
 import { riskSummary, type WeatherHour } from '../../src/agent/weather';
 import type { DayNumber, FestivalEvent, PassType } from '../../src/core/types';
@@ -51,7 +52,16 @@ export function Overview({ s, user, go }: P) {
     const allNotes = { ...kept, ...n };
     setOriginal(first); setKept(allNotes); setShowOriginal(false);
     try { localStorage.setItem('usher-original-plan-v1', JSON.stringify(first)); localStorage.setItem('usher-plan-notes-v1', JSON.stringify(allNotes)); } catch { /* private mode */ }
+    boardChanged();
   };
+  // Another device (or a reset) changed the plan before the last approval: read it again.
+  useEffect(() => {
+    const on = () => {
+      try { const o = localStorage.getItem('usher-original-plan-v1'); setOriginal(o ? JSON.parse(o) : null); const n = localStorage.getItem('usher-plan-notes-v1'); setKept(n ? JSON.parse(n) : {}); } catch { /* ignore */ }
+    };
+    window.addEventListener('usher-board', on);
+    return () => window.removeEventListener('usher-board', on);
+  }, []);
   // An original plan only counts while the schedule still differs from it (a demo reset clears it).
   const differs = (o: FestivalEvent | undefined, e: FestivalEvent) => !!o && (o.start !== e.start || o.venueId !== e.venueId || o.guestIds.join() !== e.guestIds.join());
   const hasOriginal = !!original && f.events.some(e => differs(original.find(x => x.id === e.id), e));
