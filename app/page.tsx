@@ -138,10 +138,22 @@ export default function Site() {
         .to(cards, { y: (i: number) => 380 + i * 30, rotateZ: (i: number) => (i % 2 ? 24 : -24), rotateX: -30, autoAlpha: 0, duration: 2, stagger: 0.08, ease: 'power2.in' }, 7.6)
         .to(q('.s-problem-copy'), { autoAlpha: 0, y: -40, duration: 1.2 }, 8.6);
 
+      // --- 2. the forecast changes: feeds converge on the agent, the agent finds who is affected
+      const t = scene('trigger');
+      q('[data-feed]').forEach(pth => { const len = (pth as unknown as SVGPathElement).getTotalLength(); gsap.set(pth, { strokeDasharray: len, strokeDashoffset: len }); });
+      t.fromTo(q('[data-trigger-copy] > *'), { autoAlpha: 0, y: 30, filter: 'blur(8px)' }, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 1, stagger: 0.3 }, 0.2)
+        .fromTo(q('[data-feed-in]'), { autoAlpha: 0, x: -30 }, { autoAlpha: 1, x: 0, duration: 0.8, stagger: 0.25 }, 1.4)
+        .to(q('[data-feed="in"]'), { strokeDashoffset: 0, duration: 2, stagger: 0.25 }, 1.8)
+        .fromTo(q('[data-node]'), { scale: 0.4, autoAlpha: 0, transformOrigin: '50% 50%' }, { scale: 1, autoAlpha: 1, duration: 1, ease: 'back.out(1.6)' }, 3.6)
+        .to(q('[data-feed="out"]'), { strokeDashoffset: 0, duration: 2, stagger: 0.2 }, 4.6)
+        .fromTo(q('[data-feed-out]'), { autoAlpha: 0, x: 30 }, { autoAlpha: 1, x: 0, duration: 0.8, stagger: 0.25 }, 5.2)
+        .to(q('[data-trigger-copy], [data-feeds]'), { autoAlpha: matchMedia('(max-width: 760px)').matches ? 1 : 0, scale: 0.94, duration: 0.8 }, 9.2);
+
       // --- 3. the recommendation: the calendar turns to face you and redraws itself
+      const phone = matchMedia('(max-width: 760px)').matches;
       const r = scene('rec');
       const big = q('[data-cal="rec"]')[0];
-      r.fromTo(big, { rotateX: 62, rotateZ: -14, rotateY: 8, scale: 0.78, y: 120, autoAlpha: 0.3 }, { rotateX: 0, rotateZ: 0, rotateY: 0, scale: 1, y: 0, autoAlpha: 1, duration: 2.6, ease: 'power2.inOut' }, 0)
+      r.fromTo(big, phone ? { rotateX: 24, rotateZ: -4, scale: 0.92, y: 40, autoAlpha: 0.6 } : { rotateX: 62, rotateZ: -14, rotateY: 8, scale: 0.78, y: 120, autoAlpha: 0.3 }, { rotateX: 0, rotateZ: 0, rotateY: 0, scale: 1, y: 0, autoAlpha: 1, duration: phone ? 1.6 : 2.6, ease: 'power2.inOut' }, 0)
         .fromTo(q('[data-rec-alert]'), { y: -80, z: 200, autoAlpha: 0 }, { y: 0, z: 60, autoAlpha: 1, duration: 1, ease: 'power3.out' }, 2.4)
         .to(big.querySelectorAll('[data-snowband]'), { opacity: 1, duration: 0.8 }, 2.6)
         .to(big.querySelectorAll('[data-ghost]'), { opacity: 1, duration: 0.6 }, 3.6)
@@ -149,8 +161,8 @@ export default function Site() {
         .call(() => big.querySelectorAll('[data-move]').forEach(e => e.classList.add('hot')), [], 3.7)
         .fromTo(q('[data-chg]'), { autoAlpha: 0, x: 30 }, { autoAlpha: 1, x: 0, duration: 0.7, stagger: 0.5, ease: 'power3.out' }, 3.9)
         .add(swapGuest(big, true), 6.6)
-        .fromTo(q('[data-rec-step="2"]'), { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.8 }, 6.4)
-        .to(q('[data-rec-step="1"]'), { autoAlpha: 0, y: -20, duration: 0.6 }, 6.2);
+        .to(q('[data-rec-step="1"]'), { autoAlpha: 0, y: -20, duration: 0.5 }, 5.8)
+        .fromTo(q('[data-rec-step="2"]'), { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.7 }, 6.4);
 
       q('[data-reveal]').forEach(el => gsap.fromTo(el, { y: 40, autoAlpha: 0, filter: 'blur(8px)' }, { y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1, ease: 'power4.out', scrollTrigger: { trigger: el, start: 'top 85%', once: true } }));
       q('[data-split-scroll]').forEach(el => {
@@ -280,6 +292,43 @@ export default function Site() {
           <div className="s-progress"><i /></div>
         </div>
       </section>
+
+      {/* 2. the trigger */}
+      <section className="s-pin s-trigger" data-scene="trigger">
+        <div className="s-sticky">
+          <canvas className="s-snowfield" data-snowfield aria-hidden="true" />
+          <div className="s-trigger-copy" data-trigger-copy>
+            <span className="s-clock">Thursday · 1:10 pm</span>
+            <h2 className="s-h2">The agent sees the snow coming.</h2>
+            <p className="s-lead" style={{ textAlign: 'center' }}>It reads the weather, flight and shuttle feeds, then checks every screening, guest and shift against them.</p>
+          </div>
+          <div className="s-feeds" data-feeds>
+            <svg viewBox="0 0 1100 420" role="img" aria-label="Weather, flights and the shuttle feed reach the agent, which finds three screenings, twenty-one people, one guest and three door teams affected">
+              {[['Weather', '3 in of snow, 2 to 7 pm', 90], ['Flights', 'DL2207 lands 2:41 pm', 210], ['Shuttle', 'Harbor Loop 12 min late', 330]].map(([l, s, y]) => (
+                <g key={String(l)} data-feed-in>
+                  <text className="lbl" x="20" y={Number(y) - 6}>{l}</text>
+                  <text className="sub" x="20" y={Number(y) + 16}>{s}</text>
+                  <path className="dim" d={`M250 ${y} C 380 ${y}, 420 210, 500 210`} />
+                  <path data-feed="in" d={`M250 ${y} C 380 ${y}, 420 210, 500 210`} />
+                </g>
+              ))}
+              <g data-node>
+                <circle className="node" cx="550" cy="210" r="56" />
+                <text className="node-t" x="550" y="220" textAnchor="middle">Agent</text>
+              </g>
+              {[['3 screenings', 60], ['21 people', 160], ['1 guest', 260], ['3 door teams', 360]].map(([l, y]) => (
+                <g key={String(l)} data-feed-out>
+                  <path className="dim" d={`M600 210 C 680 210, 720 ${y}, 840 ${y}`} />
+                  <path data-feed="out" d={`M600 210 C 680 210, 720 ${y}, 840 ${y}`} />
+                  <text className="out" x="860" y={Number(y) + 7}>{l}</text>
+                </g>
+              ))}
+            </svg>
+          </div>
+          <div className="s-progress"><i /></div>
+        </div>
+      </section>
+
 
       {/* 3. the recommendation */}
       <section className="s-pin s-rec" data-scene="rec">

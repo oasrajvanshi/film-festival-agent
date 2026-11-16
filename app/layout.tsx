@@ -11,10 +11,7 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover' as const,
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#f6f3ee' },
-    { media: '(prefers-color-scheme: dark)', color: '#111015' },
-  ],
+  themeColor: '#120b09',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -24,7 +21,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Montserrat:wght@600;700;800&family=DM+Mono:wght@400;500&display=swap" />
       </head>
       <body>{children}</body>
     </html>
