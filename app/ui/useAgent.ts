@@ -70,7 +70,7 @@ export function useAgent() {
   const [who, setWhoState] = useState<Who | null>(null);
   const [notice, setNotice] = useState('');
   const [llmInfo, setLlmInfo] = useState<{ available: boolean; model: string | null }>({ available: false, model: null });
-  const [useModel, setUseModel] = useState(false);
+  const [useModel, setUseModel] = useState(true);
   const agentRef = useRef<FestivalAgent | null>(null);
   const [sheet, setSheet] = useState<SheetStatus>({ source: 'built-in', errors: [], warnings: [] });
   const sheetRef = useRef(sheet);

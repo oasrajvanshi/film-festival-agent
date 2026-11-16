@@ -74,30 +74,54 @@ function scheduleAnswer(f: Festival, question: string): Answer | null {
 
 export const MIN_SCORE = 2.5;
 
-export async function answerQuestion(f: Festival, question: string, llm: LlmClient | null = null): Promise<Answer> {
-  const sched = scheduleAnswer(f, question);
-  if (sched) return sched;
-  const sources = retrieve(f, question);
-  // The best section must share a telling word with the question, not only a common one like "screening".
-  if (!sources.length || sources[0].score < MIN_SCORE || !sources[0].specific) return { known: false, text: IDK, citations: [], via: 'none' };
+/** The festival's schedule and venues as short lines a model can read. */
+export function scheduleDigest(f: Festival, max = 160): string {
+  const venue = (id: string) => f.venues.find(v => v.id === id);
+  const who = (ids: string[]) => ids.map(id => f.people.find(p => p.id === id)?.name).filter(Boolean).join(', ');
+  const day = (d: number) => new Date(`${f.dates[d]}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
+  const lines = [...f.events].sort((a, b) => a.start.localeCompare(b.start)).slice(0, max).map(e =>
+    `- Day ${e.day} (${day(e.day)}) ${clock(e.start)}–${clock(e.end)}: ${e.kind} "${e.title}" at ${venue(e.venueId)?.name ?? e.venueId}${e.room ? `, ${e.room}` : ''}`
+    + `${e.guestIds.length ? `; with ${who(e.guestIds)}` : ''}${e.restriction ? `; ${e.restriction.replace('_', ' ')}` : ''}${e.status === 'cancelled' ? '; CANCELLED' : ''}`);
+  const venues = f.venues.map(v => `- ${v.name}: ${v.address}${v.capacity ? `, ${v.capacity} seats` : ''}`);
+  const films = f.films.map(x => `- "${x.title}" dir. ${x.director}, ${x.runtimeMin} min`);
+  return `Festival: ${f.name}\nVenues:\n${venues.join('\n')}\nFilms:\n${films.join('\n')}\nSchedule:\n${lines.join('\n')}`;
+}
 
+export async function answerQuestion(f: Festival, question: string, llm: LlmClient | null = null): Promise<Answer> {
+  const sources = retrieve(f, question, 4);
   let note: string | undefined;
   if (llm) {
+    // With a model: it reads the best-matching official sections and the whole
+    // schedule, answers only from them, and must cite what it used.
     try {
       const raw = await llm.chat([
-        { role: 'system', content: 'You answer festival questions using ONLY the numbered sources. If the sources let you answer, including a "no" (for example a source says something is not included or not admitted), set known to true and answer in one or two plain sentences. Set known to false only if the sources say nothing about the question. Never add facts. Reply as JSON: {"known": boolean, "answer": string, "cite": [source numbers]}.' },
-        { role: 'user', content: `Sources:\n${sources.map((s, i) => `[${i + 1}] ${s.title}: ${s.text}`).join('\n')}\n\nQuestion: ${question}` },
+        { role: 'system', content: 'You are Usher, the help desk for a film festival. Answer using ONLY the numbered official sources and the festival schedule below. '
+          + 'If they let you answer, including a "no", set known to true and answer in one to three plain, friendly sentences with exact times, dates and venue names. '
+          + 'Set known to false if they do not cover the question. Never guess or add facts. '
+          + 'Reply as JSON: {"known": boolean, "answer": string, "cite": [source numbers, or "schedule"]}.' },
+        { role: 'user', content: `Official sources:\n${sources.length ? sources.map((s, i) => `[${i + 1}] ${s.title}: ${s.text}`).join('\n') : '(none matched)'}\n\n${scheduleDigest(f)}\n\nQuestion: ${question}` },
       ], { json: true });
-      const parsed = extractJson(raw) as { known?: boolean | string; answer?: string; cite?: (number | string)[] | number };
-      if (parsed.known === false || parsed.known === 'false') return { known: false, text: IDK, citations: [], via: 'llm' };
+      const parsed = extractJson(raw) as { known?: boolean | string; answer?: string; cite?: (number | string)[] | number | string };
+      if (parsed.known === false || parsed.known === 'false' || !parsed.answer) return { known: false, text: IDK, citations: [], via: 'llm' };
       const citeList = Array.isArray(parsed.cite) ? parsed.cite : parsed.cite != null ? [parsed.cite] : [];
-      const cites = citeList.map(n => sources[Number(String(n).replace(/\D/g, '')) - 1]?.ref).filter((x): x is string => !!x);
-      if (parsed.answer && cites.length) return { known: true, text: parsed.answer, citations: [...new Set(cites)], via: 'llm' };
-      if (parsed.answer) return { known: true, text: parsed.answer, citations: [sources[0].ref], via: 'llm' };
-      note = 'model reply had no answer';
+      const cites = citeList.map(n => /sched/i.test(String(n)) ? 'grid' : sources[Number(String(n).replace(/\D/g, '')) - 1]?.ref).filter((x): x is string => !!x);
+      return { known: true, text: parsed.answer, citations: cites.length ? [...new Set(cites)] : ['grid'], via: 'llm' };
     } catch (e) {
       note = (e as Error).message.slice(0, 160);
     }
   }
+  // Without a model (or if it failed): schedule lookups and the best official section, or "I don't know".
+  const sched = scheduleAnswer(f, question);
+  if (sched) return { ...sched, ...(note ? { note } : {}) };
+  // The best section must share a telling word with the question, not only a common one like "screening".
+  if (!sources.length || sources[0].score < MIN_SCORE || !sources[0].specific) return { known: false, text: IDK, citations: [], via: 'none', ...(note ? { note } : {}) };
   return { known: true, text: sources[0].text, citations: [sources[0].ref], via: 'extractive', ...(note ? { note } : {}) };
+}
+
+/** A citation as people read it, e.g. "FAQ › Food" or "Festival schedule". */
+export function citeLabel(f: Festival, ref: string): string {
+  if (ref === 'grid' || ref.startsWith('grid#')) return 'Festival schedule';
+  const [docId, heading] = ref.split('#');
+  const d = f.docs.find(x => x.id === docId);
+  return d ? `${d.title} › ${heading}` : ref;
 }

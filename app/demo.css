@@ -1,0 +1,22 @@
+/* Demo-day toolbar and phone frame (only with ?demo=1). */
+.demo-bar {
+  position: sticky; top: 0; z-index: 200; display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+  padding: 8px 14px; background: rgba(10, 6, 5, .92); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line-2); font-size: 13px;
+}
+.demo-tag { font-family: var(--mono); text-transform: uppercase; letter-spacing: .14em; font-size: 11px; color: var(--accent-ink); background: var(--gold); padding: 3px 8px; border-radius: 999px; }
+.demo-seg { display: inline-flex; border: 1px solid var(--line-2); border-radius: 999px; overflow: hidden; }
+.demo-seg button { border: 0; border-radius: 0; background: transparent; color: var(--muted); padding: 6px 12px; min-height: 0; font-size: 13px; box-shadow: none; }
+.demo-seg button.on { background: var(--ink); color: var(--bg); }
+.demo-seg button:disabled { opacity: .4; }
+.demo-hint { color: var(--muted); }
+.demo-phone { min-height: 100svh; }
+.demo-stage { display: grid; place-items: center; padding: 24px 12px 40px; }
+.demo-device {
+  width: 390px; height: min(844px, calc(100svh - 110px)); border-radius: 46px; padding: 12px; background: #050302;
+  box-shadow: 0 0 0 2px #2c201a, 0 30px 80px rgba(0, 0, 0, .7);
+}
+.demo-device iframe { width: 100%; height: 100%; border: 0; border-radius: 34px; background: var(--bg); display: block; }
+@media (max-width: 520px) { .demo-who { order: 3; width: 100%; overflow-x: auto; } .demo-device { width: 100%; border-radius: 0; padding: 0; box-shadow: none; } }
+/* The toolbar does the switching, so the "Viewing as" strip is not needed in the demo. */
+.demo-mode .viewas-bar { display: none; }

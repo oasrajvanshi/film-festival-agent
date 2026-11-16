@@ -7,7 +7,7 @@ import type { DayNumber, FestivalEvent, PassType } from '../../src/core/types';
 import { festivalDays } from '../../src/core/types';
 import { addMinutes, clock as fmt, toMinutes } from '../../src/core/time';
 import { PASS_LABELS, qrFor, type ScanResult } from '../../src/rules/access';
-import type { Answer } from '../../src/agent/answer';
+import { citeLabel, type Answer } from '../../src/agent/answer';
 import { runAll, type SuiteResult } from '../../src/eval/scenarios';
 import { evalRandomFestivals } from '../../src/eval/fuzz';
 import type { Recommendation } from '../../src/agent/recommend';
@@ -15,7 +15,7 @@ import { Icon } from './icons';
 import { buildBrief } from '../../src/agent/briefs';
 import { HeroPhoto, PhotoBand } from './photos';
 
-type P = { s: AgentStore; user: string; go: (page: 'today' | 'approvals' | 'scan' | 'schedule' | 'ask' | 'briefs' | 'feeds' | 'log' | 'eval' | 'data') => void };
+type P = { s: AgentStore; user: string; go: (page: 'today' | 'approvals' | 'scan' | 'schedule' | 'ask' | 'briefs' | 'feeds' | 'log' | 'data') => void };
 
 const dayOf = (iso: string, dates: Record<DayNumber, string>): DayNumber =>
   Number(Object.entries(dates).find(([, d]) => iso.startsWith(d))?.[0] ?? 1) as DayNumber;
@@ -195,7 +195,7 @@ export function WeatherCard({ s, go, compact }: P & { compact?: boolean }) {
   return (
     <div className="card stack">
       {!compact && <PhotoBand k="snow" label="Snow, storms, heat" />}
-      <div className="section-title"><h2><Icon name="cloud" size={18} /> Weather watch</h2><span className="muted" style={{ fontSize: 12 }}>Open-Meteo, no key needed</span></div>
+      <div className="section-title"><h2><Icon name="cloud" size={18} /> Weather watch</h2><span className="muted" style={{ fontSize: 12 }}>Live forecast</span></div>
       {!compact && <p className="muted" style={{ margin: 0 }}>The agent checks the forecast for {city}, finds risky hours, tells staff and volunteers on shift, and drafts a personal note for everyone with tickets or plans in that window. Those notes wait for your approval.</p>}
       <div className="row">
         <button className="primary" disabled={busy} onClick={() => run()}>{preview ? `Preview with today's ${city} weather` : `Check the forecast for ${dayLabel}`}</button>
@@ -504,7 +504,7 @@ export function Ask({ s }: P) {
         <div className="msg" key={i}>
           <div className="who">{h.q}</div>
           <div>{h.a.text}</div>
-          <div className="who">{h.a.known ? `Source: ${h.a.citations.join(', ')}` : 'No source found'} · {h.a.via}{h.a.note ? ` (model skipped: ${h.a.note})` : ''}</div>
+          {h.a.known && <div className="who">Source: {[...new Set(h.a.citations.map(c => citeLabel(s.agent.f, c)))].join(' · ')}</div>}
         </div>
       ))}
     </div>

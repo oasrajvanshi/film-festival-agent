@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { readSetup, useAgent, writeSetup, writeWho } from '../ui/useAgent';
-import { Approvals, Ask, Briefs, Data, Evaluation, Feeds, Grid, Log, Overview, Scan } from '../ui/panels';
+import { Approvals, Ask, Briefs, Data, Feeds, Grid, Log, Overview, Scan } from '../ui/panels';
+import { DemoShell, backToOrganizer, demoPerson, useDemo, type Demo } from '../ui/demo';
 import { Icon } from '../ui/icons';
 import '../mobile.css';
 import { AccessCodes, Feedback, PersonalApp, SignIn } from '../ui/profiles';
@@ -20,8 +21,7 @@ const PAGES = [
   { id: 'ask', label: 'Ask', icon: 'chat', group: 'Festival day' },
   { id: 'briefs', label: 'Volunteer briefs', icon: 'users', group: 'Teams' },
   { id: 'feeds', label: 'Alerts & feeds', icon: 'bolt', group: 'Teams' },
-  { id: 'log', label: 'Log', icon: 'list', group: 'Behind the scenes' },
-  { id: 'eval', label: 'Evaluation', icon: 'chart', group: 'Behind the scenes' },
+  { id: 'log', label: 'Activity log', icon: 'list', group: 'Behind the scenes' },
   { id: 'data', label: 'Data', icon: 'sheet', group: 'Behind the scenes' },
   { id: 'codes', label: 'Access codes', icon: 'key', group: 'Behind the scenes' },
   { id: 'feedback', label: 'Feedback', icon: 'chat', group: 'Behind the scenes' },
@@ -30,6 +30,12 @@ type PageId = typeof PAGES[number]['id'];
 const BOTTOM: PageId[] = ['today', 'approvals', 'scan', 'schedule'];
 
 export default function App() {
+  const demo = useDemo();
+  if (demo.on) return <DemoShell demo={demo}><AppInner demo={demo} /></DemoShell>;
+  return <AppInner demo={demo.framed ? demo : null} />;
+}
+
+function AppInner({ demo }: { demo: Demo | null }) {
   const s = useAgent();
   const [page, setPageState] = useState<PageId>('today');
   const [user, setUser] = useState('Operations lead');
@@ -119,15 +125,6 @@ export default function App() {
       <label className="field">Festival clock
         <input type="time" value={s.clock.slice(11)} onChange={e => e.target.value && s.setClock(`${s.clock.slice(0, 11)}${e.target.value}`)} />
       </label>
-      <label className="field">Acting as
-        <input value={user} onChange={e => setUser(e.target.value)} />
-      </label>
-      <label className="field" title={s.llmInfo.available ? '' : 'Set GROQ_API_KEY or OLLAMA_API_KEY on the server to enable'}>Language model
-        <span className="row">
-          <input type="checkbox" disabled={!s.llmInfo.available} checked={s.useModel} onChange={e => s.setUseModel(e.target.checked)} />
-          {s.llmInfo.available ? <>Use {s.llmInfo.model}</> : 'Not configured'}
-        </span>
-      </label>
       <div className="field">Alerts on this device
         {alerts === 'granted' ? <span className="muted">On. New approvals and flags show as notifications.</span>
           : alerts === 'denied' ? <span className="muted">Blocked in this browser's settings.</span>
@@ -149,6 +146,8 @@ export default function App() {
   if (!ready) return null;
   if (!who) return <SignIn s={s} onIn={w => { if (w.kind === 'organizer') setUser(w.name); }} />;
   if (who.kind !== 'organizer') return <PersonalApp s={s} who={who} onOut={signOut} />;
+  const demoWho = demo && demo.kind !== 'organizer' ? demoPerson(f, demo.kind, s.clock) : null;
+  if (demoWho) return <PersonalApp key={demoWho.id} s={s} who={demoWho} viewAs onOut={() => backToOrganizer(demo)} />;
   if (viewAs) return <PersonalApp s={s} who={viewAs} viewAs onOut={() => { setViewAs(null); window.scrollTo({ top: 0 }); }} />;
 
   return (
@@ -204,7 +203,6 @@ export default function App() {
           {page === 'ask' && <Ask {...props} />}
           {page === 'feeds' && <Feeds {...props} />}
           {page === 'log' && <Log {...props} />}
-          {page === 'eval' && <Evaluation {...props} />}
           {page === 'data' && <Data {...props} />}
           {page === 'feedback' && <Feedback s={s} />}
           {page === 'codes' && <AccessCodes s={s} onViewAs={w => { setViewAs(w); window.scrollTo({ top: 0 }); }} />}
