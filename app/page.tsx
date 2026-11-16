@@ -152,6 +152,8 @@ export default function Site() {
 
       const scene = (name: string) => {
         const el = q(`[data-scene="${name}"]`)[0];
+        // Phones: no pinned scrubbing; the scene plays once, on its own clock, as it scrolls into view.
+        if (phone) return gsap.timeline({ defaults: { ease: 'power2.out' }, scrollTrigger: { trigger: el, start: 'top 72%', once: true } }).timeScale(2.2);
         return gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: el, start: 'top top', end: 'bottom bottom', scrub: 1 } })
           .to(el.querySelector('.s-progress i'), { scaleX: 1, duration: 10 }, 0);
       };
@@ -173,12 +175,16 @@ export default function Site() {
         .fromTo(q('[data-node]'), { scale: 0.4, autoAlpha: 0, transformOrigin: '50% 50%' }, { scale: 1, autoAlpha: 1, duration: 1, ease: 'back.out(1.6)' }, 3.6)
         .to(q('[data-feed="out"]'), { strokeDashoffset: 0, duration: 2, stagger: 0.2 }, 4.6)
         .fromTo(q('[data-feed-out]'), { autoAlpha: 0, x: 30 }, { autoAlpha: 1, x: 0, duration: 0.8, stagger: 0.25 }, 5.2)
-        .to(q('[data-trigger-copy], [data-feeds]'), { autoAlpha: matchMedia('(max-width: 760px)').matches ? 1 : 0, scale: 0.94, duration: 0.8 }, 9.2);
+      if (!phone) t.to(q('[data-trigger-copy], [data-feeds]'), { autoAlpha: 0, scale: 0.94, duration: 0.8 }, 9.2);
 
       // --- 3. the recommendation: the calendar turns to face you and redraws itself
       const r = scene('rec');
       const big = q('[data-cal="rec"]')[0];
-      r.fromTo(big, phone ? { rotateX: 24, rotateZ: -4, scale: 0.92, y: 40, autoAlpha: 0.6 } : { rotateX: 62, rotateZ: -14, rotateY: 8, scale: 0.78, y: 120, autoAlpha: 0.3 }, { rotateX: 0, rotateZ: 0, rotateY: 0, scale: 1, y: 0, autoAlpha: 1, duration: phone ? 1.6 : 2.6, ease: 'power2.inOut' }, 0)
+      if (phone) {
+        // Phones: the alert, then each change in turn; both headings stay on screen.
+        r.fromTo(q('.s-rec-malert'), { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.8 }, 0.2)
+          .fromTo(q('[data-chg]'), { autoAlpha: 0, x: 24 }, { autoAlpha: 1, x: 0, duration: 0.7, stagger: 0.45, ease: 'power3.out' }, 0.9);
+      } else r.fromTo(big, phone ? { rotateX: 24, rotateZ: -4, scale: 0.92, y: 40, autoAlpha: 0.6 } : { rotateX: 62, rotateZ: -14, rotateY: 8, scale: 0.78, y: 120, autoAlpha: 0.3 }, { rotateX: 0, rotateZ: 0, rotateY: 0, scale: 1, y: 0, autoAlpha: 1, duration: phone ? 1.6 : 2.6, ease: 'power2.inOut' }, 0)
         .fromTo(q('[data-rec-alert]'), { y: -80, z: 200, autoAlpha: 0 }, { y: 0, z: 60, autoAlpha: 1, duration: 1, ease: 'power3.out' }, 2.4)
         .to(big.querySelectorAll('[data-snowband]'), { opacity: 1, duration: 0.8 }, 2.6)
         .to(big.querySelectorAll('[data-ghost]'), { opacity: 1, duration: 0.6 }, 3.6)
@@ -238,7 +244,7 @@ export default function Site() {
       <header className="s-hero">
         <div className="s-hero-bg" data-hero-bg style={{ backgroundImage: `url(${PHOTOS.hero.src})` }} />
         <div className="s-hero-copy">
-          <h1 className="s-h1" data-split>Usher: your festival&apos;s change manager agent.</h1>
+          <h1 className="s-h1 s-h1-hero" data-split>{'Usher: the best film festival\nchange management agent.'}</h1>
           <p className="s-lead" data-hero-fade><q className="s-quote">Don&apos;t worry. I&apos;ll take care of everything.</q> That&apos;s what Usher says when a print arrives late, a guest misses their flight or snow slows the city down. It tracks your schedule and tells everyone affected by a change what to do next.</p>
           <div className="s-ctas" data-hero-fade>
             <a className="btn primary" href="/onboarding">Try the live demo</a>
@@ -259,13 +265,36 @@ export default function Site() {
         <div className="s-scrollcue" aria-hidden="true">Scroll<i /></div>
       </header>
 
-      {/* 1. the problem */}
-      <section id="story" className="s-pin s-problem" data-scene="problem">
+      {/* 1. the first problem: anything can go wrong */}
+      <section id="story" className="s-risk">
+        <div className="s-risk-copy" data-reveal>
+          <p className="s-mono">The problem</p>
+          <h2 className="s-h2">Anything can go wrong at a film festival.</h2>
+          <p className="s-lead">And one thing going wrong moves everything around it.</p>
+        </div>
+        <div className="s-risk-cards">
+          <article className="s-risk-card" data-reveal>
+            <div className="s-risk-img" style={{ backgroundImage: 'url(/hl/snow.jpg)' }}><span>Weather</span></div>
+            <h3>Snow from 2:00 pm</h3>
+            <p>The shuttle runs 12 minutes late. Three 3:00 screenings start with half the audience still outside, and 60 volunteers need new instructions.</p>
+            <div className="s-impact"><span>3 screenings</span><span>21 attendees</span><span>60 volunteers</span></div>
+          </article>
+          <article className="s-risk-card" data-reveal>
+            <div className="s-risk-img" style={{ backgroundImage: 'url(/hl/hall.jpg)' }}><span>A late guest</span></div>
+            <h3>Pavel Kettering is stuck on the bridge</h3>
+            <p>His 4:00 panel has no speaker and a full room. His 6:30 talk is at risk too, and the other panelists don&apos;t know yet.</p>
+            <div className="s-impact"><span>2 panels</span><span>4 guests</span><span>120 seats</span></div>
+          </article>
+        </div>
+      </section>
+
+      {/* 2. the second problem: every fix lives in a different place */}
+      <section className="s-pin s-problem" data-scene="problem">
         <div className="s-sticky">
           <div className="s-problem-copy">
-            <p className="s-mono">The problem</p>
-            <h2 className="s-h2">Schedule changes are still passed on by hand.</h2>
-            <p className="s-lead">Every change travels across spreadsheets, emails and group chats, so updates arrive late or reach the wrong people.</p>
+            <p className="s-mono">And every fix is scattered</p>
+            <h2 className="s-h2">The answers live in four different places.</h2>
+            <p className="s-lead">The schedule is in a spreadsheet, updates go out by email, volunteers read a Word brief and the team decides in a group chat. Each person ends up with a different version of the day.</p>
           </div>
           <div className="s-tools" data-tools data-lve-skip aria-hidden="true">
             <figure className="s-tool t-sheets" data-tool>

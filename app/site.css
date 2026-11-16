@@ -534,3 +534,47 @@
 
 /* The hero's quote: Usher speaking. */
 .s-quote { display: block; quotes: "\201C" "\201D"; font-family: var(--f-title, inherit); font-style: italic; font-size: 1.12em; color: var(--cream); margin-bottom: 6px; }
+
+/* Phones: the agent and plan scenes are not pinned; they play in as they arrive. */
+@media (max-width: 760px) {
+  .s-trigger.s-pin, .s-rec.s-pin { height: auto; }
+  .s-trigger .s-sticky { position: relative; height: auto; min-height: 92svh; padding: 64px 16px 48px; overflow: hidden; }
+  .s-rec .s-sticky { position: relative; height: auto; overflow: visible; padding: 56px 16px 48px; }
+  .s-rec-copy { display: grid; gap: 22px; }
+  .s-rec-copy [data-rec-step="2"] { position: static !important; opacity: 1 !important; visibility: visible !important; transform: none !important; }
+  .s-rec-list { margin-top: 16px; }
+}
+@media (max-width: 760px) {
+  .s-rec-copy > [data-rec-step="1"] { grid-area: 1 / 1; }
+  .s-rec-copy > [data-rec-step="2"] { grid-area: 2 / 1; }
+}
+
+/* Hero: the headline on exactly two lines, the quote on one, more air between them. */
+.s-hero .s-h1.s-h1-hero { white-space: pre-line; max-width: none; font-size: clamp(30px, 2.7vw, 44px); line-height: 1.1; }
+.s-hero .s-lead { margin-top: 14px; }
+.s-quote { color: #EBC35E; white-space: nowrap; font-size: 1.08em; margin-bottom: 10px; }
+@media (max-width: 760px) {
+  .s-hero .s-h1.s-h1-hero { white-space: normal; font-size: 27px; }
+  .s-quote { font-size: 1em; }
+}
+
+/* ---------------------------------------------------------------- the first problem */
+.s-risk { position: relative; padding: 120px max(28px, 6vw) 90px; display: grid; gap: 36px; }
+.s-risk-copy { display: grid; gap: 14px; max-width: 760px; }
+.s-risk-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; }
+.s-risk-card { border-radius: 20px; overflow: hidden; background: rgba(28, 19, 15, .72); border: 1px solid var(--line); display: grid; gap: 10px; padding-bottom: 20px; }
+.s-risk-img { position: relative; height: 230px; background: center / cover no-repeat; filter: sepia(.2) saturate(.9); }
+.s-risk-img::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(18, 11, 9, 0) 40%, rgba(28, 19, 15, .95) 100%); }
+.s-risk-img span { position: absolute; z-index: 1; left: 18px; top: 16px; font-family: var(--f-time); font-size: 12.5px; padding: 3px 10px; border-radius: 999px; background: rgba(18, 11, 9, .7); color: var(--amber-2); }
+.s-risk-card h3 { margin: 0 20px; font-family: var(--f-display); font-size: 22px; font-weight: 700; color: var(--cream); letter-spacing: -.01em; }
+.s-risk-card p { margin: 0 20px; font-size: 15.5px; line-height: 1.55; color: var(--text); }
+.s-impact { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 20px 0; }
+.s-impact span { font-style: normal; font-size: 12.5px; padding: 4px 10px; border-radius: 999px; background: rgba(232, 104, 75, .12); border: 1px solid rgba(232, 104, 75, .35); color: #F2A48F; }
+@media (max-width: 760px) {
+  .s-risk { padding: 64px 18px 24px; gap: 20px; }
+  .s-risk-cards { grid-template-columns: 1fr; gap: 14px; }
+  .s-risk-img { height: 150px; }
+  .s-risk-card h3 { font-size: 18px; margin: 0 16px; }
+  .s-risk-card p { font-size: 14px; margin: 0 16px; }
+  .s-impact { margin: 2px 16px 0; }
+}
