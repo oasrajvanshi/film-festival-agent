@@ -374,7 +374,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
           <div className={`wx-alert wx-all${openId === 'all' ? ' open' : ''}`}>
             <div className="wx-alert-row">
               <span className="wx-alert-ic"><Icon name="sparkle" size={18} /></span>
-              <div className="wx-alert-text"><b>Handle all {shown.length} at once</b><span>{shown.map(x => SHORT[x.al.kind]).join(', ')}</span></div>
+              <div className="wx-alert-text"><b>Handle all at once</b></div>
               <button className={openId === 'all' ? '' : 'primary'} onClick={() => show(openId === 'all' ? null : 'all')}>
                 {openId === 'all' ? 'Close preview' : <><Icon name="sparkle" size={15} /> Overall recommendation</>}
               </button>
@@ -405,8 +405,6 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
               <span><Icon name="sparkle" size={14} /> Agent&apos;s recommendation</span>
               <button className="ghost small" aria-label="Close" onClick={() => show(null)}><Icon name="x" size={16} /></button>
             </div>
-            <b className="rec-float-title">{open.rec.title}</b>
-            {open.rec.what && <p className="wx-what">{open.rec.what}</p>}
             <ul className="wx-list">
               {open.rec.items.map(i => (
                 <li key={i.key}><label>

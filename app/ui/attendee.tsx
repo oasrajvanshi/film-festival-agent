@@ -45,7 +45,7 @@ export function AttendeeApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who
         {!viewAs && <button className="at-me" onClick={onOut} aria-label="Sign out" title="Sign out">{who.name.split(/\s+/).slice(0, 2).map(w => w[0]).join('')}</button>}
       </header>
       <main className="at-body">
-        {tab === 'agenda' && <Agenda s={s} who={who} onUpdates={() => go('updates')} />}
+        {tab === 'agenda' && <Agenda s={s} who={who} />}
         {tab === 'updates' && <Updates s={s} who={who} />}
         {tab === 'pass' && <><Pass s={s} who={who} /><MyArrival s={s} who={who} /></>}
         {tab === 'ask' && <div className="at-ask"><h1 className="at-h1">Ask</h1><Ask s={s} user={who.name} go={() => undefined} /></div>}
@@ -63,7 +63,7 @@ export function AttendeeApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who
 }
 
 // ---------------------------------------------------------------- agenda
-function Agenda({ s, who, onUpdates }: { s: AgentStore; who: Who; onUpdates: () => void }) {
+function Agenda({ s, who }: { s: AgentStore; who: Who }) {
   const f = s.agent.f;
   const days = festivalDays(f);
   const [v, setV] = useState(0); // bump after a swap or a save
@@ -81,7 +81,6 @@ function Agenda({ s, who, onUpdates }: { s: AgentStore; who: Who; onUpdates: () 
   const was = (e: FestivalEvent) => { const o = original.find(x => x.id === e.id); return o && o.start !== e.start ? o.start : null; };
   const changedOn = (d: DayNumber) => plans.some(p => p.e.day === d && (was(p.e) || p.e.status === 'cancelled'));
   const mine = plans.filter(p => p.e.day === day);
-  const latest = [...s.agent.outbox].reverse().find(m => m.personId === who.id);
   const inPlan = new Set(plans.map(p => p.e.id));
 
   // Change the plan here at once; on a shared festival the server keeps it (only your own plan).
@@ -177,12 +176,6 @@ function Agenda({ s, who, onUpdates }: { s: AgentStore; who: Who; onUpdates: () 
           );
         })}
       </div>
-      {latest && (
-        <button className="at-alert" onClick={onUpdates}>
-          <span className="at-alert-ic"><Icon name="alert" size={16} /></span>
-          <span><b>{latest.subject}</b><em>{latest.body}</em></span>
-        </button>
-      )}
       <div className="at-dayhead">
         <b>{new Date(`${f.dates[day]}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</b>
         <span>{mine.length ? `${mine.length} on your plan` : 'Nothing planned'}</span>
