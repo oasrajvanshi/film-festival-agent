@@ -103,7 +103,7 @@ export default function Site() {
 
     const ctx = gsap.context(() => {
       const q = gsap.utils.selector(root);
-      if (reduce) { finalStates(q); q('[data-leader]').forEach(e => e.remove()); return; }
+      if (reduce) { finalStates(q); q('[data-leader]').forEach(e => e.remove()); root.current?.classList.add('ready'); return; }
 
       const phone = matchMedia('(max-width: 760px)').matches;
       // Phones: the four tools are a swipeable row; the dots follow the swipe.
@@ -148,7 +148,7 @@ export default function Site() {
       } else {
         const r0 = h1.getBoundingClientRect();
         const toCentre = { x: innerWidth / 2 - (r0.left + r0.width / 2), y: innerHeight / 2 - (r0.top + r0.height / 2) };
-        gsap.set(h1, { x: toCentre.x, y: toCentre.y, scale: 1.45, transformOrigin: '50% 50%' });
+        gsap.set(h1, { x: toCentre.x, y: toCentre.y, scale: 1.25, transformOrigin: '50% 50%', force3D: true });
         gsap.set(q('[data-hero-fade]'), { autoAlpha: 0, y: 28 });
         gsap.set(q('.s-hero-stage'), { autoAlpha: 0, y: 90 });
         gsap.timeline({ scrollTrigger: { trigger: hero, start: 'top top', end: '+=110%', scrub: 0.8, pin: true, anticipatePin: 1 } })
@@ -159,6 +159,8 @@ export default function Site() {
           .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out' }, 0.95)
           .fromTo(q('[data-hero-float]'), { y: 24, autoAlpha: 0, scale: 0.96 }, { y: 0, autoAlpha: 1, scale: 1, duration: 0.5, stagger: 0.25, ease: 'back.out(1.4)' }, 1.45);
       }
+      // Every starting state is set: now the hero may be seen (it was hidden so the finished layout never flashes first).
+      root.current?.classList.add('ready');
 
       // hero: the calendar keeps showing what the product does, on a loop
       const heroCal = q('[data-cal="hero"]')[0];

@@ -720,3 +720,9 @@
   .s-scrollcue { display: none; }
 }
 .pd-rec .pd-what { color: var(--cream); font-size: 14px; font-weight: 600; line-height: 1.4; }
+
+/* Until the script has set the hero's starting frame, keep it unseen, so the finished layout never flashes
+   before the animation. If the script never runs, it shows after 3 seconds anyway. */
+.s-root:not(.ready) .s-hero-copy, .s-root:not(.ready) .s-hero-stage { visibility: hidden; animation: s-show 0s 3s forwards; }
+@keyframes s-show { to { visibility: visible; } }
+.s-hero .s-h1 { will-change: transform; backface-visibility: hidden; }
