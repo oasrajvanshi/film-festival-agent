@@ -1,7 +1,7 @@
 'use client';
 
 import { DayCalendar } from './daycal';
-import { WeatherAlerts, type Preview } from './weatherplan';
+import { ProblemTrigger, WeatherAlerts, type Preview } from './weatherplan';
 import { useMemo, useState } from 'react';
 import { DEFAULT_SHEET, readSetup, type AgentStore } from './useAgent';
 import { riskSummary, type WeatherHour } from '../../src/agent/weather';
@@ -80,6 +80,7 @@ export function Overview({ s, user }: P) {
         <h2>{s.festivalName}</h2>
       </section>
 
+      <ProblemTrigger />
       <WeatherAlerts s={s} user={user}
         onOpen={d => { setCalDay(d); setShowOriginal(false); }}
         onPreview={setPreview} onApplied={keepOriginal} />

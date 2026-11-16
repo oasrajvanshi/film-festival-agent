@@ -103,15 +103,17 @@ const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? o
 // ------------------------------------------------------------------ alerts the agent has raised
 export type AlertKind = WxKind | 'guest';
 export interface WxAlert { id: string; kind: AlertKind; day: DayNumber; status: 'open' | 'done' }
-const ALERTS_KEY = 'usher-alerts-v2';
+const ALERTS_KEY = 'usher-alerts-v3';
 const EVENT = 'usher-alerts';
-const DEFAULT_ALERTS: WxAlert[] = [
+/** The demo's three problems, brought in from the hidden button on Today. */
+const DEMO_ALERTS: WxAlert[] = [
   { id: 'guest-d1', kind: 'guest', day: 1 as DayNumber, status: 'open' },
   { id: 'storm-d1', kind: 'storm', day: 1 as DayNumber, status: 'open' },
   { id: 'snow-d2', kind: 'snow', day: 2 as DayNumber, status: 'open' },
 ];
+/** All quiet until someone brings the problems in. */
 export function readAlerts(): WxAlert[] {
-  try { const v = localStorage.getItem(ALERTS_KEY); return v ? JSON.parse(v) : DEFAULT_ALERTS; } catch { return DEFAULT_ALERTS; }
+  try { const v = localStorage.getItem(ALERTS_KEY); return v ? JSON.parse(v) : []; } catch { return []; }
 }
 function writeAlerts(list: WxAlert[]) {
   try { localStorage.setItem(ALERTS_KEY, JSON.stringify(list)); } catch { /* private mode */ }
@@ -122,7 +124,24 @@ export function raiseAlert(kind: AlertKind, day: DayNumber) {
   const id = `${kind}-d${day}`;
   writeAlerts([...readAlerts().filter(a => a.id !== id), { id, kind, day, status: 'open' }]);
 }
-export function resetAlerts() { writeAlerts(DEFAULT_ALERTS); }
+export function resetAlerts() { writeAlerts([]); }
+export function bringProblems() { writeAlerts(DEMO_ALERTS.map(a => ({ ...a }))); }
+
+/**
+ * Demo control: a small button that shows only when the pointer reaches the
+ * bottom-left corner. It brings the three problems in, or calms things down.
+ */
+export function ProblemTrigger() {
+  const [alerts] = useAlerts();
+  const live = alerts.some(a => a.status === 'open');
+  return (
+    <div className="problem-trigger" data-lve-skip>
+      <button onClick={() => (live ? resetAlerts() : bringProblems())}>
+        <Icon name={live ? 'check' : 'bolt'} size={14} /> {live ? 'Calm things down' : 'Bring on the problems'}
+      </button>
+    </div>
+  );
+}
 export function useAlerts(): [WxAlert[], (list: WxAlert[]) => void] {
   const [list, setList] = useState<WxAlert[]>([]);
   useEffect(() => {
