@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { readSetup, useAgent, writeSetup, writeWho } from '../ui/useAgent';
+import { resetAlerts } from '../ui/weatherplan';
 import { Approvals, Ask, Briefs, Data, Feeds, Grid, Log, Overview, Scan } from '../ui/panels';
 import { DemoShell, backToOrganizer, demoPerson, useDemo, type Demo } from '../ui/demo';
 import { Icon } from '../ui/icons';
@@ -138,7 +139,7 @@ function AppInner({ demo }: { demo: Demo | null }) {
         </div>
       </div>
       <button className="block" onClick={signOut}><Icon name="logout" size={16} /> Sign out</button>
-      <button className="block" style={{ marginTop: 8 }} onClick={() => { if (armed) { s.reset(); setArmed(false); setSheet(null); } else { setArmed(true); setTimeout(() => setArmed(false), 4000); } }}>
+      <button className="block" style={{ marginTop: 8 }} onClick={() => { if (armed) { s.reset(); resetAlerts(); try { localStorage.removeItem('usher-original-plan-v1'); localStorage.removeItem('usher-plan-notes-v1'); } catch { /* ignore */ } setArmed(false); setSheet(null); location.reload(); } else { setArmed(true); setTimeout(() => setArmed(false), 4000); } }}>
         {armed ? 'Tap again to reset everything' : 'Reset demo'}
       </button>
       <button className="block" style={{ marginTop: 8 }} onClick={() => { writeSetup(null); writeWho(null); try { localStorage.removeItem('ffa-fid-v1'); } catch { /* ignore */ } location.href = '/onboarding'; }}>Set up a new festival</button>

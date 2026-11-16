@@ -1,7 +1,7 @@
 'use client';
 
 import { DayCalendar } from './daycal';
-import { WeatherWatch } from './weatherplan';
+import { WeatherAlerts, type Preview } from './weatherplan';
 import { useMemo, useState } from 'react';
 import { DEFAULT_SHEET, readSetup, type AgentStore } from './useAgent';
 import { riskSummary, type WeatherHour } from '../../src/agent/weather';
@@ -32,92 +32,75 @@ function useLookups(s: AgentStore) {
 }
 
 // ------------------------------------------------------------------ Overview
-export function Overview({ s, go, user }: P) {
+export function Overview({ s, user }: P) {
   const a = s.agent;
   const f = a.f;
-  const crowd = a.crowd(s.clock);
-  const now = toMinutes(s.clock);
   const day = dayOf(s.clock, f.dates);
-  const upNext = f.events
-    .filter(e => e.day === day && e.status === 'scheduled' && toMinutes(e.start) >= now)
-    .sort((x, y) => toMinutes(x.start) - toMinutes(y.start)).slice(0, 5);
-  const venueName = (id: string) => f.venues.find(v => v.id === id)?.name ?? id;
-  const [view, setView] = useState<'cal' | 'now'>('cal');
-  // The weather plan's preview, and the schedule as it was before the last approved plan.
-  const [preview, setPreview] = useState<{ events: FestivalEvent[]; moved: string[] } | null>(null);
+  const [calDay, setCalDay] = useState<DayNumber>(day);
+  // The open recommendation's preview, and the schedule as it was before the last approved one.
+  const [preview, setPreview] = useState<Preview | null>(null);
   const [original, setOriginal] = useState<FestivalEvent[] | null>(() => {
     try { const v = typeof window !== 'undefined' && localStorage.getItem('usher-original-plan-v1'); return v ? JSON.parse(v) : null; } catch { return null; }
   });
   const [showOriginal, setShowOriginal] = useState(false);
-  const keepOriginal = (before: FestivalEvent[]) => {
+  const [kept, setKept] = useState<Record<string, string>>(() => {
+    try { const v = typeof window !== 'undefined' && localStorage.getItem('usher-plan-notes-v1'); return v ? JSON.parse(v) : {}; } catch { return {}; }
+  });
+  const keepOriginal = (before: FestivalEvent[], n: Record<string, string>) => {
     const first = original ?? before;
-    setOriginal(first); setShowOriginal(false);
-    try { localStorage.setItem('usher-original-plan-v1', JSON.stringify(first)); } catch { /* private mode */ }
+    const allNotes = { ...kept, ...n };
+    setOriginal(first); setKept(allNotes); setShowOriginal(false);
+    try { localStorage.setItem('usher-original-plan-v1', JSON.stringify(first)); localStorage.setItem('usher-plan-notes-v1', JSON.stringify(allNotes)); } catch { /* private mode */ }
   };
-  const startOf = (list: FestivalEvent[]) => Object.fromEntries(list.map(e => [e.id, e.start]));
+  // An original plan only counts while the schedule still differs from it (a demo reset clears it).
+  const differs = (o: FestivalEvent | undefined, e: FestivalEvent) => !!o && (o.start !== e.start || o.venueId !== e.venueId || o.guestIds.join() !== e.guestIds.join());
+  const hasOriginal = !!original && f.events.some(e => differs(original.find(x => x.id === e.id), e));
   const was: Record<string, string> = {};
-  if (preview) { const cur = startOf(f.events); for (const id of preview.moved) was[id] = cur[id]; }
-  else if (original && !showOriginal && f.events.length) { const old = startOf(original); for (const e of f.events) if (old[e.id] && old[e.id] !== e.start) was[e.id] = old[e.id]; }
-  // An original plan only counts while today's schedule still differs from it (a demo reset clears it).
-  const hasOriginal = !!original && f.events.some(e => { const o = original.find(x => x.id === e.id); return o && (o.start !== e.start || o.venueId !== e.venueId); });
+  const notes: Record<string, string> = { ...(preview?.notes ?? {}) };
+  if (preview) {
+    for (const id of preview.moved) {
+      const cur = f.events.find(e => e.id === id); const nxt = preview.events.find(e => e.id === id);
+      if (cur && nxt && cur.start !== nxt.start) was[id] = cur.start;
+    }
+  } else if (hasOriginal && !showOriginal) {
+    for (const e of f.events) {
+      const o = original!.find(x => x.id === e.id);
+      if (!differs(o, e)) continue;
+      if (o!.start !== e.start) was[e.id] = o!.start;
+      if (kept[e.id]) notes[e.id] = kept[e.id]; else if (o!.start === e.start) notes[e.id] = 'Changed';
+    }
+  }
   const calEvents = preview ? preview.events : showOriginal && hasOriginal ? original! : undefined;
   const dateLabel = new Date(`${f.dates[day]}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   return (
-    <>
+    <div className="today">
       <section className="hero has-photo">
         <HeroPhoto k="organizer" />
         <div className="eyebrow">Day {day} · {dateLabel} · {fmt(s.clock)}</div>
         <h2>{s.festivalName}</h2>
       </section>
 
+      <WeatherAlerts s={s} user={user}
+        onOpen={d => { setCalDay(d); setShowOriginal(false); }}
+        onPreview={setPreview} onApplied={keepOriginal} />
+
       <div className="card today-cal">
-        <div className="section-title">
-          <h2>Venues</h2>
-          <div className="row" style={{ gap: 10 }}>
-            {view === 'cal' && hasOriginal && !preview && (
-              <div className="pill-toggle" role="tablist" aria-label="Which plan">
-                <button className={!showOriginal ? 'on' : ''} onClick={() => setShowOriginal(false)}>New plan</button>
-                <button className={showOriginal ? 'on' : ''} onClick={() => setShowOriginal(true)}>Original plan</button>
-              </div>
-            )}
-            <div className="pill-toggle" role="tablist" aria-label="Venue view">
-              <button className={view === 'cal' ? 'on' : ''} onClick={() => setView('cal')}>Calendar</button>
-              <button className={view === 'now' ? 'on' : ''} onClick={() => setView('now')}>Right now</button>
-            </div>
-          </div>
-        </div>
-        {view === 'cal' && preview && <div className="cal-note">Preview of the agent's plan. Approve it below to make it the new plan.</div>}
-        {view === 'cal' ? <DayCalendar s={s} day={day} events={calEvents} was={was} /> : <>
-          <div className="venues">
-            {crowd.venues.map(v => (
-              <div className="venue" key={v.venueId}>
-                <div className="name">{v.venueName}</div>
-                <div className="now">{v.event ? v.event.title : 'Nothing on'}</div>
-                <div className={`bar ${v.status}`}><div style={{ width: `${Math.min(100, v.fill * 100)}%` }} /></div>
-                <div className="num"><span>{v.inside} inside</span><span>{v.capacity} seats</span></div>
-              </div>
+        <div className="cal-top">
+          <div className="cal-days" role="tablist" aria-label="Festival day">
+            {festivalDays(f).map(d => (
+              <button key={d} role="tab" aria-selected={d === calDay} className={d === calDay ? 'on' : ''} onClick={() => setCalDay(d)}>
+                Day {d} <small>{new Date(`${f.dates[d]}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short' })} {Number(f.dates[d].slice(8))}</small>
+              </button>
             ))}
           </div>
-          {crowd.redirects.length > 0 && <>
-            <h3>Suggested redirects</h3>
-            {crowd.redirects.map((r, i) => <div className="msg" key={i}>{r.summary}</div>)}
-          </>}
-          <h3>Up next today</h3>
-          {upNext.length === 0 && <div className="empty-note">Nothing else scheduled today.</div>}
-          {upNext.map(e => (
-            <div className="item" key={e.id}>
-              <div className="ic"><Icon name={e.kind === 'panel' ? 'users' : e.kind === 'qa' ? 'chat' : 'film'} size={16} /></div>
-              <div style={{ minWidth: 0 }}>
-                <div className="t">{e.title}</div>
-                <div className="d">{fmt(e.start)} · {venueName(e.venueId)}{e.room ? `, ${e.room}` : ''}{e.seatsSold !== undefined ? ` · ${e.seatsSold} sold` : ''}</div>
-              </div>
-            </div>
-          ))}
-        </>}
+          {hasOriginal && !preview && (
+            <button className="cal-orig" aria-pressed={showOriginal} onClick={() => setShowOriginal(!showOriginal)}>
+              <Icon name={showOriginal ? 'calendar' : 'eye'} size={15} /> {showOriginal ? 'Back to new plan' : 'Original plan'}
+            </button>
+          )}
+        </div>
+        <DayCalendar s={s} day={calDay} events={calEvents} was={was} notes={notes} />
       </div>
-
-      <WeatherWatch s={s} day={day} user={user} onPreview={p => { setPreview(p); if (p) { setView('cal'); setShowOriginal(false); } }} onApplied={keepOriginal} />
-
 
       {a.changeFeed.length > 0 && (
         <div className="card">
@@ -127,7 +110,7 @@ export function Overview({ s, go, user }: P) {
           ))}
         </div>
       )}
-    </>
+    </div>
   );
 }
 

@@ -592,3 +592,61 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
 .wx-foot button { min-width: 180px; }
 .cal-note { margin: -4px 0 12px; font-size: 13.5px; color: var(--accent); }
 @media (max-width: 640px) { .wx-foot button { width: 100%; } }
+
+/* Today: breathing room between the blocks. */
+.today { display: grid; gap: 24px; }
+.today > .card, .today > .hero { margin: 0; }
+@media (max-width: 760px) { .today { gap: 16px; } }
+
+/* The calendar card: quiet day tabs, and one small "Original plan" switch. */
+.cal-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+.cal-days { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: rgba(246, 236, 220, .05); }
+.cal-days button { min-height: 0; padding: 6px 12px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font-size: 13.5px; font-weight: 500; }
+.cal-days button small { font-size: 12px; opacity: .75; margin-left: 2px; }
+.cal-days button:hover { color: var(--ink); background: transparent; }
+.cal-days button.on { background: rgba(246, 236, 220, .12); color: var(--ink); }
+.cal-orig { min-height: 0; padding: 6px 10px; border: 0; background: transparent; color: var(--accent); font-size: 13.5px; font-weight: 500; }
+.cal-orig:hover { background: rgba(212, 154, 92, .1); }
+.dcal-ev .dcal-note { color: var(--accent); font-style: normal; }
+/* Weather alerts the agent raised. */
+.wx-alerts { display: grid; gap: 10px; }
+.wx-alert { border: 1px solid rgba(232, 104, 75, .45); background: rgba(232, 104, 75, .08); border-radius: 14px; overflow: hidden; }
+.wx-alert.k-heat { border-color: rgba(212, 154, 92, .55); background: rgba(212, 154, 92, .09); }
+.wx-alert-row { display: flex; align-items: center; gap: 14px; padding: 12px 14px; }
+.wx-alert-ic { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: rgba(232, 104, 75, .18); color: #ef8a6f; flex: none; }
+.wx-alert.k-heat .wx-alert-ic { background: rgba(212, 154, 92, .2); color: var(--accent); }
+.wx-alert-text { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.wx-alert-text b { font-size: 15.5px; color: var(--ink); }
+.wx-alert-text span { font-size: 13px; color: var(--muted); }
+.wx-alert-row button { white-space: nowrap; }
+.wx-alert .wx-rec { padding: 4px 16px 16px; border-top: 1px solid var(--line); background: var(--panel); animation: pop .2s ease; }
+.wx-alert .wx-what { margin: 14px 0 6px; }
+@media (max-width: 640px) {
+  .wx-alert-row { flex-wrap: wrap; }
+  .wx-alert-row button { width: 100%; }
+  .cal-days button small { display: none; }
+}
+
+/* The recommendation floats over the left rail, so the calendar stays where it is. */
+.rec-float {
+  position: fixed; left: 16px; top: 84px; z-index: 40; width: 340px; max-height: calc(100vh - 104px); overflow-y: auto;
+  background: var(--panel); border: 1px solid rgba(212, 154, 92, .45); border-radius: 16px; padding: 14px 16px 16px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .55); animation: rec-in .35s cubic-bezier(.2, .8, .2, 1);
+}
+.rec-float-head { display: flex; align-items: center; justify-content: space-between; color: var(--accent); font-size: 12.5px; font-weight: 600; }
+.rec-float-head span { display: inline-flex; align-items: center; gap: 6px; }
+.rec-float-head button { min-height: 0; padding: 4px; }
+.rec-float-title { display: block; margin: 6px 0 2px; font-size: 16px; color: var(--ink); }
+.rec-float .wx-what { font-size: 14.5px; margin: 6px 0 10px; color: var(--ink-2); }
+.rec-float .wx-list label { font-size: 14px; padding: 11px 2px; }
+.rec-float-foot { padding-top: 12px; opacity: 0; transform: translateY(6px); transition: opacity .35s, transform .35s; }
+.rec-float-foot.ready { opacity: 1; transform: none; }
+.rec-float-foot button { width: 100%; }
+.wx-alert.open { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+@keyframes rec-in { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: none; } }
+@media (max-width: 760px) {
+  .rec-float { left: 8px; right: 8px; top: auto; bottom: calc(76px + env(safe-area-inset-bottom)); width: auto; max-height: 52vh; animation-name: rec-up; }
+  @keyframes rec-up { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+}
+.cal-days button, .cal-orig { white-space: nowrap; }
+@media (max-width: 760px) { .cal-days button { padding: 6px 10px; } .cal-orig { padding: 6px 4px; } }

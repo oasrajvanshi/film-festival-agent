@@ -14,7 +14,7 @@ import '../daycal.css';
  * original plan); `was` maps moved events to their earlier start, and those
  * blocks are picked out and slide to their new time.
  */
-export function DayCalendar({ s, day, events: over, was }: { s: AgentStore; day: DayNumber; events?: FestivalEvent[]; was?: Record<string, string> }) {
+export function DayCalendar({ s, day, events: over, was, notes }: { s: AgentStore; day: DayNumber; events?: FestivalEvent[]; was?: Record<string, string>; notes?: Record<string, string> }) {
   const f = s.agent.f;
   const events = useMemo(() => (over ?? f.events).filter(e => e.day === day).sort((a, b) => a.start.localeCompare(b.start)), [f, over, day, s.version]); // eslint-disable-line react-hooks/exhaustive-deps
   const venues = f.venues.filter(v => events.some(e => e.venueId === v.id));
@@ -40,12 +40,12 @@ export function DayCalendar({ s, day, events: over, was }: { s: AgentStore; day:
               const short = toMinutes(e.end) - toMinutes(e.start) < 45;
               const live = onDay && now >= toMinutes(e.start) && now < toMinutes(e.end);
               return (
-                <div key={e.id} className={`dcal-ev k-${e.kind}${short ? ' short' : ''}${flagged.has(e.id) ? ' hot' : ''}${was?.[e.id] ? ' moved' : ''}${e.status === 'cancelled' ? ' off' : ''}${live ? ' live' : ''}`}
+                <div key={e.id} className={`dcal-ev k-${e.kind}${short ? ' short' : ''}${flagged.has(e.id) ? ' hot' : ''}${was?.[e.id] || notes?.[e.id] ? ' moved' : ''}${e.status === 'cancelled' ? ' off' : ''}${live ? ' live' : ''}`}
                   style={{ top: `${pct(e.start)}%`, height: `calc(${pct(e.end) - pct(e.start)}% - 3px)` }}
                   title={`${e.title}, ${fmt(e.start)} to ${fmt(e.end)}${e.guestIds.length ? `, with ${guests(e.guestIds)}` : ''}`}>
                   <b>{e.title}</b>
                   <small>{was?.[e.id] && <s>{fmt(was[e.id])}</s>}{fmt(e.start)} to {fmt(e.end)}</small>
-                  {e.guestIds.length > 0 && <em>{guests(e.guestIds)}</em>}
+                  {notes?.[e.id] ? <em className="dcal-note">{notes[e.id]}</em> : e.guestIds.length > 0 && <em>{guests(e.guestIds)}</em>}
                   {flagged.has(e.id) && <span className="tag">Flag</span>}
                   {e.status === 'cancelled' && <span className="tag">Off</span>}
                 </div>
