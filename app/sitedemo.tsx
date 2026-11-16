@@ -27,21 +27,27 @@ const EVENTS: Ev[] = [
   { col: 3, t: 'Last Gods', s: '17:30', e: '18:55', img: 'f-08' },
 ];
 
-// A guided order: the alert, an arrow down to the recommendation, its checklist,
-// an arrow across to the calendar, then the calendar moves.
+// Four connected steps: the alert, then the agent's recommendation button, then its
+// checklist and Approve, then (from Approve) the calendar, which only appears when the
+// arrow reaches it and then moves.
 const STEPS = [
-  { at: 0 },      // 0 alert appears
-  { at: 800 },    // 1 recommendation pressed, the arrow draws down
-  { at: 1400 },   // 2 the recommendation opens
-  { at: 2000 },   // 3 first item ticked
-  { at: 2450 },   // 4 second item
-  { at: 2900 },   // 5 third item
-  { at: 3500 },   // 6 the arrow draws across to the calendar
-  { at: 4100 },   // 7 calendar moves, guest swaps
-  { at: 5700 },   // 8 approve pressed
-  { at: 6300 },   // 9 approved, the attendee's phone lights up
+  { at: 0 },      // 0 the alert
+  { at: 700 },    // 1 arrow down
+  { at: 1100 },   // 2 the recommendation button
+  { at: 1700 },   // 3 button pressed
+  { at: 2000 },   // 4 arrow down
+  { at: 2400 },   // 5 the checklist
+  { at: 2900 },   // 6 first tick
+  { at: 3300 },   // 7 second tick
+  { at: 3700 },   // 8 third tick
+  { at: 4100 },   // 9 Approve appears
+  { at: 4700 },   // 10 Approve pressed
+  { at: 5000 },   // 11 arrow to the calendar
+  { at: 5500 },   // 12 the calendar appears
+  { at: 6200 },   // 13 events move, the guest swaps
+  { at: 7700 },   // 14 the attendee's phone lights up
 ];
-const LOOP = 10400;
+const LOOP = 11600;
 
 export function PlanDemo() {
   const box = useRef<HTMLDivElement>(null);
@@ -51,7 +57,7 @@ export function PlanDemo() {
     const el = box.current;
     if (!el) return;
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) { setStep(9); return; }
+    if (reduce) { setStep(14); return; }
     let timers: ReturnType<typeof setTimeout>[] = [];
     let loop: ReturnType<typeof setInterval> | null = null;
     const play = () => {
@@ -67,44 +73,40 @@ export function PlanDemo() {
     io.observe(el);
     return () => { io.disconnect(); if (loop) clearInterval(loop); timers.forEach(clearTimeout); };
   }, []);
-  const moved = step >= 7;
+  const moved = step >= 13;
   const items = ['Start 3 screenings 15 min later', 'Send 21 people their new time', 'Yara Hollis opens Pavel’s panel'];
   return (
     <div ref={box} className={`pd${snap ? ' snap' : ''}`} data-lve-skip aria-label="Usher suggesting a new plan, shown in the product">
-      {/* the alert the agent raised */}
-      <div className={`pd-alert${step >= 0 ? ' in' : ''}`}>
-        <span className="pd-ic">!</span>
-        <span className="pd-alert-t"><b>Thunderstorms 3:00 to 6:00 pm</b><small>Day 1 · and Pavel Kettering is running late</small></span>
-        <span className={`pd-btn${step === 1 ? ' press' : ''}${step >= 1 ? ' on' : ''}`}>Agent’s recommendation</span>
+      <div className="pd-flow">
+        {/* 1. the alert the agent raised */}
+        <div className={`pd-alert${step >= 0 ? ' in' : ''}`}>
+          <span className="pd-ic">!</span>
+          <span className="pd-alert-t"><b>Thunderstorms 3:00 to 6:00 pm</b><small>Day 1 · and Pavel Kettering is running late</small></span>
+        </div>
+        <Arrow on={step >= 1} />
+        {/* 2. the agent's recommendation */}
+        <span className={`pd-btn${step >= 2 ? ' in' : ''}${step === 3 ? ' press' : ''}${step >= 4 ? ' on' : ''}`}><i>✦</i> Agent’s recommendation</span>
+        <Arrow on={step >= 4} />
       </div>
 
-      {/* arrow: from the alert down to its recommendation */}
-      <svg className={`pd-arrow pd-arrow-down${step >= 1 ? ' on' : ''}`} viewBox="0 0 24 44" aria-hidden="true">
-        <path pathLength={1} d="M12 2 V38" /><path className="hd" d="M5 32 L12 40 L19 32" />
+      {/* 3. its checklist, then Approve */}
+      <aside className={`pd-rec${step >= 5 ? ' in' : ''}`}>
+        <ul>
+          {items.map((t, i) => <li key={t} className={step >= 6 + i ? 'on' : ''}><i>✓</i>{t}</li>)}
+        </ul>
+        <span className={`pd-approve${step >= 9 ? ' in' : ''}${step === 10 ? ' press' : ''}${step >= 11 ? ' done' : ''}`}>
+          {step >= 11 ? 'Approved' : 'Approve 3'}
+        </span>
+      </aside>
+
+      {/* 4. from Approve across to the calendar (down on a phone) */}
+      <svg className={`pd-arrow pd-arrow-side${step >= 11 ? ' on' : ''}`} viewBox="0 0 56 24" aria-hidden="true">
+        <path pathLength={1} d="M2 12 H50" /><path className="hd" d="M44 5 L52 12 L44 19" />
       </svg>
-
-      <div className="pd-main">
-        {/* the recommendation: a checklist */}
-        <aside className={`pd-rec${step >= 2 ? ' in' : ''}`}>
-          <small className="pd-rec-k">Agent’s recommendation</small>
-          <ul>
-            {items.map((t, i) => <li key={t} className={step >= 3 + i ? 'on' : ''}><i>✓</i>{t}</li>)}
-          </ul>
-          <span className={`pd-approve${step >= 7 ? ' in' : ''}${step === 8 ? ' press' : ''}${step >= 9 ? ' done' : ''}`}>
-            {step >= 9 ? 'Approved · 9 events moved · 116 messages sent' : 'Approve 3'}
-          </span>
-        </aside>
-
-        {/* arrow: from the checklist across to the calendar (down on a phone) */}
-        <svg className={`pd-arrow pd-arrow-side${step >= 6 ? ' on' : ''}`} viewBox="0 0 56 24" aria-hidden="true">
-          <path pathLength={1} d="M2 12 H50" /><path className="hd" d="M44 5 L52 12 L44 19" />
-        </svg>
-        <svg className={`pd-arrow pd-arrow-down pd-arrow-phone${step >= 6 ? ' on' : ''}`} viewBox="0 0 24 44" aria-hidden="true">
-          <path pathLength={1} d="M12 2 V38" /><path className="hd" d="M5 32 L12 40 L19 32" />
-        </svg>
+      <span className="pd-arrow-phone"><Arrow on={step >= 11} /></span>
 
         {/* the calendar previewing the plan */}
-        <div className={`pd-cal${moved ? ' moved' : ''}`}>
+        <div className={`pd-cal${step >= 12 ? ' in' : ''}${moved ? ' moved' : ''}`}>
           <div className="pd-head"><span />{VENUES.map(v => <span key={v}>{v}</span>)}</div>
           <div className="pd-body">
             <div className="pd-hours">{[13, 14, 15, 16, 17, 18].map(h => <b key={h} style={{ top: `${((h * 60 - T0) / (T1 - T0)) * 100}%` }}>{h % 12 || 12} pm</b>)}</div>
@@ -136,14 +138,22 @@ export function PlanDemo() {
             ))}
           </div>
         </div>
-      </div>
 
       {/* what an attendee sees once it is approved */}
-      <div className={`pd-phone${step >= 9 ? ' in' : ''}`}>
+      <div className={`pd-phone${step >= 14 ? ' in' : ''}`}>
         <span className="pd-phone-app">Usher · now</span>
         <b>Wild Tide now starts at 3:15 pm</b>
         <small>Your seat is held. Leave 15 minutes early; the shuttle is running late.</small>
       </div>
     </div>
+  );
+}
+
+/** A short arrow pointing down that draws itself when `on`. */
+function Arrow({ on }: { on: boolean }) {
+  return (
+    <svg className={`pd-arrow pd-arrow-down${on ? ' on' : ''}`} viewBox="0 0 24 40" aria-hidden="true">
+      <path pathLength={1} d="M12 2 V34" /><path className="hd" d="M5 28 L12 36 L19 28" />
+    </svg>
   );
 }

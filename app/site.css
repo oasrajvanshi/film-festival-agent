@@ -860,3 +860,68 @@
 
 /* The top bar never sits on top of the page's text: a solid, blurred band. */
 .s-nav { background: rgba(18, 11, 9, .86); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid rgba(246, 236, 220, .06); }
+
+/* Problem 1: a picture in each card, as support for the facts under it. */
+.s-risk-pic { margin: -18px -20px 2px; height: 120px; overflow: hidden; border-radius: 14px 14px 0 0; position: relative; }
+.s-risk-pic::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(28, 19, 15, 0) 45%, rgba(28, 19, 15, .9) 100%); pointer-events: none; }
+.s-prob .s-risk-pic .s-risk-img { height: 100%; min-height: 0; border-radius: 0; box-shadow: none; filter: sepia(.2) saturate(.9); }
+@media (max-width: 760px) { .s-risk-pic { margin: -14px -16px 2px; height: 96px; } }
+
+/* The watch: narrower cards pushed to the sides, so the lines into Usher run longer. */
+@media (min-width: 901px) {
+  .s-flow { width: min(1240px, 100%); grid-template-columns: minmax(0, 270px) minmax(0, 1fr) minmax(0, 310px); }
+  .s-flow-feed, .s-flow-out { padding: 10px 12px; }
+  .s-flow-feed b, .s-flow-out b { font-size: 14px; }
+  .s-flow-feed small, .s-flow-out small { font-size: 12px; }
+}
+
+/* ---------------------------------------------------------------- new plan: four connected steps, the calendar last */
+.pd { grid-template-columns: 300px 76px minmax(0, 1fr); align-items: end; gap: 0; }
+.pd-flow { grid-column: 1; display: grid; justify-items: center; }
+.pd-flow .pd-alert { width: 100%; justify-self: stretch; padding: 11px 14px; }
+.pd-flow .pd-arrow-down { width: 24px; height: 40px; margin: 6px 0; }
+.pd-btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; opacity: 0; transform: translateY(8px);
+  transition: opacity .4s, transform .4s cubic-bezier(.2, .8, .2, 1), background .3s, color .3s, box-shadow .3s; }
+.pd-btn i { font-style: normal; font-size: 12px; }
+.pd-btn.in { opacity: 1; transform: none; }
+.pd-btn.in.press { transform: scale(.92); }
+.pd-btn.on { background: rgba(201, 152, 99, .14); color: var(--amber-2); box-shadow: inset 0 0 0 1px rgba(201, 152, 99, .55); }
+.pd-flow .pd-rec { width: 100%; }
+.pd-approve.done { background: #93B27E; color: #13200d; }
+.pd-arrow-side { grid-column: 2; align-self: end; justify-self: center; margin: 0 0 22px; width: 60px; height: 24px; }
+.pd > .pd-cal { grid-column: 3; align-self: end; opacity: 0; transform: translateX(28px) scale(.98); transform-origin: 0 50%;
+  transition: opacity .5s, transform .6s cubic-bezier(.2, .8, .2, 1); }
+.pd > .pd-cal.in { opacity: 1; transform: none; }
+.pd-arrow-phone { display: none; }
+@media (max-width: 760px) {
+  .pd { grid-template-columns: 1fr; }
+  .pd-flow { grid-column: auto; }
+  .pd-arrow-side { display: none; }
+  .pd-arrow-phone { display: grid; justify-items: center; }
+  .pd-arrow-phone .pd-arrow-down { width: 24px; height: 40px; margin: 6px 0; }
+  .pd > .pd-cal { grid-column: auto; transform: translateY(20px); }
+  .pd-btn { padding: 8px 14px; font-size: 12.5px; }
+}
+@media (min-width: 761px) { .pd-phone { bottom: -78px; } .s-plan { padding-bottom: 140px; } }
+/* the checklist, the last arrow and the calendar share one middle line */
+@media (min-width: 761px) {
+  .pd { grid-template-rows: auto auto; }
+  .pd > .pd-flow { grid-column: 1; grid-row: 1; }
+  .pd > .pd-rec { grid-column: 1; grid-row: 2; align-self: center; width: 100%; }
+  .pd > .pd-arrow-side { grid-column: 2; grid-row: 2; align-self: center; margin: 0; }
+  .pd > .pd-cal { grid-column: 3; grid-row: 2; align-self: center; }
+}
+.s-float-alert { padding-right: 18px; }
+@media (min-width: 761px) {
+  /* the row is as tall as the checklist, so the second arrow runs straight into it; the taller
+     calendar stays centred on the checklist's middle and overhangs above and below */
+  .pd > .pd-rec { align-self: start; }
+  .pd > .pd-cal { margin: -40vh 0; }
+}
+
+/* One page margin everywhere on a computer: the top bar, the hero and the footer line up with the sections. */
+@media (min-width: 761px) {
+  .s-nav { padding-left: max(28px, 6vw); padding-right: max(28px, 6vw); }
+  .s-hero { padding-left: max(28px, 6vw); padding-right: max(28px, 6vw); }
+  .s-footer { padding-left: max(28px, 6vw); padding-right: max(28px, 6vw); }
+}

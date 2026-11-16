@@ -144,28 +144,32 @@ export default function Site() {
       if (phone) ScrollTrigger.config({ ignoreMobileResize: true });
       gsap.set(q('[data-cal="hero"]'), { rotateX: phone ? 0 : 24, rotateZ: phone ? 0 : -6 });
       intro.fromTo(q('.s-hero .split-word'), { yPercent: 110 }, { yPercent: 0, duration: 1.05, stagger: 0.05, ease: 'power4.out' }, seen ? 0.1 : 1.75);
-      // The hero: the headline first, then everything else in one move, on its own clock
-      // (or straight away if you start scrolling). No pinning: one scroll always reaches the next section.
+      // The hero: the headline first, alone and centred. One scroll settles it into place while the
+      // page holds still; everything else arrives in that same scroll, then the page rests a moment
+      // before it moves on. Phones: no holding; the rest arrives on its own after the headline.
       gsap.set(q('[data-hero-fade]'), { autoAlpha: 0, y: 24 });
       gsap.set(q('.s-hero-stage'), { autoAlpha: 0, y: phone ? 30 : 60 });
       gsap.set(q('[data-hero-float]'), { autoAlpha: 0, y: 18 });
-      const settle = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } });
       if (!phone) {
         const r0 = h1.getBoundingClientRect();
         const toCentre = { x: innerWidth / 2 - (r0.left + r0.width / 2), y: innerHeight / 2 - (r0.top + r0.height / 2) };
         gsap.set(h1, { x: toCentre.x, y: toCentre.y, scale: 1.25, transformOrigin: '50% 50%', force3D: true });
-        settle.to(h1, { x: 0, y: 0, scale: 1, duration: 1, ease: 'power2.inOut' }, 0)
+        gsap.timeline({ defaults: { ease: 'power2.out' }, scrollTrigger: { trigger: hero, start: 'top top', end: '+=95%', scrub: 0.6, pin: true, anticipatePin: 1 } })
+          .to(h1, { x: 0, y: 0, scale: 1, duration: 1, ease: 'power2.inOut' }, 0)
+          .to(q('.s-scrollcue'), { autoAlpha: 0, duration: 0.2 }, 0)
           .to(q('[data-film="top"]'), { yPercent: -80, autoAlpha: 0, duration: 0.6, ease: 'power2.in' }, 0.1)
           .to(q('[data-film="bottom"]'), { yPercent: 80, autoAlpha: 0, duration: 0.6, ease: 'power2.in' }, 0.1)
-          .to(q('.s-scrollcue'), { autoAlpha: 0, duration: 0.3 }, 0);
-      }
-      settle.to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.08 }, phone ? 0 : 0.55)
-        .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.8 }, phone ? 0.1 : 0.65)
-        .to(q('[data-hero-float]'), { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.1 }, phone ? 0.2 : 0.8);
-      intro.call(() => { settle.play(); }, [], (seen ? 0.1 : 1.75) + 1.9);
-      const early = () => { if (!settle.isActive() && settle.progress() === 0) settle.timeScale(1.4).play(); };
-      window.addEventListener('scroll', early, { once: true, passive: true });
-      if (phone) {
+          .to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.08 }, 0.7)
+          .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.5 }, 0.75)
+          .to(q('[data-hero-float]'), { autoAlpha: 1, y: 0, duration: 0.4, stagger: 0.08 }, 0.9)
+          // everything is in place: hold before the page moves on
+          .to({}, { duration: 0.8 });
+      } else {
+        const settle = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } })
+          .to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.08 }, 0)
+          .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.8 }, 0.1)
+          .to(q('[data-hero-float]'), { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.1 }, 0.2);
+        intro.call(() => { settle.play(); }, [], (seen ? 0.1 : 1.75) + 1.4);
         // The film strips part as the page starts to move (decoration only).
         gsap.to(q('[data-film="top"]'), { yPercent: -60, autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: '+=40%', scrub: 0.6 } });
         gsap.to(q('[data-film="bottom"]'), { yPercent: 60, autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: '+=40%', scrub: 0.6 } });
@@ -187,26 +191,35 @@ export default function Site() {
       if (!phone) gsap.to(q('[data-hero-bg]'), { yPercent: 12, ease: 'none', scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
       gsap.to(q('[data-cal-wrap]'), { y: phone ? -8 : -14, rotateX: phone ? 0 : 3, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 2.4 });
 
-      // Every other section: one scroll brings it into view and all of it arrives together, once.
-      const arrive = (el: Element) => gsap.timeline({ defaults: { ease: 'power3.out' }, scrollTrigger: { trigger: el, start: 'top 70%', once: true } });
-
-      // the two problems
+      // The problems: each one plays in full where you can see it. The headline rises, the cards
+      // follow one after another, their pictures settle, and the trouble in each one lights up.
       q('.s-prob').forEach(sec => {
-        const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, scrollTrigger: { trigger: sec, start: 'top 85%', once: true } }).fromTo(sec.querySelectorAll('.s-prob-copy > *'), { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.06 }, 0);
-        if (!phone) tl.fromTo(sec.querySelectorAll('.s-prob-item'), { autoAlpha: 0, y: 36 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.06 }, 0.12);
+        const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, scrollTrigger: { trigger: sec, start: 'top 62%', once: true } })
+          .fromTo(sec.querySelectorAll('.s-prob-copy > *'), { autoAlpha: 0, y: 28 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.09 }, 0);
+        if (!phone) tl.fromTo(sec.querySelectorAll('.s-prob-item'), { autoAlpha: 0, y: 56 }, { autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.14 }, 0.25)
+          .fromTo(sec.querySelectorAll('.s-risk-img'), { scale: 1.12 }, { scale: 1, duration: 1.6, ease: 'power2.out' }, 0.25);
+        tl.fromTo(sec.querySelectorAll('.s-risk-card li'), { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: 0.45, stagger: 0.08 }, phone ? 0.3 : 0.75);
         const marks = sec.querySelectorAll('[data-tool] .edit, [data-tool] .clash, [data-tool] .row.u');
-        if (marks.length) tl.fromTo(marks, { backgroundColor: 'rgba(232, 104, 75, 0)' }, { backgroundColor: 'rgba(232, 104, 75, .18)', duration: 0.5, stagger: 0.08 }, 0.9);
+        if (marks.length) tl.fromTo(marks, { backgroundColor: 'rgba(232, 104, 75, 0)' }, { backgroundColor: 'rgba(232, 104, 75, .2)', duration: 0.5, stagger: 0.1 }, phone ? 0.4 : 1.1);
       });
 
-      // the watch: feeds go into Usher, what it found comes out, all in one short play
-      q('[data-feed]').forEach(pth => { const len = (pth as unknown as SVGPathElement).getTotalLength(); gsap.set(pth, { strokeDasharray: len, strokeDashoffset: len }); });
-      arrive(q('[data-scene="trigger"]')[0])
-        .fromTo(q('[data-trigger-copy] > *'), { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.06 }, 0)
-        .fromTo(q('[data-feed-in]'), { autoAlpha: 0, x: -24 }, { autoAlpha: 1, x: 0, duration: 0.6, stagger: 0.06 }, 0.15)
-        .to(q('[data-feed="in"]'), { strokeDashoffset: 0, duration: 0.7, ease: 'power2.inOut' }, 0.3)
-        .fromTo(q('[data-node]'), { scale: 0.6, autoAlpha: 0, transformOrigin: '50% 50%' }, { scale: 1, autoAlpha: 1, duration: 0.6 }, 0.6)
-        .to(q('[data-feed="out"]'), { strokeDashoffset: 0, duration: 0.7, ease: 'power2.inOut' }, 0.8)
-        .fromTo(q('[data-feed-out]'), { autoAlpha: 0, x: 24 }, { autoAlpha: 1, x: 0, duration: 0.6, stagger: 0.06 }, 0.95);
+      // The watch: the weather, flights and shuttle feed into Usher, and what it found comes out.
+      // Computers: the scene holds while one scroll draws it, then rests before moving on.
+      // Phones: it plays on its own once it is on screen.
+      // The lines are stretched to the space between the cards (and keep a fixed stroke), so their
+      // drawn length on screen is longer than their own length: dash generously so each draws in full.
+      q('[data-feed]').forEach(pth => { const len = (pth as unknown as SVGPathElement).getTotalLength() * 6; gsap.set(pth, { strokeDasharray: len, strokeDashoffset: len }); });
+      const watchEl = q('[data-scene="trigger"]')[0];
+      const watch = phone
+        ? gsap.timeline({ defaults: { ease: 'power3.out' }, scrollTrigger: { trigger: watchEl, start: 'top 55%', once: true } })
+        : gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: watchEl, start: 'top top', end: '+=110%', scrub: 0.6, pin: true, anticipatePin: 1 } });
+      watch.fromTo(q('[data-trigger-copy] > *'), { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.08 }, 0)
+        .fromTo(q('[data-feed-in]'), { autoAlpha: 0, x: -30 }, { autoAlpha: 1, x: 0, duration: 0.45, stagger: 0.1 }, 0.25)
+        .to(q('[data-feed="in"]'), { strokeDashoffset: 0, duration: 0.5, stagger: 0.06 }, 0.55)
+        .fromTo(q('[data-node]'), { scale: 0.6, autoAlpha: 0, transformOrigin: '50% 50%' }, { scale: 1, autoAlpha: 1, duration: 0.4 }, 0.95)
+        .to(q('[data-feed="out"]'), { strokeDashoffset: 0, duration: 0.5, stagger: 0.06 }, 1.2)
+        .fromTo(q('[data-feed-out]'), { autoAlpha: 0, x: 30 }, { autoAlpha: 1, x: 0, duration: 0.45, stagger: 0.1 }, 1.45);
+      if (!phone) watch.to({}, { duration: 1 });
 
       // --- 3. the recommendation: the calendar turns to face you and redraws itself
       q('[data-reveal]').forEach(el => gsap.fromTo(el, { y: 40, autoAlpha: 0, filter: 'blur(8px)' }, { y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1, ease: 'power4.out', scrollTrigger: { trigger: el, start: 'top 85%', once: true } }));
@@ -281,10 +294,10 @@ export default function Site() {
           </div>
           {/* The problems as the product raises them: alerts with the agent's recommendation. */}
           <div className="s-float s-float-alert" data-hero-float>
-            <span className="ic">!</span><span><b>Thunderstorms 3:00 to 6:00 pm</b><small>Day 1 · 9 events start in the storm</small></span><span className="pill">Agent&apos;s recommendation</span>
+            <span className="ic">!</span><span><b>Thunderstorms 3:00 to 6:00 pm</b></span>
           </div>
           <div className="s-float s-float-alert late" data-hero-float>
-            <span className="ic"><Bell /></span><span><b>Pavel Kettering is running late</b><small>Selling at Markets · 4:00 pm · Pier 9 Hall</small></span><span className="pill">Agent&apos;s recommendation</span>
+            <span className="ic"><Bell /></span><span><b>Pavel Kettering is running late</b></span>
           </div>
         </div>
         <div className="s-scrollcue" aria-hidden="true">Scroll<i /></div>
@@ -300,6 +313,7 @@ export default function Site() {
         </div>
         <div className="s-prob-row s-risk-cards">
           <article className="s-prob-item s-risk-card">
+            <div className="s-risk-pic"><div className="s-risk-img" style={{ backgroundImage: 'url(/hl/snow.jpg)' }} /></div>
             <p className="s-risk-k"><i className="ap wx">❄</i>Weather · Thursday</p>
             <h3>Snow from 2:00 to 7:00 pm</h3>
             <ul>
@@ -309,6 +323,7 @@ export default function Site() {
             </ul>
           </article>
           <article className="s-prob-item s-risk-card">
+            <div className="s-risk-pic"><div className="s-risk-img" style={{ backgroundImage: 'url(/hl/hall.jpg)' }} /></div>
             <p className="s-risk-k"><i className="ap late">!</i>Late guest · 3:40 pm</p>
             <h3>Pavel Kettering is stuck on the bridge</h3>
             <ul>
@@ -381,7 +396,7 @@ export default function Site() {
       </section>
 
       {/* 2. the trigger */}
-      <section className="s-trigger" data-section data-scene="trigger">
+      <section className="s-trigger" data-scene="trigger">
         <div className="s-sticky">
           <canvas className="s-snowfield" data-snowfield aria-hidden="true" />
           <div className="s-trigger-copy" data-trigger-copy>
