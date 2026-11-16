@@ -33,7 +33,9 @@ export function AttendeeApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who
   const unread = Math.max(0, inbox.length - seen);
   const go = (t: typeof tab) => { setTab(t); if (t === 'updates') setSeen(inbox.length); window.scrollTo({ top: 0 }); };
   return (
-    <div className="at">
+    <div className={`at at-on-${tab}`}>
+      {/* The whole app sits on a cinema photo, darkened so the cards read on top. */}
+      <div className="at-photo" aria-hidden="true" style={{ backgroundImage: `url(${tab === 'pass' ? '/hl/hall.jpg' : '/hl/audience.jpg'})` }} />
       {viewAs && <div className="viewas-bar"><Icon name="eye" size={16} /> Viewing as {who.name}. <button className="small" onClick={onOut}>Back to organizer</button></div>}
       <header className="at-head">
         <div>
@@ -181,6 +183,10 @@ function Agenda({ s, who, onUpdates }: { s: AgentStore; who: Who; onUpdates: () 
           <span><b>{latest.subject}</b><em>{latest.body}</em></span>
         </button>
       )}
+      <div className="at-dayhead">
+        <b>{new Date(`${f.dates[day]}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</b>
+        <span>{mine.length ? `${mine.length} on your plan` : 'Nothing planned'}</span>
+      </div>
       {mine.length === 0
         ? <div className="at-empty">Nothing on your plan this day.</div>
         : <div className="at-list">{rows}</div>}

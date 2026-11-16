@@ -836,3 +836,33 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
 .at-keep button { min-height: 32px; font-size: 12.5px; }
 .at-time span, .at-time s { white-space: nowrap; }
 .at-row { grid-template-columns: 62px 1fr; }
+
+/* ---------------------------------------------------------------- attendee app: on a photo, glass on top */
+.at { position: relative; isolation: isolate; background: var(--bg); }
+.at-photo { position: fixed; inset: 0; z-index: -1; background: var(--bg) center 30% / cover no-repeat; filter: sepia(.25) saturate(.9) brightness(.9); }
+.at-photo::after { content: ""; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(18, 11, 9, .45) 0%, rgba(18, 11, 9, .62) 28%, rgba(18, 11, 9, .86) 62%, rgba(18, 11, 9, .94) 100%); }
+.at-on-pass .at-photo::after { background: linear-gradient(180deg, rgba(18, 11, 9, .35) 0%, rgba(18, 11, 9, .7) 55%, rgba(18, 11, 9, .92) 100%); }
+.at-head .at-fest { text-shadow: 0 2px 12px rgba(0, 0, 0, .5); }
+.at-me { background: rgba(28, 19, 15, .45); backdrop-filter: blur(10px); }
+/* glass surfaces */
+.at-days button, .at-card, .at-msg, .at-pick, .at-empty { background: rgba(28, 19, 15, .5); backdrop-filter: blur(14px) saturate(1.1); -webkit-backdrop-filter: blur(14px) saturate(1.1); border-color: rgba(246, 236, 220, .14); }
+.at-days button.on { background: #f1e5d0; backdrop-filter: none; }
+.at-alert { background: rgba(70, 44, 24, .55); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.at-row.moved .at-card { background: linear-gradient(180deg, rgba(212, 154, 92, .26), rgba(28, 19, 15, .55)); }
+/* the day, then the timeline with a rail */
+.at-dayhead { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-top: 4px; }
+.at-dayhead b { font-family: var(--display); font-size: 19px; font-weight: 800; letter-spacing: -.01em; }
+.at-dayhead span { font-size: 12.5px; color: var(--muted); }
+.at-list { position: relative; gap: 12px; }
+.at-list::before { content: ""; position: absolute; left: 66px; top: 14px; bottom: 14px; width: 1px; background: linear-gradient(180deg, rgba(212, 154, 92, .55), rgba(246, 236, 220, .12)); }
+.at-row { grid-template-columns: 58px 1fr; gap: 16px; position: relative; }
+.at-row::before { content: ""; position: absolute; left: 62px; top: 16px; width: 9px; height: 9px; border-radius: 50%; background: #2a1d16; border: 1.5px solid rgba(246, 236, 220, .45); }
+.at-row.moved::before { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 10px rgba(212, 154, 92, .7); }
+.at-row.off::before { background: #E8684B; border-color: #E8684B; }
+.at-row.at-free::before { border-style: dashed; background: transparent; }
+.at-time { text-align: right; padding-right: 2px; color: rgba(246, 236, 220, .78); }
+/* pass on the hall photo */
+.at-ticket { margin-top: 18px; filter: drop-shadow(0 24px 40px rgba(0, 0, 0, .5)); }
+.at-nav { background: rgba(28, 19, 15, .72); }
+.at-photo::after { background: linear-gradient(180deg, rgba(18, 11, 9, .32) 0%, rgba(18, 11, 9, .55) 26%, rgba(18, 11, 9, .84) 60%, rgba(18, 11, 9, .94) 100%); }
