@@ -31,11 +31,10 @@ function useLookups(s: AgentStore) {
 }
 
 // ------------------------------------------------------------------ Overview
-export function Overview({ s, go, user }: P) {
+export function Overview({ s, go }: P) {
   const a = s.agent;
   const f = a.f;
   const crowd = a.crowd(s.clock);
-  const pending = a.queue.filter(q => q.status === 'pending');
   const now = toMinutes(s.clock);
   const day = dayOf(s.clock, f.dates);
   const upNext = f.events
@@ -49,33 +48,13 @@ export function Overview({ s, go, user }: P) {
       <section className="hero has-photo">
         <HeroPhoto k="organizer" />
         <div className="eyebrow">Day {day} · {dateLabel} · {fmt(s.clock)}</div>
-        <h2>{pending.length + a.flags.length ? `${pending.length + a.flags.length} thing${pending.length + a.flags.length > 1 ? 's' : ''} for you` : 'All quiet at the festival'}</h2>
-        <div className="row">
-          <button onClick={() => go('schedule')}><Icon name="calendar" size={16} />Edit schedule</button>
-          <button onClick={() => go('here')}><Icon name="scan" size={16} />Check people in</button>
-        </div>
+        <h2>{s.festivalName}</h2>
       </section>
-
-      <div className="card for-you">
-        <div className="section-title"><h2>For you</h2>{pending.length + a.flags.length > 0 && <span className="chip bad">{pending.length + a.flags.length}</span>}</div>
-        {pending.length + a.flags.length === 0 && <div className="empty-note">Nothing needs you right now.</div>}
-        <ApprovalLines s={s} user={user} go={go} />
-        <FlagList s={s} user={user} go={go} />
-      </div>
-
-      <div className="stats">
-        <div className={`stat ${pending.length ? 'hot' : ''}`}><div className="k"><Icon name="inbox" size={14} />To approve</div><div className="v">{pending.length}</div></div>
-        <div className={`stat ${a.flags.length ? 'warn' : ''}`}><div className="k"><Icon name="flag" size={14} />Flags</div><div className="v">{a.flags.length}</div></div>
-        <button className="stat" onClick={() => go('log')}><div className="k"><Icon name="send" size={14} />Messages sent</div><div className="v">{a.outbox.length}</div></button>
-        <button className="stat" onClick={() => go('here')}><div className="k"><Icon name="users" size={14} />Here today</div><div className="v">{(f.arrivals ?? []).filter(x => x.day === day && !x.reentry).length}</div></button>
-      </div>
-
-      <WeatherCard s={s} go={go} user="" compact />
 
       <div className="card">
         <div className="section-title">
           <h2>Venues</h2>
-          <div className="seg seg-nowrap" role="tablist" aria-label="Venue view">
+          <div className="pill-toggle" role="tablist" aria-label="Venue view">
             <button className={view === 'cal' ? 'on' : ''} onClick={() => setView('cal')}>Calendar</button>
             <button className={view === 'now' ? 'on' : ''} onClick={() => setView('now')}>Right now</button>
           </div>
@@ -108,6 +87,9 @@ export function Overview({ s, go, user }: P) {
           ))}
         </>}
       </div>
+
+      <WeatherCard s={s} go={go} user="" compact />
+
 
       {a.changeFeed.length > 0 && (
         <div className="card">

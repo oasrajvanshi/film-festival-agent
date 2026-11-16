@@ -572,3 +572,9 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
 @keyframes ob-drift { from { transform: scale(1.04); } to { transform: scale(1.12) translateY(-1.5%); } }
 @media (min-width: 900px) { .ob-hi { place-items: center; } }
 @media (prefers-reduced-motion: reduce) { .ob-hi .ph-img { animation: none; } }
+
+/* Today: the venue view switch uses the hero's outline pill buttons. */
+.pill-toggle { display: inline-flex; gap: 10px; }
+.pill-toggle button { background: transparent; border: 1px solid rgba(246, 236, 220, .5); color: var(--ink); border-radius: 999px; padding: 8px 18px; white-space: nowrap; }
+.pill-toggle button:hover { background: rgba(246, 236, 220, .1); border-color: var(--ink); }
+.pill-toggle button.on { background: #f3e8d4; color: #151110; border-color: #f3e8d4; }
