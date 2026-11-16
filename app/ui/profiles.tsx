@@ -118,7 +118,7 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
             <button className="ghost small" onClick={() => choose(null)}>← All profiles</button>
             <h2 className="display">{pick!.label}</h2>
             <p className="muted" style={{ marginTop: 0 }}>Enter your name and email as the festival has them, and Usher emails your access code.</p>
-            <label className="field">{kind === 'vendor' ? 'Your name or company' : 'Full name'}<input autoFocus value={name} autoComplete="name" onChange={e => { setName(e.target.value); setErr(''); }} /></label>
+            <label className="field">{kind === 'vendor' ? 'Your name or company' : 'Full name'}<input value={name} autoComplete="name" onChange={e => { setName(e.target.value); setErr(''); }} /></label>
             <label className="field">Email<input type="email" value={email} autoComplete="email" onChange={e => { setEmail(e.target.value); setErr(''); }} onKeyDown={e => e.key === 'Enter' && name && email && sendCode()} /></label>
             {err && <div className="issues bad" role="alert">{err}</div>}
             {note && <div className={`issues ${note.tone === 'ok' ? 'ok' : ''}`} role="status">{note.text}</div>}

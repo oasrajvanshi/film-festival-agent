@@ -378,7 +378,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
         {allRec && (
           <div className="wx-frame-head">
             <button className={`wx-all-btn${openId === 'all' ? ' on' : ''}`} onClick={() => show(openId === 'all' ? null : 'all')}>
-              <Icon name="sparkle" size={15} /> {openId === 'all' ? 'Close preview' : 'Overall recommendation'}
+              <Icon name="sparkle" size={15} /> {openId === 'all' ? 'Close preview' : 'Fix them all'}
             </button>
           </div>
         )}
