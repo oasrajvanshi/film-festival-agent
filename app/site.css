@@ -726,3 +726,7 @@
 .s-root:not(.ready) .s-hero-copy, .s-root:not(.ready) .s-hero-stage { visibility: hidden; animation: s-show 0s 3s forwards; }
 @keyframes s-show { to { visibility: visible; } }
 .s-hero .s-h1 { will-change: transform; backface-visibility: hidden; }
+/* Phones: centre the headline with padding, never flex (flex drops the spaces between the animated words). */
+@media (max-width: 760px) {
+  .s-hero .s-h1.s-h1-hero { display: block; min-height: 0; padding: calc(50svh - 150px) 0 calc(50svh - 150px); white-space: normal; overflow-wrap: break-word; }
+}

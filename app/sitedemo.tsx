@@ -60,7 +60,7 @@ export function PlanDemo() {
     const io = new IntersectionObserver(([e]) => {
       if (e.isIntersecting && !loop) { play(); loop = setInterval(play, LOOP); }
       if (!e.isIntersecting && loop) { clearInterval(loop); loop = null; timers.forEach(clearTimeout); }
-    }, { threshold: 0.35 });
+    }, { threshold: 0.08 });
     io.observe(el);
     return () => { io.disconnect(); if (loop) clearInterval(loop); timers.forEach(clearTimeout); };
   }, []);
