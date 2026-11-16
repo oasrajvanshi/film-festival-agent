@@ -443,3 +443,30 @@
 .s-pain { margin: 2px 0 0; font-size: 14px; font-weight: 600; color: #F2A48F; }
 .t-sheets td.clash { color: #C5221F; font-weight: 700; }
 @media (max-width: 900px) { .s-pain { font-size: 12px; } }
+
+/* ---------------------------------------------------------------- agent section: feeds in, specific results out */
+.s-flow { position: relative; z-index: 2; width: min(1120px, 100%); display: grid; grid-template-columns: 1fr 210px 1.15fr; align-items: center; margin-top: 18px; text-align: left; }
+.s-flow-col { display: grid; gap: 12px; }
+.s-flow-feed, .s-flow-out { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 12px; background: rgba(26, 17, 14, .86); border: 1px solid var(--line); backdrop-filter: blur(6px); }
+.s-flow-feed b, .s-flow-out b { display: block; color: var(--cream); font-size: 15px; font-weight: 600; }
+.s-flow-feed small, .s-flow-out small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.s-flow-feed .ic { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; background: var(--bg-3); color: var(--amber-2); flex: none; font-size: 15px; }
+.s-flow-out { display: block; border-color: rgba(201, 152, 99, .4); }
+.s-flow-mid { position: relative; height: 300px; }
+.s-flow-mid svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.s-flow-mid path { fill: none; stroke: rgba(201, 152, 99, .6); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.s-flow-mid path.out { stroke: rgba(232, 184, 120, .9); }
+.s-flow-node { position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 132px; height: 132px; border-radius: 50%; display: grid; place-content: center; text-align: center; padding: 12px;
+  background: radial-gradient(circle, #3a2518, #1e130e); border: 1px solid var(--amber); box-shadow: 0 0 46px rgba(201, 152, 99, .35); }
+.s-flow-node b { color: var(--cream); font-size: 19px; }
+.s-flow-node small { color: var(--muted); font-size: 10.5px; line-height: 1.3; margin-top: 4px; }
+.s-trigger .s-h2 { max-width: 22ch; }
+@media (max-width: 900px) {
+  .s-flow { grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
+  .s-flow-mid { height: 92px; } .s-flow-mid svg { display: none; }
+  .s-flow-node { width: 84px; height: 84px; } .s-flow-node small { display: none; }
+  .s-flow-col { grid-template-columns: 1fr 1fr; gap: 8px; } .s-flow-col:first-child { grid-template-columns: 1fr 1fr 1fr; }
+  .s-flow-feed { padding: 8px; gap: 6px; } .s-flow-feed .ic { display: none; } .s-flow-feed b, .s-flow-out b { font-size: 12.5px; } .s-flow-feed small, .s-flow-out small { font-size: 11px; }
+  .s-flow-out { padding: 8px 10px; }
+  .s-trigger .s-lead { display: none; }
+}

@@ -319,30 +319,26 @@ export default function Site() {
           <div className="s-trigger-copy" data-trigger-copy>
             <span className="s-clock">Thursday · 1:10 pm</span>
             <h2 className="s-h2">Usher keeps an eye on everything that could go wrong.</h2>
-            <p className="s-lead" style={{ textAlign: 'center' }}>It follows the weather, flight arrivals and shuttle times, and checks them against every screening, guest and volunteer shift.</p>
+            <p className="s-lead" style={{ textAlign: 'center' }}>It follows the weather, flight arrivals and shuttle times all day. When one of them affects your programme, it shows you exactly what it touches.</p>
           </div>
-          <div className="s-feeds" data-feeds>
-            <svg viewBox="0 0 1100 420" role="img" aria-label="Weather, flights and the shuttle feed reach the agent, which finds three screenings, twenty-one people, one guest and three door teams affected">
-              {[['Weather', '3 in of snow, 2 to 7 pm', 90], ['Flights', 'DL2207 lands 2:41 pm', 210], ['Shuttle', 'Harbor Loop 12 min late', 330]].map(([l, s, y]) => (
-                <g key={String(l)} data-feed-in>
-                  <text className="lbl" x="20" y={Number(y) - 6}>{l}</text>
-                  <text className="sub" x="20" y={Number(y) + 16}>{s}</text>
-                  <path className="dim" d={`M250 ${y} C 380 ${y}, 420 210, 500 210`} />
-                  <path data-feed="in" d={`M250 ${y} C 380 ${y}, 420 210, 500 210`} />
-                </g>
+          <div className="s-flow" data-feeds data-lve-skip>
+            <div className="s-flow-col">
+              {[['❄', 'Weather', 'Snow 2:00 to 7:00 pm'], ['✈', 'Flights', 'DL2207 landed 21 min late'], ['◷', 'Shuttle', 'Harbor Loop 12 min late']].map(([ic, k, v]) => (
+                <div className="s-flow-feed" data-feed-in key={k}><span className="ic">{ic}</span><span><b>{k}</b><small>{v}</small></span></div>
               ))}
-              <g data-node>
-                <circle className="node" cx="550" cy="210" r="56" />
-                <text className="node-t" x="550" y="220" textAnchor="middle">Agent</text>
-              </g>
-              {[['3 screenings', 60], ['21 people', 160], ['1 guest', 260], ['3 door teams', 360]].map(([l, y]) => (
-                <g key={String(l)} data-feed-out>
-                  <path className="dim" d={`M600 210 C 680 210, 720 ${y}, 840 ${y}`} />
-                  <path data-feed="out" d={`M600 210 C 680 210, 720 ${y}, 840 ${y}`} />
-                  <text className="out" x="860" y={Number(y) + 7}>{l}</text>
-                </g>
+            </div>
+            <div className="s-flow-mid">
+              <svg viewBox="0 0 200 300" preserveAspectRatio="none" aria-hidden="true">
+                {[50, 150, 250].map(y => <path key={`i${y}`} data-feed="in" d={`M0 ${y} C 60 ${y}, 60 150, 100 150`} />)}
+                {[38, 113, 188, 263].map(y => <path key={`o${y}`} data-feed="out" className="out" d={`M100 150 C 140 150, 140 ${y}, 200 ${y}`} />)}
+              </svg>
+              <div className="s-flow-node" data-node><b>Usher</b><small>checks 40 screenings, 312 tickets, 60 shifts</small></div>
+            </div>
+            <div className="s-flow-col">
+              {[['3 screenings move to 3:15 pm', 'Late Country, Quiet Animals, Wild Tide'], ['21 attendees get their new time', 'Seats held, leave 15 min early'], ['Yara Hollis opens Pavel’s panel', 'He joins at 4:20 pm'], ['3 door teams briefed', 'Hold doors until 3:20 pm']].map(([b2, sm]) => (
+                <div className="s-flow-out" data-feed-out key={b2}><b>{b2}</b><small>{sm}</small></div>
               ))}
-            </svg>
+            </div>
           </div>
           <div className="s-progress"><i /></div>
         </div>
