@@ -1,6 +1,7 @@
 'use client';
 
 import { DayCalendar } from './daycal';
+import { WeatherWatch } from './weatherplan';
 import { useMemo, useState } from 'react';
 import { DEFAULT_SHEET, readSetup, type AgentStore } from './useAgent';
 import { riskSummary, type WeatherHour } from '../../src/agent/weather';
@@ -31,7 +32,7 @@ function useLookups(s: AgentStore) {
 }
 
 // ------------------------------------------------------------------ Overview
-export function Overview({ s, go }: P) {
+export function Overview({ s, go, user }: P) {
   const a = s.agent;
   const f = a.f;
   const crowd = a.crowd(s.clock);
@@ -42,6 +43,24 @@ export function Overview({ s, go }: P) {
     .sort((x, y) => toMinutes(x.start) - toMinutes(y.start)).slice(0, 5);
   const venueName = (id: string) => f.venues.find(v => v.id === id)?.name ?? id;
   const [view, setView] = useState<'cal' | 'now'>('cal');
+  // The weather plan's preview, and the schedule as it was before the last approved plan.
+  const [preview, setPreview] = useState<{ events: FestivalEvent[]; moved: string[] } | null>(null);
+  const [original, setOriginal] = useState<FestivalEvent[] | null>(() => {
+    try { const v = typeof window !== 'undefined' && localStorage.getItem('usher-original-plan-v1'); return v ? JSON.parse(v) : null; } catch { return null; }
+  });
+  const [showOriginal, setShowOriginal] = useState(false);
+  const keepOriginal = (before: FestivalEvent[]) => {
+    const first = original ?? before;
+    setOriginal(first); setShowOriginal(false);
+    try { localStorage.setItem('usher-original-plan-v1', JSON.stringify(first)); } catch { /* private mode */ }
+  };
+  const startOf = (list: FestivalEvent[]) => Object.fromEntries(list.map(e => [e.id, e.start]));
+  const was: Record<string, string> = {};
+  if (preview) { const cur = startOf(f.events); for (const id of preview.moved) was[id] = cur[id]; }
+  else if (original && !showOriginal && f.events.length) { const old = startOf(original); for (const e of f.events) if (old[e.id] && old[e.id] !== e.start) was[e.id] = old[e.id]; }
+  // An original plan only counts while today's schedule still differs from it (a demo reset clears it).
+  const hasOriginal = !!original && f.events.some(e => { const o = original.find(x => x.id === e.id); return o && (o.start !== e.start || o.venueId !== e.venueId); });
+  const calEvents = preview ? preview.events : showOriginal && hasOriginal ? original! : undefined;
   const dateLabel = new Date(`${f.dates[day]}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   return (
     <>
@@ -51,15 +70,24 @@ export function Overview({ s, go }: P) {
         <h2>{s.festivalName}</h2>
       </section>
 
-      <div className="card">
+      <div className="card today-cal">
         <div className="section-title">
           <h2>Venues</h2>
-          <div className="pill-toggle" role="tablist" aria-label="Venue view">
-            <button className={view === 'cal' ? 'on' : ''} onClick={() => setView('cal')}>Calendar</button>
-            <button className={view === 'now' ? 'on' : ''} onClick={() => setView('now')}>Right now</button>
+          <div className="row" style={{ gap: 10 }}>
+            {view === 'cal' && hasOriginal && !preview && (
+              <div className="pill-toggle" role="tablist" aria-label="Which plan">
+                <button className={!showOriginal ? 'on' : ''} onClick={() => setShowOriginal(false)}>New plan</button>
+                <button className={showOriginal ? 'on' : ''} onClick={() => setShowOriginal(true)}>Original plan</button>
+              </div>
+            )}
+            <div className="pill-toggle" role="tablist" aria-label="Venue view">
+              <button className={view === 'cal' ? 'on' : ''} onClick={() => setView('cal')}>Calendar</button>
+              <button className={view === 'now' ? 'on' : ''} onClick={() => setView('now')}>Right now</button>
+            </div>
           </div>
         </div>
-        {view === 'cal' ? <DayCalendar s={s} day={day} /> : <>
+        {view === 'cal' && preview && <div className="cal-note">Preview of the agent's plan. Approve it below to make it the new plan.</div>}
+        {view === 'cal' ? <DayCalendar s={s} day={day} events={calEvents} was={was} /> : <>
           <div className="venues">
             {crowd.venues.map(v => (
               <div className="venue" key={v.venueId}>
@@ -88,7 +116,7 @@ export function Overview({ s, go }: P) {
         </>}
       </div>
 
-      <WeatherCard s={s} go={go} user="" compact />
+      <WeatherWatch s={s} day={day} user={user} onPreview={p => { setPreview(p); if (p) { setView('cal'); setShowOriginal(false); } }} onApplied={keepOriginal} />
 
 
       {a.changeFeed.length > 0 && (

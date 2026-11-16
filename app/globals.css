@@ -578,3 +578,17 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
 .pill-toggle button { background: transparent; border: 1px solid rgba(246, 236, 220, .5); color: var(--ink); border-radius: 999px; padding: 8px 18px; white-space: nowrap; }
 .pill-toggle button:hover { background: rgba(246, 236, 220, .1); border-color: var(--ink); }
 .pill-toggle button.on { background: #f3e8d4; color: #151110; border-color: #f3e8d4; }
+
+/* Weather on Today: one sentence, a checklist, one approve button. */
+.wx .section-title { flex-wrap: wrap; gap: 12px; }
+.wx-hint { margin: 0; color: var(--muted); }
+.wx-rec { display: grid; gap: 4px; }
+.wx-what { margin: 0 0 6px; font-size: 17px; line-height: 1.5; color: var(--ink); max-width: 760px; }
+.wx-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.wx-list li { border-bottom: 1px solid var(--line); }
+.wx-list label { display: flex; gap: 14px; align-items: flex-start; padding: 14px 2px; cursor: pointer; font-size: 15px; line-height: 1.45; }
+.wx-list input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--accent); flex: none; }
+.wx-foot { display: flex; justify-content: flex-end; padding-top: 14px; }
+.wx-foot button { min-width: 180px; }
+.cal-note { margin: -4px 0 12px; font-size: 13.5px; color: var(--accent); }
+@media (max-width: 640px) { .wx-foot button { width: 100%; } }

@@ -26,3 +26,9 @@
 .dcal-now { position: absolute; left: 48px; right: 0; border-top: 1.5px solid var(--bad); z-index: 2; pointer-events: none; }
 .dcal-now i { position: absolute; left: -46px; top: -9px; font-style: normal; font-family: var(--mono); font-size: 10px; background: var(--bad); color: #fff; padding: 1px 4px; border-radius: 5px; }
 .seg-nowrap button { white-space: nowrap; }
+
+/* Moves from a weather plan: blocks slide to their new time and stay picked out. */
+.dcal-ev { transition: top .7s cubic-bezier(.2, .8, .2, 1), height .7s cubic-bezier(.2, .8, .2, 1), background .3s, border-color .3s; }
+.dcal-ev.moved { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 22%, var(--panel)); box-shadow: 0 0 0 1px var(--accent); }
+.dcal-ev.moved small s { opacity: .6; margin-right: 6px; }
+@media (prefers-reduced-motion: reduce) { .dcal-ev { transition: none; } }

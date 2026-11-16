@@ -6,12 +6,17 @@
 import { useMemo } from 'react';
 import type { AgentStore } from './useAgent';
 import { clock as fmt, toMinutes } from '../../src/core/time';
-import type { DayNumber } from '../../src/core/types';
+import type { DayNumber, FestivalEvent } from '../../src/core/types';
 import '../daycal.css';
 
-export function DayCalendar({ s, day }: { s: AgentStore; day: DayNumber }) {
+/**
+ * `events` shows a different version of the schedule (a preview or the
+ * original plan); `was` maps moved events to their earlier start, and those
+ * blocks are picked out and slide to their new time.
+ */
+export function DayCalendar({ s, day, events: over, was }: { s: AgentStore; day: DayNumber; events?: FestivalEvent[]; was?: Record<string, string> }) {
   const f = s.agent.f;
-  const events = useMemo(() => f.events.filter(e => e.day === day).sort((a, b) => a.start.localeCompare(b.start)), [f, day, s.version]); // eslint-disable-line react-hooks/exhaustive-deps
+  const events = useMemo(() => (over ?? f.events).filter(e => e.day === day).sort((a, b) => a.start.localeCompare(b.start)), [f, over, day, s.version]); // eslint-disable-line react-hooks/exhaustive-deps
   const venues = f.venues.filter(v => events.some(e => e.venueId === v.id));
   if (!events.length) return <div className="empty-note">Nothing scheduled this day.</div>;
   const t0 = Math.floor(Math.min(...events.map(e => toMinutes(e.start))) / 60) * 60;
@@ -35,11 +40,11 @@ export function DayCalendar({ s, day }: { s: AgentStore; day: DayNumber }) {
               const short = toMinutes(e.end) - toMinutes(e.start) < 45;
               const live = onDay && now >= toMinutes(e.start) && now < toMinutes(e.end);
               return (
-                <div key={e.id} className={`dcal-ev k-${e.kind}${short ? ' short' : ''}${flagged.has(e.id) ? ' hot' : ''}${e.status === 'cancelled' ? ' off' : ''}${live ? ' live' : ''}`}
+                <div key={e.id} className={`dcal-ev k-${e.kind}${short ? ' short' : ''}${flagged.has(e.id) ? ' hot' : ''}${was?.[e.id] ? ' moved' : ''}${e.status === 'cancelled' ? ' off' : ''}${live ? ' live' : ''}`}
                   style={{ top: `${pct(e.start)}%`, height: `calc(${pct(e.end) - pct(e.start)}% - 3px)` }}
                   title={`${e.title}, ${fmt(e.start)} to ${fmt(e.end)}${e.guestIds.length ? `, with ${guests(e.guestIds)}` : ''}`}>
                   <b>{e.title}</b>
-                  <small>{fmt(e.start)} to {fmt(e.end)}</small>
+                  <small>{was?.[e.id] && <s>{fmt(was[e.id])}</s>}{fmt(e.start)} to {fmt(e.end)}</small>
                   {e.guestIds.length > 0 && <em>{guests(e.guestIds)}</em>}
                   {flagged.has(e.id) && <span className="tag">Flag</span>}
                   {e.status === 'cancelled' && <span className="tag">Off</span>}
