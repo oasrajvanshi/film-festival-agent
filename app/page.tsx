@@ -20,27 +20,32 @@ const pct = (hm: string) => Math.max(0, (m(hm) - T0) / (T1 - T0)) * 100;
 const span = (a: string, b: string) => Math.min(100, pct(b)) - pct(a);
 const h12 = (hm: string) => { const h = Number(hm.slice(0, 2)); return `${h % 12 || 12}:${hm.slice(3)}`; };
 
-interface Ev { col: number; t: string; s: string; e: string; kind?: 'panel'; move?: number; swap?: boolean; who?: string }
+interface Ev { col: number; t: string; s: string; e: string; kind?: 'panel'; move?: number; swap?: boolean; who?: string; img: string; faces?: string[] }
 const EVENTS: Ev[] = [
-  { col: 0, t: 'Open Gods', s: '12:30', e: '14:12', who: 'Femi Hollis' },
-  { col: 0, t: 'Q&A: Open Gods', s: '14:12', e: '14:32' },
-  { col: 0, t: 'Late Country', s: '15:00', e: '16:41', move: 15 },
-  { col: 0, t: 'Last Light', s: '17:30', e: '18:53' },
-  { col: 1, t: 'Silver Water', s: '12:30', e: '14:17' },
-  { col: 1, t: 'Quiet Animals', s: '15:00', e: '16:29', move: 15 },
-  { col: 1, t: 'Bright Weather', s: '17:30', e: '19:10' },
-  { col: 2, t: 'Documentary Ethics Now', s: '13:30', e: '14:30', kind: 'panel', who: 'Nico Thibault, Yara Hollis' },
-  { col: 2, t: 'Selling at Markets', s: '16:00', e: '17:00', kind: 'panel', swap: true },
-  { col: 2, t: 'Writing for Small Budgets', s: '18:30', e: '19:30', kind: 'panel' },
-  { col: 3, t: 'Wild Tide', s: '15:00', e: '16:17', move: 15, who: 'Sami Whitlock' },
-  { col: 3, t: 'Q&A: Wild Tide', s: '16:17', e: '16:37', move: 15 },
-  { col: 3, t: 'Last Gods', s: '17:30', e: '18:57', who: 'Elif Galloway' },
+  { col: 0, t: 'Open Gods', s: '12:30', e: '14:12', who: 'Femi Hollis', img: 'f-07', faces: ['Femi Hollis'] },
+  { col: 0, t: 'Q&A: Open Gods', s: '14:12', e: '14:32', img: 'talk-qa' },
+  { col: 0, t: 'Late Country', s: '15:00', e: '16:41', move: 15, img: 'f-13' },
+  { col: 0, t: 'Last Light', s: '17:30', e: '18:53', img: 'f-19' },
+  { col: 1, t: 'Silver Water', s: '12:30', e: '14:17', img: 'f-24' },
+  { col: 1, t: 'Quiet Animals', s: '15:00', e: '16:29', move: 15, img: 'f-30' },
+  { col: 1, t: 'Bright Weather', s: '17:30', e: '19:10', img: 'f-36' },
+  { col: 2, t: 'Documentary Ethics Now', s: '13:30', e: '14:30', kind: 'panel', who: 'Nico Thibault, Yara Hollis', img: 'talk-speaker', faces: ['Nico Thibault', 'Yara Hollis', 'Luca Pell'] },
+  { col: 2, t: 'Selling at Markets', s: '16:00', e: '17:00', kind: 'panel', swap: true, img: 'talk-stage', faces: ['Pavel Kettering', 'Luca Pell', 'Luca Hollis'] },
+  { col: 2, t: 'Writing for Small Budgets', s: '18:30', e: '19:30', kind: 'panel', img: 'talk-speaker', faces: ['Pavel Kettering', 'Sami Whitlock', 'Luca Abara'] },
+  { col: 3, t: 'Wild Tide', s: '15:00', e: '16:17', move: 15, who: 'Sami Whitlock', img: 'f-02', faces: ['Sami Whitlock'] },
+  { col: 3, t: 'Q&A: Wild Tide', s: '16:17', e: '16:37', move: 15, img: 'talk-qa' },
+  { col: 3, t: 'Last Gods', s: '17:30', e: '18:57', who: 'Elif Galloway', img: 'f-08', faces: ['Elif Galloway'] },
 ];
 
-function Cal({ id }: { id: string }) {
+const TONES = ['#b9825a', '#8f6a4f', '#a4744e', '#7d5b46', '#c39367', '#6f5a4e'];
+const initials = (n: string) => n.split(' ').map(w => w[0]).join('');
+const tone = (n: string) => TONES[[...n].reduce((h, c) => h + c.charCodeAt(0), 0) % TONES.length];
+
+/** `rich`: the app's own calendar look, with each event's picture and its guests' avatars. */
+function Cal({ id, rich }: { id: string; rich?: boolean }) {
   const hours = [13, 14, 15, 16, 17, 18];
   return (
-    <div className="s-cal" data-cal={id}>
+    <div className={`s-cal${rich ? ' rich' : ''}`} data-cal={id}>
       <div className="s-cal-board">
         <div className="s-cal-head"><span />{VENUES.map(v => <span key={v}>{v}</span>)}</div>
         <div className="s-cal-body">
@@ -55,9 +60,23 @@ function Cal({ id }: { id: string }) {
                 return (
                   <div key={e.t} className={`s-ev${e.kind ? ` k-${e.kind}` : ''}${short ? ' short' : ''}`} data-move={e.move ?? undefined} data-swap={e.swap ? '' : undefined}
                     data-top={pct(e.s)} style={{ top: `${pct(e.s)}%`, height: `calc(${span(e.s, e.e)}% - 3px)` }}>
-                    <b>{e.t}</b>
-                    <small data-time>{h12(e.s)} to {h12(e.e)}</small>
-                    {e.swap ? <em><ins data-in style={{ display: 'none' }}>Yara Hollis opens · </ins>Luca Pell, <span data-out>Pavel Kettering</span></em> : e.who && <em>{e.who}</em>}
+                    {rich ? <>
+                      <div className="s-ev-main">
+                        {!short && <img className="s-ev-img" src={`/hl/ev/${e.img}.jpg`} alt="" />}
+                        <div className="s-ev-txt"><b>{e.t}</b><small data-time>{h12(e.s)} to {h12(e.e)}</small></div>
+                      </div>
+                      {!short && e.faces && (
+                        <span className="s-faces">
+                          {e.swap && <i className="in" data-in style={{ display: 'none', background: tone('Yara Hollis') }}>YH</i>}
+                          {e.faces.map(n => <i key={n} className={n === 'Pavel Kettering' ? 'late' : ''} data-late={n === 'Pavel Kettering' ? '' : undefined} style={{ background: tone(n) }} title={n}>{initials(n)}</i>)}
+                        </span>
+                      )}
+                      {e.swap && <em className="s-ev-note" data-out>Pavel Kettering is running late</em>}
+                    </> : <>
+                      <b>{e.t}</b>
+                      <small data-time>{h12(e.s)} to {h12(e.e)}</small>
+                      {e.swap ? <em><ins data-in style={{ display: 'none' }}>Yara Hollis opens · </ins>Luca Pell, <span data-out>Pavel Kettering</span></em> : e.who && <em>{e.who}</em>}
+                    </>}
                     {e.move && <span className="tag" data-tag>+{e.move} min</span>}
                   </div>
                 );
@@ -102,7 +121,7 @@ export default function Site() {
       split(q('[data-split]'));
       intro.fromTo(q('.s-hero .split-word'), { yPercent: 110 }, { yPercent: 0, duration: 1.05, stagger: 0.05, ease: 'power4.out' }, seen ? 0.1 : 1.75)
         .fromTo(q('[data-hero-fade]'), { y: 24, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.9, stagger: 0.1 }, '<0.35')
-        .fromTo(q('[data-cal="hero"]'), { rotateX: 70, rotateZ: -18, y: 120, autoAlpha: 0 }, { rotateX: 52, rotateZ: -12, y: 0, autoAlpha: 1, duration: 1.6, ease: 'power3.out' }, '<0.1')
+        .fromTo(q('[data-cal="hero"]'), { rotateX: 60, rotateZ: -14, y: 140, autoAlpha: 0 }, { rotateX: 24, rotateZ: -6, y: 0, autoAlpha: 1, duration: 1.8, ease: 'power3.out' }, '<0.1')
         .fromTo(q('[data-hero-float]'), { y: -40, autoAlpha: 0, z: 120 }, { y: 0, autoAlpha: 1, z: 60, duration: 1, stagger: 0.25, ease: 'power3.out' }, '<0.6');
 
       // hero: the calendar keeps showing what the product does, on a loop
@@ -118,7 +137,8 @@ export default function Site() {
         .add(moveBlocks(heroCal, 0))
         .to(heroCal.querySelectorAll('[data-ghost], [data-snowband]'), { opacity: 0, duration: 0.5 }, '<');
       gsap.to(q('[data-hero-bg]'), { yPercent: 12, ease: 'none', scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
-      gsap.to(q('[data-cal="hero"]'), { rotateX: 30, rotateZ: -4, y: -60, ease: 'none', scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
+      gsap.to(q('[data-cal-wrap]'), { y: -14, rotateX: 3, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 2.4 });
+      gsap.to(q('[data-cal="hero"]'), { rotateX: 14, rotateZ: -3, y: -60, ease: 'none', scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
 
       const scene = (name: string) => {
         const el = q(`[data-scene="${name}"]`)[0];
@@ -128,15 +148,10 @@ export default function Site() {
 
       // --- 1. the problem: changes travel by hand, in pieces, late
       const p = scene('problem');
-      const cards = q('[data-chaos] .s-card');
-      cards.forEach((c, i) => {
-        const a = (i % 2 ? 1 : -1) * (12 + (i * 7) % 20);
-        p.fromTo(c, { z: -900, y: 160, rotateX: 12, rotateY: a / 2, rotateZ: a / 3, autoAlpha: 0 },
-          { z: 0, y: 0, rotateX: 0, rotateY: a / 8, rotateZ: Number(c.getAttribute('data-r') ?? 0), autoAlpha: 1, duration: 1.6, ease: 'power3.out' }, 0.2 + i * 0.42);
-      });
-      p.fromTo(q('[data-chaos] .s-stamp'), { scale: 1.8, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 0.5, stagger: 0.35, ease: 'back.out(2)' }, 4.4)
-        .fromTo(q('[data-p2]'), { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 1 }, 4.6)
-        .to(cards, { y: (i: number) => 380 + i * 30, rotateZ: (i: number) => (i % 2 ? 24 : -24), rotateX: -30, autoAlpha: 0, duration: 2, stagger: 0.08, ease: 'power2.in' }, 7.6)
+      const tools = q('[data-tool]');
+      p.fromTo(tools, { y: 60, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.2, stagger: 0.7, ease: 'power3.out' }, 0.3)
+        .fromTo(q('[data-tool] .edit, [data-tool] .clash, [data-tool] .row.u'), { backgroundColor: 'rgba(232, 104, 75, 0)' }, { backgroundColor: 'rgba(232, 104, 75, .18)', duration: 0.6, stagger: 0.15 }, 3.8)
+        .to(tools, { y: -30, autoAlpha: 0, duration: 1.4, stagger: 0.08, ease: 'power2.in' }, 7.6)
         .to(q('.s-problem-copy'), { autoAlpha: 0, y: -40, duration: 1.2 }, 8.6);
 
       // --- 2. the forecast changes: feeds converge on the agent, the agent finds who is affected
@@ -214,9 +229,8 @@ export default function Site() {
       <header className="s-hero">
         <div className="s-hero-bg" data-hero-bg style={{ backgroundImage: `url(${PHOTOS.hero.src})` }} />
         <div className="s-hero-copy">
-          <p className="s-kicker" data-hero-fade>Usher your festival with ease</p>
-          <h1 className="s-h1" data-split>Every schedule change, to everyone it affects.</h1>
-          <p className="s-lead" data-hero-fade>A screening moves, a guest runs late, a delivery slips. Usher finds who it affects and gives each of them their next step. You approve what goes out.</p>
+          <h1 className="s-h1" data-split>Usher helps you manage every unexpected change at your festival.</h1>
+          <p className="s-lead" data-hero-fade>Usher tracks your schedule, tells everyone affected by a change and gives each of them a recommendation. It flags clashes and checks passes, and your staff approve anything sent publicly.</p>
           <div className="s-ctas" data-hero-fade>
             <a className="btn primary" href="/onboarding">Try the live demo</a>
             <a className="btn" href="#story" onClick={go('#story')}>See how it works</a>
@@ -240,55 +254,59 @@ export default function Site() {
       <section id="story" className="s-pin s-problem" data-scene="problem">
         <div className="s-sticky">
           <div className="s-problem-copy">
-            <p className="s-mono">Before</p>
-            <h2 className="s-h2">One change takes hours of copying by hand.</h2>
-            <p>Spreadsheets, Word briefs, emails and group chats, all updated by hand.</p>
-            <p data-p2>So updates arrive late, reach the wrong people, or never arrive.</p>
+            <p className="s-mono">The problem</p>
+            <h2 className="s-h2">Schedule changes are still passed on by hand.</h2>
+            <p className="s-lead">Every change travels across spreadsheets, emails and group chats, so updates arrive late or reach the wrong people.</p>
           </div>
-          <div className="s-chaos" data-chaos data-lve-skip aria-hidden="true">
-            <div className="s-card s-doc d-sheet" data-r="-2" style={{ left: '0%', top: '0%' }}>
-              <div className="bar"><i /><i /><i /><span>Harbor Lights 2027 · Schedule grid (v7 FINAL)</span></div>
-              <table><tbody>
-                <tr><th /><th>A</th><th>B</th><th>C</th><th>D</th></tr>
-                <tr><th>1</th><td>Event</td><td>Start</td><td>Title</td><td>Venue</td></tr>
-                <tr><th>2</th><td>e-003</td><td>15:00</td><td>Wild Tide</td><td>Riverside</td></tr>
-                <tr><th>3</th><td>e-023</td><td className="hl">15:15??</td><td>Late Country</td><td>Harbor</td></tr>
-                <tr><th>4</th><td>e-040</td><td>15:00</td><td>Quiet Animals</td><td>Canal St</td></tr>
-                <tr><th>5</th><td>e-056</td><td className="cm">16:00</td><td>Selling at Markets</td><td>Pier 9</td></tr>
-              </tbody></table>
-              <span className="s-stamp">Version 7</span>
-            </div>
-            <div className="s-card s-doc d-mail" data-r="3" style={{ right: '0%', top: '12%' }}>
-              <div className="bar"><b>Inbox</b><span>47 unread</span></div>
-              <div className="row u"><b>Mara Quist</b><span>Pavel is running late, new ETA 4:20</span><em>2:58 pm</em></div>
-              <div className="row u"><b>Kaia Ivers</b><span>Re: Re: Fwd: schedule v7 FINAL (2)</span><em>2:41 pm</em></div>
-              <div className="row"><b>Lantern Print Couriers</b><span>Prints for 3 screenings running 15 min late</span><em>1:05 pm</em></div>
-              <div className="row"><b>Box office</b><span>21 people asking about Wild Tide</span><em>12:50 pm</em></div>
-              <span className="s-stamp">Late</span>
-            </div>
-            <div className="s-card s-doc d-word" data-r="-3" style={{ left: '3%', top: '42%' }}>
-              <div className="bar"><span>Door brief v3.docx</span></div>
-              <div className="page">
-                <b>Door brief, Thursday</b>
-                <p>Doors open <del>2:45</del> <ins>3:00?</ins> for the <del>3:00</del> <ins>3:15??</ins> screenings.</p>
-                <p>Shuttle every 20 min from Canal Street.</p>
-                <span className="cmt">Is this still right? K.</span>
+          <div className="s-tools" data-tools data-lve-skip aria-hidden="true">
+            <figure className="s-tool t-sheets" data-tool>
+              <figcaption><i className="ap sheets" />Google Sheets</figcaption>
+              <div className="win">
+                <div className="win-bar"><b>Harbor Lights 2027 · Schedule</b></div>
+                <table><tbody>
+                  <tr><th /><th>A</th><th>B</th><th>C</th></tr>
+                  <tr><th>1</th><td className="h">Start</td><td className="h">Event</td><td className="h">Guest</td></tr>
+                  <tr><th>2</th><td className="edit">3:15 pm</td><td>Late Country</td><td>None</td></tr>
+                  <tr><th>3</th><td>4:00 pm</td><td>Selling at Markets</td><td className="clash">Pavel Kettering</td></tr>
+                  <tr><th>4</th><td>4:15 pm</td><td>Q&amp;A: Wild Tide</td><td className="clash">Pavel Kettering</td></tr>
+                  <tr><th>5</th><td>5:30 pm</td><td>Last Light</td><td>None</td></tr>
+                </tbody></table>
               </div>
-              <span className="s-stamp">Outdated</span>
-            </div>
-            <div className="s-card s-doc d-chat" data-r="4" style={{ right: '1%', top: '50%' }}>
-              <div className="bar"><b>Volunteers · Harbor Lights</b><span>83 members</span></div>
-              <p className="them">who is telling the door teams??</p>
-              <p className="them">sheet says 3:00, the email says 3:15</p>
-              <p className="me">can someone call Yara?</p>
-              <span className="s-stamp">Wrong people</span>
-            </div>
-            <div className="s-card s-doc d-phone" data-r="-4" style={{ left: '38%', top: '72%' }}>
-              <b>3 missed calls</b><span>Guest relations · 2:59 pm</span>
-              <b>Voicemail</b><span>Pier 9 Hall stage door</span>
-              <span className="s-stamp">Missed</span>
-            </div>
-            <div className="s-card note" data-r="-6" style={{ left: '46%', top: '30%' }}>call Pavel&apos;s assistant!! panel at 4</div>
+              <p className="s-pain">Guests get double-booked.</p>
+            </figure>
+            <figure className="s-tool t-gmail" data-tool>
+              <figcaption><i className="ap gmail" />Gmail</figcaption>
+              <div className="win">
+                <div className="row u"><b>Mara Quist</b><span>Pavel is running late, new ETA 4:20</span><em>2:58 pm</em></div>
+                <div className="row u"><b>Kaia Ivers</b><span>Re: Fwd: schedule v7 FINAL</span><em>2:41 pm</em></div>
+                <div className="row"><b>Lantern Print</b><span>Prints running 15 min late</span><em>1:05 pm</em></div>
+                <div className="row"><b>Box office</b><span>21 people asking about Wild Tide</span><em>12:50 pm</em></div>
+              </div>
+              <p className="s-pain">Updates arrive late, or reach the wrong people.</p>
+            </figure>
+            <figure className="s-tool t-word" data-tool>
+              <figcaption><i className="ap word" />Word</figcaption>
+              <div className="win">
+                <div className="page">
+                  <b>Door brief · Thursday</b>
+                  <p>Doors open <del>2:45</del> <ins>3:00</ins> for the <del>3:00</del> <ins>3:15</ins> screenings.</p>
+                  <p>Shuttle every 20 min from Canal Street.</p>
+                </div>
+              </div>
+              <p className="s-pain">Volunteers work from an outdated brief.</p>
+            </figure>
+            <figure className="s-tool t-whatsapp" data-tool>
+              <figcaption><i className="ap whatsapp" />WhatsApp</figcaption>
+              <div className="win">
+                <div className="wa-head"><b>Harbor Lights volunteers</b><span>83 members</span></div>
+                <div className="wa-body">
+                  <p className="wa-them"><b>Noor</b>Is the 3:00 still on?</p>
+                  <p className="wa-them"><b>Theo</b>Sheet says 3:00, email says 3:15</p>
+                  <p className="wa-me">Checking with the office</p>
+                </div>
+              </div>
+              <p className="s-pain">Staff spend the day relaying information.</p>
+            </figure>
           </div>
           <div className="s-progress"><i /></div>
         </div>
@@ -300,8 +318,8 @@ export default function Site() {
           <canvas className="s-snowfield" data-snowfield aria-hidden="true" />
           <div className="s-trigger-copy" data-trigger-copy>
             <span className="s-clock">Thursday · 1:10 pm</span>
-            <h2 className="s-h2">The agent sees the snow coming.</h2>
-            <p className="s-lead" style={{ textAlign: 'center' }}>Weather, flights and shuttles, checked against every screening, guest and shift.</p>
+            <h2 className="s-h2">Usher keeps an eye on everything that could go wrong.</h2>
+            <p className="s-lead" style={{ textAlign: 'center' }}>It follows the weather, flight arrivals and shuttle times, and checks them against every screening, guest and volunteer shift.</p>
           </div>
           <div className="s-feeds" data-feeds>
             <svg viewBox="0 0 1100 420" role="img" aria-label="Weather, flights and the shuttle feed reach the agent, which finds three screenings, twenty-one people, one guest and three door teams affected">
@@ -335,11 +353,11 @@ export default function Site() {
       <section className="s-pin s-rec" data-scene="rec">
         <div className="s-sticky">
           <div className="s-rec-copy">
-            <div data-rec-step="1"><h2 className="s-h2">Usher updates the plan.</h2><p className="s-lead">A late print pushes three 3:00 pm screenings to 3:15. Usher drafts a note for everyone affected.</p></div>
-            <div data-rec-step="2" style={{ position: 'absolute', top: 0, opacity: 0 }}><h2 className="s-h2">And covers a late guest.</h2><p className="s-lead">Pavel Kettering is late for his 4:00 panel. Yara Hollis opens it until he arrives.</p></div>
+            <div data-rec-step="1"><h2 className="s-h2">It suggests a new plan, and you decide.</h2><p className="s-lead">The prints are 15 minutes late, so Usher proposes starting three screenings at 3:15. You see every change on the calendar before anything is sent.</p></div>
+            <div data-rec-step="2" style={{ position: 'absolute', top: 0, opacity: 0 }}><h2 className="s-h2">It looks after your guests, too.</h2><p className="s-lead">Pavel Kettering is stuck on the harbor bridge. Usher asks Yara Hollis, who is already at Pier 9 Hall, to open his panel until he arrives.</p></div>
           </div>
           <div className="s-rec-stage" data-lve-skip aria-hidden="true">
-            <div style={{ position: 'absolute', inset: 0, transformStyle: 'preserve-3d' }}><Cal id="rec" /></div>
+            <div style={{ position: 'absolute', inset: 0, transformStyle: 'preserve-3d' }}><Cal id="rec" rich /></div>
             <div className="s-float" data-rec-alert style={{ top: '-30px', right: '3%' }}>
               <span className="ic"><Brief /></span><span><b>Print delivery 15 min late</b><small>3 screenings at 3:00 pm</small></span><span className="pill">Recommendation</span>
             </div>
@@ -362,7 +380,7 @@ export default function Site() {
       {/* call to action */}
       <footer className="s-footer">
         <div className="s-footer-bg" data-footer-bg />
-        <h2 className="s-h1" data-split-scroll>See Usher run a festival day.</h2>
+        <h2 className="s-h1" data-split-scroll>See how Usher handles a snow day at Harbor Lights.</h2>
         <div className="s-roles" data-reveal>
           <a className="btn primary" href="/onboarding">Try the live demo</a>
         </div>
@@ -425,8 +443,12 @@ function swapGuest(cal: Element, on: boolean) {
   tl.to(ev, { rotateX: -90, duration: 0.32, ease: 'power2.in' })
     .call(() => {
       ev.classList.toggle('hot', on);
-      if (ins) ins.style.display = on ? 'inline' : 'none';
-      if (out) out.innerHTML = on ? '<s>Pavel Kettering</s>' : 'Pavel Kettering';
+      const rich = cal.classList.contains('rich');
+      if (ins) ins.style.display = on ? (rich ? 'inline-grid' : 'inline') : 'none';
+      if (out) {
+        if (rich) out.textContent = on ? 'Yara Hollis opens · Pavel joins 4:20' : 'Pavel Kettering is running late';
+        else out.innerHTML = on ? '<s>Pavel Kettering</s>' : 'Pavel Kettering';
+      }
     })
     .fromTo(ev, { rotateX: 90 }, { rotateX: 0, duration: 0.5, ease: 'power3.out' });
   return tl;
@@ -437,9 +459,9 @@ function finalStates(q: (s: string) => Element[]) {
   for (const cal of q('[data-cal]')) {
     cal.querySelectorAll<HTMLElement>('[data-move]').forEach(el => { el.style.top = `${Number(el.dataset.top) + (Number(el.dataset.move) / (T1 - T0)) * 100}%`; el.classList.add('hot'); });
     cal.querySelectorAll<HTMLElement>('[data-ghost], [data-snowband]').forEach(el => { el.style.opacity = '1'; });
-    const ins = cal.querySelector<HTMLElement>('[data-in]'); if (ins) ins.style.display = 'inline';
+    const ins = cal.querySelector<HTMLElement>('[data-in]'); if (ins) ins.style.display = cal.classList.contains('rich') ? 'inline-grid' : 'inline';
   }
-  q('[data-cal="hero"]').forEach(el => { (el as HTMLElement).style.transform = 'rotateX(52deg) rotateZ(-12deg)'; });
+  q('[data-cal="hero"]').forEach(el => { (el as HTMLElement).style.transform = 'rotateX(24deg) rotateZ(-6deg)'; });
   q('[data-phone]').forEach((el, i) => { (el as HTMLElement).style.transform = `translateX(${[-330, 0, 330][i]}px)`; });
 }
 

@@ -368,3 +368,78 @@
   .s-pin { height: 180vh; }
   .s-footer { min-height: 0; align-content: start; padding-top: 72px; gap: 24px; }
 }
+
+/* ---------------------------------------------------------------- calmer type: sentence case, smaller */
+.s-h1, .s-h2 { text-transform: none; font-weight: 700; letter-spacing: -.02em; line-height: 1.04; }
+.s-h1 { font-size: clamp(40px, 4.4vw, 72px); }
+.s-h2 { font-size: clamp(32px, 3.6vw, 56px); }
+.s-hero .s-h1 { max-width: 13ch; }
+.s-lead { font-size: clamp(16px, 1.25vw, 19px); max-width: 44ch; }
+.s-problem-copy .s-lead { max-width: 38ch; }
+
+/* ---------------------------------------------------------------- "Today": four real tools, each named */
+.s-tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-content: center; }
+.s-tool { margin: 0; display: grid; gap: 8px; }
+.s-tool figcaption { display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--cream); }
+.s-tool .ap { width: 18px; height: 18px; border-radius: 4px; flex: none; position: relative; }
+.s-tool .ap.sheets { background: #188038; }
+.s-tool .ap.sheets::after { content: ""; position: absolute; inset: 5px 4px; border: 1.5px solid #fff; border-radius: 1px; background: linear-gradient(#fff, #fff) center / 100% 1.5px no-repeat, linear-gradient(#fff, #fff) center / 1.5px 100% no-repeat; }
+.s-tool .ap.gmail { background: #fff; }
+.s-tool .ap.gmail::after { content: "M"; position: absolute; inset: 0; display: grid; place-items: center; font: 800 12px/1 Arial, sans-serif; color: #EA4335; }
+.s-tool .ap.word { background: #185ABD; }
+.s-tool .ap.word::after { content: "W"; position: absolute; inset: 0; display: grid; place-items: center; font: 800 11px/1 Arial, sans-serif; color: #fff; }
+.s-tool .ap.whatsapp { background: #25D366; border-radius: 50%; }
+.s-tool .ap.whatsapp::after { content: ""; position: absolute; inset: 4px; border: 1.5px solid #fff; border-radius: 50%; }
+.s-tool .win { border-radius: 12px; overflow: hidden; background: #fff; color: #202124; box-shadow: 0 22px 50px rgba(0, 0, 0, .45); font-family: Arial, Helvetica, sans-serif; font-size: 12px; min-height: 172px; }
+/* Sheets */
+.t-sheets .win-bar { padding: 8px 10px; background: #F8F9FA; border-bottom: 1px solid #E0E3E7; font-size: 12px; }
+.t-sheets table { border-collapse: collapse; width: 100%; font-size: 11.5px; }
+.t-sheets th { background: #F8F9FA; color: #5F6368; font-weight: 400; border: 1px solid #E0E3E7; padding: 3px 6px; width: 1%; }
+.t-sheets td { border: 1px solid #E0E3E7; padding: 4px 7px; white-space: nowrap; }
+.t-sheets td.h { font-weight: 700; }
+.t-sheets td.edit { outline: 2px solid #1A73E8; outline-offset: -2px; }
+/* Gmail */
+.t-gmail .win { padding: 4px 0; }
+.t-gmail .row { display: grid; grid-template-columns: 92px 1fr auto; gap: 8px; padding: 9px 12px; border-bottom: 1px solid #F1F3F4; align-items: baseline; }
+.t-gmail .row b { font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t-gmail .row span { color: #5F6368; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t-gmail .row em { font-style: normal; color: #5F6368; font-size: 11px; }
+.t-gmail .row.u b, .t-gmail .row.u span { font-weight: 700; color: #202124; }
+/* Word */
+.t-word .win { background: #F3F2F1; padding: 12px; }
+.t-word .page { background: #fff; padding: 14px 16px; box-shadow: 0 1px 3px rgba(0, 0, 0, .12); font-family: Georgia, 'Times New Roman', serif; font-size: 12.5px; line-height: 1.5; }
+.t-word .page b { display: block; margin-bottom: 6px; font-size: 13.5px; }
+.t-word .page p { margin: 0 0 4px; }
+.t-word del { color: #C4314B; }
+.t-word ins { color: #185ABD; text-decoration: underline; }
+/* WhatsApp */
+.t-whatsapp .wa-head { display: flex; justify-content: space-between; align-items: baseline; padding: 9px 12px; background: #075E54; color: #fff; }
+.t-whatsapp .wa-head span { font-size: 11px; opacity: .8; }
+.t-whatsapp .wa-body { background: #ECE5DD; padding: 10px; display: grid; gap: 6px; }
+.t-whatsapp .wa-body p { margin: 0; padding: 6px 9px; border-radius: 8px; max-width: 82%; box-shadow: 0 1px 1px rgba(0, 0, 0, .12); line-height: 1.35; }
+.t-whatsapp .wa-them { background: #fff; justify-self: start; }
+.t-whatsapp .wa-them b { display: block; font-size: 11px; color: #1F7AEC; }
+.t-whatsapp .wa-me { background: #DCF8C6; justify-self: end; }
+@media (max-width: 900px) {
+  .s-tools { gap: 12px; }
+  .s-tool .win { font-size: 10.5px; min-height: 0; }
+  .t-gmail .row { grid-template-columns: 70px 1fr; } .t-gmail .row em { display: none; }
+  .t-sheets td { padding: 3px 4px; } .s-tool figcaption { font-size: 12px; }
+}
+
+/* ---------------------------------------------------------------- the app's calendar look (fourth section) */
+.s-cal.rich .s-ev { display: flex; flex-direction: column; gap: 3px; padding: 5px 7px; }
+.s-ev-main { display: flex; gap: 7px; align-items: center; min-width: 0; }
+.s-ev-img { width: 28px; height: 28px; border-radius: 6px; object-fit: cover; flex: none; filter: sepia(.15) saturate(.9); }
+.s-ev-txt { min-width: 0; }
+.s-faces { display: inline-flex; padding-left: 4px; margin-top: auto; }
+.s-faces i { width: 20px; height: 20px; margin-left: -5px; border-radius: 50%; display: inline-grid; place-items: center; font-style: normal; font-size: 8.5px; font-weight: 700; color: #1b120e; border: 1.5px solid #1d1411; }
+.s-ev.hot .s-faces i.late, .s-cal.rich .s-ev[data-swap] .s-faces i.late { box-shadow: 0 0 0 2px #E8684B; position: relative; z-index: 1; }
+.s-faces i.in { box-shadow: 0 0 0 2px var(--amber); }
+.s-ev .s-ev-note { color: #F2A48F; font-size: clamp(9px, .75vw, 11px); }
+.s-hero .s-h1 { max-width: 17ch; font-size: clamp(36px, 3.9vw, 64px); }
+.s-hero .s-lead { max-width: 46ch; }
+
+.s-pain { margin: 2px 0 0; font-size: 14px; font-weight: 600; color: #F2A48F; }
+.t-sheets td.clash { color: #C5221F; font-weight: 700; }
+@media (max-width: 900px) { .s-pain { font-size: 12px; } }
