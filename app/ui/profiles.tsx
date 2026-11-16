@@ -28,15 +28,17 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
   const f = s.agent.f;
   const festName = s.festivalName;
   const [kind, setKind] = useState<ProfileKind | null>(null);
-  const [mode, setMode] = useState<'email' | 'code'>('email');
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<{ tone: 'ok' | 'info'; text: ReactNode } | null>(null);
   const [err, setErr] = useState('');
+  const [codeErr, setCodeErr] = useState('');
+  const codeRef = useRef<HTMLInputElement>(null);
+  const toCode = () => setTimeout(() => codeRef.current?.focus(), 0);
   const pick = PROFILES.find(p => p.kind === kind);
-  const choose = (k: ProfileKind | null) => { setKind(k); setMode('email'); setErr(''); setNote(null); setCode(''); };
+  const choose = (k: ProfileKind | null) => { setKind(k); setErr(''); setCodeErr(''); setNote(null); setCode(''); };
   const go = async () => {
     if (!kind) return;
     if (s.shared) {
@@ -44,11 +46,11 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
       const r = await s.verifyCode(kind, code).catch(() => ({ ok: false as const, reason: 'offline' }));
       setBusy(false);
       if (r.ok) { onIn(r.who); return; }
-      setErr(r.reason === 'too_many' ? 'Too many tries. Wait 15 minutes, or ask for a new code.' : `That code doesn't open the ${pick!.label} profile. Check it and try again.`);
+      setCodeErr(r.reason === 'too_many' ? 'Too many tries. Wait 15 minutes, or ask for a new code.' : `That code doesn't open the ${pick!.label} profile. Check it and try again.`);
       return;
     }
     const w = signIn(f, kind, code);
-    if (!w) { setErr(`That code doesn't open the ${pick!.label} profile. Check it and try again.`); return; }
+    if (!w) { setCodeErr(`That code doesn't open the ${pick!.label} profile. Check it and try again.`); return; }
     s.signInAs(w); onIn(w);
   };
   const sendCode = async () => {
@@ -67,7 +69,7 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
       }
       setNote(r.sent ? { tone: 'ok', text: <>Checked against the festival list. Your code is on its way. In test mode it goes to the team inbox, not {email}.</> }
         : { tone: 'info', text: <>Checked against the festival list. Email isn't connected yet, so here is the code it would send: <b>{r.code}</b></> });
-      setMode('code');
+      toCode();
       return;
     }
     const r = lookupForCode(f, kind, name, email);
@@ -84,10 +86,10 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
       const b = await res.json().catch(() => ({}));
       if (b.sent) setNote({ tone: 'ok', text: <>Checked against the festival list. Your code is on its way. In test mode it goes to the team inbox, not {email}.</> });
       else setNote({ tone: 'info', text: <>Checked against the festival list. Email isn't connected yet, so here is the code it would send: <b>{r.who.code}</b></> });
-      setMode('code');
+      toCode();
     } catch {
       setNote({ tone: 'info', text: <>Checked against the festival list. Email couldn't be reached, so here is the code: <b>{r.who.code}</b></> });
-      setMode('code');
+      toCode();
     }
     setBusy(false);
   };
@@ -113,26 +115,21 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
           <div className="code-box">
             <button className="ghost small" onClick={() => choose(null)}>← All profiles</button>
             <h2 className="display">{pick!.label}</h2>
-            {mode === 'email' ? <>
-              <p className="muted" style={{ marginTop: 0 }}>Enter your name and email as the festival has them. Usher checks them against the {pick!.label.toLowerCase()} list, then emails your access code.</p>
-              <label className="field">{kind === 'vendor' ? 'Your name or company' : 'Full name'}<input autoFocus value={name} autoComplete="name" onChange={e => { setName(e.target.value); setErr(''); }} /></label>
-              <label className="field">Email<input type="email" value={email} autoComplete="email" onChange={e => { setEmail(e.target.value); setErr(''); }} onKeyDown={e => e.key === 'Enter' && name && email && sendCode()} /></label>
-              {err && <div className="issues bad" role="alert">{err}</div>}
-              <button className="primary big" style={{ marginTop: 14 }} disabled={!name.trim() || !email.trim() || busy} onClick={sendCode}>
-                <Icon name="send" size={16} /> {busy ? 'Checking…' : 'Email me my code'}
-              </button>
-              <button className="ghost small" style={{ marginTop: 10 }} onClick={() => { setMode('code'); setErr(''); }}>I already have a code</button>
-            </> : <>
-              {note && <div className={`issues ${note.tone === 'ok' ? 'ok' : ''}`} role="status">{note.text}</div>}
-              <p className="muted" style={{ marginTop: 0 }}>Enter your access code. It starts with {pick!.prefix}.</p>
-              <input autoFocus className="code-input" placeholder={`${pick!.prefix}-XXXXXX`} value={code} maxLength={11}
-                onChange={e => { setCode(e.target.value.toUpperCase()); setErr(''); }} onKeyDown={e => e.key === 'Enter' && code.trim() && go()} />
-              {err && <div className="issues bad" role="alert">{err}</div>}
-              <button className="primary big" style={{ marginTop: 14 }} disabled={!code.trim() || busy} onClick={go}>
-                <Icon name="key" size={16} /> Open my profile
-              </button>
-              <button className="ghost small" style={{ marginTop: 10 }} onClick={() => { setMode('email'); setErr(''); setNote(null); }}>Email me a code instead</button>
-            </>}
+            <p className="muted" style={{ marginTop: 0 }}>Enter your name and email as the festival has them, and Usher emails your access code.</p>
+            <label className="field">{kind === 'vendor' ? 'Your name or company' : 'Full name'}<input autoFocus value={name} autoComplete="name" onChange={e => { setName(e.target.value); setErr(''); }} /></label>
+            <label className="field">Email<input type="email" value={email} autoComplete="email" onChange={e => { setEmail(e.target.value); setErr(''); }} onKeyDown={e => e.key === 'Enter' && name && email && sendCode()} /></label>
+            {err && <div className="issues bad" role="alert">{err}</div>}
+            {note && <div className={`issues ${note.tone === 'ok' ? 'ok' : ''}`} role="status">{note.text}</div>}
+            <button className="big" style={{ marginTop: 14 }} disabled={!name.trim() || !email.trim() || busy} onClick={sendCode}>
+              <Icon name="send" size={16} /> {busy ? 'Checking…' : 'Email me my code'}
+            </button>
+            <div className="ob-or">Or enter your code</div>
+            <input ref={codeRef} className="code-input" placeholder={`${pick!.prefix}-XXXXXX`} value={code} maxLength={11} aria-label="Access code"
+              onChange={e => { setCode(e.target.value.toUpperCase()); setCodeErr(''); }} onKeyDown={e => e.key === 'Enter' && code.trim() && go()} />
+            {codeErr && <div className="issues bad" role="alert">{codeErr}</div>}
+            <button className="primary big" style={{ marginTop: 14 }} disabled={!code.trim() || busy} onClick={go}>
+              <Icon name="key" size={16} /> Open my profile
+            </button>
           </div>
         )}
         <p className="muted signin-foot">
