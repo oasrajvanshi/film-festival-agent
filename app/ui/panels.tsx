@@ -13,6 +13,7 @@ import { evalRandomFestivals } from '../../src/eval/fuzz';
 import type { Recommendation } from '../../src/agent/recommend';
 import { Icon } from './icons';
 import { buildBrief } from '../../src/agent/briefs';
+import { HeroPhoto, PhotoBand } from './photos';
 
 type P = { s: AgentStore; user: string; go: (page: 'today' | 'approvals' | 'scan' | 'schedule' | 'ask' | 'briefs' | 'feeds' | 'log' | 'eval' | 'data') => void };
 
@@ -43,7 +44,8 @@ export function Overview({ s, go, user }: P) {
   const dateLabel = new Date(`${f.dates[day]}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   return (
     <>
-      <section className="hero">
+      <section className="hero has-photo">
+        <HeroPhoto k="organizer" />
         <div className="eyebrow">Day {day} · {dateLabel} · {fmt(s.clock)}</div>
         <h2>{pending.length ? `${pending.length} update${pending.length > 1 ? 's' : ''} waiting for you` : a.flags.length ? `${a.flags.length} thing${a.flags.length > 1 ? 's' : ''} to look at` : 'All quiet at the festival'}</h2>
         <p>The agent watches the schedule, the doors and outside feeds. Anything sent to attendees or guests waits for your approval.</p>
@@ -192,6 +194,7 @@ export function WeatherCard({ s, go, compact }: P & { compact?: boolean }) {
   const scenarios: [string, string][] = [['storm', 'Thunderstorm'], ['snow', 'Snow'], ['heat', 'Heat wave']];
   return (
     <div className="card stack">
+      {!compact && <PhotoBand k="snow" label="Snow, storms, heat" />}
       <div className="section-title"><h2><Icon name="cloud" size={18} /> Weather watch</h2><span className="muted" style={{ fontSize: 12 }}>Open-Meteo, no key needed</span></div>
       {!compact && <p className="muted" style={{ margin: 0 }}>The agent checks the forecast for {city}, finds risky hours, tells staff and volunteers on shift, and drafts a personal note for everyone with tickets or plans in that window. Those notes wait for your approval.</p>}
       <div className="row">
@@ -256,6 +259,7 @@ export function Grid({ s, user }: P) {
   const dirty = Object.keys(draft).length;
   return (
     <div className="card">
+      <PhotoBand k="change" label="Schedule changes" />
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <h2 style={{ margin: 0 }}>Schedule grid</h2>
         <div className="row">
@@ -541,6 +545,7 @@ export function Feeds({ s, go, user }: P) {
     <div className="grid2" style={{ marginTop: 16 }}>
       <div className="card stack">
         <h2>Vendor and partner feeds</h2>
+        <PhotoBand k="flight" label="Late flights" />
         <h3>Guest flights</h3>
         {guests.length === 0 ? <div className="empty-note">No guests in this festival.</div> : <>
         <label className="row">Guest <select value={gid} onChange={e => pickGuest(e.target.value)}>{guests.map(g => <option key={g.id} value={g.id}>{g.name}{g.arrives ? ` · lands ${g12(g.arrives)}` : ''}</option>)}</select></label>

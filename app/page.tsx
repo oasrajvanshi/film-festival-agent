@@ -9,6 +9,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useEffect, useRef, type MouseEvent } from 'react';
 import { Bell, Brief, Move, People, Swap } from './hl/icons';
+import { PHOTOS } from './ui/photos';
 
 // ---------------------------------------------------------------- the calendar (1 pm to 7 pm, four venues)
 
@@ -211,7 +212,7 @@ export default function Site() {
 
       {/* hero */}
       <header className="s-hero">
-        <div className="s-hero-bg" data-hero-bg style={{ backgroundImage: 'url(/hl/projector.jpg)' }} />
+        <div className="s-hero-bg" data-hero-bg style={{ backgroundImage: `url(${PHOTOS.hero.src})` }} />
         <div className="s-hero-copy">
           <p className="s-kicker" data-hero-fade>Usher your festival with ease</p>
           <h1 className="s-h1" data-split>Every schedule change, to everyone it affects.</h1>

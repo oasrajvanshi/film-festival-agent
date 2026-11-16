@@ -8,6 +8,7 @@ import '../mobile.css';
 import { FestivalAgent } from '../../src/agent/agent';
 import { GATE_POLICY, type ActionKind } from '../../src/agent/approvals';
 import type { Festival } from '../../src/core/types';
+import { HeroPhoto } from '../ui/photos';
 import { parseCsv, tablesToFestival } from '../../src/data/sheet';
 import { buildTables, guessKind, KIND_ORDER, KINDS, matchColumns, scheduleDateRange, summarizeNotes, type Kind, type Upload } from '../../src/onboard/mapping';
 import { clock } from '../../src/core/time';
@@ -199,6 +200,7 @@ export default function Onboarding() {
               <div><span>Your team</span> <span>approves first</span></div>
             </aside>
             <div className="ob-photo">
+              <HeroPhoto k="onboard" />
               <h1 className="display">Bring your festival.<br />We’ll keep everyone in step.</h1>
             </div>
           </div>

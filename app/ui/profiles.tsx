@@ -13,6 +13,7 @@ import { PROFILES, deriveVendors, directory, lookupForCode, signIn, type Profile
 import { clock as fmt } from '../../src/core/time';
 import { PASS_LABELS, qrFor, type ScanResult } from '../../src/rules/access';
 import type { DayNumber, FestivalEvent } from '../../src/core/types';
+import { HeroPhoto } from './photos';
 
 export { readWho, writeWho };
 
@@ -267,7 +268,8 @@ function StaffHome({ s, who }: { s: AgentStore; who: Who }) {
   const me = f.people.find(p => p.id === who.id);
   return (
     <>
-      <section className="hero">
+      <section className="hero has-photo">
+        <HeroPhoto k="staff" />
         <div className="eyebrow">{next ? `${dayLabel(f.dates[next.day])} · your next shift` : 'Your shifts'}</div>
         <h2>{next ? `${next.task} · ${venue(next.venueId)}` : 'No more shifts'}</h2>
         <p>{next ? `${fmt(next.start)} to ${fmt(next.end)}. Your brief below is rebuilt from the live schedule every time you open it.` : 'Thanks for your help this festival.'}</p>
@@ -325,7 +327,8 @@ function PersonHome({ s, who, go }: { s: AgentStore; who: Who; go: (t: string) =
   const when = (iso: string) => `${new Date(`${iso.slice(0, 10)}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })} ${fmt(iso)}`;
   return (
     <>
-      <section className="hero">
+      <section className={who.kind === 'attendee' ? 'hero has-photo' : 'hero'}>
+        {who.kind === 'attendee' && <HeroPhoto k="attendee" />}
         <div className="eyebrow">{next ? `Next up · ${dayLabel(f.dates[next.e.day])}` : 'Your festival'}</div>
         <h2>{next ? next.e.title : 'Nothing else on your list'}</h2>
         <p>{next ? `${fmt(next.e.start)} at ${where(next.e)}. ${next.why === 'You’re appearing' ? 'You’re on stage for this one.' : 'Doors open 20 minutes before.'}` : 'Browse the program or ask a question any time.'}</p>
@@ -386,7 +389,8 @@ function VendorHome({ s, who }: { s: AgentStore; who: Who }) {
   const days = [...new Set(v.deliveries.map(d => d.day))].sort();
   return (
     <>
-      <section className="hero">
+      <section className="hero has-photo">
+        <HeroPhoto k="vendor" />
         <div className="eyebrow">{v.service} · {v.deliveries.filter(d => !d.cancelled).length} drops</div>
         <h2>{next ? `Next: ${fmt(next.at)} at ${venue(next.venueId)}` : 'All deliveries done'}</h2>
         <p>{next ? `${next.what}.` : 'Thanks for working with the festival.'} Timings follow the live schedule, so if an event moves, this list moves with it.</p>

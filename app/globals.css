@@ -544,3 +544,18 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
 .count { background: var(--velvet-red); color: #fff4e8; }
 .pass-qr { background: var(--paper); }
 ::selection { background: rgba(201, 152, 99, .35); }
+
+/* photos from the mood board (app/ui/photos.tsx): warm grade + dark shade so text stays readable */
+.ph-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: sepia(.28) saturate(.9) contrast(1.08) brightness(.82); z-index: 0; }
+.ph-shade { position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(90deg, rgba(18, 11, 9, .92) 0%, rgba(18, 11, 9, .72) 48%, rgba(18, 11, 9, .28) 100%), linear-gradient(0deg, rgba(18, 11, 9, .55), transparent 55%); }
+.hero.has-photo > :not(.ph-img):not(.ph-shade) { position: relative; z-index: 1; }
+.hero.has-photo::before, .hero.has-photo::after { z-index: 2; }
+.ob-photo .ph-shade { background: linear-gradient(0deg, rgba(18, 11, 9, .9) 0%, rgba(18, 11, 9, .35) 60%, rgba(18, 11, 9, .15) 100%); }
+.ob-photo h1 { z-index: 1; }
+.ph-band { position: relative; margin: -4px 0 4px; height: 128px; border-radius: 12px; overflow: hidden; background: var(--bg-2); }
+.ph-band figcaption { position: absolute; left: 16px; bottom: 12px; z-index: 1; color: #f6ecdc; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; }
+@media (max-width: 640px) {
+  .ph-shade { background: linear-gradient(0deg, rgba(18, 11, 9, .94) 0%, rgba(18, 11, 9, .78) 55%, rgba(18, 11, 9, .45) 100%); }
+  .ph-band { height: 104px; }
+}
