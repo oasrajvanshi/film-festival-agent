@@ -997,13 +997,31 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
 
 /* ---------------------------------------------------------------- organizer on a phone: the venue grid, nothing floating over it */
 @media (max-width: 760px) {
+  /* The whole day fits the screen's width and shows at full height: the calendar never scrolls on its own,
+     so every swipe moves the page. The venue names stay pinned under the top bar. */
   .today-cal { padding: 0; border: 0; background: transparent; box-shadow: none; }
-  .today .dcal { max-height: 66vh; border-radius: 14px; }
-  .dcal .dcal-head, .dcal .dcal-body { grid-template-columns: 40px repeat(var(--cols), 112px); min-width: calc(40px + var(--cols) * 112px); }
-  .dcal .dcal-head span { white-space: normal; font-size: 10.5px; line-height: 1.2; padding: 8px 6px; }
-  .dcal .dcal-line, .dcal .dcal-now { left: 40px; }
-  .dcal .dcal-now i { left: -39px; font-size: 9px; padding: 1px 3px; }
-  .dcal .dcal-hours b { font-size: 9.5px; right: 4px; }
+  .today .dcal { max-height: none; overflow: visible; border-radius: 14px; scroll-behavior: auto; }
+  .dcal .dcal-head, .dcal .dcal-body { grid-template-columns: 34px repeat(var(--cols), minmax(0, 1fr)); min-width: 0; }
+  .dcal .dcal-head { top: var(--phone-top, 57px); border-radius: 14px 14px 0 0; background: #1a120e; }
+  .dcal .dcal-head span { white-space: normal; overflow-wrap: anywhere; font-size: 9.5px; line-height: 1.15; letter-spacing: .01em; padding: 7px 5px; }
+  .dcal .dcal-body { height: calc(var(--hours) * 52px); }
+  .dcal .dcal-line, .dcal .dcal-now { left: 34px; }
+  .dcal .dcal-now i { left: -34px; font-size: 8.5px; padding: 1px 2px; }
+  .dcal .dcal-hours b { font-size: 9px; right: 3px; }
+  .dcal .dcal-ev { left: 2px; right: 2px; padding: 3px 5px; gap: 1px; border-radius: 6px; }
+  .dcal .dcal-ev b { font-size: 11.5px; line-height: 1.15; }
+  .dcal .dcal-ev small { font-size: 9.5px; margin-top: 0; }
+  .dcal .dcal-ev small s { margin-right: 3px; }
+  .dcal .dcal-ev em { font-size: 9.5px; }
+  .dcal .dcal-ghost { left: 2px; right: 2px; border-radius: 6px; }
+  /* Guests go on their own line under the title, so a late guest's highlight is never hidden. */
+  .dcal .dcal-main { flex-wrap: wrap; row-gap: 2px; }
+  .dcal .dcal-txt { flex: 1 1 100%; }
+  .dcal .dcal-ev .faces { display: inline-flex; margin: 0; --face: 16px; }
+  .dcal .dcal-swap { margin: 0; gap: 2px; }
+  .dcal .dcal-swap i { width: 18px; height: 18px; font-size: 7.5px; border-width: 1.5px; }
+  .dcal .dcal-swap .arr { font-size: 10px; }
+  .dcal .dcal-ev .tag { font-size: 8px; padding: 0 3px; right: 3px; top: 3px; }
   /* The demo button sits in the page, above the alerts, instead of over the calendar. */
   .problem-trigger { position: static; width: auto; height: auto; justify-self: start; }
   .problem-trigger button { position: static; opacity: 1; min-height: 30px; padding: 5px 12px; font-size: 12.5px; box-shadow: none; }
@@ -1042,3 +1060,41 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
   .vb-name { font-size: 12px; line-height: 1.25; }
   .wh-row .chip { max-width: 40%; }
 }
+
+/* ---------------------------------------------------------------- organizer Overview on a phone: lighter, more air, clearer groups */
+@media (max-width: 760px) {
+  .today { gap: 18px; }
+  /* Calendar titles: two lines in blocks of 75 minutes or more, one line otherwise. */
+  .dcal .dcal-ev.tall b { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  /* The banner: one compact strip, not a poster. */
+  .today > .hero { padding: 22px 16px; border-radius: 14px; }
+  .today > .hero h2 { font-size: 19px; line-height: 1.15; margin: 0; letter-spacing: .02em; }
+  .today > .hero::before { top: 5px; } .today > .hero::after { bottom: 5px; }
+  /* Pending approvals: a quiet single line. */
+  .needs-row { padding: 9px 12px; font-size: 13px; border-radius: 12px; }
+  /* Alerts: rows divided by hairlines inside one frame, instead of boxes inside a box. */
+  .wx-alerts.framed { padding: 4px 12px 6px; gap: 0; border-radius: 14px; }
+  .wx-alerts.framed .wx-frame-head { padding: 8px 0 10px; border-bottom: 1px solid rgba(212, 154, 92, .18); }
+  .wx-all-btn { min-height: 32px; padding: 5px 12px; font-size: 12.5px; }
+  .wx-alerts.framed .wx-alert { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+  .wx-alerts.framed .wx-alert + .wx-alert { border-top: 1px solid rgba(246, 236, 220, .07); }
+  .wx-alerts.framed .wx-alert.open { background: rgba(212, 154, 92, .08); border-radius: 10px; }
+  .wx-alerts.framed .wx-alert-row { padding: 11px 0; }
+  .wx-alert-ic { width: 26px; height: 26px; border-radius: 8px; }
+  .wx-alert-ic svg { width: 14px; height: 14px; }
+  .wx-alert-text b { font-size: 13.5px; font-weight: 600; }
+  .wx-alert-text span { font-size: 11.5px; }
+  .wx-alert-row button { min-height: 30px; padding: 4px 11px; font-size: 12px; gap: 5px; }
+  .wx-alert-row button svg { width: 13px; height: 13px; }
+  .problem-trigger button { min-height: 28px; padding: 3px 11px; font-size: 12px; }
+  /* Recommendation: same quiet scale. */
+  .rec-float { padding: 10px 12px; border-radius: 14px; }
+  .rec-float .wx-list label { font-size: 12.5px; padding: 7px 0; }
+  .rec-float-foot button { min-height: 38px; font-size: 14px; }
+  /* Day tabs and the original-plan switch: smaller, one line. */
+  .today > .cal-top { margin: 4px 0 -8px; }
+  .cal-days button { padding: 5px 10px; font-size: 13px; min-height: 0; }
+  .cal-orig { font-size: 12.5px; }
+}
+@media (max-width: 760px) { .dcal .ampm { display: none; } }
+@media (max-width: 760px) { .dcal.focus .dcal-body { overflow: hidden; } }

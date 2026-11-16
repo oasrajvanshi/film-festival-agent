@@ -768,3 +768,7 @@
   .s-h1-sub { font-size: 18px; }
 }
 .s-nav .wordmark { font-family: 'Limelight', var(--f-title, serif); font-weight: 400; letter-spacing: .01em; text-transform: none; font-size: 24px; }
+
+/* "Usher keeps an eye on / everything that could go wrong." on exactly two lines, sized to the screen on phones. */
+.s-trigger .s-h2.s-watch-h { white-space: pre-line; max-width: none; }
+@media (max-width: 760px) { .s-trigger .s-h2.s-watch-h { font-size: min(24px, calc((100vw - 36px) / 16.4)); line-height: 1.2; } }

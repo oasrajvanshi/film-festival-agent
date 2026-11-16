@@ -387,7 +387,7 @@ export default function Site() {
           <canvas className="s-snowfield" data-snowfield aria-hidden="true" />
           <div className="s-trigger-copy" data-trigger-copy>
             <span className="s-clock">Thursday · 1:10 pm</span>
-            <h2 className="s-h2">Usher keeps an eye on everything that could go wrong.</h2>
+            <h2 className="s-h2 s-watch-h">{'Usher keeps an eye on\neverything that could go wrong.'}</h2>
             <p className="s-lead" style={{ textAlign: 'center' }}>It follows the weather, flight arrivals and shuttle times all day. When one of them affects your programme, it shows you exactly what it touches.</p>
           </div>
           <div className="s-flow" data-feeds data-lve-skip>
