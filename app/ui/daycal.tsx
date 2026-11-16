@@ -1,5 +1,5 @@
 'use client';
-// Today's calendar map, in the style of Sienna's prototype: one column per
+// Overview's calendar map, in the style of Sienna's prototype: one column per
 // venue, the day's events as blocks, a line for "now", and anything flagged
 // or just moved picked out in amber.
 

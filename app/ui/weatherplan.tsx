@@ -1,5 +1,5 @@
 'use client';
-// Weather on the Today page. The agent watches the forecast in the
+// Weather on the Overview page. The agent watches the forecast in the
 // background; when weather threatens the programme, an alert appears above
 // the calendar. Opening its recommendation shows one sentence and a
 // checklist while the calendar previews the moves; one approval makes it
@@ -105,7 +105,7 @@ export type AlertKind = WxKind | 'guest';
 export interface WxAlert { id: string; kind: AlertKind; day: DayNumber; status: 'open' | 'done' }
 const ALERTS_KEY = 'usher-alerts-v3';
 const EVENT = 'usher-alerts';
-/** The demo's three problems, brought in from the hidden button on Today. */
+/** The demo's three problems, brought in from the hidden button on Overview. */
 const DEMO_ALERTS: WxAlert[] = [
   { id: 'guest-d1', kind: 'guest', day: 1 as DayNumber, status: 'open' },
   { id: 'storm-d1', kind: 'storm', day: 1 as DayNumber, status: 'open' },
@@ -172,7 +172,7 @@ const channelFor = (p: { channels: string[] }) => (p.channels.includes('app_push
 /** Send messages as one action, through the approval queue (approved here, by the organizer). */
 function send(s: AgentStore, id: string, kind: Action['kind'], title: string, messages: OutboundMessage[], by: string) {
   if (!messages.length) return 0;
-  const action: Action = { id: `${id}-${Date.now()}`, kind, title, rationale: 'Approved from a recommendation on Today', messages };
+  const action: Action = { id: `${id}-${Date.now()}`, kind, title, rationale: 'Approved from a recommendation on Overview', messages };
   s.agent.queue.push({ action, runId: 'today-rec', status: 'pending' });
   s.agent.approve(action.id, by, 'Recommendation');
   return messages.length;

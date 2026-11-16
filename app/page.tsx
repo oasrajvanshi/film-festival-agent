@@ -104,6 +104,17 @@ export default function Site() {
       const q = gsap.utils.selector(root);
       if (reduce) { finalStates(q); q('[data-leader]').forEach(e => e.remove()); return; }
 
+      const phone = matchMedia('(max-width: 760px)').matches;
+      // Phones: the four tools are a swipeable row; the dots follow the swipe.
+      if (phone) {
+        const row = q('[data-tools]')[0] as HTMLElement | undefined;
+        const dots = q('[data-dots] i');
+        row?.addEventListener('scroll', () => {
+          const w = (row.firstElementChild as HTMLElement | null)?.offsetWidth || 1;
+          const i = Math.round(row.scrollLeft / (w + 12));
+          dots.forEach((d, j) => d.classList.toggle('on', i === j));
+        }, { passive: true });
+      }
       // --- film leader, then the hero
       const intro = gsap.timeline({ defaults: { ease: 'power3.out' } });
       const seen = (() => { try { return sessionStorage.getItem('fa:leader') === '1'; } catch { return false; } })();
@@ -121,7 +132,7 @@ export default function Site() {
       split(q('[data-split]'));
       intro.fromTo(q('.s-hero .split-word'), { yPercent: 110 }, { yPercent: 0, duration: 1.05, stagger: 0.05, ease: 'power4.out' }, seen ? 0.1 : 1.75)
         .fromTo(q('[data-hero-fade]'), { y: 24, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.9, stagger: 0.1 }, '<0.35')
-        .fromTo(q('[data-cal="hero"]'), { rotateX: 60, rotateZ: -14, y: 140, autoAlpha: 0 }, { rotateX: 24, rotateZ: -6, y: 0, autoAlpha: 1, duration: 1.8, ease: 'power3.out' }, '<0.1')
+        .fromTo(q('[data-cal="hero"]'), { rotateX: phone ? 30 : 60, rotateZ: phone ? -4 : -14, y: 140, autoAlpha: 0 }, { rotateX: phone ? 0 : 24, rotateZ: phone ? 0 : -6, y: 0, autoAlpha: 1, duration: 1.8, ease: 'power3.out' }, '<0.1')
         .fromTo(q('[data-hero-float]'), { y: -40, autoAlpha: 0, z: 120 }, { y: 0, autoAlpha: 1, z: 60, duration: 1, stagger: 0.25, ease: 'power3.out' }, '<0.6');
 
       // hero: the calendar keeps showing what the product does, on a loop
@@ -136,8 +147,8 @@ export default function Site() {
         // back to the original plan in one frame, so only the change forward is ever shown
         .call(() => resetHero(heroCal));
       gsap.to(q('[data-hero-bg]'), { yPercent: 12, ease: 'none', scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
-      gsap.to(q('[data-cal-wrap]'), { y: -14, rotateX: 3, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 2.4 });
-      gsap.fromTo(q('[data-cal="hero"]'), { rotateX: 24, rotateZ: -6, y: 0 }, { rotateX: 14, rotateZ: -3, y: -60, ease: 'none', immediateRender: false, scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
+      gsap.to(q('[data-cal-wrap]'), { y: phone ? -8 : -14, rotateX: phone ? 0 : 3, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 2.4 });
+      if (!phone) gsap.fromTo(q('[data-cal="hero"]'), { rotateX: 24, rotateZ: -6, y: 0 }, { rotateX: 14, rotateZ: -3, y: -60, ease: 'none', immediateRender: false, scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
 
       const scene = (name: string) => {
         const el = q(`[data-scene="${name}"]`)[0];
@@ -147,8 +158,8 @@ export default function Site() {
 
       // --- 1. the problem: changes travel by hand, in pieces, late
       const p = scene('problem');
-      const tools = q('[data-tool]');
-      p.fromTo(tools, { y: 60, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.2, stagger: 0.7, ease: 'power3.out' }, 0.3)
+      const tools = phone ? [] : q('[data-tool]');
+      if (tools.length) p.fromTo(tools, { y: 60, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.2, stagger: 0.7, ease: 'power3.out' }, 0.3)
         .fromTo(q('[data-tool] .edit, [data-tool] .clash, [data-tool] .row.u'), { backgroundColor: 'rgba(232, 104, 75, 0)' }, { backgroundColor: 'rgba(232, 104, 75, .18)', duration: 0.6, stagger: 0.15 }, 3.8)
         .to(tools, { y: -30, autoAlpha: 0, duration: 1.4, stagger: 0.08, ease: 'power2.in' }, 7.6)
         .to(q('.s-problem-copy'), { autoAlpha: 0, y: -40, duration: 1.2 }, 8.6);
@@ -165,7 +176,6 @@ export default function Site() {
         .to(q('[data-trigger-copy], [data-feeds]'), { autoAlpha: matchMedia('(max-width: 760px)').matches ? 1 : 0, scale: 0.94, duration: 0.8 }, 9.2);
 
       // --- 3. the recommendation: the calendar turns to face you and redraws itself
-      const phone = matchMedia('(max-width: 760px)').matches;
       const r = scene('rec');
       const big = q('[data-cal="rec"]')[0];
       r.fromTo(big, phone ? { rotateX: 24, rotateZ: -4, scale: 0.92, y: 40, autoAlpha: 0.6 } : { rotateX: 62, rotateZ: -14, rotateY: 8, scale: 0.78, y: 120, autoAlpha: 0.3 }, { rotateX: 0, rotateZ: 0, rotateY: 0, scale: 1, y: 0, autoAlpha: 1, duration: phone ? 1.6 : 2.6, ease: 'power2.inOut' }, 0)
@@ -307,6 +317,7 @@ export default function Site() {
               <p className="s-pain">Staff spend the day relaying information.</p>
             </figure>
           </div>
+          <div className="s-swipe" aria-hidden="true"><span data-dots>{[0, 1, 2, 3].map(i => <i key={i} className={i === 0 ? 'on' : ''} />)}</span>Swipe to see all four</div>
           <div className="s-progress"><i /></div>
         </div>
       </section>
@@ -358,6 +369,7 @@ export default function Site() {
             </div>
           </div>
           <div className="s-rec-list" data-lve-skip>
+            <div className="s-rec-malert"><Brief /><span><b>Print delivery 15 min late</b><small>3 screenings at 3:00 pm</small></span></div>
             <h3>Changes</h3>
             {[
               [Move, '"Wild Tide" 3:00 → 3:15 pm', 'Riverside Studio'],
@@ -366,7 +378,7 @@ export default function Site() {
               [People, 'Tell 21 people with these in their plan', 'Seats are held'],
               [Brief, 'Brief 3 door teams', 'Staff only'],
               [Swap, 'Yara Hollis opens "Selling at Markets"', 'Pavel Kettering joins on arrival'],
-            ].map(([I, t, s]) => { const Icon = I as typeof Move; return <div className="s-chg" data-chg key={String(t)}><Icon /><span>{String(t)}<small>{String(s)}</small></span></div>; })}
+            ].map(([I, t, s]) => { const Icon = I as typeof Move; return <div className="s-chg" data-chg key={String(t)}><Icon /><span>{String(t)}<small>{String(s)}</small></span>{I === Swap && <span className="s-chg-swap"><i className="out">PK</i>→<i className="in">YH</i></span>}</div>; })}
           </div>
           <div className="s-progress"><i /></div>
         </div>

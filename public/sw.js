@@ -1,11 +1,11 @@
-// Festival Agent service worker: makes the app installable and shows notifications.
+// Usher service worker: makes the app installable and shows notifications.
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch', () => {});
 self.addEventListener('push', e => {
   let d = {};
   try { d = e.data ? e.data.json() : {}; } catch { d = { body: e.data && e.data.text() }; }
-  e.waitUntil(self.registration.showNotification(d.title || 'Festival Agent', {
+  e.waitUntil(self.registration.showNotification(d.title || 'Usher', {
     body: d.body || '', icon: '/icon-192.png', badge: '/icon-192.png', data: { url: d.url || '/app' },
   }));
 });

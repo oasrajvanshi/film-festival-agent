@@ -14,7 +14,8 @@ export function venueCounts(f: Festival, rows: RosterRow[], late: (r: RosterRow)
   return f.venues.map(v => ({
     venue: v,
     expected: rows.filter(r => r.firstVenueId === v.id && !r.walkIn).length,
-    here: rows.filter(r => r.arrival?.venueId === v.id).length,
+    // Same basis as "expected": the people due at this venue first, and which of them are here.
+    here: rows.filter(r => r.firstVenueId === v.id && !r.walkIn && r.arrival).length,
     late: rows.filter(r => r.firstVenueId === v.id && late(r)),
     now: nowTitle(v),
   }));

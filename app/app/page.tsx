@@ -2,34 +2,35 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { readSetup, useAgent, writeSetup, writeWho } from '../ui/useAgent';
-import { resetAlerts } from '../ui/weatherplan';
+import { clearFestivalLocal } from '../ui/localkeys';
 import { Approvals, Ask, Briefs, Data, Feeds, Grid, Log, Overview, Scan } from '../ui/panels';
 import { DemoShell, backToOrganizer, demoPerson, useDemo, type Demo } from '../ui/demo';
 import { Icon } from '../ui/icons';
 import '../mobile.css';
 import { AccessCodes, Feedback, PersonalApp, SignIn } from '../ui/profiles';
 import { WhosHere } from '../ui/presence';
-import type { Who } from '../../src/access/profiles';
+import { directory, type Who } from '../../src/access/profiles';
+import { PhoneFrame, inFrame, isWide, readDevice, toParent, writeDevice, type Device } from '../ui/phoneframe';
 import type { DayNumber } from '../../src/core/types';
 import { festivalDays } from '../../src/core/types';
 
 const PAGES = [
   { id: 'today', label: 'Overview', icon: 'home', group: 'Festival day' },
+  { id: 'approvals', label: 'Approvals', icon: 'inbox', group: 'Festival day' },
   { id: 'here', label: "Who's here", icon: 'scan', group: 'Festival day' },
   { id: 'schedule', label: 'Schedule', icon: 'calendar', group: 'Festival day' },
   { id: 'ask', label: 'Ask', icon: 'chat', group: 'Festival day' },
   { id: 'briefs', label: 'Volunteer briefs', icon: 'users', group: 'Team' },
   { id: 'feeds', label: 'Live feeds', icon: 'bolt', group: 'Team' },
   { id: 'codes', label: 'Access codes', icon: 'key', group: 'Team' },
-  // Reached from Today or Settings, not the menu.
-  { id: 'approvals', label: 'Past approvals', icon: 'inbox', group: '' },
+  // Reached from Overview or Settings, not the menu.
   { id: 'scan', label: 'Door scan', icon: 'scan', group: '' },
   { id: 'log', label: 'Activity log', icon: 'list', group: '' },
   { id: 'data', label: 'Data', icon: 'sheet', group: '' },
   { id: 'feedback', label: 'Feedback', icon: 'chat', group: '' },
 ] as const;
 type PageId = typeof PAGES[number]['id'];
-const BOTTOM: PageId[] = ['today', 'here', 'schedule'];
+const BOTTOM: PageId[] = ['today', 'approvals', 'here', 'schedule'];
 
 export default function App() {
   const demo = useDemo();
@@ -47,6 +48,19 @@ function AppInner({ demo }: { demo: Demo | null }) {
   const ready = s.mode !== 'loading';
   const [viewAs, setViewAs] = useState<Who | null>(null);
   const f = s.agent.f;
+  // Phones for everyone; the organizer may also use a computer.
+  const [framed, setFramed] = useState(false);
+  const [wide, setWide] = useState(false);
+  const [device, setDeviceState] = useState<Device>('desktop');
+  const [viewasId, setViewasId] = useState<string | null>(null);
+  useEffect(() => {
+    setFramed(inFrame()); setDeviceState(readDevice());
+    setViewasId(new URLSearchParams(location.search).get('viewas'));
+    const r = () => setWide(isWide()); r();
+    window.addEventListener('resize', r);
+    return () => window.removeEventListener('resize', r);
+  }, []);
+  const setDevice = (d: Device) => { writeDevice(d); setDeviceState(d); };
   const pending = s.agent.queue.filter(q => q.status === 'pending').length;
   const flags = s.agent.flags.length;
   const day = Number(Object.entries(f.dates).find(([, d]) => s.clock.startsWith(d))?.[0] ?? 1) as DayNumber;
@@ -67,9 +81,9 @@ function AppInner({ demo }: { demo: Demo | null }) {
     const notes: [string, string, string][] = [];
     if (pending > prev.pending) {
       const q = s.agent.queue.filter(x => x.status === 'pending').at(-1);
-      notes.push([`${pending - prev.pending} new update${pending - prev.pending > 1 ? 's' : ''} to approve`, q?.action.title ?? '', '/app#today']);
+      notes.push([`${pending - prev.pending} new update${pending - prev.pending > 1 ? 's' : ''} to approve`, q?.action.title ?? '', '/app#approvals']);
     }
-    if (flags > prev.flags) notes.push(['Needs attention', s.agent.flags.at(-1)?.title ?? '', '/app#today']);
+    if (flags > prev.flags) notes.push(['Needs attention', s.agent.flags.at(-1)?.title ?? '', '/app#approvals']);
     for (const [title, body, url] of notes) {
       navigator.serviceWorker.ready.then(r => r.showNotification(title, { body, icon: '/icon-192.png', badge: '/icon-192.png', tag: url, data: { url } })).catch(() => {});
     }
@@ -90,7 +104,7 @@ function AppInner({ demo }: { demo: Demo | null }) {
         return;
       } catch { /* fall back to a local notification */ }
     }
-    reg.showNotification('Alerts are on', { body: 'You will hear about new approvals and flags on this device.', icon: '/icon-192.png', data: { url: '/app#today' } });
+    reg.showNotification('Alerts are on', { body: 'You will hear about new approvals and flags on this device.', icon: '/icon-192.png', data: { url: '/app#approvals' } });
   };
 
   const setPage = (p: PageId) => {
@@ -111,7 +125,7 @@ function AppInner({ demo }: { demo: Demo | null }) {
     return () => window.removeEventListener('hashchange', fromHash);
   }, []);
 
-  const countFor = (id: PageId) => (id === 'today' ? pending + flags : 0);
+  const countFor = (id: PageId) => (id === 'approvals' ? pending + flags : 0);
   const props = { s, user, go: setPage };
   const groups = [...new Set(PAGES.map(p => p.group))].filter(Boolean);
 
@@ -135,14 +149,14 @@ function AppInner({ demo }: { demo: Demo | null }) {
       </div>
       <div className="field">More
         <div className="row">
-          {(['log', 'approvals', 'data', 'feedback'] as PageId[]).map(id => <button key={id} className="small" onClick={() => setPage(id)}>{PAGES.find(p => p.id === id)!.label}</button>)}
+          {(['log', 'data', 'feedback'] as PageId[]).map(id => <button key={id} className="small" onClick={() => setPage(id)}>{PAGES.find(p => p.id === id)!.label}</button>)}
         </div>
       </div>
       <button className="block" onClick={signOut}><Icon name="logout" size={16} /> Sign out</button>
-      <button className="block" style={{ marginTop: 8 }} onClick={() => { if (armed) { s.reset(); resetAlerts(); try { localStorage.removeItem('usher-original-plan-v1'); localStorage.removeItem('usher-plan-notes-v1'); } catch { /* ignore */ } setArmed(false); setSheet(null); location.reload(); } else { setArmed(true); setTimeout(() => setArmed(false), 4000); } }}>
+      <button className="block" style={{ marginTop: 8 }} onClick={async () => { if (armed) { setArmed(false); setSheet(null); await s.reset(); clearFestivalLocal(); location.reload(); } else { setArmed(true); setTimeout(() => setArmed(false), 4000); } }}>
         {armed ? 'Tap again to reset everything' : 'Reset demo'}
       </button>
-      <button className="block" style={{ marginTop: 8 }} onClick={() => { writeSetup(null); writeWho(null); try { localStorage.removeItem('ffa-fid-v1'); } catch { /* ignore */ } location.href = '/onboarding'; }}>Set up a new festival</button>
+      <button className="block" style={{ marginTop: 8 }} onClick={() => { writeSetup(null); writeWho(null); clearFestivalLocal(); try { localStorage.removeItem('ffa-fid-v1'); } catch { /* ignore */ } location.href = '/onboarding'; }}>Set up a new festival</button>
       <p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>Test mode: messages go only to the team’s own inbox.</p>
     </>
   );
@@ -150,10 +164,20 @@ function AppInner({ demo }: { demo: Demo | null }) {
   function signOut() { s.signOut(); setViewAs(null); setSheet(null); window.scrollTo({ top: 0 }); }
   if (!ready) return null;
   if (!who) return <SignIn s={s} onIn={w => { if (w.kind === 'organizer') setUser(w.name); }} />;
-  if (who.kind !== 'organizer') return <PersonalApp s={s} who={who} onOut={signOut} />;
+  if (who.kind !== 'organizer') {
+    if (!framed && wide) return <PhoneFrame src="/app?inframe=1" title={`Usher for ${who.name}`} onMessage={m => { if (m.signedOut) location.reload(); }} />;
+    return <PersonalApp s={s} who={who} onOut={() => { signOut(); if (framed) toParent({ signedOut: 1 }); }} />;
+  }
   const demoWho = demo && demo.kind !== 'organizer' ? demoPerson(f, demo.kind, s.clock) : null;
   if (demoWho) return <PersonalApp key={demoWho.id} s={s} who={demoWho} viewAs onOut={() => backToOrganizer(demo)} />;
-  if (viewAs) return <PersonalApp s={s} who={viewAs} viewAs onOut={() => { setViewAs(null); window.scrollTo({ top: 0 }); }} />;
+  // The organizer viewing as someone: inside the frame, show that person.
+  const asWho = framed && viewasId ? directory(f).find(w => w.id === viewasId) : null;
+  if (asWho) return <PersonalApp s={s} who={{ ...asWho, code: '' }} viewAs onOut={() => toParent({ back: 1 })} />;
+  if (viewAs) {
+    if (!framed && wide) return <PhoneFrame src={`/app?inframe=1&viewas=${encodeURIComponent(viewAs.id)}`} title={`Viewing as ${viewAs.name}`} onMessage={m => { if (m.back) { setViewAs(null); location.reload(); } }} />;
+    return <PersonalApp s={s} who={viewAs} viewAs onOut={() => { setViewAs(null); window.scrollTo({ top: 0 }); }} />;
+  }
+  if (!framed && wide && device === 'phone') return <PhoneFrame organizer src="/app?inframe=1" title="Usher for the organizer" onDevice={d => { setDevice(d); location.reload(); }} />;
 
   return (
     <div className="shell">
@@ -178,6 +202,7 @@ function AppInner({ demo }: { demo: Demo | null }) {
         <header className="topbar">
           <h1>{current.label}</h1>
           <div className="spacer" />
+          <button className="ghost small" onClick={() => setDevice('phone')} title="See the organizer app on a phone"><Icon name="ticket" size={15} /> Phone view</button>
           <button className="ghost" onClick={() => setSheet('settings')} title="Settings">
             <span className={`model-dot ${s.useModel && s.llmInfo.available ? 'on' : ''}`} /> {user} <Icon name="gear" size={16} />
           </button>

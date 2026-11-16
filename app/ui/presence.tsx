@@ -7,6 +7,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { AgentStore } from './useAgent';
 import { Icon } from './icons';
 import { VenueBuildings, venueCounts } from './venues';
+import { useLateGuests } from './weatherplan';
 import { clock as fmt } from '../../src/core/time';
 import { festivalDays, type DayNumber } from '../../src/core/types';
 import { dayAt, roster, rosterCsv, type ArrivalResult, type PresenceKind, type RosterRow } from '../../src/agent/presence';
@@ -140,7 +141,8 @@ export function WhosHere({ s, eventScan }: { s: AgentStore; eventScan?: ReactNod
   const rows = useMemo(() => roster(f, day), [f, day, s.version]); // eslint-disable-line react-hooks/exhaustive-deps
   const now = s.clock;
   const isToday = day === dayAt(f, now);
-  const late = (r: RosterRow) => isToday && !r.arrival && r.kind === 'guest' && !!r.firstAt && r.firstAt.slice(0, 16) <= addMin(now, 45);
+  const flaggedLate = useLateGuests(s);
+  const late = (r: RosterRow) => (isToday && !r.arrival && r.kind === 'guest' && !!r.firstAt && r.firstAt.slice(0, 16) <= addMin(now, 45)) || (!r.arrival && flaggedLate.has(r.id));
   const shown = rows
     .filter(r => kind === 'all' ? true : kind === 'missing' ? !r.arrival : r.kind === kind)
     .filter(r => !q || r.name.toLowerCase().includes(q.toLowerCase()))

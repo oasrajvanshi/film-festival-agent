@@ -1,4 +1,4 @@
-/* Today's calendar map (organizer Today), after Sienna's prototype calendar. */
+/* The Overview calendar map, after Sienna's prototype calendar. */
 .dcal { border: 1px solid var(--line-2); border-radius: 16px; overflow: auto; background: linear-gradient(160deg, rgba(40, 27, 21, .6), rgba(20, 13, 10, .7)); max-height: 70vh; }
 .dcal-head, .dcal-body { display: grid; grid-template-columns: 48px repeat(var(--cols), minmax(120px, 1fr)); min-width: calc(48px + var(--cols) * 120px); }
 .dcal-head { position: sticky; top: 0; z-index: 3; background: #1a120e; border-bottom: 1px solid var(--line); }

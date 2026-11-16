@@ -80,7 +80,8 @@ export function Overview({ s, user }: P) {
         <h2>{problems ? `${problems} problem${problems === 1 ? '' : 's'} need${problems === 1 ? 's' : ''} you` : s.festivalName}</h2>
       </section>
 
-      <ProblemTrigger />
+      {/* The demo's scripted problems belong to the sample festival only. */}
+      {f.people.some(p => p.name === 'Pavel Kettering') && <ProblemTrigger />}
       <WeatherAlerts s={s} user={user}
         onOpen={d => { setCalDay(d); setShowOriginal(false); }}
         onPreview={setPreview} onApplied={keepOriginal} />
@@ -248,7 +249,7 @@ export function WeatherCard({ s, go, compact }: P & { compact?: boolean }) {
         {scenarios.map(([k, l]) => <button key={k} disabled={busy} onClick={() => run(k)}>Try: {l}</button>)}
       </div>
       {busy && <div className="muted">Checking the forecast…</div>}
-      {note && <div className="msg">{note}{note.includes('waiting') && <> <button className="small" onClick={() => go('today')}>Review</button></>}</div>}
+      {note && <div className="msg">{note}{note.includes('waiting') && <> <button className="small" onClick={() => go('approvals')}>Review</button></>}</div>}
     </div>
   );
 }
@@ -364,7 +365,7 @@ export function Grid({ s, user }: P) {
 }
 
 // ------------------------------------------------------------------ Approvals
-export function Approvals({ s, user }: P) {
+export function Approvals({ s, user, go }: P) {
   const { person } = useLookups(s);
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const items = [...s.agent.queue].reverse();
@@ -387,6 +388,11 @@ export function Approvals({ s, user }: P) {
   };
   return (
     <div className="stack">
+      <div className="card">
+        <h2>Needs attention ({s.agent.flags.length})</h2>
+        {s.agent.flags.length === 0 && <p className="muted">Nothing flagged.</p>}
+        <FlagList s={s} user={user} go={go} />
+      </div>
       <div className="card">
         <h2>Waiting for approval ({pending.length})</h2>
         {pending.length === 0 && <p className="muted">Nothing waiting.</p>}
@@ -587,9 +593,9 @@ export function Feeds({ s, go, user }: P) {
     setLive(`${r.flight} is ${r.status}, landing ${r.iata} ${fmt(r.estimated)}${r.delayMin ? ` (${r.delayMin} min late)` : ''}.`);
   };
   const [mins, setMins] = useState(45);
-  const [filmId, setFilmId] = useState(f.films[0].id);
+  const [filmId, setFilmId] = useState(f.films[0]?.id ?? '');
   const [eta, setEta] = useState('09:30');
-  const [vEvent, setVEvent] = useState(f.events.find(e => e.kind === 'screening' && !e.restriction)!.id);
+  const [vEvent, setVEvent] = useState(f.events.find(e => e.kind === 'screening' && !e.restriction)?.id ?? '');
   const [note, setNote] = useState<string | null>(null);
   const date = s.clock.slice(0, 10);
   return (

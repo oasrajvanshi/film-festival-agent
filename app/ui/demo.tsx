@@ -62,20 +62,22 @@ export function backToOrganizer(demo: Demo | null) {
 
 export function DemoShell({ demo, signedIn = true, children }: { demo: Demo; signedIn?: boolean; children: ReactNode }) {
   const src = `/app?demoframe=1&as=${demo.kind}`;
+  // Only the organizer has a desktop view; everyone else is always on a phone.
+  const phone = demo.phone || demo.kind !== 'organizer';
   return (
-    <div className={`demo ${demo.phone ? 'demo-phone' : ''}`}>
+    <div className={`demo ${phone ? 'demo-phone' : ''}`}>
       <div className="demo-bar" role="toolbar" aria-label="Demo controls">
         <span className="demo-tag">Demo</span>
         <div className="demo-seg" aria-label="View">
-          <button className={!demo.phone ? 'on' : ''} onClick={() => demo.setPhone(false)}>Desktop</button>
-          <button className={demo.phone ? 'on' : ''} onClick={() => demo.setPhone(true)}>Phone</button>
+          <button className={!phone ? 'on' : ''} disabled={demo.kind !== 'organizer'} onClick={() => demo.setPhone(false)}>Desktop</button>
+          <button className={phone ? 'on' : ''} onClick={() => demo.setPhone(true)}>Phone</button>
         </div>
         <div className="demo-seg demo-who" aria-label="Profile">
           {KINDS.map(k => <button key={k.kind} className={demo.kind === k.kind ? 'on' : ''} disabled={!signedIn && k.kind !== 'organizer'} onClick={() => demo.setKind(k.kind)}>{k.label}</button>)}
         </div>
         {!signedIn && <span className="demo-hint">Sign in as organizer to switch profiles</span>}
       </div>
-      {demo.phone
+      {phone
         ? <div className="demo-stage"><div className="demo-device"><iframe key={src} src={src} title={`Usher on a phone, ${demo.kind}`} /></div></div>
         : <div className="demo-body">{children}</div>}
     </div>

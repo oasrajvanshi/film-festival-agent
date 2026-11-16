@@ -78,8 +78,8 @@ function deliverNew(kv: Kv, rec: FestRecord, origin: string) {
       if (want.has('sms')) jobs.push(sendSms(`Usher test (${fest}): ${title}. ${msgs.length} message${msgs.length === 1 ? '' : 's'} went out, e.g. to ${msgs[0].personName}: "${msgs[0].subject}"`));
     }
     if (want.has('push')) {
-      if (newAsks.length) jobs.push(sendPush(kv, rec.id, { title: `${newAsks.length} update${newAsks.length > 1 ? 's' : ''} to approve`, body: newAsks.at(-1)!.action.title, url: `${origin}/app#today` }));
-      if (newFlags.length) jobs.push(sendPush(kv, rec.id, { title: 'Needs attention', body: newFlags.length > 1 ? `${newFlags.at(-1)!.title} and ${newFlags.length - 1} more` : newFlags[0].title, url: `${origin}/app#today` }));
+      if (newAsks.length) jobs.push(sendPush(kv, rec.id, { title: `${newAsks.length} update${newAsks.length > 1 ? 's' : ''} to approve`, body: newAsks.at(-1)!.action.title, url: `${origin}/app#approvals` }));
+      if (newFlags.length) jobs.push(sendPush(kv, rec.id, { title: 'Needs attention', body: newFlags.length > 1 ? `${newFlags.at(-1)!.title} and ${newFlags.length - 1} more` : newFlags[0].title, url: `${origin}/app#approvals` }));
     }
     await Promise.allSettled(jobs);
   });
@@ -216,6 +216,20 @@ export async function POST(req: Request) {
     return json({ result: res, version: rec.version });
   }
 
+  // An attendee or guest changes their own plan: save an event, or drop one (a swap does both).
+  if (action === 'booking') {
+    if (s.who.kind !== 'attendee' && s.who.kind !== 'guest') return bad('Only attendees and guests keep a plan.', 403);
+    const f = rec.state.agent.f;
+    const add = b.add ? String(b.add) : null;
+    const drop = b.drop ? String(b.drop) : null;
+    if (add && !f.events.some(e => e.id === add && e.status === 'scheduled')) return bad('That event is not on the programme.');
+    f.bookings = f.bookings.filter(x => !(x.personId === s.who.id && x.eventId === drop));
+    if (add && !f.bookings.some(x => x.personId === s.who.id && x.eventId === add)) f.bookings.push({ personId: s.who.id, eventId: add });
+    rec.version++;
+    await saveFest(kv, rec);
+    return json({ ok: true, version: rec.version });
+  }
+
   if (action === 'vendor-report') {
     if (s.who.kind !== 'vendor') return bad('Vendors only.', 403);
     const type = String(b.type);
@@ -296,7 +310,7 @@ export async function POST(req: Request) {
   }
 
   if (action === 'push-test') {
-    const n = await sendPush(kv, fid, { title: 'Alerts are on', body: `You'll hear about ${f.name} approvals and flags on this device.`, url: `${origin}/app#today` });
+    const n = await sendPush(kv, fid, { title: 'Alerts are on', body: `You'll hear about ${f.name} approvals and flags on this device.`, url: `${origin}/app#approvals` });
     return json({ sent: n });
   }
 

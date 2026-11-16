@@ -8,6 +8,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import qrcode from 'qrcode-generator';
 import { readWho, writeWho, type AgentStore } from './useAgent';
 import { EventThumb, Faces } from './media';
+import { AttendeeApp } from './attendee';
 import { Icon } from './icons';
 import { Ask, BriefView } from './panels';
 import { MyArrival, ScanDesk } from './presence';
@@ -190,7 +191,12 @@ export function AccessCodes({ s, onViewAs }: { s: AgentStore; onViewAs: (w: Who)
 // ------------------------------------------------------------------ personal shell
 type Tab = { id: string; label: string; icon: string };
 
-export function PersonalApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who; onOut: () => void; viewAs?: boolean }) {
+/** Attendees get their own phone app; the other profiles share this one. */
+export function PersonalApp(props: { s: AgentStore; who: Who; onOut: () => void; viewAs?: boolean }) {
+  return props.who.kind === 'attendee' ? <AttendeeApp {...props} /> : <PeopleApp {...props} />;
+}
+
+function PeopleApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who; onOut: () => void; viewAs?: boolean }) {
   const tabs: Tab[] = who.kind === 'staff'
     ? [{ id: 'home', label: 'My shift', icon: 'home' }, { id: 'scan', label: 'Door scan', icon: 'scan' }, { id: 'updates', label: 'Updates', icon: 'inbox' }, { id: 'ask', label: 'Ask', icon: 'chat' }]
     : who.kind === 'vendor'

@@ -200,7 +200,7 @@ export default function Onboarding() {
           <div className="ob-hi-name display">Usher</div>
           <p className="ob-hi-line">Usher your festival with ease.</p>
           <button className="primary big ob-hi-go" onClick={() => setStarted(true)}>Set up a festival</button>
-          <a className="ob-link ob-hi-try" href="/app" onClick={async e => { e.preventDefault(); await s.openSample(); location.href = '/app'; }}>Or try a sample festival</a>
+          <a className="ob-link ob-hi-try" href="/app" onClick={async e => { e.preventDefault(); if (s.mode === 'loading') return; await s.openSample(); location.href = '/app'; }}>Or try a sample festival</a>
         </div>
       </div>
     );

@@ -6,6 +6,7 @@
 //  - local: with no storage, state stays in this browser's localStorage.
 // Model calls go through /api/llm (server-side key).
 
+import { clearFestivalLocal } from './localkeys';
 import type { ArrivalResult } from '../../src/agent/presence';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FestivalAgent } from '../../src/agent/agent';
@@ -243,6 +244,7 @@ export function useAgent() {
   const setClock = useCallback((c: string) => { clockRef.current = c; setClockState(c); commit(); }, [commit]);
 
   const reset = useCallback(async () => {
+    clearFestivalLocal();
     if (modeRef.current === 'shared') {
       const r = await api<never>('POST', { action: 'reset', f: fidRef.current });
       if (r.ok) hydrate(r.body);
@@ -275,6 +277,7 @@ export function useAgent() {
       message: `Onboarded ${festival.events.length} events, ${festival.people.length} people and ${festival.films.length} films.` };
     sheetRef.current = next; setSheet(next);
     writeSetup(setup);
+    clearFestivalLocal();
     const owner: Who = { kind: 'organizer', id: 'owner', name: setup.approver || 'Organizer', detail: 'Set up the festival', code: '' };
     if (modeRef.current === 'shared') {
       const r = await api<{ fid: string; token: string; who: Who; error?: string }>('POST', { action: 'create', snapshot: agentRef.current!.snapshot(), clock: clockRef.current, sheet: next, setup });
@@ -293,7 +296,9 @@ export function useAgent() {
   const openSample = useCallback(async () => {
     const setup: Setup = { festivalName: 'Harbor Lights Film Festival', city: 'New York', approver: 'Operations lead', channels: ['push', 'email'], onboardedAt: new Date().toISOString() };
     writeSetup(setup); writeWho(null);
-    if (modeRef.current !== 'shared') return;
+    clearFestivalLocal();
+    // Local mode: start the sample fresh rather than restoring an older festival.
+    if (modeRef.current !== 'shared') { try { localStorage.removeItem(KEY); } catch { /* ignore */ } return; }
     const a = new FestivalAgent(buildFestival(), null, () => SAMPLE_CLOCK);
     a.sweepClashes();
     const r = await api<{ fid: string }>('POST', { action: 'create', sample: true, snapshot: a.snapshot(), clock: SAMPLE_CLOCK, sheet: { source: 'built-in', errors: [], warnings: [] }, setup });

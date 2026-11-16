@@ -20,3 +20,10 @@
 @media (max-width: 520px) { .demo-who { order: 3; width: 100%; overflow-x: auto; } .demo-device { width: 100%; border-radius: 0; padding: 0; box-shadow: none; } }
 /* The toolbar does the switching, so the "Viewing as" strip is not needed in the demo. */
 .demo-mode .viewas-bar { display: none; }
+
+/* Phone frame for people who only use Usher on a phone. */
+.pf { min-height: 100vh; background: radial-gradient(ellipse at 50% 0%, #2a1a14 0%, var(--bg) 60%); }
+.pf-bar { display: flex; align-items: center; justify-content: space-between; padding: 14px 24px 0; }
+.pf-seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 10px; background: rgba(246, 236, 220, .06); }
+.pf-seg button { min-height: 0; padding: 6px 12px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font-size: 13px; gap: 6px; }
+.pf-seg button.on { background: rgba(246, 236, 220, .14); color: var(--ink); }

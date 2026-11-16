@@ -12,7 +12,12 @@ const TALKS = ['talk-stage', 'talk-speaker', 'talk-qa'];
 
 /** One picture per event: the film's still, or a picture for the kind of event. */
 export function eventImage(e: Pick<FestivalEvent, 'kind' | 'filmId' | 'title'>): string {
-  if (e.filmId && e.kind === 'screening') return `/hl/ev/${e.filmId}.jpg`;
+  if (e.filmId && e.kind === 'screening') {
+    // The sample's films have their own stills (f-01 to f-40); any other film id gets one of them.
+    const m = /^f-(\d+)$/.exec(e.filmId);
+    const n = m && +m[1] >= 1 && +m[1] <= 40 ? +m[1] : ([...e.filmId].reduce((h, c) => h * 31 + c.charCodeAt(0), 7) >>> 0) % 40 + 1;
+    return `/hl/ev/f-${String(n).padStart(2, '0')}.jpg`;
+  }
   if (e.kind === 'qa') return '/hl/ev/talk-qa.jpg';
   if (e.kind === 'market') return '/hl/ev/market.jpg';
   if (e.kind === 'activity') return '/hl/ev/reception.jpg';
@@ -23,7 +28,8 @@ export function eventImage(e: Pick<FestivalEvent, 'kind' | 'filmId' | 'title'>):
 export function EventThumb({ e, size = 44 }: { e: Pick<FestivalEvent, 'kind' | 'filmId' | 'title'>; size?: number }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img className="ev-thumb" src={eventImage(e)} alt="" width={size} height={size} loading="lazy" decoding="async" style={{ width: size, height: size }} />
+    <img className="ev-thumb" src={eventImage(e)} alt="" width={size} height={size} loading="lazy" decoding="async" style={{ width: size, height: size }}
+      onError={x => { const img = x.currentTarget; if (!img.src.endsWith('/talk-stage.jpg')) img.src = '/hl/ev/talk-stage.jpg'; }} />
   );
 }
 

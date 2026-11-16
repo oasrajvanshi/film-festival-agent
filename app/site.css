@@ -476,3 +476,58 @@
 .s-hero .s-lead { max-width: 40ch; }
 /* No progress bars under the scroll scenes. */
 .s-progress { display: none !important; }
+
+/* ---------------------------------------------------------------- phones: their own layout */
+.s-swipe, .s-rec-malert { display: none; }
+.s-chg-swap { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; color: var(--amber-2); font-size: 12px; }
+.s-chg-swap i { width: 24px; height: 24px; border-radius: 50%; display: inline-grid; place-items: center; font-style: normal; font-size: 9.5px; font-weight: 700; color: #1b120e; background: #c39367; }
+.s-chg-swap i.out { box-shadow: 0 0 0 2px #E8684B; opacity: .55; filter: grayscale(1); }
+.s-chg-swap i.in { box-shadow: 0 0 0 2px var(--amber); }
+@media (max-width: 760px) {
+  /* type: smaller, calmer */
+  .s-h1, .s-hero .s-h1 { font-size: 30px; line-height: 1.1; max-width: none; letter-spacing: -.015em; }
+  .s-h2 { font-size: 25px; line-height: 1.15; }
+  .s-lead, .s-hero .s-lead, .s-problem-copy .s-lead { font-size: 15px; line-height: 1.5; max-width: none; }
+  .s-mono { font-size: 12px; }
+  .s-nav .wordmark { font-size: 18px; }
+  /* hero: words first, then a flat calendar floating underneath */
+  .s-hero { min-height: auto; padding-top: 88px; padding-bottom: 28px; }
+  .s-hero-copy { gap: 14px; }
+  .s-ctas .btn:not(.primary) { display: none; }
+  .s-hero-stage { height: 300px; margin-top: 18px; }
+  .s-hero [data-hero-float]:nth-of-type(2) { display: none; }
+  .s-scrollcue { display: none; }
+  /* the problem: one tool at a time, swiped */
+  .s-problem.s-pin { height: auto; }
+  .s-problem .s-sticky { position: relative; height: auto; overflow: visible; padding: 56px 0 40px; gap: 18px; }
+  .s-problem-copy { padding: 0 18px; gap: 10px; }
+  .s-tools { display: flex; grid-template-columns: none; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; padding: 4px 18px 8px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .s-tools::-webkit-scrollbar { display: none; }
+  .s-tool { flex: 0 0 84%; scroll-snap-align: center; opacity: 1 !important; transform: none !important; visibility: visible !important; }
+  .s-tool .win { font-size: 11.5px; min-height: 190px; }
+  .s-pain { font-size: 14px; }
+  .s-swipe { display: flex; align-items: center; gap: 10px; padding: 0 18px; font-family: var(--f-time); font-size: 12px; color: var(--muted); }
+  .s-swipe span { display: inline-flex; gap: 5px; }
+  .s-swipe i { width: 6px; height: 6px; border-radius: 50%; background: var(--line-2); transition: width .3s, background .3s; }
+  .s-swipe i.on { width: 18px; border-radius: 3px; background: var(--amber); }
+  /* the agent */
+  .s-trigger .s-h2 { font-size: 24px; }
+  .s-flow-out b, .s-flow-feed b { font-size: 12.5px; }
+  /* the plan: no squeezed calendar; the alert, then the changes one by one */
+  .s-rec-stage { display: none; }
+  .s-rec-copy .s-lead { font-size: 14.5px; }
+  .s-rec-list { width: 100%; display: grid; gap: 8px; }
+  .s-rec-list h3 { font-size: 13px; margin: 6px 0 0; color: var(--muted); }
+  .s-rec-malert { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(201, 152, 99, .5); background: rgba(201, 152, 99, .12); color: var(--amber-2); }
+  .s-rec-malert b { display: block; color: var(--cream); font-size: 14.5px; }
+  .s-rec-malert small { color: var(--muted); font-size: 12.5px; }
+  .s-chg { padding: 11px 12px; font-size: 13.5px; }
+  /* footer */
+  .s-footer .s-h1 { font-size: 28px; }
+}
+@media (max-width: 760px) {
+  .s-rec-list { grid-template-columns: 1fr !important; }
+  .s-rec-list > * { grid-column: 1 / -1; }
+  .s-chg { display: flex; align-items: center; gap: 10px; }
+  .s-chg > span:not(.s-chg-swap) { flex: 1; }
+}

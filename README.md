@@ -1,146 +1,113 @@
 # Usher
 
-*Usher your festival with ease.* Usher is the Group Blue film festival agent.
+*Usher your festival with ease.* Group Blue · Oas, Sienna, David, Henry
 
-Group Blue · Oas, Sienna, David, Henry
+Usher helps a film festival team manage every unexpected change. It tracks the schedule, guests, passes and volunteer shifts; when something changes (a late print, a delayed guest, snow), it works out who is affected, suggests a new plan, and tells each person what to do. Staff approve anything sent publicly.
 
-## Problem statement
+**Live:** https://film-festival-agent.vercel.app
 
-Film festival schedule changes are relayed by hand across emails, sheets and chats, so updates arrive late or reach the wrong people. Volunteers work from outdated briefs, guests get double-booked, and staff spend the day relaying information. The Film Festival Agent tracks the schedule, notifies and gives recommendation to everyone affected. It flags clashes and checks access, with staff approving anything sent publicly.
+## The problem
 
-## What it does
+Schedule changes are relayed by hand across spreadsheets, emails and group chats, so updates arrive late or reach the wrong people. Volunteers work from outdated briefs, guests get double-booked, and staff spend the day relaying information.
 
-| Pain point (proposal) | What the agent does | Human stays in charge of |
-|---|---|---|
-| Changes don't propagate | Diffs each schedule-grid edit, finds exactly who is affected (ticket holders, people who saved it, guests, volunteers on shift, the right staff) and drafts **one bundle** of updates. Each person gets a **recommendation**, not just a notice. | Approving anything sent outside the team |
-| Slow door checks | Access rules for all 10 pass and badge types encoded once; a QR scan returns green or red with a reason | Overrides and exceptions |
-| Pass vs. ticket | Every pass and extra ticket is linked to one person and one QR code | Refunds and disputes |
-| Misinformed volunteers | Live brief by role and venue, rebuilt from the current grid; answers from official documents only, or "I don't know" | Shift changes and final rosters |
-| Guest conflicts | Flags guest clashes, counting travel time between venues; also double-booked rooms and Q&As left behind when a screening moves | Resolving the conflict |
-| No crowd view | Live venue view from check-in scans, with suggestions where to redirect people | Crowd and safety decisions |
-| Unverified votes (post-MVP) | Voting form only to people who checked in | Award results |
-| Outside failures | Reads vendor feeds (flight delays, print delays, cancellations), flags what's at risk, drafts contingency messages | Sending them |
+## Tutorial: a festival day in ten minutes
 
-### Recommendations
+1. **Open the site** and press **Try the live demo**. On the welcome screen choose **Or try a sample festival** (Harbor Lights, April 15 to 17, 2027: 40 films, 4 venues, 162 people).
+2. **Sign in.** Pick a profile: Organizer, Staff, Guest, Attendee or Vendor. Type any access code and press **Open my profile** (in the demo any code works; real codes are on the **Access codes** page). You can also ask for a code by email.
+3. **Overview (organizer).** The banner shows the festival; the calendar below shows each venue's day. Switch days with the small **Day 1 / 2 / 3** tabs.
+4. **Bring in the problems.** Press **Bring on the problems** at the bottom left. Three alerts appear and the banner reads "3 problems need you":
+   - Pavel Kettering is running late for his 4:00 panel.
+   - Thunderstorms from 3:00 to 6:00 pm on Day 1.
+   - Snow from 1:00 to 7:00 pm on Day 2.
+5. **Open a recommendation.** Press **Agent's recommendation** on an alert. The calendar previews the new plan: moved events slide to their new time (old time crossed out), and a swapped guest shows as avatars changing places. The recommendation sits on the left: one sentence on what happened, then a checklist. Untick anything you don't want; **Approve** appears once the preview has played.
+6. **Approve.** The events move, the right people are messaged, and the alert clears. **Original plan** above the calendar shows the schedule as it was. With two or more problems open, **Handle all at once** gives one combined recommendation.
+7. **See it from the other side.** On **Access codes**, view the festival as any person, or sign in as an Attendee: the agenda shows what moved ("Now starts at 3:15 pm, was 3:00. Your seat is held."), offers a swap if something is cancelled, asks which one to keep when two plans overlap, and suggests something for free time. **Updates** holds only messages about your plan; **Pass** is one QR code for the pass and every ticket.
+8. **Who's here.** Each venue is drawn as a small building whose floors light up as expected people are scanned in. Late guests show on their venue. Click a venue to filter the list; use **Scan people in** at the door and **Download list** for the day.
+9. **Approvals.** Anything waiting for a person (messages to attendees, guests or partners, public listings) and every flag (guest clashes, double-booked rooms, uncovered shifts) is here.
+10. **Start again.** Settings (gear, top right) → **Reset demo**.
 
-Recommendations are computed from the grid, travel times, the person's pass and their own itinerary, never by the model. Examples:
+Everyone except the organizer uses Usher on a phone; on a computer their app opens in a phone frame. The organizer can switch with **Phone view** in the top bar.
 
-- *"Silver Water moves to Riverside Studio. Head to Riverside Studio instead and arrive by 12:20 pm."*
-- *"Open Gods now starts at 1:30 pm. It now runs into "Quiet Animals" at 3:00 pm. Choose which one to keep, or swap it for one that fits. Options: …"*
-- *"Late Country is cancelled. Pick another event in the same window that fits your day. Options: "Wild Tide" at Riverside Studio, 3:00 pm; …"*
-- Volunteers: *"Redirect arrivals to Riverside Studio; the free shuttle runs every 20 minutes."*
+## The organizer's pages
 
-## The agent loop
-
-Every run follows five steps: **Trigger** (grid edit, QR scan, question, vendor alert) → **Understand** (reads the relevant records and official documents) → **Decide** (answer, allow/deny, flag, draft, escalate) → **Act or ask** (public or outbound actions wait in the approval queue) → **Log** (every input, tool call, output and approval).
-
-### Approval gate
-
-A fixed rule in [`src/agent/approvals.ts`](src/agent/approvals.ts), not the model's judgment:
-
-| Runs on its own | Needs a person's approval |
+| Page | What it's for |
 |---|---|
-| Update volunteer briefs, heads-up to staff, dashboard flags | Messages to attendees, guests or partners; website listing; public announcements; roster changes; voting forms; vendor contingency messages |
+| Overview | Problems the agent has raised, their recommendations, and the venue calendar |
+| Approvals | Flags and anything waiting for approval |
+| Who's here | Arrivals by venue, door scanning, the day's list |
+| Schedule | Edit times, venues and guests like the sheet; saving runs the agent and shows recent changes |
+| Ask | Questions answered from the festival's own documents, or "I don't know" |
+| Volunteer briefs | Each volunteer's live brief, rebuilt from the current schedule |
+| Live feeds | Weather, guest flights, print deliveries and vendor feeds |
+| Access codes | Every person's code; view the app as them |
 
-## Guardrails
+People's apps: **Attendee** (agenda, updates, pass, ask), **Guest** (appearances and updates), **Staff** (shift, live brief, door scan), **Vendor** (deliveries and changes).
 
-- **Retrieves, never creates.** Synopses, bios and policies come from loaded documents. The model can only rephrase drafted messages, and a rewrite is thrown away if it drops or changes any time, title or number ([`src/agent/phrase.ts`](src/agent/phrase.ts)).
-- **No new hardware.** QR codes live in the app; ticketing data is read only.
-- **Privacy.** The prototype uses only made-up people (`@example.test`). Attendees opt in to crowd tracking.
+## Setting up your own festival
 
-## Language model
+**Set up a festival** on the welcome screen takes three steps:
 
-The model step uses **Groq** (free API key at [console.groq.com](https://console.groq.com/keys)) or **Ollama**. If `GROQ_API_KEY` is set, Groq is used; otherwise Ollama. It is optional: without a key everything runs deterministically, which is what the tests use.
+1. **Festival and data.** Name, dates and city, then drop in your files or a Google Sheet link (schedule, venues, films, people, tickets, saved events, volunteer shifts, FAQ). Use **Use sample festival files** to see the expected format; the files are in `public/samples/`.
+2. **Check.** The whole festival as one small calendar, the counts, and anything that must be fixed.
+3. **Team.** Who approves, and how people are reached.
 
-| Variable | Default | |
-|---|---|---|
-| `GROQ_API_KEY` | none | Your Groq key. Set it in Vercel or a local `.env`; never commit it. |
-| `GROQ_MODEL` | `openai/gpt-oss-120b` | Any Groq chat model |
-| `OLLAMA_API_KEY` | none | Your Ollama Cloud key. Set it in Vercel or a local `.env`; never commit it. |
-| `RESEND_API_KEY` | none | Resend key for emailing access codes. Never commit it. |
-| `USHER_TEST_EMAIL` | none | Test mode: every access-code email goes to this one inbox (the team's own) instead of the address typed in. Codes are only emailed when both this and `RESEND_API_KEY` are set; otherwise the sign-in screen shows the code (demo mode). |
-| `RESEND_FROM` | `Usher <onboarding@resend.dev>` | Sender address. |
-| `OLLAMA_MODEL` | `gpt-oss:120b` | Any Ollama chat model |
-| `OLLAMA_HOST` | `https://ollama.com` | Use `http://localhost:11434` for a local Ollama |
+A Google Sheet must be shared as "anyone with the link can view". Usher re-reads it and runs the agent on what changed.
 
-The model is used for: phrasing outbound messages (fact-checked), and answering questions from retrieved document sections with citations (or "I don't know").
+## How the agent decides
 
-## The mock festival
+Every run: **trigger** (schedule edit, feed alert, scan, question) → **understand** (who is affected) → **decide** (move, swap, message, flag) → **act or ask** → **log**.
 
-*Harbor Lights Film Festival*, April 15–17, 2027 (made up): 40 films, 4 venues, 3 days, 10 pass types, 15 guests, 10 panels, 60 volunteers. Generated deterministically in [`src/data/seed.ts`](src/data/seed.ts); official documents in [`src/data/docs.ts`](src/data/docs.ts).
+- A fixed rule (`src/agent/approvals.ts`), not the model, decides what needs a person: messages to attendees, guests or partners, public listings and announcements always wait for approval; internal briefs and staff heads-ups go straight out.
+- Recommendations are computed from the schedule, travel times, passes and each person's plan. The language model only rephrases messages, and a rewrite is discarded if it changes any time, title or number.
+- The sample festival uses made-up people (`@example.test`).
 
-Pass types, modeled on the Tribeca badge: Day pass, Single-screening ticket, 3-day pass, VIP; badges Industry, Press, Panelist, Featured filmmaker, Volunteer staffer, Festival staff.
-
-## Evaluation
-
-The proposal's four tests on a scripted festival day, each with a pass mark:
-
-```
-npm run eval
-```
-
-| Test | Pass mark |
-|---|---|
-| 5 schedule changes: the right people get each update | All 5, none to the wrong person |
-| 3 planted guest clashes: each clash is flagged | 3 of 3 |
-| 20 QR scans across pass types: each allow or deny is correct | 20 of 20 |
-| 10 questions about the festival: from official documents, or "I don't know" | 10 of 10 |
-
-`npm run eval -- --llm` runs the question test through the model when `GROQ_API_KEY` or `OLLAMA_API_KEY` is set.
-
-## Festival data (Google Sheet)
-
-The festival lives in a [Google Sheet](https://docs.google.com/spreadsheets/d/18Pp1GAMQz__QzyvKYlddcR-agiG1p7rH5QJq8NV9lNM/edit) that staff edit (a snapshot is in [`data/`](data/): an .xlsx copy and one CSV per tab), one tab per table: Festival (name and dates), Schedule grid, Venues, Travel times, Films, People, Passes, Tickets, Saved events, Volunteer shifts and Official documents. A *Read me* tab explains the columns and allowed values.
-
-- The dashboard's **Data** tab loads the sheet. **Check sheet for changes** diffs the Schedule grid against what's loaded and runs the agent on the changes, so the right people get updates and recommendations.
-- The sheet must be shared as **anyone with the link can view**; the server exports each tab as CSV by its fixed tab ID (`src/data/sheet.ts`). Don't delete and recreate a tab, or its ID changes.
-- Every row is checked: unknown venue, person, event or film IDs, bad times or days are listed by tab and row, and nothing loads until they're fixed.
-- `FESTIVAL_SHEET_ID` (optional env var) sets the default sheet for the server; otherwise the link in the Data tab is used.
-- `npx tsx scripts/export-tables.ts out.json` exports the built-in mock festival in the sheet's format.
-
-## Management dashboard
-
-A Next.js app (the proposal's first demo). The agent runs in the browser and keeps demo state in localStorage, so no database is needed; model calls go through `/api/llm` so the key stays on the server.
-
-Tabs: **Overview** (crowd view, flags, recent changes) · **Schedule grid** (edit times, venues, guests, cancel; save runs the agent) · **Approvals** (each person's message and recommendation, with the reasons) · **Door scan** (green/red for any pass, door-rush simulator) · **Volunteer briefs** · **Ask** · **Feeds & voting** (flight and print delays, audience-award form) · **Log** (audit log and delivered messages) · **Evaluation** (runs the four tests).
-
-The festival clock in the header sets "now" for scans, briefs and the crowd view. *Reset demo* restores the original festival.
-
-```
-npm run dev       # http://localhost:3000
-```
-
-### Deploy on Vercel
-
-Import the repo in Vercel (framework: Next.js, no settings needed), then add `GROQ_API_KEY` (or `OLLAMA_API_KEY`) under Project → Settings → Environment Variables and redeploy. Without it the dashboard works with the model switched off. Open `/api/llm?test=1` to check the key: it makes one tiny model call and reports `"test":"ok"` or the error.
-
-## Develop
+## Run it
 
 ```
 npm install
-npm test          # unit tests + the four evaluation tests
-npm run eval      # readable evaluation report
+npm run dev        # http://localhost:3000
+npm test           # unit tests and the evaluation scenarios
+npm run eval       # readable evaluation report
 npm run typecheck
 ```
 
-## Layout
+Without any settings Usher runs in **local mode**: each browser keeps its own copy of the festival. Add shared storage to put one festival on the server for the whole team.
+
+## Settings (Vercel → Project → Environment Variables)
+
+| Variable | What it turns on |
+|---|---|
+| `KV_REST_API_URL`, `KV_REST_API_TOKEN` (or `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`) | Shared mode: one festival on the server, join links, sign-in codes, push alerts |
+| `GROQ_API_KEY` (`GROQ_MODEL`) or `OLLAMA_API_KEY` (`OLLAMA_HOST`, `OLLAMA_MODEL`) | The language model for phrasing and Ask. Optional; everything else works without it |
+| `RESEND_API_KEY`, `RESEND_FROM`, `USHER_TEST_EMAIL` | Emailing access codes and updates (test mode sends to `USHER_TEST_EMAIL`) |
+| `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM`, `USHER_TEST_PHONE` | Text messages |
+| `FLIGHT_API_KEY` or `AVIATIONSTACK_KEY` | Live flight status on Live feeds |
+| `FESTIVAL_SHEET_ID` | A default Google Sheet |
+
+Weather uses Open-Meteo and needs no key. Never commit keys.
+
+## Evaluation
+
+`npm run eval` runs the proposal's four tests on a scripted festival day:
+
+| Test | Pass mark |
+|---|---|
+| 5 schedule changes reach the right people | All 5, none to the wrong person |
+| 3 planted guest clashes are flagged | 3 of 3 |
+| 20 QR scans across pass types | 20 of 20 correct |
+| 10 questions about the festival | 10 of 10 from official documents, or "I don't know" |
+
+## Where things are
 
 ```
-src/core      types and time helpers
-src/data      mock festival + official documents
-src/rules     pass and badge access rules, QR codes
-src/agent     agent loop, propagation, recommendations, clashes, briefs, Q&A, crowd, vendors, voting, approvals, log
-src/llm       Groq and Ollama clients
-src/eval      the four evaluation scenarios
-data/         snapshot of the mock festival sheet (.xlsx and CSVs)
+app/            the site (/), onboarding, the app (/app) and API routes (/app/api)
+app/ui/         screens: Overview, recommendations, calendar, Who's here, people's apps
+src/agent/      the agent: propagation, recommendations, weather, clashes, briefs, approvals, log
+src/access/     profiles and access codes
+src/rules/      pass and badge rules, QR codes
+src/data/       the sample festival and Google Sheet reading
+src/onboard/    reading uploaded files and sheets
+src/server/     shared storage, sessions, email, SMS and push
+tests/          unit tests and evaluation scenarios
+public/samples/ sample festival files
 ```
-
-## Roadmap
-
-1. ✅ Data and rules
-2. ✅ Propagate and answer
-3. ✅ Conflicts and approvals
-4. ✅ Check-in and feedback (core logic)
-5. ✅ Management dashboard (Next.js): grid editor, approval queue, scan simulator, crowd view, log
-6. ✅ Google Sheets as the data source (read; the dashboard grid does not write back)
-7. Festival app: mobile web with QR, volunteer mode and guest mode
