@@ -7,6 +7,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import qrcode from 'qrcode-generator';
 import { readWho, writeWho, type AgentStore } from './useAgent';
+import { EventThumb, Faces } from './media';
 import { Icon } from './icons';
 import { Ask, BriefView } from './panels';
 import { MyArrival, ScanDesk } from './presence';
@@ -285,7 +286,7 @@ function StaffHome({ s, who }: { s: AgentStore; who: Who }) {
           {mine.length === 0 && <div className="empty-note">No shifts assigned.</div>}
           {mine.map(x => (
             <div className="item" key={x.id}>
-              <div className="ic"><Icon name="clock" size={16} /></div>
+              {(() => { const ev = f.events.filter(e => e.venueId === x.venueId && e.status === 'scheduled' && e.start < x.end && e.end > x.start).sort((p, q) => p.start.localeCompare(q.start))[0]; return ev ? <EventThumb e={ev} /> : <div className="ic"><Icon name="clock" size={16} /></div>; })()}
               <div><div className="t">{x.task} · {venue(x.venueId)}</div><div className="d">{dayLabel(f.dates[x.day])} · {fmt(x.start)}–{fmt(x.end)}</div></div>
             </div>
           ))}
@@ -342,10 +343,11 @@ function PersonHome({ s, who, go }: { s: AgentStore; who: Who; go: (t: string) =
         {plans.length > 0 && upcoming.length <= 1 && <div className="empty-note">Nothing else coming up.</div>}
         {upcoming.slice(1, 4).map(p => (
           <div className="item" key={p.e.id}>
-            <div className={`ic ${p.why === 'You’re appearing' ? 'bad' : ''}`}><Icon name={p.e.kind === 'panel' ? 'users' : p.e.kind === 'qa' ? 'chat' : 'film'} size={16} /></div>
+            <EventThumb e={p.e} />
             <div style={{ minWidth: 0, flex: 1 }}>
               <div className="t">{p.e.title}</div>
               <div className="d">{when(p.e.start)} · {where(p.e)}</div>
+              <Faces s={s} ids={p.e.guestIds.filter(id => id !== who.id)} />
             </div>
           </div>
         ))}
@@ -355,10 +357,11 @@ function PersonHome({ s, who, go }: { s: AgentStore; who: Who; go: (t: string) =
             <h3>{dayLabel(f.dates[d as DayNumber])}</h3>
             {plans.filter(p => p.e.day === d).map(p => (
               <div className={`item ${p.e.status === 'cancelled' ? 'is-off' : ''}`} key={p.e.id}>
-                <div className={`ic ${p.why === 'You’re appearing' ? 'bad' : ''}`}><Icon name={p.e.kind === 'panel' ? 'users' : p.e.kind === 'qa' ? 'chat' : 'film'} size={16} /></div>
+                <EventThumb e={p.e} />
                 <div style={{ minWidth: 0, flex: 1 }}>
                   <div className="t">{p.e.title}</div>
                   <div className="d">{fmt(p.e.start)}–{fmt(p.e.end)} · {where(p.e)}</div>
+                  <Faces s={s} ids={p.e.guestIds.filter(id => id !== who.id)} />
                 </div>
                 <span className={`chip plan-chip ${p.e.status === 'cancelled' ? 'bad' : p.why === 'You’re appearing' ? 'warn' : ''}`}>{p.e.status === 'cancelled' ? 'Cancelled' : p.why === 'You’re appearing' ? 'On stage' : p.why}</span>
               </div>
@@ -411,7 +414,7 @@ function VendorHome({ s, who }: { s: AgentStore; who: Who }) {
         {upcoming.length <= 1 && <div className="empty-note">Nothing else coming up.</div>}
         {upcoming.slice(1, 4).map(x => (
           <div className="item" key={x.id}>
-            <div className="ic"><Icon name="truck" size={16} /></div>
+            {(() => { const ev = x.eventId ? f.events.find(e => e.id === x.eventId) : undefined; return ev ? <EventThumb e={ev} /> : <div className="ic"><Icon name="truck" size={16} /></div>; })()}
             <div style={{ minWidth: 0, flex: 1 }}><div className="t">{dayLabel(f.dates[x.day])} {fmt(x.at)} · {venue(x.venueId)}</div><div className="d">{x.what}</div></div>
           </div>
         ))}
@@ -421,7 +424,7 @@ function VendorHome({ s, who }: { s: AgentStore; who: Who }) {
             <h3>{dayLabel(f.dates[d])}</h3>
             {v.deliveries.filter(x => x.day === d).map(x => (
               <div className={`item ${x.cancelled ? 'is-off' : ''}`} key={x.id}>
-                <div className="ic"><Icon name="truck" size={16} /></div>
+                {(() => { const ev = x.eventId ? f.events.find(e => e.id === x.eventId) : undefined; return ev ? <EventThumb e={ev} /> : <div className="ic"><Icon name="truck" size={16} /></div>; })()}
                 <div style={{ minWidth: 0, flex: 1 }}><div className="t">{fmt(x.at)} · {venue(x.venueId)}</div><div className="d">{x.what}</div></div>
                 {x.cancelled && <span className="chip bad">Not needed</span>}
               </div>

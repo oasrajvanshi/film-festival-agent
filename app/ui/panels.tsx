@@ -99,17 +99,9 @@ export function Overview({ s, user }: P) {
             </button>
           )}
         </div>
-        <DayCalendar s={s} day={calDay} events={calEvents} was={was} notes={notes} />
+        <DayCalendar s={s} day={calDay} events={calEvents} was={was} notes={notes} animate={!!preview} />
       </div>
 
-      {a.changeFeed.length > 0 && (
-        <div className="card">
-          <h2>Recent changes</h2>
-          {[...a.changeFeed].reverse().slice(0, 6).map((c, i) => (
-            <div className="item" key={i}><div className="ic info"><Icon name="calendar" size={16} /></div><div className="d">{c}</div></div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
@@ -328,6 +320,14 @@ export function Grid({ s, user }: P) {
         {dirty > 0 && <button onClick={() => setDraft({})}>Discard</button>}
       </div>
       {result && <div className="msg" style={{ borderColor: 'var(--ok)' }}>{result} See Approvals and Flags.</div>}
+      {s.agent.changeFeed.length > 0 && (
+        <details className="recent">
+          <summary>Recent changes ({s.agent.changeFeed.length})</summary>
+          {[...s.agent.changeFeed].reverse().slice(0, 8).map((c, i) => (
+            <div className="item" key={i}><div className="ic info"><Icon name="calendar" size={16} /></div><div className="d">{c}</div></div>
+          ))}
+        </details>
+      )}
       <div className="scroll">
         <table className="stackable">
           <thead><tr><th>Time</th><th>Event</th><th>Venue</th><th>Guests</th><th></th></tr></thead>

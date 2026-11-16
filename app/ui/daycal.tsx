@@ -3,49 +3,97 @@
 // venue, the day's events as blocks, a line for "now", and anything flagged
 // or just moved picked out in amber.
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { AgentStore } from './useAgent';
-import { clock as fmt, toMinutes } from '../../src/core/time';
+import { addMinutes, clock as fmt, toMinutes } from '../../src/core/time';
 import type { DayNumber, FestivalEvent } from '../../src/core/types';
 import '../daycal.css';
+import { EventThumb, Faces } from './media';
+
+/** Pixels per hour: dense enough to see most of a day at once. */
+const HOUR = 58;
 
 /**
  * `events` shows a different version of the schedule (a preview or the
- * original plan); `was` maps moved events to their earlier start, and those
- * blocks are picked out and slide to their new time.
+ * original plan); `was` maps moved events to their earlier start. With
+ * `animate`, moved cards slide between their old and new time every two
+ * seconds, over a dashed outline of where they were.
  */
-export function DayCalendar({ s, day, events: over, was, notes }: { s: AgentStore; day: DayNumber; events?: FestivalEvent[]; was?: Record<string, string>; notes?: Record<string, string> }) {
+export function DayCalendar({ s, day, events: over, was, notes, animate }: {
+  s: AgentStore; day: DayNumber; events?: FestivalEvent[]; was?: Record<string, string>; notes?: Record<string, string>; animate?: boolean;
+}) {
   const f = s.agent.f;
   const events = useMemo(() => (over ?? f.events).filter(e => e.day === day).sort((a, b) => a.start.localeCompare(b.start)), [f, over, day, s.version]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Preview loop: false shows the old times, true the new ones.
+  const [atNew, setAtNew] = useState(true);
+  const loopKey = animate ? Object.keys(was ?? {}).join() : '';
+  useEffect(() => {
+    if (!loopKey) { setAtNew(true); return; }
+    setAtNew(false);
+    const first = setTimeout(() => setAtNew(true), 400);
+    const every = setInterval(() => setAtNew(x => !x), 2000);
+    return () => { clearTimeout(first); clearInterval(every); };
+  }, [loopKey]);
+
+  // Bring the moved hours into view inside the calendar itself; the page stays still.
+  const box = useRef<HTMLDivElement>(null);
+  const firstMoved = loopKey && was ? Math.min(...Object.values(was).map(toMinutes)) : null;
+  useEffect(() => {
+    if (firstMoved === null || !box.current) return;
+    const all = events.map(e => toMinutes(e.start));
+    const start = Math.floor(Math.min(...all, firstMoved) / 60) * 60;
+    box.current.scrollTo({ top: Math.max(0, ((firstMoved - start) / 60) * HOUR - HOUR), behavior: 'smooth' });
+  }, [loopKey]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const venues = f.venues.filter(v => events.some(e => e.venueId === v.id));
   if (!events.length) return <div className="empty-note">Nothing scheduled this day.</div>;
-  const t0 = Math.floor(Math.min(...events.map(e => toMinutes(e.start))) / 60) * 60;
+  const oldOf = (e: FestivalEvent) => {
+    const w = was?.[e.id];
+    if (!w) return null;
+    const d = toMinutes(e.start) - toMinutes(w);
+    return { start: w, end: addMinutes(e.end, -d) };
+  };
+  const t0 = Math.floor(Math.min(...events.map(e => Math.min(toMinutes(e.start), toMinutes(oldOf(e)?.start ?? e.start)))) / 60) * 60;
   const t1 = Math.ceil(Math.max(...events.map(e => toMinutes(e.end))) / 60) * 60;
   const span = Math.max(60, t1 - t0);
   const pct = (iso: string) => ((toMinutes(iso) - t0) / span) * 100;
+  const place = (a: string, b: string) => ({ top: `${pct(a)}%`, height: `calc(${pct(b) - pct(a)}% - 3px)` });
   const hours = Array.from({ length: span / 60 + 1 }, (_, i) => t0 + i * 60);
   const flagged = new Set(s.agent.flags.flatMap(fl => events.filter(e => fl.id.includes(e.id)).map(e => e.id)));
   const now = toMinutes(s.clock);
   const onDay = s.clock.slice(0, 10) === f.dates[day];
   const guests = (ids: string[]) => ids.map(id => f.people.find(p => p.id === id)?.name).filter(Boolean).join(', ');
   return (
-    <div className="dcal" style={{ ['--cols' as string]: venues.length, ['--h' as string]: `${Math.max(360, (span / 60) * 64)}px` }}>
+    <div ref={box} className={`dcal${animate ? ' previewing' : ''}`} style={{ ['--cols' as string]: venues.length, ['--h' as string]: `${(span / 60) * HOUR}px` }}>
       <div className="dcal-head"><span />{venues.map(v => <span key={v.id} title={v.name}>{v.name}</span>)}</div>
       <div className="dcal-body">
         <div className="dcal-hours">{hours.map(m => <b key={m} style={{ top: `${((m - t0) / span) * 100}%` }}>{fmt(`2000-01-01T${String(Math.floor(m / 60) % 24).padStart(2, '0')}:00`).replace(':00', '')}</b>)}</div>
         {hours.map(m => <div key={m} className="dcal-line" style={{ top: `${((m - t0) / span) * 100}%` }} />)}
         {venues.map(v => (
           <div className="dcal-col" key={v.id}>
+            {animate && events.filter(e => e.venueId === v.id && oldOf(e)).map(e => {
+              const o = oldOf(e)!;
+              return <div key={`ghost-${e.id}`} className="dcal-ghost" style={place(o.start, o.end)} aria-hidden="true" />;
+            })}
             {events.filter(e => e.venueId === v.id).map(e => {
-              const short = toMinutes(e.end) - toMinutes(e.start) < 45;
+              const mins = toMinutes(e.end) - toMinutes(e.start);
+              const short = mins < 45;
               const live = onDay && now >= toMinutes(e.start) && now < toMinutes(e.end);
+              const o = oldOf(e);
+              const at = animate && o && !atNew ? o : e;
               return (
-                <div key={e.id} className={`dcal-ev k-${e.kind}${short ? ' short' : ''}${flagged.has(e.id) ? ' hot' : ''}${was?.[e.id] || notes?.[e.id] ? ' moved' : ''}${e.status === 'cancelled' ? ' off' : ''}${live ? ' live' : ''}`}
-                  style={{ top: `${pct(e.start)}%`, height: `calc(${pct(e.end) - pct(e.start)}% - 3px)` }}
+                <div key={e.id} className={`dcal-ev k-${e.kind}${short ? ' short' : ''}${flagged.has(e.id) ? ' hot' : ''}${o || notes?.[e.id] ? ' moved' : ''}${e.status === 'cancelled' ? ' off' : ''}${live ? ' live' : ''}`}
+                  style={place(at.start, at.end)}
                   title={`${e.title}, ${fmt(e.start)} to ${fmt(e.end)}${e.guestIds.length ? `, with ${guests(e.guestIds)}` : ''}`}>
-                  <b>{e.title}</b>
-                  <small>{was?.[e.id] && <s>{fmt(was[e.id])}</s>}{fmt(e.start)} to {fmt(e.end)}</small>
-                  {notes?.[e.id] ? <em className="dcal-note">{notes[e.id]}</em> : e.guestIds.length > 0 && <em>{guests(e.guestIds)}</em>}
+                  <div className="dcal-main">
+                    {!short && <EventThumb e={e} size={26} />}
+                    <div className="dcal-txt">
+                      <b>{e.title}</b>
+                      <small>{o && <s>{fmt(o.start)}</s>}{fmt(e.start)}{!short && mins >= 60 ? '' : ` to ${fmt(e.end)}`}</small>
+                    </div>
+                    {!short && e.guestIds.length > 0 && <Faces s={s} ids={e.guestIds} size={18} max={3} />}
+                  </div>
+                  {notes?.[e.id] && <em className="dcal-note">{notes[e.id]}</em>}
                   {flagged.has(e.id) && <span className="tag">Flag</span>}
                   {e.status === 'cancelled' && <span className="tag">Off</span>}
                 </div>

@@ -174,17 +174,15 @@ function weatherRec(s: AgentStore, kind: WxKind, day: DayNumber): Rec | null {
   const plan = planFor(s, kind, day);
   if (!plan) return null;
   const items = [
-    ...(plan.moved.length ? [{ key: 'shift', text: `Start the ${plural(plan.starting, 'event')} in the window ${plan.delay} min later, ${WHY[kind]}${plan.moved.length > plan.starting ? `, and push ${plural(plan.moved.length - plan.starting, 'later event')} at the same venues to match` : ''}` }] : []),
-    ...(plan.people ? [{ key: 'people', text: `Send ${plural(plan.people, 'person', 'people')} with plans then their new time and what to bring` }] : []),
-    { key: 'team', text: `Tell ${plural(plan.staff, 'staff member')}${plan.volunteers ? ` and brief ${plural(plan.volunteers, 'volunteer')} on shift` : ''}` },
+    ...(plan.moved.length ? [{ key: 'shift', text: `Start ${plural(plan.moved.length, 'event')} ${plan.delay} min later` }] : []),
+    ...(plan.people ? [{ key: 'people', text: `Send ${plural(plan.people, 'person', 'people')} their new time` }] : []),
+    { key: 'team', text: `Brief ${plural(plan.staff, 'staff member')}${plan.volunteers ? ` and ${plural(plan.volunteers, 'volunteer')}` : ''}` },
   ];
-  const guests = plan.guests.length > 2 ? `${plan.guests.slice(0, 2).join(', ')} and ${plan.guests.length - 2} more guests` : plan.guests.join(' and ');
   return {
     title: `${NAME[kind]} ${fmt(plan.risk.from)} to ${fmt(plan.risk.to)}`,
     sub: `Day ${day} · ${dayName(s, day)} · from the forecast`,
-    what: `${plan.starting ? `${plural(plan.starting, 'event')} start${plan.starting === 1 ? 's' : ''} in this window` : 'Nothing starts in this window'}`
-      + `${plan.people ? `, ${plural(plan.people, 'person', 'people')} will be on their way` : ''}`
-      + `${plan.guests.length ? `, and ${guests} ${plan.guests.length === 1 ? 'is' : 'are'} due on stage` : ''}.`,
+    what: `${plan.starting ? `${plural(plan.starting, 'event')} start${plan.starting === 1 ? 's' : ''} in the ${kind === 'heat' ? 'heat' : kind === 'snow' ? 'snow' : 'storm'}` : 'Nothing starts in this window'}`
+      + `${plan.people ? `, with ${plural(plan.people, 'person', 'people')} on the way` : ''}. Starting later ${WHY[kind].replace(/^so /, 'means ')}.`,
     items,
     preview: off => (plan.moved.length && !off.has('shift') ? { events: plan.after, moved: plan.moved } : null),
     apply: async (want, by) => {
@@ -204,7 +202,8 @@ function weatherRec(s: AgentStore, kind: WxKind, day: DayNumber): Rec | null {
 function guestRec(s: AgentStore, day: DayNumber): Rec | null {
   const f = s.agent.f;
   const person = (name: string) => f.people.find(p => p.name === name);
-  const pavel = person('Pavel Kettering') ?? f.people.find(p => p.role === 'guest');
+  const lateId = lateGuestId(s);
+  const pavel = f.people.find(p => p.id === lateId);
   if (!pavel) return null;
   const ev = f.events.find(e => e.day === day && e.status === 'scheduled' && e.guestIds.includes(pavel.id) && e.kind === 'panel')
     ?? f.events.find(e => e.day === day && e.status === 'scheduled' && e.guestIds.includes(pavel.id));
@@ -218,14 +217,14 @@ function guestRec(s: AgentStore, day: DayNumber): Rec | null {
   const staff = f.people.filter(p => p.role === 'festival_staff');
   const after = f.events.map(e => (e.id === ev.id && backup ? { ...e, guestIds: [backup.id, ...e.guestIds] } : { ...e }));
   const items = [
-    ...(backup ? [{ key: 'open', text: `Open at ${fmt(ev.start)} with ${backup.name}, who is already at ${venue}` }] : []),
-    { key: 'guest', text: `Tell ${pavel.name} to come straight to the stage when he arrives, about ${fmt(eta)}` },
-    { key: 'team', text: `Tell ${others.length ? `the ${plural(others.length, 'other panelist')} and ` : ''}${plural(staff.length, 'staff member')}` },
+    ...(backup ? [{ key: 'open', text: `Open with ${backup.name}, already at ${venue}` }] : []),
+    { key: 'guest', text: `Tell ${pavel.name.split(' ')[0]} to go straight to the stage` },
+    { key: 'team', text: `Tell ${others.length ? `${plural(others.length, 'panelist')} and ` : ''}${plural(staff.length, 'staff member')}` },
   ];
   return {
     title: `${pavel.name} is running late`,
     sub: `${ev.title} · Day ${day}, ${fmt(ev.start)} · ${venue}`,
-    what: `His flight landed late and his car is stuck on the harbor bridge. He now expects to reach ${venue} at ${fmt(eta)}, 20 minutes after "${ev.title}" starts. No one in the audience needs to be told.`,
+    what: `Stuck on the harbor bridge; he now reaches ${venue} at ${fmt(eta)}, 20 min after the start.`,
     items,
     preview: off => (backup && !off.has('open') ? { events: after, moved: [ev.id], notes: { [ev.id]: `${backup.name} opens · ${pavel.name.split(' ')[0]} joins ${fmt(eta)}` } } : null),
     apply: async (want, by) => {
@@ -282,13 +281,8 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
   const show = (id: string | null) => {
     setOpenId(id); setOff(new Set());
     const o = shown.find(x => x.al.id === id);
-    if (o) {
-      onOpen(o.al.day);
-      document.querySelector('.today-cal')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-    // Let the calendar settle on the right day first, then move the events.
-    onPreview(null);
-    if (o) setTimeout(() => onPreview(o.rec.preview(new Set())), 350);
+    if (o) onOpen(o.al.day);
+    onPreview(o ? o.rec.preview(new Set()) : null);
   };
   const toggle = (k: string) => {
     const next = new Set(off);
@@ -357,4 +351,15 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
       })()}
     </>
   );
+}
+
+/** Guests the agent has flagged as running late (still late after the plan is approved, until a reset). */
+export function lateGuestId(s: AgentStore): string | null {
+  const f = s.agent.f;
+  return (f.people.find(p => p.name === 'Pavel Kettering') ?? f.people.find(p => p.role === 'guest'))?.id ?? null;
+}
+export function useLateGuests(s: AgentStore): Set<string> {
+  const [alerts] = useAlerts();
+  const id = alerts.some(a => a.kind === 'guest') ? lateGuestId(s) : null;
+  return new Set(id ? [id] : []);
 }
