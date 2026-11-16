@@ -1171,3 +1171,15 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
   body .wh-top button.primary { min-height: 40px; font-size: 14px; }
   body .at-signout { min-height: 40px; }
 }
+
+/* ---------------------------------------------------------------- Fix it: a small bar (View changes · Approve), the checklist folded until asked for */
+.rec-float { padding: 8px; width: 232px; }
+.rec-float .wx-list { margin: 2px 4px 8px; }
+.rec-bar { display: flex; align-items: center; gap: 6px; }
+.rec-bar .rec-view { flex: 1; justify-content: flex-start; gap: 6px; color: var(--accent); min-height: 34px; padding: 4px 6px; font-size: 13px; white-space: nowrap; }
+.rec-bar .rec-approve { min-height: 34px; padding: 4px 12px; font-size: 13px; white-space: nowrap; opacity: .45; transition: opacity .35s; }
+.rec-bar .rec-approve.ready { opacity: 1; }
+@media (max-width: 760px) {
+  .rec-float { width: auto; padding: 6px 6px 6px 8px; border-radius: 12px; }
+  .rec-bar .rec-view, .rec-bar .rec-approve { min-height: 30px; font-size: 12.5px; }
+}

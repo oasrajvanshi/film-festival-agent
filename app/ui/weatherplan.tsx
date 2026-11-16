@@ -290,6 +290,8 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
   const [openId, setOpenId] = useState<string | null>(null);
   const [off, setOff] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
+  // The checklist stays folded behind "View changes" so opening a fix barely changes the page.
+  const [listOpen, setListOpen] = useState(false);
   // Approve shows once the calendar has finished moving, so the change is seen first.
   const [ready, setReady] = useState(false);
   useEffect(() => {
@@ -334,7 +336,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
   const open = openId === 'all' && allRec ? { al: ALL, rec: allRec } : shown.find(x => x.al.id === openId) ?? null;
 
   const show = (id: string | null) => {
-    setOpenId(id); setOff(new Set());
+    setOpenId(id); setOff(new Set()); setListOpen(false);
     const o = id === 'all' && allRec ? { al: ALL, rec: allRec } : shown.find(x => x.al.id === id);
     if (o) onOpen(o.al.day);
     onPreview(o ? o.rec.preview(new Set()) : null);
@@ -405,21 +407,22 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
       {open && (() => {
         const count = open.rec.items.filter(i => !off.has(i.key)).length;
         return (
-          <aside className="rec-float" aria-label="Agent's recommendation">
-            <div className="rec-float-head">
-              <span><Icon name="sparkle" size={14} /> Agent&apos;s recommendation</span>
-              <button className="ghost small" aria-label="Close" onClick={() => show(null)}><Icon name="x" size={16} /></button>
-            </div>
-            <ul className="wx-list">
-              {open.rec.items.map(i => (
-                <li key={i.key}><label>
-                  <input type="checkbox" checked={!off.has(i.key)} onChange={() => toggle(i.key)} />
-                  <span>{i.text}</span>
-                </label></li>
-              ))}
-            </ul>
-            <div className={`rec-float-foot${ready ? ' ready' : ''}`}>
-              <button className="primary big" disabled={!count || busy || !ready} onClick={approve}>{busy ? 'Working…' : `Approve ${count}`}</button>
+          <aside className={`rec-float${listOpen ? ' list-open' : ''}`} aria-label="Agent's recommendation">
+            {listOpen && (
+              <ul className="wx-list" id="rec-changes">
+                {open.rec.items.map(i => (
+                  <li key={i.key}><label>
+                    <input type="checkbox" checked={!off.has(i.key)} onChange={() => toggle(i.key)} />
+                    <span>{i.text}</span>
+                  </label></li>
+                ))}
+              </ul>
+            )}
+            <div className="rec-bar">
+              <button className="rec-view ghost small" aria-expanded={listOpen} aria-controls="rec-changes" onClick={() => setListOpen(!listOpen)}>
+                <Icon name="sparkle" size={14} /> {listOpen ? 'Hide changes' : 'View changes'}
+              </button>
+              <button className={`primary small rec-approve${ready ? ' ready' : ''}`} disabled={!count || busy || !ready} onClick={approve}>{busy ? 'Working…' : `Approve ${count}`}</button>
             </div>
           </aside>
         );

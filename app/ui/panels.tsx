@@ -90,10 +90,13 @@ export function Overview({ s, user, go }: P) {
   const problems = problemsBroughtOn() ? alerts.filter(x => x.status === 'open').length : 0;
   return (
     <div className="today">
-      <section className="hero has-photo">
-        <HeroPhoto k="organizer" />
-        <h2>{problems ? `${problems} problem${problems === 1 ? '' : 's'} need${problems === 1 ? 's' : ''} you` : s.festivalName}</h2>
-      </section>
+      {/* Once problems are up, the alerts take the banner's place. */}
+      {!problems && (
+        <section className="hero has-photo">
+          <HeroPhoto k="organizer" />
+          <h2>{s.festivalName}</h2>
+        </section>
+      )}
 
       {/* The demo's scripted problems belong to the sample festival only. */}
       {f.people.some(p => p.name === 'Pavel Kettering') && <ProblemTrigger />}

@@ -393,7 +393,6 @@ export default function Site() {
                   <tr><th>5</th><td>5:30 pm</td><td>Last Light</td><td>None</td></tr>
                 </tbody></table>
               </div>
-              <p className="s-pain">Guests get double-booked.</p>
             </figure>
             <figure className="s-prob-item s-tool t-gmail" data-tool>
               <figcaption><i className="ap gmail" />Gmail</figcaption>
@@ -403,7 +402,6 @@ export default function Site() {
                 <div className="row"><b>Lantern Print</b><span>Prints running 15 min late</span><em>1:05 pm</em></div>
                 <div className="row"><b>Box office</b><span>21 people asking about Wild Tide</span><em>12:50 pm</em></div>
               </div>
-              <p className="s-pain">Updates arrive late, or reach the wrong people.</p>
             </figure>
             <figure className="s-prob-item s-tool t-word" data-tool>
               <figcaption><i className="ap word" />Word</figcaption>
@@ -414,7 +412,6 @@ export default function Site() {
                   <p>Shuttle every 20 min from Canal Street.</p>
                 </div>
               </div>
-              <p className="s-pain">Volunteers work from an outdated brief.</p>
             </figure>
             <figure className="s-prob-item s-tool t-whatsapp" data-tool>
               <figcaption><i className="ap whatsapp" />WhatsApp</figcaption>
@@ -426,7 +423,6 @@ export default function Site() {
                   <p className="wa-me">Checking with the office</p>
                 </div>
               </div>
-              <p className="s-pain">Staff spend the day relaying information.</p>
             </figure>
           </div>
           <div className="s-swipe" aria-hidden="true"><span data-dots>{[0, 1, 2, 3].map(i => <i key={i} className={i === 0 ? 'on' : ''} />)}</span>Swipe to see all four</div>
