@@ -8,7 +8,7 @@ import './site.css';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useEffect, useRef, type MouseEvent } from 'react';
-import { Bell, Move } from './hl/icons';
+import { Bell } from './hl/icons';
 import { PHOTOS } from './ui/photos';
 import { PlanDemo } from './sitedemo';
 
@@ -143,12 +143,13 @@ export default function Site() {
       gsap.set(q('.s-hero-stage'), { autoAlpha: 0, y: 90 });
       gsap.set(q('[data-cal="hero"]'), { rotateX: phone ? 0 : 24, rotateZ: phone ? 0 : -6 });
       intro.fromTo(q('.s-hero .split-word'), { yPercent: 110 }, { yPercent: 0, duration: 1.05, stagger: 0.05, ease: 'power4.out' }, seen ? 0.1 : 1.75);
-      gsap.timeline({ scrollTrigger: { trigger: hero, start: 'top top', end: phone ? '+=55%' : '+=90%', scrub: 0.8, pin: true, anticipatePin: 1 } })
+      gsap.timeline({ scrollTrigger: { trigger: hero, start: 'top top', end: phone ? '+=65%' : '+=110%', scrub: 0.8, pin: true, anticipatePin: 1 } })
         .to(h1, { x: 0, y: 0, scale: 1, duration: 1, ease: 'power2.inOut' }, 0)
         .to(q('.s-scrollcue'), { autoAlpha: 0, duration: 0.3 }, 0)
-        .to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.15, ease: 'power2.out' }, 0.45)
-        .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.9, ease: 'power3.out' }, 0.55)
-        .fromTo(q('[data-hero-float]'), { y: -30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, stagger: 0.2 }, 1.0);
+        .to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.12, ease: 'power2.out' }, 0.5)
+        // the calendar after the words have settled, then the problems it is about
+        .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out' }, 0.95)
+        .fromTo(q('[data-hero-float]'), { y: 24, autoAlpha: 0, scale: 0.96 }, { y: 0, autoAlpha: 1, scale: 1, duration: 0.5, stagger: 0.25, ease: 'back.out(1.4)' }, 1.45);
 
       // hero: the calendar keeps showing what the product does, on a loop
       const heroCal = q('[data-cal="hero"]')[0];
@@ -244,19 +245,19 @@ export default function Site() {
           <h1 className="s-h1 s-h1-hero" data-split>{'Usher: the best film festival\nchange management agent.'}</h1>
           <p className="s-lead" data-hero-fade><q className="s-quote">Don&apos;t worry. I&apos;ll take care of everything.</q> That&apos;s what Usher says when a print arrives late, a guest misses their flight or snow slows the city down. It tracks your schedule and tells everyone affected by a change what to do next.</p>
           <div className="s-ctas" data-hero-fade>
-            <a className="btn primary" href="/onboarding">Try the live demo</a>
             <a className="btn" href="#story" onClick={go('#story')}>See how it works</a>
           </div>
         </div>
         <div className="s-hero-stage" data-lve-skip aria-hidden="true">
-          <div style={{ position: 'absolute', inset: '6% 2% 4% 2%', transformStyle: 'preserve-3d' }} data-cal-wrap>
+          <div className="s-hero-cal" data-cal-wrap>
             <Cal id="hero" />
           </div>
-          <div className="s-float" data-hero-float style={{ top: '2%', left: '6%' }}>
-            <span className="ic"><Move /></span><span><b>Late Country moves to 3:15 pm</b><small>Harbor Theater · 21 people affected</small></span><span className="pill">Recommendation</span>
+          {/* The problems as the product raises them: alerts with the agent's recommendation. */}
+          <div className="s-float s-float-alert" data-hero-float>
+            <span className="ic">!</span><span><b>Thunderstorms 3:00 to 6:00 pm</b><small>Day 1 · 9 events start in the storm</small></span><span className="pill">Agent&apos;s recommendation</span>
           </div>
-          <div className="s-float" data-hero-float style={{ bottom: '6%', right: '0%' }}>
-            <span className="ic"><Bell /></span><span><b>Wild Tide now 3:15 pm</b><small>Your seat is held. Leave 15 min early.</small></span>
+          <div className="s-float s-float-alert late" data-hero-float>
+            <span className="ic"><Bell /></span><span><b>Pavel Kettering is running late</b><small>Selling at Markets · 4:00 pm · Pier 9 Hall</small></span><span className="pill">Agent&apos;s recommendation</span>
           </div>
         </div>
         <div className="s-scrollcue" aria-hidden="true">Scroll<i /></div>
@@ -291,8 +292,7 @@ export default function Site() {
       <section className="s-pin s-problem" data-scene="problem">
         <div className="s-sticky">
           <div className="s-problem-copy">
-            <p className="s-mono">And every fix is scattered</p>
-            <h2 className="s-h2">The answers live in four different places.</h2>
+            <h2 className="s-h2">Decision-making tools and documents are scattered.</h2>
             <p className="s-lead">The schedule is in a spreadsheet, updates go out by email, volunteers read a Word brief and the team decides in a group chat. Each person ends up with a different version of the day.</p>
           </div>
           <div className="s-tools" data-tools data-lve-skip aria-hidden="true">

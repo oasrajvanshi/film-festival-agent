@@ -691,3 +691,23 @@
   .pd-faces.swapped i.in { width: 16px; }
   .pd-phone { position: relative; right: auto; bottom: auto; width: auto; }
 }
+
+/* Hero stage: the calendar in the middle band, the alerts above and below it, never on top of it. */
+.s-hero-cal { position: absolute; inset: 16% 2% 15% 2%; transform-style: preserve-3d; }
+.s-float-alert { left: auto; border-color: rgba(232, 104, 75, .5); background: rgba(40, 20, 16, .9); }
+.s-float-alert .ic { background: rgba(232, 104, 75, .2); color: #ef8a6f; font-weight: 800; }
+.s-float-alert b { font-family: var(--f-ui); font-weight: 600; font-size: 15px; }
+.s-float-alert .pill { font-size: 12px; padding: 6px 11px; }
+.s-float-alert:not(.late) { top: 0; right: 0; }
+.s-float-alert.late { bottom: 0; left: 4%; }
+.s-hero .s-ctas .btn { min-width: 0; }
+@media (max-width: 760px) {
+  .s-hero-cal { inset: 18% 0 16% 0; }
+  .s-float-alert { padding: 8px 10px; gap: 8px; max-width: 100%; }
+  .s-float-alert b { font-size: 13px; }
+  .s-float-alert small { font-size: 11px; }
+  .s-float-alert .pill { display: none; }
+  .s-float-alert.late { left: 0; }
+  .s-hero [data-hero-float]:nth-of-type(2) { display: flex; }
+}
+@media (max-width: 760px) { .s-hero-stage { height: 470px; } .s-hero-cal { inset: 22% 0 20% 0; } }
