@@ -7,6 +7,7 @@ import './hl.css';
 import './site.css';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollSmoother } from 'gsap/ScrollSmoother';
 import { useEffect, useRef, type MouseEvent } from 'react';
 import { Bell } from './hl/icons';
 import { PHOTOS } from './ui/photos';
@@ -100,11 +101,17 @@ export default function Site() {
 
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    gsap.registerPlugin(ScrollTrigger);
+    gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
     // Development only: lets a test browser run the timelines at real speed in a background tab.
     if (process.env.NODE_ENV !== 'production') (window as unknown as { __gsap?: typeof gsap }).__gsap = gsap;
     const stopSnow = snowfield(root.current!.querySelector<HTMLCanvasElement>('[data-snowfield]'), reduce);
 
+    // Computers: the wheel glides (one smoothing for the whole page, so every scene follows it evenly).
+    // Phones keep their own native scrolling.
+    const glide = !window.matchMedia('(prefers-reduced-motion: reduce)').matches && !matchMedia('(max-width: 760px)').matches && !matchMedia('(pointer: coarse)').matches
+      ? ScrollSmoother.create({ wrapper: '#smooth-wrapper', content: '#smooth-content', smooth: 0.9, effects: false, smoothTouch: false })
+      : null;
+    smootherRef = glide;
     const ctx = gsap.context(() => {
       const q = gsap.utils.selector(root);
       if (reduce) { finalStates(q); q('[data-leader]').forEach(e => e.remove()); root.current?.classList.add('ready'); return; }
@@ -154,7 +161,7 @@ export default function Site() {
         const r0 = h1.getBoundingClientRect();
         const toCentre = { x: innerWidth / 2 - (r0.left + r0.width / 2), y: innerHeight / 2 - (r0.top + r0.height / 2) };
         gsap.set(h1, { x: toCentre.x, y: toCentre.y, scale: 1.25, transformOrigin: '50% 50%', force3D: true });
-        gsap.timeline({ defaults: { ease: 'power2.out' }, scrollTrigger: { trigger: hero, start: 'top top', end: '+=95%', scrub: 0.6, pin: true, anticipatePin: 1 } })
+        gsap.timeline({ defaults: { ease: 'power2.out' }, scrollTrigger: { trigger: hero, start: 'top top', end: '+=80%', scrub: true, pin: true, anticipatePin: 1 } })
           .to(h1, { x: 0, y: 0, scale: 1, duration: 1, ease: 'power2.inOut' }, 0)
           .to(q('.s-scrollcue'), { autoAlpha: 0, duration: 0.2 }, 0)
           .to(q('[data-film="top"]'), { yPercent: -80, autoAlpha: 0, duration: 0.6, ease: 'power2.in' }, 0.1)
@@ -162,8 +169,8 @@ export default function Site() {
           .to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.08 }, 0.7)
           .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.5 }, 0.75)
           .to(q('[data-hero-float]'), { autoAlpha: 1, y: 0, duration: 0.4, stagger: 0.08 }, 0.9)
-          // everything is in place: hold before the page moves on
-          .to({}, { duration: 0.8 });
+          // everything is in place: a short rest before the page moves on
+          .to({}, { duration: 0.4 });
       } else {
         const settle = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' } })
           .to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.08 }, 0)
@@ -188,13 +195,13 @@ export default function Site() {
         .to({}, { duration: 1.5 })
         // back to the original plan in one frame, so only the change forward is ever shown
         .call(() => resetHero(heroCal));
-      if (!phone) gsap.to(q('[data-hero-bg]'), { yPercent: 12, ease: 'none', scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
+      if (!phone) gsap.to(q('[data-hero-bg]'), { yPercent: 12, ease: 'none', scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: true } });
       gsap.to(q('[data-cal-wrap]'), { y: phone ? -8 : -14, rotateX: phone ? 0 : 3, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 2.4 });
 
       // The problems: each one plays in full where you can see it. The headline rises, the cards
       // follow one after another, their pictures settle, and the trouble in each one lights up.
       q('.s-prob').forEach(sec => {
-        const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, scrollTrigger: { trigger: sec, start: 'top 62%', once: true } })
+        const tl = gsap.timeline({ defaults: { ease: 'power3.out' }, scrollTrigger: { trigger: sec, start: 'top 70%', once: true } })
           .fromTo(sec.querySelectorAll('.s-prob-copy > *'), { autoAlpha: 0, y: 28 }, { autoAlpha: 1, y: 0, duration: 0.8, stagger: 0.09 }, 0);
         if (!phone) tl.fromTo(sec.querySelectorAll('.s-prob-item'), { autoAlpha: 0, y: 56 }, { autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.14 }, 0.25)
           .fromTo(sec.querySelectorAll('.s-risk-img'), { scale: 1.12 }, { scale: 1, duration: 1.6, ease: 'power2.out' }, 0.25);
@@ -212,14 +219,14 @@ export default function Site() {
       const watchEl = q('[data-scene="trigger"]')[0];
       const watch = phone
         ? gsap.timeline({ defaults: { ease: 'power3.out' }, scrollTrigger: { trigger: watchEl, start: 'top 55%', once: true } })
-        : gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: watchEl, start: 'top top', end: '+=110%', scrub: 0.6, pin: true, anticipatePin: 1 } });
+        : gsap.timeline({ defaults: { ease: 'none' }, scrollTrigger: { trigger: watchEl, start: 'top top', end: '+=90%', scrub: true, pin: true, anticipatePin: 1 } });
       watch.fromTo(q('[data-trigger-copy] > *'), { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.08 }, 0)
         .fromTo(q('[data-feed-in]'), { autoAlpha: 0, x: -30 }, { autoAlpha: 1, x: 0, duration: 0.45, stagger: 0.1 }, 0.25)
         .to(q('[data-feed="in"]'), { strokeDashoffset: 0, duration: 0.5, stagger: 0.06 }, 0.55)
         .fromTo(q('[data-node]'), { scale: 0.6, autoAlpha: 0, transformOrigin: '50% 50%' }, { scale: 1, autoAlpha: 1, duration: 0.4 }, 0.95)
         .to(q('[data-feed="out"]'), { strokeDashoffset: 0, duration: 0.5, stagger: 0.06 }, 1.2)
         .fromTo(q('[data-feed-out]'), { autoAlpha: 0, x: 30 }, { autoAlpha: 1, x: 0, duration: 0.45, stagger: 0.1 }, 1.45);
-      if (!phone) watch.to({}, { duration: 1 });
+      if (!phone) watch.to({}, { duration: 0.45 });
 
       // --- 3. the recommendation: the calendar turns to face you and redraws itself
       q('[data-reveal]').forEach(el => gsap.fromTo(el, { y: 40, autoAlpha: 0, filter: 'blur(8px)' }, { y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1, ease: 'power4.out', scrollTrigger: { trigger: el, start: 'top 85%', once: true } }));
@@ -227,7 +234,7 @@ export default function Site() {
         split([el]);
         gsap.fromTo(el.querySelectorAll('.split-word'), { yPercent: 110 }, { yPercent: 0, duration: 1, stagger: 0.05, ease: 'power4.out', scrollTrigger: { trigger: el, start: 'top 85%', once: true } });
       });
-      gsap.fromTo(q('[data-footer-bg]'), { yPercent: -10, scale: 1.1 }, { yPercent: 0, scale: 1, ease: 'none', scrollTrigger: { trigger: q('.s-footer')[0], start: 'top bottom', end: 'bottom bottom', scrub: 1 } });
+      gsap.fromTo(q('[data-footer-bg]'), { yPercent: -10, scale: 1.1 }, { yPercent: 0, scale: 1, ease: 'none', scrollTrigger: { trigger: q('.s-footer')[0], start: 'top bottom', end: 'bottom bottom', scrub: true } });
     }, root);
 
     const refresh = () => ScrollTrigger.refresh();
@@ -237,6 +244,7 @@ export default function Site() {
       window.removeEventListener('load', refresh);
       stopSnow();
       ctx.revert();
+      glide?.kill(); smootherRef = null;
     };
   }, []);
 
@@ -244,7 +252,7 @@ export default function Site() {
     const el = document.querySelector(hash);
     if (!el) return;
     e.preventDefault();
-    el.scrollIntoView({ behavior: 'smooth' });
+    if (smootherRef) smootherRef.scrollTo(el, true, 'top top'); else el.scrollIntoView({ behavior: 'smooth' });
   };
 
   // Join links shared before the site had a home page (/?f=...) still open the festival.
@@ -266,6 +274,7 @@ export default function Site() {
         <a className="navlink" href="/app">Sign in</a>
         <a className="btn small primary" href="/onboarding">Try the live demo</a>
       </nav>
+      <div id="smooth-wrapper"><div id="smooth-content">
 
       {/* hero */}
       <header className="s-hero">
@@ -445,11 +454,14 @@ export default function Site() {
           <a className="btn primary" href="/onboarding">Try the live demo</a>
         </div>
       </footer>
+      </div></div>
     </div>
   );
 }
 
 // ---------------------------------------------------------------- helpers
+
+let smootherRef: ScrollSmoother | null = null;
 
 function split(els: Element[]) {
   for (const el of els) {

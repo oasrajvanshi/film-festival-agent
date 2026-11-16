@@ -126,8 +126,12 @@ export function raiseAlert(kind: AlertKind, day: DayNumber) {
   const id = `${kind}-d${day}`;
   writeAlerts([...readAlerts().filter(a => a.id !== id), { id, kind, day, status: 'open' }]);
 }
-export function resetAlerts() { writeAlerts([]); }
-export function bringProblems() { writeAlerts(DEMO_ALERTS.map(a => ({ ...a }))); }
+// Every time the organizer opens the app the day starts calm: problems show only after
+// "Bring on the problems" is pressed (in this page load).
+let broughtOn = false;
+export const problemsBroughtOn = () => broughtOn;
+export function resetAlerts() { broughtOn = false; writeAlerts([]); }
+export function bringProblems() { broughtOn = true; writeAlerts(DEMO_ALERTS.map(a => ({ ...a }))); }
 
 /**
  * Demo control: a small button that shows only when the pointer reaches the
@@ -343,7 +347,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
     setOff(next);
     if (open) onPreview(open.rec.preview(next));
   };
-  if (!shown.length) return null;
+  if (!shown.length || !problemsBroughtOn()) return null;
 
   const approve = async () => {
     if (!open) return;

@@ -2,7 +2,7 @@
 
 import { DayCalendar } from './daycal';
 import { boardChanged } from './localkeys';
-import { ProblemTrigger, WeatherAlerts, useAlerts, type Preview } from './weatherplan';
+import { ProblemTrigger, WeatherAlerts, problemsBroughtOn, resetAlerts, useAlerts, type Preview } from './weatherplan';
 import { useEffect, useMemo, useState } from 'react';
 import { DEFAULT_SHEET, readSetup, type AgentStore } from './useAgent';
 import { riskSummary, type WeatherHour } from '../../src/agent/weather';
@@ -82,7 +82,12 @@ export function Overview({ s, user, go }: P) {
   }
   const calEvents = preview ? preview.events : showOriginal && hasOriginal ? original! : undefined;
   const [alerts] = useAlerts();
-  const problems = alerts.filter(x => x.status === 'open').length;
+  // Opening the app starts calm: problems left over from before (on this device or the server)
+  // are cleared until the organizer brings them on with the bottom-left button.
+  useEffect(() => {
+    if (!problemsBroughtOn() && alerts.length) resetAlerts();
+  }, [alerts]);
+  const problems = problemsBroughtOn() ? alerts.filter(x => x.status === 'open').length : 0;
   return (
     <div className="today">
       <section className="hero has-photo">
@@ -90,20 +95,6 @@ export function Overview({ s, user, go }: P) {
         <h2>{problems ? `${problems} problem${problems === 1 ? '' : 's'} need${problems === 1 ? 's' : ''} you` : s.festivalName}</h2>
       </section>
 
-      {/* Anything waiting for a person, in one line; Approvals has the detail. */}
-      {(() => {
-        const waiting = s.agent.queue.filter(q => q.status === 'pending').length;
-        const flagged = s.agent.flags.length;
-        // A calm day shows only the festival and its calendar.
-        if (!problems || (!waiting && !flagged)) return null;
-        return (
-          <button className="needs-row" onClick={() => go('approvals')}>
-            <Icon name="inbox" size={16} />
-            <span>{[waiting ? `${waiting} waiting for approval` : '', flagged ? `${flagged} flag${flagged === 1 ? '' : 's'}` : ''].filter(Boolean).join(' · ')}</span>
-            <b>Review</b>
-          </button>
-        );
-      })()}
       {/* The demo's scripted problems belong to the sample festival only. */}
       {f.people.some(p => p.name === 'Pavel Kettering') && <ProblemTrigger />}
       <WeatherAlerts s={s} user={user}
