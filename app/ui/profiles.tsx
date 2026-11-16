@@ -49,7 +49,7 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
     }
     const w = signIn(f, kind, code);
     if (!w) { setErr(`That code doesn't open the ${pick!.label} profile. Check it and try again.`); return; }
-    writeWho(w); onIn(w);
+    s.signInAs(w); onIn(w);
   };
   const sendCode = async () => {
     if (!kind) return;
@@ -126,9 +126,9 @@ export function SignIn({ s, onIn }: { s: AgentStore; onIn: (w: Who) => void }) {
               {note && <div className={`issues ${note.tone === 'ok' ? 'ok' : ''}`} role="status">{note.text}</div>}
               <p className="muted" style={{ marginTop: 0 }}>Enter your access code. It starts with {pick!.prefix}.</p>
               <input autoFocus className="code-input" placeholder={`${pick!.prefix}-XXXXXX`} value={code} maxLength={11}
-                onChange={e => { setCode(e.target.value.toUpperCase()); setErr(''); }} onKeyDown={e => e.key === 'Enter' && go()} />
+                onChange={e => { setCode(e.target.value.toUpperCase()); setErr(''); }} onKeyDown={e => e.key === 'Enter' && code.trim() && go()} />
               {err && <div className="issues bad" role="alert">{err}</div>}
-              <button className="primary big" style={{ marginTop: 14 }} disabled={code.replace(/[^A-Z0-9]/gi, '').length < 7 || busy} onClick={go}>
+              <button className="primary big" style={{ marginTop: 14 }} disabled={!code.trim() || busy} onClick={go}>
                 <Icon name="key" size={16} /> Open my profile
               </button>
               <button className="ghost small" style={{ marginTop: 10 }} onClick={() => { setMode('email'); setErr(''); setNote(null); }}>Email me a code instead</button>

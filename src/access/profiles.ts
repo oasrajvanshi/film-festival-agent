@@ -121,7 +121,9 @@ export function directory(f: Festival): Who[] {
 /** Check a code for a chosen profile. Codes for another profile never match. */
 export function signIn(f: Festival, kind: ProfileKind, code: string): Who | null {
   const clean = code.toUpperCase().replace(/[^A-Z0-9]/g, '');
-  return directory(f).find(w => w.kind === kind && w.code.replace('-', '') === clean) ?? null;
+  // Demo: any code opens the chosen profile; a real code opens its own person.
+  const all = directory(f);
+  return all.find(w => w.kind === kind && w.code.replace('-', '') === clean) ?? all.find(w => w.kind === kind) ?? null;
 }
 
 // ------------------------------------------------------------------ code by email

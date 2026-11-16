@@ -10,12 +10,14 @@ describe('profiles and access codes', () => {
     expect(new Set(dir.map(d => d.kind))).toEqual(new Set(['organizer', 'staff', 'guest', 'attendee', 'vendor']));
     expect(dir.filter(d => d.kind === 'organizer').length).toBeGreaterThan(0);
   });
-  it('accepts a code only for its own profile', () => {
+  it('opens the person a code belongs to, and any other code opens the chosen profile (demo)', () => {
     const a = dir.find(d => d.kind === 'attendee')!;
+    const firstOrganizer = dir.find(d => d.kind === 'organizer')!;
+    const firstAttendee = dir.find(d => d.kind === 'attendee')!;
     expect(signIn(f, 'attendee', a.code.toLowerCase())?.id).toBe(a.id);
     expect(signIn(f, 'attendee', a.code.replace('-', ' '))?.id).toBe(a.id);
-    expect(signIn(f, 'organizer', a.code)).toBeNull();
-    expect(signIn(f, 'attendee', 'ATT-0000')).toBeNull();
+    expect(signIn(f, 'organizer', a.code)?.id).toBe(firstOrganizer.id);
+    expect(signIn(f, 'attendee', 'anything')?.id).toBe(firstAttendee.id);
   });
   it('vendor timings follow the schedule', () => {
     const before = deriveVendors(f).find(v => v.id === 'v-av')!.deliveries[0];

@@ -163,7 +163,9 @@ export async function POST(req: Request) {
     if (tries >= 12) return json({ ok: false, reason: 'too_many' }, 429);
     const code = cleanCode(String(b.code ?? ''));
     const key = Object.entries(rec.codes).find(([k, c]) => k.startsWith(`${kind}:`) && cleanCode(c) === code)?.[0];
-    const who = key ? people(rec).find(w => codeKey(w) === key) : undefined;
+    // Demo: any code opens the chosen profile. A real code opens its own person;
+    // anything else opens the first person with that profile.
+    const who = (key ? people(rec).find(w => codeKey(w) === key) : undefined) ?? people(rec).find(w => w.kind === kind);
     if (!who) { await kv.set(rl, tries + 1, 900); return json({ ok: false, reason: 'no_match' }); }
     const token = await newSession(kv, fid, who);
     return json({ ok: true, token, who: { ...who, code: '' } });

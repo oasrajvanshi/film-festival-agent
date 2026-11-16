@@ -376,7 +376,7 @@ export function useAgent() {
 
   return {
     agent: agentRef.current!, version, commit, clock, setClock, reset, llmInfo, useModel, setUseModel, sheet, loadSheet, goLive, openSample,
-    mode, shared: mode === 'shared', pub, who, fid: fidRef.current, notice, requestCode, verifyCode, signOut, scan, arrive, call, pull,
+    mode, shared: mode === 'shared', pub, who, fid: fidRef.current, notice, requestCode, verifyCode, signOut, signInAs: setWho, scan, arrive, call, pull,
     festivalName: pub?.name ?? agentRef.current!.f.name,
   };
 }

@@ -559,3 +559,26 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
   .ph-shade { background: linear-gradient(0deg, rgba(18, 11, 9, .94) 0%, rgba(18, 11, 9, .78) 55%, rgba(18, 11, 9, .45) 100%); }
   .ph-band { height: 104px; }
 }
+
+/* Welcome: one calm screen, a small ticket character holding an usher's torch. */
+.ob-hi { min-height: 100svh; display: grid; place-items: center; padding: 32px 16px calc(32px + env(safe-area-inset-bottom)); }
+.ob-hi-card { width: min(100%, 360px); display: flex; flex-direction: column; align-items: center; text-align: center; animation: pop .35s ease; }
+.ob-pal { width: 150px; height: auto; margin-bottom: 8px; overflow: visible; }
+.ob-pal-body { animation: ob-bob 3.2s ease-in-out infinite; transform-origin: 70px 66px; }
+.ob-pal-body > path:first-child { fill: var(--accent); }
+.ob-pal-perf { stroke: rgba(0, 0, 0, .28); stroke-width: 2; stroke-dasharray: 3 4; fill: none; }
+.ob-pal-eye { fill: #1b1210; animation: ob-blink 4.6s infinite; transform-box: fill-box; transform-origin: center; }
+.ob-pal-smile { stroke: #1b1210; stroke-width: 2.6; stroke-linecap: round; fill: none; }
+.ob-pal-cheek { fill: #e0785a; opacity: .55; }
+.ob-pal-torch { fill: #1b1210; }
+.ob-pal-beam { animation: ob-beam 3.2s ease-in-out infinite; transform-origin: 114px 65px; }
+.ob-pal-shadow { fill: #000; opacity: .3; animation: ob-shadow 3.2s ease-in-out infinite; transform-origin: 70px 126px; }
+.ob-hi-name { font-size: clamp(44px, 12vw, 64px); line-height: 1; letter-spacing: .04em; font-weight: 700; }
+.ob-hi-line { margin: 10px 0 30px; font-size: 16px; color: var(--ink-2); }
+.ob-hi-go { width: 100%; justify-content: center; }
+.ob-hi-try { margin-top: 14px; font-size: 14px; }
+@keyframes ob-bob { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-7px) rotate(2deg); } }
+@keyframes ob-shadow { 0%, 100% { transform: scaleX(1); opacity: .3; } 50% { transform: scaleX(.82); opacity: .2; } }
+@keyframes ob-beam { 0%, 100% { transform: rotate(-4deg); opacity: .8; } 50% { transform: rotate(5deg); opacity: 1; } }
+@keyframes ob-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+@media (prefers-reduced-motion: reduce) { .ob-pal-body, .ob-pal-beam, .ob-pal-shadow, .ob-pal-eye { animation: none; } }

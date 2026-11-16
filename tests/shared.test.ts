@@ -44,7 +44,10 @@ describe('shared festival on the server', () => {
     // An attendee asks for a code by name and email (no email configured: shown on screen), then signs in.
     const req = await post({ action: 'signin-request', f: fid, kind: 'attendee', name: att.name, email: att.email });
     expect(req.body).toMatchObject({ ok: true, sent: false, code: att.code });
-    expect((await post({ action: 'signin-verify', f: fid, kind: 'guest', code: att.code })).body.ok).toBe(false);
+    // Demo: a code from another profile still opens the chosen profile, as its first person.
+    const other = await post({ action: 'signin-verify', f: fid, kind: 'guest', code: att.code });
+    expect(other.body.ok).toBe(true);
+    expect(other.body.who.kind).toBe('guest');
     const ok = await post({ action: 'signin-verify', f: fid, kind: 'attendee', code: att.code.toLowerCase() });
     expect(ok.body.ok).toBe(true);
     const mine = await get({ action: 'state', f: fid }, ok.body.token);

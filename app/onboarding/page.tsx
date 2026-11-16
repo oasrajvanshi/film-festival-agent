@@ -8,7 +8,6 @@ import '../mobile.css';
 import { FestivalAgent } from '../../src/agent/agent';
 import { GATE_POLICY, type ActionKind } from '../../src/agent/approvals';
 import type { Festival } from '../../src/core/types';
-import { HeroPhoto } from '../ui/photos';
 import { parseCsv, tablesToFestival } from '../../src/data/sheet';
 import { buildTables, guessKind, KIND_ORDER, KINDS, matchColumns, scheduleDateRange, summarizeNotes, type Kind, type Upload } from '../../src/onboard/mapping';
 import { clock } from '../../src/core/time';
@@ -193,31 +192,32 @@ export default function Onboarding() {
 
   if (!started) {
     return (
-      <div className="ob ob-welcome">
-        <div className="ob-poster">
-          <div className="ob-mast display">Usher</div>
-          <div className="ob-tag">Usher your festival with ease.</div>
-          <div className="ob-poster-grid">
-            <aside className="ob-meta">
-              <div><span>For film</span> <span>festivals</span></div>
-              <hr />
-              <div><span>Schedules</span> <span>People</span> <span>Passes</span> <span>Disruptions</span></div>
-              <hr />
-              <div><span>Your team</span> <span>approves first</span></div>
-            </aside>
-            <div className="ob-photo">
-              <HeroPhoto k="onboard" />
-              <h1 className="display">Bring your festival.<br />We’ll keep everyone in step.</h1>
-            </div>
-          </div>
-          <p>Connect your schedule, people and passes. The agent watches for changes and disruptions, works out who is affected, and drafts each person a recommendation. Your team approves anything that goes out.</p>
-          <div className="row">
-            <button className="primary big" onClick={() => setStarted(true)}>Set up a festival <Icon name="send" size={16} /></button>
-            <a className="ob-link" href="/app" onClick={async e => { e.preventDefault(); await s.openSample(); location.href = '/app'; }}>Or explore a sample festival</a>
-          </div>
-          <ol className="ob-steps-preview">
-            {STEPS.map((t, i) => <li key={t}><span>{String(i + 1).padStart(2, '0')}</span>{t}</li>)}
-          </ol>
+      <div className="ob ob-hi">
+        <div className="ob-hi-card">
+          <svg className="ob-pal" viewBox="0 0 160 150" aria-hidden="true">
+            <defs>
+              <linearGradient id="ob-beam" x1="0" x2="1" y1="0" y2="0">
+                <stop offset="0" stopColor="#f6ddb0" stopOpacity=".75" />
+                <stop offset="1" stopColor="#f6ddb0" stopOpacity="0" />
+              </linearGradient>
+            </defs>
+            <path className="ob-pal-beam" d="M114 63 L160 40 Q166 65 160 90 L114 67 Z" fill="url(#ob-beam)" />
+            <g className="ob-pal-body">
+              <path d="M30 40h80a6 6 0 0 1 6 6v10a10 10 0 0 0 0 20v10a6 6 0 0 1-6 6H30a6 6 0 0 1-6-6V76a10 10 0 0 0 0-20V46a6 6 0 0 1 6-6z" />
+              <path className="ob-pal-perf" d="M88 44v48" />
+              <circle className="ob-pal-eye" cx="50" cy="62" r="3.6" />
+              <circle className="ob-pal-eye" cx="68" cy="62" r="3.6" />
+              <path className="ob-pal-smile" d="M52 73q7 6 14 0" />
+              <circle className="ob-pal-cheek" cx="44" cy="71" r="3.4" />
+              <circle className="ob-pal-cheek" cx="74" cy="71" r="3.4" />
+              <rect className="ob-pal-torch" x="104" y="60" width="12" height="10" rx="2.5" />
+            </g>
+            <ellipse className="ob-pal-shadow" cx="70" cy="126" rx="34" ry="5" />
+          </svg>
+          <div className="ob-hi-name display">Usher</div>
+          <p className="ob-hi-line">Usher your festival with ease.</p>
+          <button className="primary big ob-hi-go" onClick={() => setStarted(true)}>Set up a festival</button>
+          <a className="ob-link ob-hi-try" href="/app" onClick={async e => { e.preventDefault(); await s.openSample(); location.href = '/app'; }}>Or try a sample festival</a>
         </div>
       </div>
     );
