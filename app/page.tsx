@@ -275,15 +275,19 @@ export default function Site() {
         <div className="s-risk-cards">
           <article className="s-risk-card" data-reveal>
             <div className="s-risk-img" style={{ backgroundImage: 'url(/hl/snow.jpg)' }}><span>Weather</span></div>
+            <div className="s-risk-txt">
             <h3>Snow from 2:00 pm</h3>
-            <p>The shuttle runs 12 minutes late. Three 3:00 screenings start with half the audience still outside, and 60 volunteers need new instructions.</p>
+            <p>The shuttle runs late, screenings start with people still outside, and volunteers need new instructions.</p>
             <div className="s-impact"><span>3 screenings</span><span>21 attendees</span><span>60 volunteers</span></div>
+            </div>
           </article>
           <article className="s-risk-card" data-reveal>
-            <div className="s-risk-img" style={{ backgroundImage: 'url(/hl/hall.jpg)' }}><span>A late guest</span></div>
-            <h3>Pavel Kettering is stuck on the bridge</h3>
-            <p>His 4:00 panel has no speaker and a full room. His 6:30 talk is at risk too, and the other panelists don&apos;t know yet.</p>
+            <div className="s-risk-img" style={{ backgroundImage: 'url(/hl/hall.jpg)' }}><span>Late guest</span></div>
+            <div className="s-risk-txt">
+            <h3>A guest is stuck on the bridge</h3>
+            <p>His 4:00 panel has no speaker, his 6:30 talk is at risk, and the other panelists don&apos;t know yet.</p>
             <div className="s-impact"><span>2 panels</span><span>4 guests</span><span>120 seats</span></div>
+            </div>
           </article>
         </div>
       </section>
