@@ -43,6 +43,8 @@ const initials = (n: string) => n.split(' ').map(w => w[0]).join('');
 const tone = (n: string) => TONES[[...n].reduce((h, c) => h + c.charCodeAt(0), 0) % TONES.length];
 
 /** `rich`: the app's own calendar look, with each event's picture and its guests' avatars. */
+const FILM_FRAMES = ['f-02', 'f-13', 'f-19', 'f-24', 'f-30', 'f-07', 'f-36', 'f-08', 'f-11', 'f-27'];
+
 function Cal({ id, rich }: { id: string; rich?: boolean }) {
   const hours = [13, 14, 15, 16, 17, 18];
   return (
@@ -141,10 +143,16 @@ export default function Site() {
       gsap.set(q('[data-cal="hero"]'), { rotateX: phone ? 0 : 24, rotateZ: phone ? 0 : -6 });
       intro.fromTo(q('.s-hero .split-word'), { yPercent: 110 }, { yPercent: 0, duration: 1.05, stagger: 0.05, ease: 'power4.out' }, seen ? 0.1 : 1.75);
       if (phone) {
-        const once = (els: Element[], delay = 0) => els.forEach((el, i) => gsap.fromTo(el, { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.7, delay: delay + i * 0.08, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 90%', once: true } }));
-        once(q('[data-hero-fade]'));
-        once(q('.s-hero-stage'));
-        once(q('[data-hero-float]'), 0.25);
+        // Tied to the scroll position (never pinned): the film strips part and fade as the quote rises,
+        // then each part floats up into place. Scrolling back plays it in reverse.
+        const quote = q('[data-hero-fade]')[0];
+        gsap.to(q('[data-film="top"]'), { yPercent: -60, autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: quote, start: 'top 100%', end: 'top 62%', scrub: 0.6 } });
+        gsap.to(q('[data-film="bottom"]'), { yPercent: 60, autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: quote, start: 'top 100%', end: 'top 62%', scrub: 0.6 } });
+        gsap.to(h1, { scale: 0.94, y: -24, ease: 'none', transformOrigin: '0% 50%', scrollTrigger: { trigger: hero, start: 'top top', end: '+=55%', scrub: 0.6 } });
+        const rise = (el: Element) => gsap.fromTo(el, { autoAlpha: 0, y: 46 }, { autoAlpha: 1, y: 0, ease: 'none', scrollTrigger: { trigger: el, start: 'top 96%', end: 'top 70%', scrub: 0.6 } });
+        q('[data-hero-fade]').forEach(rise);
+        rise(q('.s-hero-cal')[0]);
+        q('[data-hero-float]').forEach(rise);
       } else {
         const r0 = h1.getBoundingClientRect();
         const toCentre = { x: innerWidth / 2 - (r0.left + r0.width / 2), y: innerHeight / 2 - (r0.top + r0.height / 2) };
@@ -154,6 +162,8 @@ export default function Site() {
         gsap.timeline({ scrollTrigger: { trigger: hero, start: 'top top', end: '+=110%', scrub: 0.8, pin: true, anticipatePin: 1 } })
           .to(h1, { x: 0, y: 0, scale: 1, duration: 1, ease: 'power2.inOut' }, 0)
           .to(q('.s-scrollcue'), { autoAlpha: 0, duration: 0.3 }, 0)
+          .to(q('[data-film="top"]'), { yPercent: -80, autoAlpha: 0, duration: 0.5, ease: 'power2.in' }, 0.3)
+          .to(q('[data-film="bottom"]'), { yPercent: 80, autoAlpha: 0, duration: 0.5, ease: 'power2.in' }, 0.3)
           .to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.12, ease: 'power2.out' }, 0.5)
           // the calendar after the words have settled, then the problems it is about
           .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out' }, 0.95)
@@ -252,6 +262,14 @@ export default function Site() {
       {/* hero */}
       <header className="s-hero">
         <div className="s-hero-bg" data-hero-bg style={{ backgroundImage: `url(${PHOTOS.hero.src})` }} />
+        {/* Two film strips frame the headline on the first screen; they leave as the quote arrives. */}
+        {['top', 'bottom'].map(side => (
+          <div key={side} className={`s-film s-film-${side}`} data-film={side} aria-hidden="true" data-lve-skip>
+            <div className="s-film-track">
+              {[...FILM_FRAMES, ...FILM_FRAMES].map((id, i) => <span key={i} className="s-film-frame" style={{ backgroundImage: `url(/hl/ev/${id}.jpg)` }} />)}
+            </div>
+          </div>
+        ))}
         <div className="s-hero-copy">
           <h1 className="s-h1 s-h1-hero" data-split>{'Usher: the best film festival\nchange management agent.'}</h1>
           <p className="s-lead" data-hero-fade><q className="s-quote">Don&apos;t worry. I&apos;ll take care of everything.</q> That&apos;s what Usher says when a print arrives late, a guest misses their flight or snow slows the city down. It tracks your schedule and tells everyone affected by a change what to do next.</p>
