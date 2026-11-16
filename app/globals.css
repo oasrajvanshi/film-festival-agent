@@ -931,3 +931,44 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
 .at-venue-list > div { display: flex; gap: 10px; align-items: center; }
 .at-venue-list span { display: grid; } .at-venue-list b { font-size: 13.5px; } .at-venue-list em { font-style: normal; font-size: 12px; color: var(--muted); }
 .at-venue-list .ev-thumb { border-radius: 8px; }
+
+/* Overview: anything waiting for a person, as one line. */
+.needs-row { display: flex; align-items: center; gap: 10px; min-height: 0; padding: 11px 14px; border-radius: 14px; border: 1px solid var(--line-2); background: rgba(246, 236, 220, .04); color: var(--ink); text-align: left; font-size: 14px; }
+.needs-row span { flex: 1; }
+.needs-row b { font-size: 13px; color: var(--accent); }
+
+.wh-progress { display: none; }
+/* ---------------------------------------------------------------- Who's here on phones: scan first, venues in a row */
+@media (max-width: 760px) {
+  .wh { gap: 14px; }
+  .wh-top { display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: center; }
+  .wh-top .cal-days { grid-column: 1 / -1; justify-self: start; }
+  .wh-top > span[style] { display: none; }
+  .wh-sum { grid-column: 1 / -1; display: grid; gap: 8px; padding: 14px; border-radius: 16px; background: rgba(246, 236, 220, .04); border: 1px solid var(--line); font-size: 13.5px; }
+  .wh-sum b { font-family: var(--display); font-size: 30px; font-weight: 800; line-height: 1; }
+  .wh-progress { display: block; height: 6px; border-radius: 6px; background: rgba(246, 236, 220, .08); overflow: hidden; }
+  .wh-progress i { display: block; height: 100%; border-radius: 6px; background: var(--accent); }
+  .wh-top button.primary { grid-column: 1 / 2; min-height: 48px; font-size: 15px; justify-content: center; }
+  .wh-top button.ghost { grid-column: 2 / 3; font-size: 13px; }
+  .wh .card { padding: 12px; }
+  .vb-row { display: flex; overflow-x: auto; gap: 8px; scrollbar-width: none; margin: 0 -4px; padding: 0 4px; }
+  .vb-row::-webkit-scrollbar { display: none; }
+  .vb { flex: 0 0 128px; padding: 8px 6px 10px; border: 1px solid var(--line); background: rgba(246, 236, 220, .03); }
+  .vb-building { transform: scale(.62); transform-origin: 50% 100%; margin: -26px 0 -4px; }
+  .vb-name { font-size: 12.5px; }
+  .vb-num { font-size: 12px; }
+  .vb-now { font-size: 11px; }
+  .wh-filters { display: grid; gap: 8px; }
+  .wh-filters > span { display: none; }
+  .wh-find { order: -1; max-width: none; width: 100%; }
+  .wh-chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 -4px; padding: 0 4px 2px; }
+  .wh-chips::-webkit-scrollbar { display: none; }
+  .wh-chip { flex: none; }
+  .wh-row { padding: 9px 0; gap: 10px; }
+  .wh-av { width: 30px; height: 30px; font-size: 11px; }
+  .wh-who b { font-size: 14px; }
+  .wh-row .chip { font-size: 11px; padding: 3px 8px; }
+}
+
+.wh-chips { display: contents; }
+@media (max-width: 760px) { .wh-chips { display: flex; } }

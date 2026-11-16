@@ -20,7 +20,74 @@ const HOUR = 58;
  * `animate`, moved cards slide between their old and new time every 1.5
  * seconds, over a dashed outline of where they were.
  */
-export function DayCalendar({ s, day, events: over, was, notes, animate }: {
+type CalProps = { s: AgentStore; day: DayNumber; events?: FestivalEvent[]; was?: Record<string, string>; notes?: Record<string, string>; animate?: boolean };
+
+/** Phones get a schedule list (like a phone calendar's schedule view); wider screens get the venue grid. */
+export function DayCalendar(props: CalProps) {
+  const [phone, setPhone] = useState(false);
+  useEffect(() => {
+    const mq = matchMedia('(max-width: 760px)');
+    const on = () => setPhone(mq.matches);
+    on(); mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, []);
+  return phone ? <PhoneSchedule {...props} /> : <GridCalendar {...props} />;
+}
+
+const VENUE_TONES = ['#d49a5c', '#8fa0c4', '#93b27e', '#c97b9a', '#b9a36b', '#7fb0b5'];
+const hourOf = (iso: string) => Number(iso.slice(11, 13));
+const hourLabel = (h: number) => `${h % 12 || 12} ${h < 12 ? 'am' : 'pm'}`;
+
+function PhoneSchedule({ s, day, events: over, was, notes, animate }: CalProps) {
+  const f = s.agent.f;
+  const [venue, setVenue] = useState<string | null>(null);
+  const tone = (id: string) => VENUE_TONES[Math.max(0, f.venues.findIndex(v => v.id === id)) % VENUE_TONES.length];
+  const all = (over ?? f.events).filter(e => e.day === day).sort((a, b) => a.start.localeCompare(b.start));
+  const venues = f.venues.filter(v => all.some(e => e.venueId === v.id));
+  const list = all.filter(e => !venue || e.venueId === venue);
+  const onDay = s.clock.slice(0, 10) === f.dates[day];
+  const now = s.clock.slice(0, 16);
+  const nowAt = onDay ? list.findIndex(e => e.start.slice(0, 16) >= now) : -1;
+  const hours = [...new Set(list.map(e => hourOf(e.start)))];
+  const venueName = (id: string) => f.venues.find(v => v.id === id)?.name ?? id;
+  return (
+    <div className={`msch${animate ? ' previewing' : ''}`}>
+      <div className="msch-venues" role="tablist" aria-label="Venue">
+        <button className={!venue ? 'on' : ''} onClick={() => setVenue(null)}>All venues</button>
+        {venues.map(v => <button key={v.id} className={venue === v.id ? 'on' : ''} onClick={() => setVenue(venue === v.id ? null : v.id)}><i style={{ background: tone(v.id) }} />{v.name}</button>)}
+      </div>
+      {!list.length && <div className="empty-note">Nothing scheduled.</div>}
+      {hours.map(h => (
+        <section key={h} className="msch-hour">
+          <h4>{hourLabel(h)}</h4>
+          {list.map((e, i) => {
+            if (hourOf(e.start) !== h) return null;
+            const old = was?.[e.id];
+            const note = notes?.[e.id];
+            return (
+              <div key={e.id}>
+                {i === nowAt && <div className="msch-now"><i>{fmt(s.clock)}</i></div>}
+                <div className={`msch-ev${old || note ? ' moved' : ''}${e.status === 'cancelled' ? ' off' : ''}`} style={{ ['--vc' as string]: tone(e.venueId) }}>
+                  <div className="msch-time">{old && <s>{fmt(old)}</s>}<b>{fmt(e.start)}</b><small>{fmt(e.end)}</small></div>
+                  <EventThumb e={e} size={40} />
+                  <div className="msch-txt">
+                    <b>{e.title}</b>
+                    <span>{venueName(e.venueId)}{e.room ? `, ${e.room}` : ''}</span>
+                    {note && <em>{note}</em>}
+                  </div>
+                  {e.guestIds.length > 0 && <Faces s={s} ids={e.guestIds} size={20} max={3} />}
+                </div>
+              </div>
+            );
+          })}
+        </section>
+      ))}
+      {onDay && nowAt === -1 && list.length > 0 && <div className="msch-now"><i>{fmt(s.clock)}</i></div>}
+    </div>
+  );
+}
+
+function GridCalendar({ s, day, events: over, was, notes, animate }: {
   s: AgentStore; day: DayNumber; events?: FestivalEvent[]; was?: Record<string, string>; notes?: Record<string, string>; animate?: boolean;
 }) {
   const f = s.agent.f;

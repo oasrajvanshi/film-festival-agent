@@ -32,7 +32,7 @@ function useLookups(s: AgentStore) {
 }
 
 // ------------------------------------------------------------------ Overview
-export function Overview({ s, user }: P) {
+export function Overview({ s, user, go }: P) {
   const a = s.agent;
   const f = a.f;
   const day = dayOf(s.clock, f.dates);
@@ -80,6 +80,19 @@ export function Overview({ s, user }: P) {
         <h2>{problems ? `${problems} problem${problems === 1 ? '' : 's'} need${problems === 1 ? 's' : ''} you` : s.festivalName}</h2>
       </section>
 
+      {/* Anything waiting for a person, in one line; Approvals has the detail. */}
+      {(() => {
+        const waiting = s.agent.queue.filter(q => q.status === 'pending').length;
+        const flagged = s.agent.flags.length;
+        if (!waiting && !flagged) return null;
+        return (
+          <button className="needs-row" onClick={() => go('approvals')}>
+            <Icon name="inbox" size={16} />
+            <span>{[waiting ? `${waiting} waiting for approval` : '', flagged ? `${flagged} flag${flagged === 1 ? '' : 's'}` : ''].filter(Boolean).join(' · ')}</span>
+            <b>Review</b>
+          </button>
+        );
+      })()}
       {/* The demo's scripted problems belong to the sample festival only. */}
       {f.people.some(p => p.name === 'Pavel Kettering') && <ProblemTrigger />}
       <WeatherAlerts s={s} user={user}

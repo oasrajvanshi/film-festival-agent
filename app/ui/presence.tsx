@@ -172,7 +172,9 @@ export function WhosHere({ s, eventScan }: { s: AgentStore; eventScan?: ReactNod
         <div className="cal-days" role="tablist" aria-label="Day">
           {days.map(d => <button key={d} role="tab" aria-selected={d === day} className={d === day ? 'on' : ''} onClick={() => setDay(d)}>Day {d}</button>)}
         </div>
-        <span className="wh-sum"><b>{here}</b> of {rows.filter(r => !r.walkIn).length} here{lateCount ? <em> · {lateCount} guest{lateCount === 1 ? '' : 's'} running late</em> : null}</span>
+        <span className="wh-sum"><b>{here}</b> of {rows.filter(r => !r.walkIn).length} here{lateCount ? <em> · {lateCount} guest{lateCount === 1 ? '' : 's'} running late</em> : null}
+          <i className="wh-progress"><i style={{ width: `${Math.min(100, (here / Math.max(1, rows.filter(r => !r.walkIn).length)) * 100)}%` }} /></i>
+        </span>
         <span style={{ flex: 1 }} />
         <button className="small primary" onClick={() => setScan(x => !x)}><Icon name="scan" size={16} /> {scan ? 'Hide scanner' : 'Scan people in'}</button>
         <button className="small ghost" onClick={download}>Download list</button>
@@ -185,9 +187,11 @@ export function WhosHere({ s, eventScan }: { s: AgentStore; eventScan?: ReactNod
 
       <div className="card">
         <div className="wh-filters">
-          {chip('all', venue ? `At ${venueName(venue)}` : 'Everyone')}
-          {(['guest', 'staff', 'vendor', 'attendee'] as PresenceKind[]).map(k => { const c = by(k); return chip(k, KIND_LABEL[k], `${c.here}/${c.all}`); })}
-          {chip('missing', 'Not here yet')}
+          <div className="wh-chips">
+            {chip('all', venue ? `At ${venueName(venue)}` : 'Everyone')}
+            {(['guest', 'staff', 'vendor', 'attendee'] as PresenceKind[]).map(k => { const c = by(k); return chip(k, KIND_LABEL[k], `${c.here}/${c.all}`); })}
+            {chip('missing', 'Not here yet')}
+          </div>
           <span style={{ flex: 1 }} />
           {venue && <button className="small ghost" onClick={() => setVenue(null)}><Icon name="x" size={14} /> All venues</button>}
           <input value={q} onChange={e => setQ(e.target.value)} placeholder="Find a name" className="wh-find" />
