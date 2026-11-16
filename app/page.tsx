@@ -238,8 +238,8 @@ export default function Site() {
       <header className="s-hero">
         <div className="s-hero-bg" data-hero-bg style={{ backgroundImage: `url(${PHOTOS.hero.src})` }} />
         <div className="s-hero-copy">
-          <h1 className="s-h1" data-split>Usher helps you manage every unexpected change at your festival.</h1>
-          <p className="s-lead" data-hero-fade>It tracks your schedule and tells everyone affected by a change what to do next. Your staff approve anything sent publicly.</p>
+          <h1 className="s-h1" data-split>Usher: your festival&apos;s change manager agent.</h1>
+          <p className="s-lead" data-hero-fade><q className="s-quote">Don&apos;t worry. I&apos;ll take care of everything.</q> That&apos;s what Usher says when a print arrives late, a guest misses their flight or snow slows the city down. It tracks your schedule and tells everyone affected by a change what to do next.</p>
           <div className="s-ctas" data-hero-fade>
             <a className="btn primary" href="/onboarding">Try the live demo</a>
             <a className="btn" href="#story" onClick={go('#story')}>See how it works</a>

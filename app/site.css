@@ -531,3 +531,6 @@
   .s-chg { display: flex; align-items: center; gap: 10px; }
   .s-chg > span:not(.s-chg-swap) { flex: 1; }
 }
+
+/* The hero's quote: Usher speaking. */
+.s-quote { display: block; quotes: "\201C" "\201D"; font-family: var(--f-title, inherit); font-style: italic; font-size: 1.12em; color: var(--cream); margin-bottom: 6px; }
