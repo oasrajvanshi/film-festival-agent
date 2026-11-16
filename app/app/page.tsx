@@ -14,20 +14,21 @@ import { festivalDays } from '../../src/core/types';
 
 const PAGES = [
   { id: 'today', label: 'Today', icon: 'home', group: 'Festival day' },
-  { id: 'approvals', label: 'Approvals', icon: 'inbox', group: 'Festival day' },
-  { id: 'here', label: "Who's here", icon: 'users', group: 'Festival day' },
-  { id: 'scan', label: 'Door scan', icon: 'scan', group: 'Festival day' },
+  { id: 'here', label: "Who's here", icon: 'scan', group: 'Festival day' },
   { id: 'schedule', label: 'Schedule', icon: 'calendar', group: 'Festival day' },
   { id: 'ask', label: 'Ask', icon: 'chat', group: 'Festival day' },
-  { id: 'briefs', label: 'Volunteer briefs', icon: 'users', group: 'Teams' },
-  { id: 'feeds', label: 'Alerts & feeds', icon: 'bolt', group: 'Teams' },
-  { id: 'log', label: 'Activity log', icon: 'list', group: 'Behind the scenes' },
-  { id: 'data', label: 'Data', icon: 'sheet', group: 'Behind the scenes' },
-  { id: 'codes', label: 'Access codes', icon: 'key', group: 'Behind the scenes' },
-  { id: 'feedback', label: 'Feedback', icon: 'chat', group: 'Behind the scenes' },
+  { id: 'briefs', label: 'Volunteer briefs', icon: 'users', group: 'Team' },
+  { id: 'feeds', label: 'Live feeds', icon: 'bolt', group: 'Team' },
+  { id: 'codes', label: 'Access codes', icon: 'key', group: 'Team' },
+  // Reached from Today or Settings, not the menu.
+  { id: 'approvals', label: 'Past approvals', icon: 'inbox', group: '' },
+  { id: 'scan', label: 'Door scan', icon: 'scan', group: '' },
+  { id: 'log', label: 'Activity log', icon: 'list', group: '' },
+  { id: 'data', label: 'Data', icon: 'sheet', group: '' },
+  { id: 'feedback', label: 'Feedback', icon: 'chat', group: '' },
 ] as const;
 type PageId = typeof PAGES[number]['id'];
-const BOTTOM: PageId[] = ['today', 'approvals', 'scan', 'schedule'];
+const BOTTOM: PageId[] = ['today', 'here', 'schedule'];
 
 export default function App() {
   const demo = useDemo();
@@ -65,7 +66,7 @@ function AppInner({ demo }: { demo: Demo | null }) {
     const notes: [string, string, string][] = [];
     if (pending > prev.pending) {
       const q = s.agent.queue.filter(x => x.status === 'pending').at(-1);
-      notes.push([`${pending - prev.pending} new update${pending - prev.pending > 1 ? 's' : ''} to approve`, q?.action.title ?? '', '/app#approvals']);
+      notes.push([`${pending - prev.pending} new update${pending - prev.pending > 1 ? 's' : ''} to approve`, q?.action.title ?? '', '/app#today']);
     }
     if (flags > prev.flags) notes.push(['Needs attention', s.agent.flags.at(-1)?.title ?? '', '/app#today']);
     for (const [title, body, url] of notes) {
@@ -109,9 +110,9 @@ function AppInner({ demo }: { demo: Demo | null }) {
     return () => window.removeEventListener('hashchange', fromHash);
   }, []);
 
-  const countFor = (id: PageId) => (id === 'approvals' ? pending : id === 'today' ? flags : 0);
+  const countFor = (id: PageId) => (id === 'today' ? pending + flags : 0);
   const props = { s, user, go: setPage };
-  const groups = [...new Set(PAGES.map(p => p.group))];
+  const groups = [...new Set(PAGES.map(p => p.group))].filter(Boolean);
 
   const settings = (
     <>
@@ -131,14 +132,17 @@ function AppInner({ demo }: { demo: Demo | null }) {
           : alerts === 'unsupported' ? <span className="muted">Not available here. On iPhone, add the app to your Home Screen first.</span>
           : <button className="small primary" onClick={enableAlerts}><Icon name="bolt" size={14} /> Turn on alerts</button>}
       </div>
+      <div className="field">More
+        <div className="row">
+          {(['log', 'approvals', 'data', 'feedback'] as PageId[]).map(id => <button key={id} className="small" onClick={() => setPage(id)}>{PAGES.find(p => p.id === id)!.label}</button>)}
+        </div>
+      </div>
       <button className="block" onClick={signOut}><Icon name="logout" size={16} /> Sign out</button>
       <button className="block" style={{ marginTop: 8 }} onClick={() => { if (armed) { s.reset(); setArmed(false); setSheet(null); } else { setArmed(true); setTimeout(() => setArmed(false), 4000); } }}>
         {armed ? 'Tap again to reset everything' : 'Reset demo'}
       </button>
       <button className="block" style={{ marginTop: 8 }} onClick={() => { writeSetup(null); writeWho(null); try { localStorage.removeItem('ffa-fid-v1'); } catch { /* ignore */ } location.href = '/onboarding'; }}>Set up a new festival</button>
-      <p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>{s.shared
-        ? 'Saved on the server, so every signed-in device sees the same festival. Test mode: emails and texts go only to the team’s own inbox and phone.'
-        : 'Saved in this browser only. Test mode: nothing is sent to the people in the data.'}</p>
+      <p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>Test mode: messages go only to the team’s own inbox.</p>
     </>
   );
 
@@ -197,7 +201,7 @@ function AppInner({ demo }: { demo: Demo | null }) {
           {page === 'today' && <Overview {...props} />}
           {page === 'schedule' && <Grid {...props} />}
           {page === 'approvals' && <Approvals {...props} />}
-          {page === 'here' && <WhosHere s={s} />}
+          {page === 'here' && <WhosHere s={s} eventScan={<Scan {...props} />} />}
           {page === 'scan' && <Scan {...props} />}
           {page === 'briefs' && <Briefs {...props} />}
           {page === 'ask' && <Ask {...props} />}
@@ -214,7 +218,7 @@ function AppInner({ demo }: { demo: Demo | null }) {
           const p = PAGES.find(x => x.id === id)!;
           return (
             <button key={id} className={page === id ? 'on' : ''} onClick={() => setPage(id)}>
-              <Icon name={p.icon} size={22} />{p.id === 'scan' ? 'Scan' : p.label}
+              <Icon name={p.icon} size={22} />{p.id === 'here' ? 'Check-in' : p.label}
               {countFor(id) > 0 && <span className="badge">{countFor(id)}</span>}
             </button>
           );
@@ -231,7 +235,7 @@ function AppInner({ demo }: { demo: Demo | null }) {
           </div>
           {sheet === 'more' && (
             <div className="more-grid">
-              {PAGES.filter(p => !BOTTOM.includes(p.id)).map(p => (
+              {PAGES.filter(p => p.group && !BOTTOM.includes(p.id)).map(p => (
                 <button key={p.id} onClick={() => setPage(p.id)}><Icon name={p.icon} size={22} />{p.label}</button>
               ))}
             </div>

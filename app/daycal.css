@@ -1,0 +1,28 @@
+/* Today's calendar map (organizer Today), after Sienna's prototype calendar. */
+.dcal { border: 1px solid var(--line-2); border-radius: 16px; overflow: auto; background: linear-gradient(160deg, rgba(40, 27, 21, .6), rgba(20, 13, 10, .7)); max-height: 70vh; }
+.dcal-head, .dcal-body { display: grid; grid-template-columns: 48px repeat(var(--cols), minmax(120px, 1fr)); min-width: calc(48px + var(--cols) * 120px); }
+.dcal-head { position: sticky; top: 0; z-index: 3; background: #1a120e; border-bottom: 1px solid var(--line); }
+.dcal-head span { padding: 10px 8px; font-family: var(--display); font-weight: 700; font-size: 12px; letter-spacing: .02em; text-transform: uppercase; color: var(--ink); border-left: 1px solid var(--line); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dcal-head span:first-child { border-left: 0; }
+.dcal-body { position: relative; height: var(--h); }
+.dcal-hours { position: relative; }
+.dcal-hours b { position: absolute; right: 6px; transform: translateY(-50%); font-family: var(--mono); font-weight: 400; font-size: 10px; color: var(--muted); white-space: nowrap; }
+.dcal-hours b:first-child { transform: none; }
+.dcal-line { position: absolute; left: 48px; right: 0; border-top: 1px solid rgba(236, 226, 208, .06); }
+.dcal-col { position: relative; border-left: 1px solid var(--line); }
+.dcal-ev { position: absolute; left: 4px; right: 4px; border-radius: 8px; padding: 5px 7px; border: 1px solid var(--line-2); background: rgba(236, 226, 208, .07); overflow: hidden; z-index: 1; }
+.dcal-ev b { display: block; font-weight: 600; font-size: 12.5px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+.dcal-ev small { display: block; font-family: var(--mono); font-size: 10.5px; color: var(--muted); margin-top: 2px; white-space: nowrap; }
+.dcal-ev em { display: block; font-style: normal; font-size: 10.5px; color: var(--ink); opacity: .8; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dcal-ev.k-panel, .dcal-ev.k-qa { background: rgba(201, 152, 99, .1); }
+.dcal-ev.k-market, .dcal-ev.k-activity { background: rgba(157, 176, 242, .08); }
+.dcal-ev.short { padding: 2px 7px; }
+.dcal-ev.short small, .dcal-ev.short em { display: none; }
+.dcal-ev.live { border-color: var(--accent-2); }
+.dcal-ev.hot { border-color: var(--gold); background: rgba(227, 162, 26, .16); }
+.dcal-ev.off { opacity: .45; }
+.dcal-ev.off b { text-decoration: line-through; }
+.dcal-ev .tag { position: absolute; right: 5px; top: 4px; font-family: var(--mono); font-size: 9.5px; background: var(--gold); color: var(--accent-ink); border-radius: 5px; padding: 1px 5px; }
+.dcal-now { position: absolute; left: 48px; right: 0; border-top: 1.5px solid var(--bad); z-index: 2; pointer-events: none; }
+.dcal-now i { position: absolute; left: -46px; top: -9px; font-style: normal; font-family: var(--mono); font-size: 10px; background: var(--bad); color: #fff; padding: 1px 4px; border-radius: 5px; }
+.seg-nowrap button { white-space: nowrap; }

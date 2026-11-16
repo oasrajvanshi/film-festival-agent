@@ -216,7 +216,7 @@ export default function Site() {
         <div className="s-hero-copy">
           <p className="s-kicker" data-hero-fade>Usher your festival with ease</p>
           <h1 className="s-h1" data-split>Every schedule change, to everyone it affects.</h1>
-          <p className="s-lead" data-hero-fade>Festival schedules change all day. A screening moves, a guest runs late, a delivery slips. Usher tracks the schedule, works out who each change affects, and gives every attendee, guest, staff member and vendor their own next step. It flags clashes and checks passes, and your team approves anything that goes out.</p>
+          <p className="s-lead" data-hero-fade>A screening moves, a guest runs late, a delivery slips. Usher finds who it affects and gives each of them their next step. You approve what goes out.</p>
           <div className="s-ctas" data-hero-fade>
             <a className="btn primary" href="/onboarding">Try the live demo</a>
             <a className="btn" href="#story" onClick={go('#story')}>See how it works</a>
@@ -242,7 +242,7 @@ export default function Site() {
           <div className="s-problem-copy">
             <p className="s-mono">Before</p>
             <h2 className="s-h2">One change takes hours of copying by hand.</h2>
-            <p>The schedule lives in a spreadsheet, the briefs in Word, the updates in email and group chats. Every change is copied between them by hand.</p>
+            <p>Spreadsheets, Word briefs, emails and group chats, all updated by hand.</p>
             <p data-p2>So updates arrive late, reach the wrong people, or never arrive.</p>
           </div>
           <div className="s-chaos" data-chaos data-lve-skip aria-hidden="true">
@@ -301,7 +301,7 @@ export default function Site() {
           <div className="s-trigger-copy" data-trigger-copy>
             <span className="s-clock">Thursday · 1:10 pm</span>
             <h2 className="s-h2">The agent sees the snow coming.</h2>
-            <p className="s-lead" style={{ textAlign: 'center' }}>It reads the weather, flight and shuttle feeds, then checks every screening, guest and shift against them.</p>
+            <p className="s-lead" style={{ textAlign: 'center' }}>Weather, flights and shuttles, checked against every screening, guest and shift.</p>
           </div>
           <div className="s-feeds" data-feeds>
             <svg viewBox="0 0 1100 420" role="img" aria-label="Weather, flights and the shuttle feed reach the agent, which finds three screenings, twenty-one people, one guest and three door teams affected">
@@ -335,8 +335,8 @@ export default function Site() {
       <section className="s-pin s-rec" data-scene="rec">
         <div className="s-sticky">
           <div className="s-rec-copy">
-            <div data-rec-step="1"><h2 className="s-h2">Usher updates the plan.</h2><p className="s-lead">A late print delivery pushes three 3:00 pm screenings to 3:15. Usher finds everyone holding a seat, the door teams and the vendors, and drafts each one a note.</p></div>
-            <div data-rec-step="2" style={{ position: 'absolute', top: 0, opacity: 0 }}><h2 className="s-h2">And covers a late guest.</h2><p className="s-lead">Pavel Kettering is running late for his 4:00 panel. Yara Hollis opens it, and he joins when he arrives.</p></div>
+            <div data-rec-step="1"><h2 className="s-h2">Usher updates the plan.</h2><p className="s-lead">A late print pushes three 3:00 pm screenings to 3:15. Usher drafts a note for everyone affected.</p></div>
+            <div data-rec-step="2" style={{ position: 'absolute', top: 0, opacity: 0 }}><h2 className="s-h2">And covers a late guest.</h2><p className="s-lead">Pavel Kettering is late for his 4:00 panel. Yara Hollis opens it until he arrives.</p></div>
           </div>
           <div className="s-rec-stage" data-lve-skip aria-hidden="true">
             <div style={{ position: 'absolute', inset: 0, transformStyle: 'preserve-3d' }}><Cal id="rec" /></div>
@@ -363,7 +363,6 @@ export default function Site() {
       <footer className="s-footer">
         <div className="s-footer-bg" data-footer-bg />
         <h2 className="s-h1" data-split-scroll>See Usher run a festival day.</h2>
-        <p className="s-lead" data-reveal>Set up a festival in a few minutes, move a screening or make a guest run late, then approve Usher&apos;s plan yourself.</p>
         <div className="s-roles" data-reveal>
           <a className="btn primary" href="/onboarding">Try the live demo</a>
         </div>

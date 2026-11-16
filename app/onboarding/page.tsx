@@ -15,7 +15,7 @@ import { clock } from '../../src/core/time';
 import { tabsToUploads } from '../../src/onboard/workbook';
 import type { GuestClash, VenueClash } from '../../src/agent/conflicts';
 
-const STEPS = ['Festival & data', 'Matching', 'Check', 'Team'] as const;
+const STEPS = ['Festival & data', 'Check', 'Team'] as const;
 const SAMPLES = ['program.csv', 'theatres.csv', 'walking-times.csv', 'film-catalog.csv', 'registrations.csv', 'ticket-orders.csv', 'my-schedule-saves.csv', 'volunteer-rota.csv', 'faq-and-policies.csv'];
 const GATE_LABELS: Partial<Record<ActionKind, string>> = {
   notify_people: 'Messages to attendees and guests', update_website: 'Website listing changes', public_announcement: 'Festival-wide announcements',
@@ -38,6 +38,18 @@ const daysBetween = (a: string, b: string) => { const n = Math.round((Date.parse
 export default function Onboarding() {
   const s = useAgent();
   const [step, setStep] = useState(0);
+  const [showAll, setShowAll] = useState(false);
+  /** A file needs a person only if its type has a required column Usher couldn't find, or a column it isn't sure of. */
+  const needsLook = (u: Upload) => {
+    if (u.kind === 'travel') return false;
+    // Usher confirms its own matches; only a must-have column it couldn't place, or placed on a weak guess, needs a look.
+    return KINDS[u.kind].fields.some(f => {
+      if (!f.required) return false;
+      const c = u.columns.find(x => x.field === f.key);
+      if (!c?.header) return !(f.key === 'name' && u.columns.find(x => x.field === 'first')?.header);
+      return c.confidence < 0.6;
+    });
+  };
   const [started, setStarted] = useState(false);
   // A new organizer starts from blank fields; dates are filled in from the schedule once it arrives.
   const [meta, setMeta] = useState<Meta>({ name: '', startDate: '', days: 1, city: '' });
@@ -88,7 +100,7 @@ export default function Onboarding() {
     try {
       const r = await fetch(`/api/festival?sheet=${encodeURIComponent(sheetUrl)}`);
       const b = await r.json();
-      if (r.ok && !b.error && b.festival) { setSheetFest(b.festival); setUploads([]); setStep(2); setBusy(''); return; }
+      if (r.ok && !b.error && b.festival) { setSheetFest(b.festival); setUploads([]); setStep(1); setBusy(''); return; }
       // Not in Usher's own layout: read every tab and match it like uploaded files.
       const t = await fetch(`/api/festival?tabs=1&sheet=${encodeURIComponent(sheetUrl)}`);
       const tb = await t.json() as { tabs?: { name: string; table: string[][] }[]; error?: string };
@@ -116,15 +128,10 @@ export default function Onboarding() {
   }, [uploads]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Matching: reveal files one by one, like the agent reading them.
-  useEffect(() => {
-    if (step !== 1) return;
-    setRevealed(0);
-    const t = setInterval(() => setRevealed(n => { if (n >= uploads.length) { clearInterval(t); return n; } return n + 1; }), 380);
-    return () => clearInterval(t);
-  }, [step, uploads.length]);
+  useEffect(() => { setRevealed(uploads.length); }, [uploads.length]);
 
   const built = useMemo(() => {
-    if (step < 2) return null;
+    if (step < 1) return null;
     if (sheetFest) return { festival: sheetFest, errors: [] as string[], unresolved: [] as string[], warnings: [] as string[], notes: [] as string[] };
     const b = buildTables(meta, uploads);
     const r = tablesToFestival(b.tables);
@@ -178,12 +185,11 @@ export default function Onboarding() {
 
   const canNext = [
     !!meta.name && /^\d{4}-\d{2}-\d{2}$/.test(meta.startDate) && (uploads.length > 0 || !!sheetFest),
-    uploads.length > 0 && uploads.some(u => u.kind === 'schedule'),
-    ready,
+    ready && (!!sheetFest || uploads.some(u => u.kind === 'schedule')),
     !!approver,
   ][step];
-  const next = () => setStep(n => Math.min(STEPS.length - 1, sheetFest && n === 0 ? 2 : n + 1));
-  const back = () => setStep(n => Math.max(0, sheetFest && n === 2 ? 0 : n - 1));
+  const next = () => setStep(n => Math.min(STEPS.length - 1, n + 1));
+  const back = () => setStep(n => Math.max(0, n - 1));
 
   if (!started) {
     return (
@@ -288,11 +294,39 @@ export default function Onboarding() {
           </section>
         )}
 
-        {step === 1 && (
+        {step === 1 && built && (
           <section className="ob-card wide">
-            <h2 className="display">The agent read your files</h2>
-            <p className="muted">It worked out what each file is and which column means what. Where it says <span className="chip warn">check</span>, that's its best guess: press Looks right, or pick the right column. Then continue.</p>
-            {uploads.slice(0, revealed).map(u => {
+            <h2 className="display">{ready ? (outside ? 'Almost there' : 'Everything checks out') : 'A few things to fix'}</h2>
+            {built.festival && built.festival.events.length > 0 && <>
+              <div className="stats">
+                {[['Events', built.festival.events.length], ['Films', built.festival.films.length], ['Venues', built.festival.venues.length], ['People', built.festival.people.length]].map(([k, v]) => (
+                  <div className="stat" key={k as string}><div className="k">{k}</div><div className="v">{v}</div></div>
+                ))}
+              </div>
+              <p className="muted">Also {built.festival.tickets.length} tickets, {built.festival.bookings.length} saved events, {built.festival.shifts.length} volunteer shifts and {built.festival.docs.reduce((a, d) => a + d.sections.length, 0)} FAQ answers.</p>
+            </>}
+            {mustFix.length > 0 && <div className="issues bad"><h3>Must fix ({mustFix.length})</h3>{mustFix.slice(0, 12).map((e, i) => <div key={i}>{e}</div>)}<p className="muted">Fix these in your file and upload it again, or go back and change the dates or a column match.</p>
+              <button className="small" onClick={() => setStep(0)}>Back to step 1</button></div>}
+            {ready && outside > 0 && <div className="issues warn"><h3>Outside your dates</h3><div>{outside} schedule {outside === 1 ? 'row falls' : 'rows fall'} outside your festival dates and {outside === 1 ? 'was' : 'were'} left out.</div>
+              <button className="small" style={{ marginTop: 8 }} onClick={() => setStep(0)}>Check the dates</button></div>}
+            {preview && preview.flags.length > 0 && (
+              <div className="issues warn"><h3>Needs a person ({preview.flags.length})</h3>
+                {preview.flags.slice(0, 8).map(fl => <div key={fl.id}>{shortFlag(fl)}</div>)}
+                {preview.flags.length > 8 && <div className="muted">and {preview.flags.length - 8} more</div>}
+                <p className="muted">They'll wait on the dashboard until someone sorts them out.</p></div>
+            )}
+            {goodToKnow.length > 0 && (
+              <details className="issues"><summary>Good to know ({goodToKnow.length})</summary>
+                {goodToKnow.slice(0, 8).map((n, i) => <div key={i}>{n}</div>)}</details>
+            )}
+            {uploads.length > 0 && (() => {
+              const look = uploads.filter(needsLook);
+              const fine = uploads.filter(u => !needsLook(u));
+              return <>
+                <h3 className="ob-sub">Your files</h3>
+                {fine.length > 0 && <p className="muted"><span className="chip ok"><Icon name="check" size={12} />Matched</span> {fine.map(u => u.name).join(', ')}</p>}
+                {look.length > 0 && <p className="muted">Usher wasn&apos;t sure about {look.length === 1 ? 'one file' : `${look.length} files`}. Pick the right column below.</p>}
+                {uploads.filter(u => showAll || needsLook(u)).map(u => {
               const headers = u.table[0] ?? [];
               const fields = KINDS[u.kind].fields;
               const setKind = (k: Kind) => setUploads(uploads.map(x => x.name === u.name ? { ...x, kind: k, columns: matchColumns(k, headers) } : x));
@@ -344,40 +378,14 @@ export default function Onboarding() {
                 </div>
               );
             })}
-            {revealed < uploads.length && <p className="muted thinking">Reading {uploads[revealed]?.name}…</p>}
-            {!uploads.some(u => u.kind === 'schedule') && revealed >= uploads.length && <p className="chip bad">None of these files is a schedule. Add one, or mark the right file as Schedule.</p>}
+                <button className="ghost small" onClick={() => setShowAll(!showAll)}>{showAll ? 'Hide matched files' : 'Review all matching'}</button>
+                {!uploads.some(u => u.kind === 'schedule') && <p className="chip bad">None of these files is a schedule. Mark the right file as Schedule.</p>}
+              </>;
+            })()}
           </section>
         )}
 
-        {step === 2 && built && (
-          <section className="ob-card wide">
-            <h2 className="display">{ready ? (outside ? 'Almost there' : 'Everything checks out') : 'A few things to fix'}</h2>
-            {built.festival && built.festival.events.length > 0 && <>
-              <div className="stats">
-                {[['Events', built.festival.events.length], ['Films', built.festival.films.length], ['Venues', built.festival.venues.length], ['People', built.festival.people.length]].map(([k, v]) => (
-                  <div className="stat" key={k as string}><div className="k">{k}</div><div className="v">{v}</div></div>
-                ))}
-              </div>
-              <p className="muted">Also {built.festival.tickets.length} tickets, {built.festival.bookings.length} saved events, {built.festival.shifts.length} volunteer shifts and {built.festival.docs.reduce((a, d) => a + d.sections.length, 0)} FAQ answers.</p>
-            </>}
-            {mustFix.length > 0 && <div className="issues bad"><h3>Must fix ({mustFix.length})</h3>{mustFix.slice(0, 12).map((e, i) => <div key={i}>{e}</div>)}<p className="muted">Fix these in your file and upload it again, or go back and change the dates or a column match.</p>
-              <button className="small" onClick={() => setStep(0)}>Back to step 1</button></div>}
-            {ready && outside > 0 && <div className="issues warn"><h3>Outside your dates</h3><div>{outside} schedule {outside === 1 ? 'row falls' : 'rows fall'} outside your festival dates and {outside === 1 ? 'was' : 'were'} left out.</div>
-              <button className="small" style={{ marginTop: 8 }} onClick={() => setStep(0)}>Check the dates</button></div>}
-            {preview && preview.flags.length > 0 && (
-              <div className="issues warn"><h3>Needs a person ({preview.flags.length})</h3>
-                {preview.flags.slice(0, 8).map(fl => <div key={fl.id}>{shortFlag(fl)}</div>)}
-                {preview.flags.length > 8 && <div className="muted">and {preview.flags.length - 8} more</div>}
-                <p className="muted">They'll wait on the dashboard until someone sorts them out.</p></div>
-            )}
-            {goodToKnow.length > 0 && (
-              <details className="issues"><summary>Good to know ({goodToKnow.length})</summary>
-                {goodToKnow.slice(0, 8).map((n, i) => <div key={i}>{n}</div>)}</details>
-            )}
-          </section>
-        )}
-
-        {step === 3 && (
+        {step === 2 && (
           <section className="ob-card wide">
             <h2 className="display">Your team and the rules</h2>
             <label className="field">Who approves outgoing messages<input value={approver} onChange={e => setApprover(e.target.value)} /></label>

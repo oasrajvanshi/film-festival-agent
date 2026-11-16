@@ -67,7 +67,6 @@ export function ArrivalScan({ s, compact }: { s: AgentStore; compact?: boolean }
     <div className={compact ? 'stack' : 'grid2'}>
       <div className="card stack">
         <h2>Check people in</h2>
-        <p className="muted" style={{ margin: 0 }}>Scan anyone&apos;s QR as they arrive: attendees, guests, staff and vendors. The first scan today records them as here.</p>
         <label className="field">Entrance
           <select value={venueId} onChange={e => setVenueId(e.target.value)}>
             {f.venues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
@@ -77,7 +76,7 @@ export function ArrivalScan({ s, compact }: { s: AgentStore; compact?: boolean }
           ? <><video ref={video} muted playsInline style={{ width: '100%', borderRadius: 12, background: '#000', aspectRatio: '4 / 3', objectFit: 'cover' }} /><button className="small" onClick={() => setCam(false)}>Stop camera</button></>
           : <button onClick={() => setCam(true)}><Icon name="scan" size={16} /> Scan with camera</button>}
         {state === 'none' && <div className="muted">This browser can&apos;t read QR codes with the camera. Type the code printed under the QR instead.</div>}
-        <label className="field">Or type the code under the QR
+        <label className="field">Or type the code
           <input value={qr} placeholder="e.g. USH1.p-012.ABC" onChange={e => setQr(e.target.value)} onKeyDown={e => e.key === 'Enter' && check(qr)} autoCapitalize="characters" />
         </label>
         <button className="primary" disabled={!qr.trim() || busy} onClick={() => check(qr)}>{busy ? 'Checking…' : 'Check in'}</button>
@@ -92,7 +91,7 @@ export function ArrivalScan({ s, compact }: { s: AgentStore; compact?: boolean }
               {res.allowed && res.next && <div style={{ marginTop: 8 }}>Next: {res.next}</div>}
             </div>
           </div>
-        ) : <p className="muted">Green means they&apos;re in and recorded. Guests and vendors get a welcome note with what they have next. Everything is checked on the festival&apos;s server, so this phone never holds anyone else&apos;s details.</p>}
+        ) : <p className="muted">Scan a QR to check someone in.</p>}
       </div>
     </div>
   );
@@ -127,7 +126,7 @@ export function MyArrival({ s, who }: { s: AgentStore; who: Who }) {
 }
 
 /** Organizers: who is expected today and who is actually here, live. */
-export function WhosHere({ s }: { s: AgentStore }) {
+export function WhosHere({ s, eventScan }: { s: AgentStore; eventScan?: ReactNode }) {
   const f = s.agent.f;
   const days = festivalDays(f);
   const today = dayAt(f, s.clock) ?? days[0];
@@ -162,7 +161,7 @@ export function WhosHere({ s }: { s: AgentStore }) {
         <button className="small" onClick={() => setScan(x => !x)}><Icon name="scan" size={16} /> {scan ? 'Hide scanner' : 'Scan people in'}</button>
         <button className="small" onClick={download}>Download list</button>
       </div>
-      {scan && <ArrivalScan s={s} />}
+      {scan && (eventScan ? <ScanDesk s={s} event={eventScan} /> : <ArrivalScan s={s} />)}
       <div className="stats">
         {(['guest', 'vendor', 'staff', 'attendee'] as PresenceKind[]).map(k => {
           const c = by(k);

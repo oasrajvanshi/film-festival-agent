@@ -160,7 +160,6 @@ export function AccessCodes({ s, onViewAs }: { s: AgentStore; onViewAs: (w: Who)
   return (
     <div className="card stack">
       <div className="section-title"><h2>Access codes</h2><span className="muted" style={{ fontSize: 12 }}>{all.length} people and vendors</span></div>
-      <p className="muted" style={{ margin: 0 }}>Each person gets one code for their own profile. A code only opens the profile it was made for. Use "View as" to see exactly what someone sees.</p>
       {link && <div className="row" style={{ alignItems: 'center' }}><span className="muted">Link for your team and guests:</span> <code className="code-chip">{link}</code>
         <button className="small" onClick={() => navigator.clipboard?.writeText(link)}>Copy</button></div>}
       {s.shared && !server && <div className="muted">Loading codes…</div>}
@@ -273,7 +272,7 @@ function StaffHome({ s, who }: { s: AgentStore; who: Who }) {
         <HeroPhoto k="staff" />
         <div className="eyebrow">{next ? `${dayLabel(f.dates[next.day])} · your next shift` : 'Your shifts'}</div>
         <h2>{next ? `${next.task} · ${venue(next.venueId)}` : 'No more shifts'}</h2>
-        <p>{next ? `${fmt(next.start)} to ${fmt(next.end)}. Your brief below is rebuilt from the live schedule every time you open it.` : 'Thanks for your help this festival.'}</p>
+        <p>{next ? `${fmt(next.start)} to ${fmt(next.end)}.` : 'Thanks for your help this festival.'}</p>
         {(me?.availableDays?.length || me?.skills?.length) ? <p className="muted">
           {me.availableDays?.length ? `You can work ${me.availableDays.map(d => dayLabel(f.dates[d]).split(',')[0]).join(', ')}.` : ''}
           {me.skills?.length ? ` Skills: ${me.skills.join(', ')}.` : ''}
@@ -324,6 +323,7 @@ function PersonHome({ s, who, go }: { s: AgentStore; who: Who; go: (t: string) =
   const unread = s.agent.outbox.filter(d => d.personId === who.id).length;
   const days = [...new Set(plans.map(p => p.e.day))].sort();
   const me = f.people.find(p => p.id === who.id);
+  const [full, setFull] = useState(false);
   const where = (e: FestivalEvent) => `${venue(e.venueId)}${e.room ? `, ${e.room}` : ''}`;
   const when = (iso: string) => `${new Date(`${iso.slice(0, 10)}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })} ${fmt(iso)}`;
   return (
@@ -340,9 +340,20 @@ function PersonHome({ s, who, go }: { s: AgentStore; who: Who; go: (t: string) =
         </div>
       </section>
       <div className="card">
-        <h2>Your schedule</h2>
+        <h2>Coming up</h2>
         {plans.length === 0 && <div className="empty-note">No tickets or saved screenings yet.</div>}
-        {days.map(d => (
+        {plans.length > 0 && upcoming.length <= 1 && <div className="empty-note">Nothing else coming up.</div>}
+        {upcoming.slice(1, 4).map(p => (
+          <div className="item" key={p.e.id}>
+            <div className={`ic ${p.why === 'You’re appearing' ? 'bad' : ''}`}><Icon name={p.e.kind === 'panel' ? 'users' : p.e.kind === 'qa' ? 'chat' : 'film'} size={16} /></div>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div className="t">{p.e.title}</div>
+              <div className="d">{when(p.e.start)} · {where(p.e)}</div>
+            </div>
+          </div>
+        ))}
+        {plans.length > 0 && <button className="ghost small" onClick={() => setFull(!full)} aria-expanded={full}>{full ? 'Hide full schedule' : `Full schedule (${plans.length})`}</button>}
+        {full && days.map(d => (
           <div key={d}>
             <h3>{dayLabel(f.dates[d as DayNumber])}</h3>
             {plans.filter(p => p.e.day === d).map(p => (
@@ -384,9 +395,11 @@ function PassCard({ s, who }: { s: AgentStore; who: Who }) {
 function VendorHome({ s, who }: { s: AgentStore; who: Who }) {
   const f = s.agent.f;
   const v = useMemo(() => deriveVendors(f).find(x => x.id === who.id), [f, s.version, who.id]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [full, setFull] = useState(false);
   if (!v) return <div className="card"><div className="empty-note">No deliveries found.</div></div>;
   const venue = (id: string) => f.venues.find(x => x.id === id)?.name ?? id;
-  const next = v.deliveries.find(d => !d.cancelled && d.at >= s.clock);
+  const upcoming = v.deliveries.filter(d => !d.cancelled && d.at >= s.clock);
+  const next = upcoming[0];
   const days = [...new Set(v.deliveries.map(d => d.day))].sort();
   return (
     <>
@@ -394,11 +407,19 @@ function VendorHome({ s, who }: { s: AgentStore; who: Who }) {
         <HeroPhoto k="vendor" />
         <div className="eyebrow">{v.service} · {v.deliveries.filter(d => !d.cancelled).length} drops</div>
         <h2>{next ? `Next: ${fmt(next.at)} at ${venue(next.venueId)}` : 'All deliveries done'}</h2>
-        <p>{next ? `${next.what}.` : 'Thanks for working with the festival.'} Timings follow the live schedule, so if an event moves, this list moves with it.</p>
+        <p>{next ? `${next.what}.` : 'Thanks for working with the festival.'}</p>
       </section>
       <div className="card">
-        <h2>Your deliveries</h2>
-        {days.map(d => (
+        <h2>Coming up</h2>
+        {upcoming.length <= 1 && <div className="empty-note">Nothing else coming up.</div>}
+        {upcoming.slice(1, 4).map(x => (
+          <div className="item" key={x.id}>
+            <div className="ic"><Icon name="truck" size={16} /></div>
+            <div style={{ minWidth: 0, flex: 1 }}><div className="t">{dayLabel(f.dates[x.day])} {fmt(x.at)} · {venue(x.venueId)}</div><div className="d">{x.what}</div></div>
+          </div>
+        ))}
+        <button className="ghost small" onClick={() => setFull(!full)} aria-expanded={full}>{full ? 'Hide full schedule' : `Full schedule (${v.deliveries.length})`}</button>
+        {full && days.map(d => (
           <div key={d}>
             <h3>{dayLabel(f.dates[d])}</h3>
             {v.deliveries.filter(x => x.day === d).map(x => (
@@ -410,7 +431,6 @@ function VendorHome({ s, who }: { s: AgentStore; who: Who }) {
             ))}
           </div>
         ))}
-        <p className="muted" style={{ fontSize: 12 }}>Festival contact for changes: operations desk. Your contact on file: {v.contact}, {v.email}.</p>
       </div>
     </>
   );
@@ -428,7 +448,6 @@ function VendorChanges({ s, who }: { s: AgentStore; who: Who }) {
       {changes.length === 0 && off.length === 0 && <div className="empty-note">No changes to your deliveries.</div>}
       {[...changes].reverse().map((c, i) => <div className="item" key={i}><div className="ic warn"><Icon name="clock" size={16} /></div><div className="d">{c}</div></div>)}
       {off.map(d => <div className="item" key={d.id}><div className="ic bad"><Icon name="x" size={16} /></div><div className="d">Cancelled: {d.what}</div></div>)}
-      <p className="muted" style={{ fontSize: 12, marginBottom: 0 }}>Vendors see only their own deliveries. Attendee and guest details are never shown here.</p>
     </div>
   );
 }
@@ -491,7 +510,7 @@ function StaffScan({ s }: { s: AgentStore }) {
       </div>
       <div className="card">
         {res ? <div className={`scan ${res.allowed ? 'ok' : 'bad'}`}>{res.allowed ? 'ALLOW' : 'DENY'}<div style={{ fontSize: 14, fontWeight: 400, marginTop: 8 }}>{res.personName && <>{res.personName} · </>}{res.reason}</div></div>
-          : <p className="muted">Scan a pass to see green or red. Passes are checked on the festival’s server, so your phone never holds anyone else’s details.</p>}
+          : <p className="muted">Scan a pass to see green or red.</p>}
       </div>
     </div>
   );

@@ -78,7 +78,7 @@ function deliverNew(kv: Kv, rec: FestRecord, origin: string) {
       if (want.has('sms')) jobs.push(sendSms(`Usher test (${fest}): ${title}. ${msgs.length} message${msgs.length === 1 ? '' : 's'} went out, e.g. to ${msgs[0].personName}: "${msgs[0].subject}"`));
     }
     if (want.has('push')) {
-      if (newAsks.length) jobs.push(sendPush(kv, rec.id, { title: `${newAsks.length} update${newAsks.length > 1 ? 's' : ''} to approve`, body: newAsks.at(-1)!.action.title, url: `${origin}/app#approvals` }));
+      if (newAsks.length) jobs.push(sendPush(kv, rec.id, { title: `${newAsks.length} update${newAsks.length > 1 ? 's' : ''} to approve`, body: newAsks.at(-1)!.action.title, url: `${origin}/app#today` }));
       if (newFlags.length) jobs.push(sendPush(kv, rec.id, { title: 'Needs attention', body: newFlags.length > 1 ? `${newFlags.at(-1)!.title} and ${newFlags.length - 1} more` : newFlags[0].title, url: `${origin}/app#today` }));
     }
     await Promise.allSettled(jobs);

@@ -1,5 +1,6 @@
 'use client';
 
+import { DayCalendar } from './daycal';
 import { useMemo, useState } from 'react';
 import { DEFAULT_SHEET, readSetup, type AgentStore } from './useAgent';
 import { riskSummary, type WeatherHour } from '../../src/agent/weather';
@@ -15,7 +16,7 @@ import { Icon } from './icons';
 import { buildBrief } from '../../src/agent/briefs';
 import { HeroPhoto, PhotoBand } from './photos';
 
-type P = { s: AgentStore; user: string; go: (page: 'today' | 'approvals' | 'scan' | 'schedule' | 'ask' | 'briefs' | 'feeds' | 'log' | 'data') => void };
+type P = { s: AgentStore; user: string; go: (page: 'today' | 'approvals' | 'here' | 'scan' | 'schedule' | 'ask' | 'briefs' | 'feeds' | 'log' | 'data') => void };
 
 const dayOf = (iso: string, dates: Record<DayNumber, string>): DayNumber =>
   Number(Object.entries(dates).find(([, d]) => iso.startsWith(d))?.[0] ?? 1) as DayNumber;
@@ -41,33 +42,45 @@ export function Overview({ s, go, user }: P) {
     .filter(e => e.day === day && e.status === 'scheduled' && toMinutes(e.start) >= now)
     .sort((x, y) => toMinutes(x.start) - toMinutes(y.start)).slice(0, 5);
   const venueName = (id: string) => f.venues.find(v => v.id === id)?.name ?? id;
+  const [view, setView] = useState<'cal' | 'now'>('cal');
   const dateLabel = new Date(`${f.dates[day]}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   return (
     <>
       <section className="hero has-photo">
         <HeroPhoto k="organizer" />
         <div className="eyebrow">Day {day} · {dateLabel} · {fmt(s.clock)}</div>
-        <h2>{pending.length ? `${pending.length} update${pending.length > 1 ? 's' : ''} waiting for you` : a.flags.length ? `${a.flags.length} thing${a.flags.length > 1 ? 's' : ''} to look at` : 'All quiet at the festival'}</h2>
-        <p>The agent watches the schedule, the doors and outside feeds. Anything sent to attendees or guests waits for your approval.</p>
+        <h2>{pending.length + a.flags.length ? `${pending.length + a.flags.length} thing${pending.length + a.flags.length > 1 ? 's' : ''} for you` : 'All quiet at the festival'}</h2>
         <div className="row">
-          {pending.length > 0 && <button className="primary" onClick={() => go('approvals')}><Icon name="inbox" size={16} />Review approvals</button>}
           <button onClick={() => go('schedule')}><Icon name="calendar" size={16} />Edit schedule</button>
-          <button onClick={() => go('scan')}><Icon name="scan" size={16} />Scan a pass</button>
+          <button onClick={() => go('here')}><Icon name="scan" size={16} />Check people in</button>
         </div>
       </section>
 
+      <div className="card for-you">
+        <div className="section-title"><h2>For you</h2>{pending.length + a.flags.length > 0 && <span className="chip bad">{pending.length + a.flags.length}</span>}</div>
+        {pending.length + a.flags.length === 0 && <div className="empty-note">Nothing needs you right now.</div>}
+        <ApprovalLines s={s} user={user} go={go} />
+        <FlagList s={s} user={user} go={go} />
+      </div>
+
       <div className="stats">
-        <button className={`stat ${pending.length ? 'hot' : ''}`} onClick={() => go('approvals')}><div className="k"><Icon name="inbox" size={14} />Waiting for approval</div><div className="v">{pending.length}</div></button>
+        <div className={`stat ${pending.length ? 'hot' : ''}`}><div className="k"><Icon name="inbox" size={14} />To approve</div><div className="v">{pending.length}</div></div>
         <div className={`stat ${a.flags.length ? 'warn' : ''}`}><div className="k"><Icon name="flag" size={14} />Flags</div><div className="v">{a.flags.length}</div></div>
         <button className="stat" onClick={() => go('log')}><div className="k"><Icon name="send" size={14} />Messages sent</div><div className="v">{a.outbox.length}</div></button>
-        <div className="stat"><div className="k"><Icon name="scan" size={14} />Check-ins</div><div className="v">{f.checkIns.filter(c => c.allowed).length}</div></div>
+        <button className="stat" onClick={() => go('here')}><div className="k"><Icon name="users" size={14} />Here today</div><div className="v">{(f.arrivals ?? []).filter(x => x.day === day && !x.reentry).length}</div></button>
       </div>
 
       <WeatherCard s={s} go={go} user="" compact />
 
-      <div className="grid2">
-        <div className="card">
-          <div className="section-title"><h2>Venues right now</h2><span className="muted" style={{ fontSize: 12 }}>from door scans</span></div>
+      <div className="card">
+        <div className="section-title">
+          <h2>Venues</h2>
+          <div className="seg seg-nowrap" role="tablist" aria-label="Venue view">
+            <button className={view === 'cal' ? 'on' : ''} onClick={() => setView('cal')}>Calendar</button>
+            <button className={view === 'now' ? 'on' : ''} onClick={() => setView('now')}>Right now</button>
+          </div>
+        </div>
+        {view === 'cal' ? <DayCalendar s={s} day={day} /> : <>
           <div className="venues">
             {crowd.venues.map(v => (
               <div className="venue" key={v.venueId}>
@@ -79,7 +92,7 @@ export function Overview({ s, go, user }: P) {
             ))}
           </div>
           {crowd.redirects.length > 0 && <>
-            <h3>Suggested redirects <span className="muted">(staff decide)</span></h3>
+            <h3>Suggested redirects</h3>
             {crowd.redirects.map((r, i) => <div className="msg" key={i}>{r.summary}</div>)}
           </>}
           <h3>Up next today</h3>
@@ -93,19 +106,67 @@ export function Overview({ s, go, user }: P) {
               </div>
             </div>
           ))}
-        </div>
+        </>}
+      </div>
 
+      {a.changeFeed.length > 0 && (
         <div className="card">
-          <div className="section-title"><h2>Needs attention</h2>{a.flags.length > 0 && <span className="chip bad">{a.flags.length}</span>}</div>
-          {a.flags.length === 0 && <div className="empty-note">No clashes or risks flagged.</div>}
-          <FlagList s={s} user={user} go={go} />
-          <h3>Recent schedule changes</h3>
-          {a.changeFeed.length === 0 && <div className="empty-note">None yet. Edit the schedule to see the agent work.</div>}
+          <h2>Recent changes</h2>
           {[...a.changeFeed].reverse().slice(0, 6).map((c, i) => (
             <div className="item" key={i}><div className="ic info"><Icon name="calendar" size={16} /></div><div className="d">{c}</div></div>
           ))}
         </div>
-      </div>
+      )}
+    </>
+  );
+}
+
+// ------------------------------------------------------------------ Approvals, one line each
+/** Each update waiting for approval is one line with one button; tap the line for the messages. */
+function ApprovalLines({ s, user }: P) {
+  const { person } = useLookups(s);
+  const [open, setOpen] = useState<string | null>(null);
+  const [all, setAll] = useState(false);
+  const [note, setNote] = useState('');
+  const pending = [...s.agent.queue].reverse().filter(q => q.status === 'pending');
+  const act = (id: string, ok: boolean) => { const n = note.trim() || undefined; ok ? s.agent.approve(id, user, n) : s.agent.reject(id, user, n); setOpen(null); setNote(''); s.commit(); };
+  return (
+    <>
+      {pending.map(q => {
+        const msgs = q.action.messages ?? [];
+        const isOpen = open === q.action.id;
+        const past = s.agent.pastDecisions?.(q.action) ?? [];
+        return (
+          <div className={`item flag-item ${isOpen ? 'open' : ''}`} key={q.action.id}>
+            <div className="ic"><Icon name="inbox" size={16} /></div>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div className="row" style={{ flexWrap: 'nowrap', gap: 8 }}>
+                <button className="flag-line" aria-expanded={isOpen} onClick={() => { setOpen(isOpen ? null : q.action.id); setAll(false); }}>
+                  <span className="t">{q.action.title}</span><span className="muted flag-more">{msgs.length ? `${msgs.length} message${msgs.length > 1 ? 's' : ''}` : isOpen ? 'Less' : 'Details'}</span>
+                </button>
+                <button className="small primary" style={{ flex: 'none' }} onClick={() => act(q.action.id, true)}>Approve</button>
+              </div>
+              {isOpen && (
+                <div className="flag-body">
+                  <div className="d">{q.action.rationale}</div>
+                  {past[0] && <div className="d muted">Last time: {past[0].by} {past[0].status} “{past[0].title}”.{past[0].note ? ` Note: “${past[0].note}”` : ''}</div>}
+                  {(all ? msgs : msgs.slice(0, 2)).map((m, i) => (
+                    <div className="msg" key={i}>
+                      <div className="who">{person(m.personId)?.name ?? m.personId} · {m.channel.replace('_', ' ')}</div>
+                      <div style={{ whiteSpace: 'pre-wrap' }}>{m.body}</div>
+                    </div>
+                  ))}
+                  {msgs.length > 2 && <button className="ghost small" onClick={() => setAll(!all)}>{all ? 'Show fewer' : `Show all ${msgs.length}`}</button>}
+                  <input placeholder="Note for next time (optional)" value={note} onChange={e => setNote(e.target.value)} style={{ marginTop: 8, width: '100%' }} />
+                  <div className="row" style={{ marginTop: 8 }}>
+                    <button className="small" onClick={() => act(q.action.id, false)}>Reject</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+      })}
     </>
   );
 }
@@ -196,13 +257,12 @@ export function WeatherCard({ s, go, compact }: P & { compact?: boolean }) {
     <div className="card stack">
       {!compact && <PhotoBand k="snow" label="Snow, storms, heat" />}
       <div className="section-title"><h2><Icon name="cloud" size={18} /> Weather watch</h2><span className="muted" style={{ fontSize: 12 }}>Live forecast</span></div>
-      {!compact && <p className="muted" style={{ margin: 0 }}>The agent checks the forecast for {city}, finds risky hours, tells staff and volunteers on shift, and drafts a personal note for everyone with tickets or plans in that window. Those notes wait for your approval.</p>}
       <div className="row">
         <button className="primary" disabled={busy} onClick={() => run()}>{preview ? `Preview with today's ${city} weather` : `Check the forecast for ${dayLabel}`}</button>
         {scenarios.map(([k, l]) => <button key={k} disabled={busy} onClick={() => run(k)}>Try: {l}</button>)}
       </div>
       {busy && <div className="muted">Checking the forecast…</div>}
-      {note && <div className="msg">{note}{note.includes('waiting') && <> <button className="small" onClick={() => go('approvals')}>Review</button></>}</div>}
+      {note && <div className="msg">{note}{note.includes('waiting') && <> <button className="small" onClick={() => go('today')}>Review</button></>}</div>}
     </div>
   );
 }
@@ -335,7 +395,6 @@ export function Approvals({ s, user }: P) {
     <div className="stack">
       <div className="card">
         <h2>Waiting for approval ({pending.length})</h2>
-        <p className="muted">Anything that reaches attendees, guests, partners or the public waits here. One approval sends the whole bundle.</p>
         {pending.length === 0 && <p className="muted">Nothing waiting.</p>}
         {pending.map(q => {
           const msgs = q.action.messages ?? [];
