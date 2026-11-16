@@ -8,8 +8,9 @@ import './site.css';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useEffect, useRef, type MouseEvent } from 'react';
-import { Bell, Brief, Move, People, Swap } from './hl/icons';
+import { Bell, Move } from './hl/icons';
 import { PHOTOS } from './ui/photos';
+import { PlanDemo } from './sitedemo';
 
 // ---------------------------------------------------------------- the calendar (1 pm to 7 pm, four venues)
 
@@ -130,10 +131,24 @@ export default function Site() {
         intro.to(leader, { yPercent: -100, duration: 0.8, ease: 'power4.inOut' }, 1.55).set(leader, { display: 'none' });
       } else if (leader) { leader.remove(); }
       split(q('[data-split]'));
-      intro.fromTo(q('.s-hero .split-word'), { yPercent: 110 }, { yPercent: 0, duration: 1.05, stagger: 0.05, ease: 'power4.out' }, seen ? 0.1 : 1.75)
-        .fromTo(q('[data-hero-fade]'), { y: 24, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.9, stagger: 0.1 }, '<0.35')
-        .fromTo(q('[data-cal="hero"]'), { rotateX: phone ? 30 : 60, rotateZ: phone ? -4 : -14, y: 140, autoAlpha: 0 }, { rotateX: phone ? 0 : 24, rotateZ: phone ? 0 : -6, y: 0, autoAlpha: 1, duration: 1.8, ease: 'power3.out' }, '<0.1')
-        .fromTo(q('[data-hero-float]'), { y: -40, autoAlpha: 0, z: 120 }, { y: 0, autoAlpha: 1, z: 60, duration: 1, stagger: 0.25, ease: 'power3.out' }, '<0.6');
+      // Hero, revealed step by step: first only the headline, large and centred;
+      // scrolling brings it into place and lets the rest arrive.
+      const hero = q('.s-hero')[0] as HTMLElement;
+      const h1 = q('.s-hero .s-h1')[0] as HTMLElement;
+      const r0 = h1.getBoundingClientRect();
+      const toCentre = { x: innerWidth / 2 - (r0.left + r0.width / 2), y: innerHeight / 2 - (r0.top + r0.height / 2) - (phone ? 20 : 0) };
+      const big = phone ? 1.08 : 1.45;
+      gsap.set(h1, { x: toCentre.x, y: toCentre.y, scale: big, transformOrigin: '50% 50%' });
+      gsap.set(q('[data-hero-fade]'), { autoAlpha: 0, y: 28 });
+      gsap.set(q('.s-hero-stage'), { autoAlpha: 0, y: 90 });
+      gsap.set(q('[data-cal="hero"]'), { rotateX: phone ? 0 : 24, rotateZ: phone ? 0 : -6 });
+      intro.fromTo(q('.s-hero .split-word'), { yPercent: 110 }, { yPercent: 0, duration: 1.05, stagger: 0.05, ease: 'power4.out' }, seen ? 0.1 : 1.75);
+      gsap.timeline({ scrollTrigger: { trigger: hero, start: 'top top', end: phone ? '+=55%' : '+=90%', scrub: 0.8, pin: true, anticipatePin: 1 } })
+        .to(h1, { x: 0, y: 0, scale: 1, duration: 1, ease: 'power2.inOut' }, 0)
+        .to(q('.s-scrollcue'), { autoAlpha: 0, duration: 0.3 }, 0)
+        .to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.15, ease: 'power2.out' }, 0.45)
+        .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.9, ease: 'power3.out' }, 0.55)
+        .fromTo(q('[data-hero-float]'), { y: -30, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.5, stagger: 0.2 }, 1.0);
 
       // hero: the calendar keeps showing what the product does, on a loop
       const heroCal = q('[data-cal="hero"]')[0];
@@ -148,7 +163,6 @@ export default function Site() {
         .call(() => resetHero(heroCal));
       gsap.to(q('[data-hero-bg]'), { yPercent: 12, ease: 'none', scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
       gsap.to(q('[data-cal-wrap]'), { y: phone ? -8 : -14, rotateX: phone ? 0 : 3, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 2.4 });
-      if (!phone) gsap.fromTo(q('[data-cal="hero"]'), { rotateX: 24, rotateZ: -6, y: 0 }, { rotateX: 14, rotateZ: -3, y: -60, ease: 'none', immediateRender: false, scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
 
       const scene = (name: string) => {
         const el = q(`[data-scene="${name}"]`)[0];
@@ -178,23 +192,6 @@ export default function Site() {
       if (!phone) t.to(q('[data-trigger-copy], [data-feeds]'), { autoAlpha: 0, scale: 0.94, duration: 0.8 }, 9.2);
 
       // --- 3. the recommendation: the calendar turns to face you and redraws itself
-      const r = scene('rec');
-      const big = q('[data-cal="rec"]')[0];
-      if (phone) {
-        // Phones: the alert, then each change in turn; both headings stay on screen.
-        r.fromTo(q('.s-rec-malert'), { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.8 }, 0.2)
-          .fromTo(q('[data-chg]'), { autoAlpha: 0, x: 24 }, { autoAlpha: 1, x: 0, duration: 0.7, stagger: 0.45, ease: 'power3.out' }, 0.9);
-      } else r.fromTo(big, phone ? { rotateX: 24, rotateZ: -4, scale: 0.92, y: 40, autoAlpha: 0.6 } : { rotateX: 62, rotateZ: -14, rotateY: 8, scale: 0.78, y: 120, autoAlpha: 0.3 }, { rotateX: 0, rotateZ: 0, rotateY: 0, scale: 1, y: 0, autoAlpha: 1, duration: phone ? 1.6 : 2.6, ease: 'power2.inOut' }, 0)
-        .fromTo(q('[data-rec-alert]'), { y: -80, z: 200, autoAlpha: 0 }, { y: 0, z: 60, autoAlpha: 1, duration: 1, ease: 'power3.out' }, 2.4)
-        .to(big.querySelectorAll('[data-snowband]'), { opacity: 1, duration: 0.8 }, 2.6)
-        .to(big.querySelectorAll('[data-ghost]'), { opacity: 1, duration: 0.6 }, 3.6)
-        .add(moveBlocks(big, 1, 3.8), 3.6)
-        .call(() => big.querySelectorAll('[data-move]').forEach(e => e.classList.add('hot')), [], 3.7)
-        .fromTo(q('[data-chg]'), { autoAlpha: 0, x: 30 }, { autoAlpha: 1, x: 0, duration: 0.7, stagger: 0.5, ease: 'power3.out' }, 3.9)
-        .add(swapGuest(big, true), 6.6)
-        .to(q('[data-rec-step="1"]'), { autoAlpha: 0, y: -20, duration: 0.5 }, 5.8)
-        .fromTo(q('[data-rec-step="2"]'), { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.7 }, 6.4);
-
       q('[data-reveal]').forEach(el => gsap.fromTo(el, { y: 40, autoAlpha: 0, filter: 'blur(8px)' }, { y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1, ease: 'power4.out', scrollTrigger: { trigger: el, start: 'top 85%', once: true } }));
       q('[data-split-scroll]').forEach(el => {
         split([el]);
@@ -278,7 +275,6 @@ export default function Site() {
             <div className="s-risk-txt">
             <h3>Snow from 2:00 pm</h3>
             <p>The shuttle runs late, screenings start with people still outside, and volunteers need new instructions.</p>
-            <div className="s-impact"><span>3 screenings</span><span>21 attendees</span><span>60 volunteers</span></div>
             </div>
           </article>
           <article className="s-risk-card" data-reveal>
@@ -286,7 +282,6 @@ export default function Site() {
             <div className="s-risk-txt">
             <h3>A guest is stuck on the bridge</h3>
             <p>His 4:00 panel has no speaker, his 6:30 talk is at risk, and the other panelists don&apos;t know yet.</p>
-            <div className="s-impact"><span>2 panels</span><span>4 guests</span><span>120 seats</span></div>
             </div>
           </article>
         </div>
@@ -388,33 +383,14 @@ export default function Site() {
       </section>
 
 
-      {/* 3. the recommendation */}
-      <section className="s-pin s-rec" data-scene="rec">
-        <div className="s-sticky">
-          <div className="s-rec-copy">
-            <div data-rec-step="1"><h2 className="s-h2">It suggests a new plan, and you decide.</h2><p className="s-lead">The prints are 15 minutes late, so Usher proposes starting three screenings at 3:15. You see every change on the calendar before anything is sent.</p></div>
-            <div data-rec-step="2" style={{ position: 'absolute', top: 0, opacity: 0 }}><h2 className="s-h2">It looks after your guests, too.</h2><p className="s-lead">Pavel Kettering is stuck on the harbor bridge. Usher asks Yara Hollis, who is already at Pier 9 Hall, to open his panel until he arrives.</p></div>
-          </div>
-          <div className="s-rec-stage" data-lve-skip aria-hidden="true">
-            <div style={{ position: 'absolute', inset: 0, transformStyle: 'preserve-3d' }}><Cal id="rec" rich /></div>
-            <div className="s-float" data-rec-alert style={{ top: '-30px', right: '3%' }}>
-              <span className="ic"><Brief /></span><span><b>Print delivery 15 min late</b><small>3 screenings at 3:00 pm</small></span><span className="pill">Recommendation</span>
-            </div>
-          </div>
-          <div className="s-rec-list" data-lve-skip>
-            <div className="s-rec-malert"><Brief /><span><b>Print delivery 15 min late</b><small>3 screenings at 3:00 pm</small></span></div>
-            <h3>Changes</h3>
-            {[
-              [Move, '"Wild Tide" 3:00 → 3:15 pm', 'Riverside Studio'],
-              [Move, '"Late Country" 3:00 → 3:15 pm', 'Harbor Theater'],
-              [Move, '"Quiet Animals" 3:00 → 3:15 pm', 'Canal Street Cinema'],
-              [People, 'Tell 21 people with these in their plan', 'Seats are held'],
-              [Brief, 'Brief 3 door teams', 'Staff only'],
-              [Swap, 'Yara Hollis opens "Selling at Markets"', 'Pavel Kettering joins on arrival'],
-            ].map(([I, t, s]) => { const Icon = I as typeof Move; return <div className="s-chg" data-chg key={String(t)}><Icon /><span>{String(t)}<small>{String(s)}</small></span>{I === Swap && <span className="s-chg-swap"><i className="out">PK</i>→<i className="in">YH</i></span>}</div>; })}
-          </div>
-          <div className="s-progress"><i /></div>
+      {/* 3. the new plan, shown as the product itself */}
+      <section className="s-plan" id="plan">
+        <div className="s-plan-copy" data-reveal>
+          <p className="s-mono">The new plan</p>
+          <h2 className="s-h2">It suggests a new plan, and you decide.</h2>
+          <p className="s-lead">Usher shows every change on the calendar before anything is sent. One approval makes it the plan, and everyone affected hears straight away.</p>
         </div>
+        <PlanDemo />
       </section>
 
       {/* call to action */}
