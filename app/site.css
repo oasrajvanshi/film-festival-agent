@@ -869,7 +869,7 @@
 
 /* The watch: narrower cards pushed to the sides, so the lines into Usher run longer. */
 @media (min-width: 901px) {
-  .s-flow { width: min(1240px, 100%); grid-template-columns: minmax(0, 270px) minmax(0, 1fr) minmax(0, 310px); }
+  .s-flow { width: min(1000px, calc(100vw - 2 * max(28px, 9vw))); grid-template-columns: minmax(0, 260px) minmax(0, 1fr) minmax(0, 300px); }
   .s-flow-feed, .s-flow-out { padding: 10px 12px; }
   .s-flow-feed b, .s-flow-out b { font-size: 14px; }
   .s-flow-feed small, .s-flow-out small { font-size: 12px; }

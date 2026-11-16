@@ -66,12 +66,24 @@ export function PlanDemo() {
       timers.push(setTimeout(() => setSnap(false), 60));
       STEPS.forEach((st, i) => timers.push(setTimeout(() => setStep(i), st.at + 120)));
     };
+    // It starts only once it is properly in view: the page asks for it ('pd-play') when the
+    // section reaches the top of the screen, or it starts by itself once most of it is visible.
+    // After the first full run it tells the page ('pd-done'), which lets scrolling go on.
+    let started = false;
+    const start = () => {
+      if (started) return;
+      started = true;
+      play(); loop = setInterval(play, LOOP);
+      timers.push(setTimeout(() => window.dispatchEvent(new Event('pd-done')), STEPS[STEPS.length - 1].at + 900));
+    };
+    window.addEventListener('pd-play', start);
     const io = new IntersectionObserver(([e]) => {
+      if (!started) { if (e.intersectionRatio >= 0.6) start(); return; }
       if (e.isIntersecting && !loop) { play(); loop = setInterval(play, LOOP); }
       if (!e.isIntersecting && loop) { clearInterval(loop); loop = null; timers.forEach(clearTimeout); }
-    }, { threshold: 0.08 });
+    }, { threshold: [0, 0.6] });
     io.observe(el);
-    return () => { io.disconnect(); if (loop) clearInterval(loop); timers.forEach(clearTimeout); };
+    return () => { window.removeEventListener('pd-play', start); io.disconnect(); if (loop) clearInterval(loop); timers.forEach(clearTimeout); };
   }, []);
   const moved = step >= 13;
   const items = ['Start 3 screenings 15 min later', 'Send 21 people their new time', 'Yara Hollis opens Pavel’s panel'];

@@ -228,6 +228,34 @@ export default function Site() {
         .fromTo(q('[data-feed-out]'), { autoAlpha: 0, x: 30 }, { autoAlpha: 1, x: 0, duration: 0.45, stagger: 0.1 }, 1.45);
       if (!phone) watch.to({}, { duration: 0.45 });
 
+      // The new plan: when it reaches the top of the screen the page stops there until the demo
+      // has played through once, so nothing in it is missed; then scrolling carries on.
+      const planEl = q('.pd')[0] as HTMLElement | undefined;
+      if (planEl && !reduce) {
+        let held = false;
+        const release = () => {
+          if (!held) return;
+          held = false;
+          if (glide) glide.paused(false);
+          else { document.documentElement.style.overflow = ''; document.body.style.overflow = ''; document.body.style.touchAction = ''; }
+        };
+        releasePlan = release;
+        ScrollTrigger.create({
+          trigger: planEl, start: phone ? 'top 64px' : 'top 14%', once: true,
+          onEnter: () => {
+            held = true;
+            if (glide) { glide.scrollTo(planEl, true, 'top 14%'); setTimeout(() => { if (held) glide.paused(true); }, 450); }
+            else {
+              window.scrollTo({ top: planEl.getBoundingClientRect().top + window.scrollY - 64 });
+              document.documentElement.style.overflow = 'hidden'; document.body.style.overflow = 'hidden'; document.body.style.touchAction = 'none';
+            }
+            window.dispatchEvent(new Event('pd-play'));
+            setTimeout(release, 9500);
+          },
+        });
+        window.addEventListener('pd-done', release);
+      }
+
       // --- 3. the recommendation: the calendar turns to face you and redraws itself
       q('[data-reveal]').forEach(el => gsap.fromTo(el, { y: 40, autoAlpha: 0, filter: 'blur(8px)' }, { y: 0, autoAlpha: 1, filter: 'blur(0px)', duration: 1, ease: 'power4.out', scrollTrigger: { trigger: el, start: 'top 85%', once: true } }));
       q('[data-split-scroll]').forEach(el => {
@@ -245,6 +273,7 @@ export default function Site() {
       stopSnow();
       ctx.revert();
       glide?.kill(); smootherRef = null;
+      if (releasePlan) { window.removeEventListener('pd-done', releasePlan); releasePlan(); releasePlan = null; }
     };
   }, []);
 
@@ -462,6 +491,7 @@ export default function Site() {
 // ---------------------------------------------------------------- helpers
 
 let smootherRef: ScrollSmoother | null = null;
+let releasePlan: (() => void) | null = null;
 
 function split(els: Element[]) {
   for (const el of els) {
