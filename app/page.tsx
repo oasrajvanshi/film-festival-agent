@@ -126,16 +126,15 @@ export default function Site() {
 
       // hero: the calendar keeps showing what the product does, on a loop
       const heroCal = q('[data-cal="hero"]')[0];
-      const loop = gsap.timeline({ repeat: -1, repeatDelay: 1.2, delay: 3.4, defaults: { ease: 'power3.inOut' } });
+      const loop = gsap.timeline({ repeat: -1, repeatDelay: 1.5, delay: 3.4, defaults: { ease: 'power3.inOut' } });
       loop.to(heroCal.querySelectorAll('[data-snowband]'), { opacity: 1, duration: 0.8 })
         .to(heroCal.querySelectorAll('[data-ghost]'), { opacity: 1, duration: 0.4 }, '<0.4')
         .add(moveBlocks(heroCal, 1), '<')
         .call(() => heroCal.querySelectorAll('[data-move]').forEach(e => e.classList.add('hot')), [], '<')
         .add(swapGuest(heroCal, true), '+=0.2')
-        .to({}, { duration: 2.4 })
-        .add(swapGuest(heroCal, false))
-        .add(moveBlocks(heroCal, 0))
-        .to(heroCal.querySelectorAll('[data-ghost], [data-snowband]'), { opacity: 0, duration: 0.5 }, '<');
+        .to({}, { duration: 1.5 })
+        // back to the original plan in one frame, so only the change forward is ever shown
+        .call(() => resetHero(heroCal));
       gsap.to(q('[data-hero-bg]'), { yPercent: 12, ease: 'none', scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
       gsap.to(q('[data-cal-wrap]'), { y: -14, rotateX: 3, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 2.4 });
       gsap.fromTo(q('[data-cal="hero"]'), { rotateX: 24, rotateZ: -6, y: 0 }, { rotateX: 14, rotateZ: -3, y: -60, ease: 'none', immediateRender: false, scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: 1 } });
@@ -417,6 +416,23 @@ function moveBlocks(cal: Element, to: 0 | 1, dur = 1.1) {
     if (!to) tl.call(() => el.classList.remove('hot'), [], i * 0.14);
   });
   return tl;
+}
+
+/** Put the hero calendar back on the original plan instantly (no reverse animation). */
+function resetHero(cal: Element) {
+  cal.querySelectorAll<HTMLElement>('[data-move]').forEach(el => {
+    gsap.set(el, { top: `${Number(el.dataset.top)}%` });
+    el.classList.remove('hot');
+    const tag = el.querySelector('[data-tag]'); if (tag) gsap.set(tag, { opacity: 0 });
+    const time = el.querySelector('[data-time]'); if (time?.getAttribute('data-orig')) time.textContent = time.getAttribute('data-orig');
+  });
+  const ev = cal.querySelector<HTMLElement>('[data-swap]');
+  if (ev) {
+    ev.classList.remove('hot');
+    const ins = ev.querySelector<HTMLElement>('[data-in]'); if (ins) ins.style.display = 'none';
+    const out = ev.querySelector<HTMLElement>('[data-out]'); if (out) out.innerHTML = 'Pavel Kettering';
+  }
+  gsap.set(cal.querySelectorAll('[data-ghost], [data-snowband]'), { opacity: 0 });
 }
 
 function shifted(text: string, by: number) {

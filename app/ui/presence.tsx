@@ -6,6 +6,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { AgentStore } from './useAgent';
 import { Icon } from './icons';
+import { VenueBuildings, venueCounts } from './venues';
 import { clock as fmt } from '../../src/core/time';
 import { festivalDays, type DayNumber } from '../../src/core/types';
 import { dayAt, roster, rosterCsv, type ArrivalResult, type PresenceKind, type RosterRow } from '../../src/agent/presence';
@@ -134,6 +135,7 @@ export function WhosHere({ s, eventScan }: { s: AgentStore; eventScan?: ReactNod
   const [kind, setKind] = useState<PresenceKind | 'all' | 'missing'>('all');
   const [q, setQ] = useState('');
   const [scan, setScan] = useState(false);
+  const [venue, setVenue] = useState<string | null>(null);
   useEffect(() => setDay(today), [today]);
   const rows = useMemo(() => roster(f, day), [f, day, s.version]); // eslint-disable-line react-hooks/exhaustive-deps
   const now = s.clock;
@@ -142,6 +144,7 @@ export function WhosHere({ s, eventScan }: { s: AgentStore; eventScan?: ReactNod
   const shown = rows
     .filter(r => kind === 'all' ? true : kind === 'missing' ? !r.arrival : r.kind === kind)
     .filter(r => !q || r.name.toLowerCase().includes(q.toLowerCase()))
+    .filter(r => !venue || r.firstVenueId === venue || r.arrival?.venueId === venue)
     .sort((a, b) => Number(late(b)) - Number(late(a)) || Number(!!a.arrival) - Number(!!b.arrival) || (a.firstAt ?? '9').localeCompare(b.firstAt ?? '9'));
   const by = (k: PresenceKind) => { const all = rows.filter(r => r.kind === k); return { here: all.filter(r => r.arrival).length, all: all.length }; };
   const here = rows.filter(r => r.arrival).length;
@@ -150,43 +153,50 @@ export function WhosHere({ s, eventScan }: { s: AgentStore; eventScan?: ReactNod
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${f.name.replace(/\W+/g, '-')}-day-${day}-arrivals.csv`; a.click();
   };
   const venueName = (id?: string) => f.venues.find(v => v.id === id)?.name ?? '';
+  const nowTitle = (vId: string) => {
+    if (!isToday) return undefined;
+    const t = now.slice(0, 16);
+    const e = f.events.find(x => x.venueId === vId && x.status === 'scheduled' && addMin(x.start, -30) <= t && t < x.end.slice(0, 16));
+    return e ? `Now: ${e.title}` : undefined;
+  };
+  const counts = venueCounts(f, rows, late, v => nowTitle(v.id));
+  const lateCount = rows.filter(late).length;
+  const chip = (k: PresenceKind | 'all' | 'missing', label: string, n?: string) => (
+    <button key={k} className={`wh-chip${kind === k ? ' on' : ''}`} onClick={() => setKind(kind === k && k !== 'all' ? 'all' : k)}>{label}{n && <small>{n}</small>}</button>
+  );
   return (
-    <div className="stack">
-      <div className="row" style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-        <div className="seg" aria-label="Day">
-          {days.map(d => <button key={d} className={d === day ? 'on' : ''} onClick={() => setDay(d)}>Day {d}</button>)}
+    <div className="wh">
+      <div className="wh-top">
+        <div className="cal-days" role="tablist" aria-label="Day">
+          {days.map(d => <button key={d} role="tab" aria-selected={d === day} className={d === day ? 'on' : ''} onClick={() => setDay(d)}>Day {d}</button>)}
         </div>
-        <span className="muted">{here} of {rows.filter(r => !r.walkIn).length} expected are here{rows.some(r => r.walkIn) ? `, plus ${rows.filter(r => r.walkIn).length} not on the list` : ''}.</span>
+        <span className="wh-sum"><b>{here}</b> of {rows.filter(r => !r.walkIn).length} here{lateCount ? <em> · {lateCount} guest{lateCount === 1 ? '' : 's'} running late</em> : null}</span>
         <span style={{ flex: 1 }} />
-        <button className="small" onClick={() => setScan(x => !x)}><Icon name="scan" size={16} /> {scan ? 'Hide scanner' : 'Scan people in'}</button>
-        <button className="small" onClick={download}>Download list</button>
+        <button className="small primary" onClick={() => setScan(x => !x)}><Icon name="scan" size={16} /> {scan ? 'Hide scanner' : 'Scan people in'}</button>
+        <button className="small ghost" onClick={download}>Download list</button>
       </div>
       {scan && (eventScan ? <ScanDesk s={s} event={eventScan} /> : <ArrivalScan s={s} />)}
-      <div className="stats">
-        {(['guest', 'vendor', 'staff', 'attendee'] as PresenceKind[]).map(k => {
-          const c = by(k);
-          return (
-            <button key={k} className={`stat ${kind === k ? 'hot' : ''}`} style={{ textAlign: 'left', cursor: 'pointer' }} onClick={() => setKind(kind === k ? 'all' : k)}>
-              <div className="k">{KIND_LABEL[k]}</div>
-              <div className="v">{c.here}<span className="muted" style={{ fontSize: 16 }}> / {c.all}</span></div>
-            </button>
-          );
-        })}
+
+      <div className="card">
+        <VenueBuildings counts={counts} picked={venue} onPick={setVenue} />
       </div>
-      <div className="card stack">
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-          <h2 style={{ margin: 0 }}>{kind === 'all' ? 'Everyone today' : kind === 'missing' ? 'Not here yet' : KIND_LABEL[kind]}</h2>
+
+      <div className="card">
+        <div className="wh-filters">
+          {chip('all', venue ? `At ${venueName(venue)}` : 'Everyone')}
+          {(['guest', 'staff', 'vendor', 'attendee'] as PresenceKind[]).map(k => { const c = by(k); return chip(k, KIND_LABEL[k], `${c.here}/${c.all}`); })}
+          {chip('missing', 'Not here yet')}
           <span style={{ flex: 1 }} />
-          <button className={`small ${kind === 'missing' ? 'primary' : ''}`} onClick={() => setKind(kind === 'missing' ? 'all' : 'missing')}>Not here yet</button>
-          <input value={q} onChange={e => setQ(e.target.value)} placeholder="Find a name" style={{ maxWidth: 200 }} />
+          {venue && <button className="small ghost" onClick={() => setVenue(null)}><Icon name="x" size={14} /> All venues</button>}
+          <input value={q} onChange={e => setQ(e.target.value)} placeholder="Find a name" className="wh-find" />
         </div>
         {!shown.length && <p className="muted">{rows.length ? 'Nobody matches.' : 'Nobody is expected on this day.'}</p>}
-        <div className="stack" style={{ gap: 0 }}>
+        <div className="wh-list">
           {shown.slice(0, 200).map(r => (
-            <div key={r.id} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '10px 0', borderTop: '1px solid var(--line)' }}>
-              <div style={{ minWidth: 0, flex: 1 }}>
-                <div><b>{r.name}</b> <span className="muted" style={{ fontSize: 12 }}>{KIND_LABEL[r.kind].replace(/s$/, '')}</span></div>
-                <div className="muted" style={{ fontSize: 13 }}>{r.why}</div>
+            <div key={r.id} className={`wh-row${late(r) ? ' late' : ''}`}>
+              <span className={`wh-av k-${r.kind}`}>{r.name.split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase()}</span>
+              <div className="wh-who">
+                <b>{r.name}</b><small>{KIND_LABEL[r.kind].replace(/s$/, '')} · {r.why}</small>
               </div>
               {r.arrival
                 ? <span className="chip ok" title={`Scanned by ${r.arrival.by}`}>Here {fmt(r.arrival.at)} · {venueName(r.arrival.venueId)}</span>

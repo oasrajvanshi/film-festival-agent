@@ -51,5 +51,22 @@
 @container (max-width: 150px) { .dcal-ev .faces { display: none; } }
 @container (max-width: 120px) { .dcal-ev .ev-thumb { display: none; } }
 /* Preview: cards slide between old and new times; a dashed outline marks where they were. */
-.previewing .dcal-ev.moved { transition: top .9s cubic-bezier(.65, 0, .35, 1), height .9s cubic-bezier(.65, 0, .35, 1); box-shadow: 0 0 0 1.5px var(--accent), 0 8px 22px rgba(212, 154, 92, .28); z-index: 2; }
+.previewing .dcal-ev.moved { transition: top .75s cubic-bezier(.65, 0, .35, 1), height .75s cubic-bezier(.65, 0, .35, 1); box-shadow: 0 0 0 1.5px var(--accent), 0 8px 22px rgba(212, 154, 92, .28); z-index: 2; }
 .dcal-ghost { position: absolute; left: 4px; right: 4px; border: 1.5px dashed rgba(212, 154, 92, .55); border-radius: 8px; background: rgba(212, 154, 92, .05); pointer-events: none; }
+
+/* Preview of a guest swap: the late guest steps back, the backup steps in, every 2 seconds. */
+.dcal-swap { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; flex: none; }
+.dcal-swap i { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 10.5px; font-weight: 700; color: #1b120e; border: 2px solid #1d1411;
+  transition: transform .6s cubic-bezier(.65, 0, .35, 1), opacity .6s, filter .6s, box-shadow .6s; }
+.dcal-swap .out { background: #c39367; box-shadow: 0 0 0 2px #E8684B; }
+.dcal-swap .in { background: #d6a873; }
+.dcal-swap .arr { color: var(--accent); font-size: 13px; transition: opacity .7s, transform .7s; }
+.dcal-swap.is-old .out { transform: scale(1.1); }
+.dcal-swap.is-old .in { transform: translateX(-16px) scale(.6); opacity: 0; }
+.dcal-swap.is-old .arr { opacity: 0; transform: translateX(-6px); }
+.dcal-swap.is-new .out { transform: scale(.78); opacity: .45; filter: grayscale(1); box-shadow: 0 0 0 2px rgba(232, 104, 75, .4); }
+.dcal-swap.is-new .in { transform: scale(1.15); box-shadow: 0 0 0 2px var(--accent), 0 0 16px rgba(212, 154, 92, .55); }
+.dcal-swap.is-new .arr { opacity: 1; }
+
+/* The jump back to the old times is instant. */
+.dcal.snap .dcal-ev, .dcal.snap .dcal-swap i, .dcal.snap .dcal-swap .arr { transition: none !important; }

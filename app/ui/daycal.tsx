@@ -9,6 +9,7 @@ import { addMinutes, clock as fmt, toMinutes } from '../../src/core/time';
 import type { DayNumber, FestivalEvent } from '../../src/core/types';
 import '../daycal.css';
 import { EventThumb, Faces } from './media';
+import { useLateGuests } from './weatherplan';
 
 /** Pixels per hour: dense enough to see most of a day at once. */
 const HOUR = 58;
@@ -16,7 +17,7 @@ const HOUR = 58;
 /**
  * `events` shows a different version of the schedule (a preview or the
  * original plan); `was` maps moved events to their earlier start. With
- * `animate`, moved cards slide between their old and new time every two
+ * `animate`, moved cards slide between their old and new time every 1.5
  * seconds, over a dashed outline of where they were.
  */
 export function DayCalendar({ s, day, events: over, was, notes, animate }: {
@@ -26,13 +27,20 @@ export function DayCalendar({ s, day, events: over, was, notes, animate }: {
   const events = useMemo(() => (over ?? f.events).filter(e => e.day === day).sort((a, b) => a.start.localeCompare(b.start)), [f, over, day, s.version]); // eslint-disable-line react-hooks/exhaustive-deps
   // Preview loop: false shows the old times, true the new ones.
   const [atNew, setAtNew] = useState(true);
-  const loopKey = animate ? Object.keys(was ?? {}).join() : '';
+  // Each loop jumps back to the old times without animating, then slides forward: only old → new is ever shown.
+  const [snap, setSnap] = useState(false);
+  const loopKey = animate ? [...Object.keys(was ?? {}), ...Object.keys(notes ?? {})].join() : '';
+  const late = useLateGuests(s);
   useEffect(() => {
-    if (!loopKey) { setAtNew(true); return; }
-    setAtNew(false);
-    const first = setTimeout(() => setAtNew(true), 400);
-    const every = setInterval(() => setAtNew(x => !x), 2000);
-    return () => { clearTimeout(first); clearInterval(every); };
+    if (!loopKey) { setAtNew(true); setSnap(false); return; }
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    const cycle = () => {
+      setSnap(true); setAtNew(false);
+      timers.push(setTimeout(() => { setSnap(false); setAtNew(true); }, 80));
+    };
+    cycle();
+    const every = setInterval(cycle, 1500);
+    return () => { clearInterval(every); timers.forEach(clearTimeout); };
   }, [loopKey]);
 
   // Bring the moved hours into view inside the calendar itself; the page stays still.
@@ -64,7 +72,7 @@ export function DayCalendar({ s, day, events: over, was, notes, animate }: {
   const onDay = s.clock.slice(0, 10) === f.dates[day];
   const guests = (ids: string[]) => ids.map(id => f.people.find(p => p.id === id)?.name).filter(Boolean).join(', ');
   return (
-    <div ref={box} className={`dcal${animate ? ' previewing' : ''}`} style={{ ['--cols' as string]: venues.length, ['--h' as string]: `${(span / 60) * HOUR}px` }}>
+    <div ref={box} className={`dcal${animate ? ' previewing' : ''}${snap ? ' snap' : ''}`} style={{ ['--cols' as string]: venues.length, ['--h' as string]: `${(span / 60) * HOUR}px` }}>
       <div className="dcal-head"><span />{venues.map(v => <span key={v.id} title={v.name}>{v.name}</span>)}</div>
       <div className="dcal-body">
         <div className="dcal-hours">{hours.map(m => <b key={m} style={{ top: `${((m - t0) / span) * 100}%` }}>{fmt(`2000-01-01T${String(Math.floor(m / 60) % 24).padStart(2, '0')}:00`).replace(':00', '')}</b>)}</div>
@@ -91,7 +99,23 @@ export function DayCalendar({ s, day, events: over, was, notes, animate }: {
                       <b>{e.title}</b>
                       <small>{o && <s>{fmt(o.start)}</s>}{fmt(e.start)}{!short && mins >= 60 ? '' : ` to ${fmt(e.end)}`}</small>
                     </div>
-                    {!short && e.guestIds.length > 0 && <Faces s={s} ids={e.guestIds} size={18} max={3} />}
+                    {(() => {
+                      const cur = f.events.find(x => x.id === e.id);
+                      const incoming = animate && cur ? e.guestIds.filter(g => !cur.guestIds.includes(g)) : [];
+                      const outgoing = incoming.length ? e.guestIds.filter(g => late.has(g)) : [];
+                      if (incoming.length && outgoing.length) {
+                        const who = (id: string) => f.people.find(p => p.id === id)?.name ?? '';
+                        const ini = (id: string) => who(id).split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+                        return (
+                          <span className={`dcal-swap ${atNew ? 'is-new' : 'is-old'}`} title={`${who(incoming[0])} opens, ${who(outgoing[0])} joins later`}>
+                            <i className="out">{ini(outgoing[0])}</i>
+                            <span className="arr">→</span>
+                            <i className="in">{ini(incoming[0])}</i>
+                          </span>
+                        );
+                      }
+                      return !short && e.guestIds.length > 0 ? <Faces s={s} ids={e.guestIds} size={18} max={3} /> : null;
+                    })()}
                   </div>
                   {notes?.[e.id] && <em className="dcal-note">{notes[e.id]}</em>}
                   {flagged.has(e.id) && <span className="tag">Flag</span>}

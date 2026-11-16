@@ -178,13 +178,6 @@ function AppInner({ demo }: { demo: Demo | null }) {
         <header className="topbar">
           <h1>{current.label}</h1>
           <div className="spacer" />
-          <span className="clock-pill">
-            <Icon name="clock" size={16} />
-            <select aria-label="Festival day" value={day} onChange={e => s.setClock(`${f.dates[+e.target.value as DayNumber]}T${s.clock.slice(11)}`)}>
-              {festivalDays(f).map(d => <option key={d} value={d}>Day {d} · {f.dates[d].slice(5)}</option>)}
-            </select>
-            <input aria-label="Festival time" type="time" value={s.clock.slice(11)} onChange={e => e.target.value && s.setClock(`${s.clock.slice(0, 11)}${e.target.value}`)} />
-          </span>
           <button className="ghost" onClick={() => setSheet('settings')} title="Settings">
             <span className={`model-dot ${s.useModel && s.llmInfo.available ? 'on' : ''}`} /> {user} <Icon name="gear" size={16} />
           </button>
@@ -193,7 +186,6 @@ function AppInner({ demo }: { demo: Demo | null }) {
         <header className="mobile-head">
           <div className="brand-mark"><Icon name="film" size={16} /></div>
           <h1>{current.label}</h1>
-          <span className="chip">Day {day} · {s.clock.slice(11)}</span>
           <button className="ghost small" aria-label="Settings" onClick={() => setSheet('settings')}><Icon name="gear" /></button>
         </header>
 

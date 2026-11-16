@@ -295,11 +295,41 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
   const shown = alerts.filter(x => x.status === 'open' && s.agent.f.dates[x.day])
     .map(al => ({ al, rec: recFor(s, al) })).filter((x): x is { al: WxAlert; rec: Rec } => !!x.rec)
     .sort((x, y) => x.al.day - y.al.day || (x.al.kind === 'guest' ? -1 : 1));
-  const open = shown.find(x => x.al.id === openId) ?? null;
+  // With two or more problems open, one overall recommendation handles them together.
+  const SHORT: Record<AlertKind, string> = { guest: 'Late guest', storm: 'Storm', snow: 'Snow', heat: 'Heat' };
+  const subOff = (off: Set<string>, id: string) => new Set([...off].filter(k => k.startsWith(`${id}:`)).map(k => k.slice(id.length + 1)));
+  const allRec: Rec | null = shown.length >= 2 ? {
+    title: `${shown.length} problems, one plan`,
+    sub: `Day ${[...new Set(shown.map(x => x.al.day))].join(' and Day ')}`,
+    what: 'Usher fits its plans together, so the changes don’t clash with each other.',
+    items: shown.flatMap(({ al, rec }) => rec.items.map(i => ({ key: `${al.id}:${i.key}`, text: `${SHORT[al.kind]}: ${i.text}` }))),
+    preview: off => {
+      const cur = s.agent.f.events;
+      const merged = new Map(cur.map(e => [e.id, { ...e }]));
+      const moved = new Set<string>(); const notes: Record<string, string> = {};
+      for (const { al, rec } of shown) {
+        const p = rec.preview(subOff(off, al.id));
+        if (!p) continue;
+        for (const id of p.moved) {
+          const nxt = p.events.find(e => e.id === id); const base = cur.find(e => e.id === id);
+          if (!nxt || !base) continue;
+          const m = merged.get(id)!;
+          if (nxt.start !== base.start) { m.start = nxt.start; m.end = nxt.end; }
+          if (nxt.guestIds.join() !== base.guestIds.join()) m.guestIds = nxt.guestIds;
+          moved.add(id);
+        }
+        Object.assign(notes, p.notes ?? {});
+      }
+      return moved.size ? { events: [...merged.values()], moved: [...moved], notes } : null;
+    },
+    apply: async () => ({ before: null }),
+  } : null;
+  const ALL: WxAlert = { id: 'all', kind: 'storm', day: (shown[0]?.al.day ?? 1) as DayNumber, status: 'open' };
+  const open = openId === 'all' && allRec ? { al: ALL, rec: allRec } : shown.find(x => x.al.id === openId) ?? null;
 
   const show = (id: string | null) => {
     setOpenId(id); setOff(new Set());
-    const o = shown.find(x => x.al.id === id);
+    const o = id === 'all' && allRec ? { al: ALL, rec: allRec } : shown.find(x => x.al.id === id);
     if (o) onOpen(o.al.day);
     onPreview(o ? o.rec.preview(new Set()) : null);
   };
@@ -316,18 +346,41 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
     setBusy(true);
     const chosen = new Set(open.rec.items.filter(i => !off.has(i.key)).map(i => i.key));
     const notes = open.rec.preview(off)?.notes ?? {};
-    const { before } = await open.rec.apply(k => chosen.has(k), user || 'Organizer');
+    let before: FestivalEvent[] | null = null;
+    if (open.al.id === 'all') {
+      // One after another, each re-planned on top of the last, so they never undo each other.
+      for (const { al } of shown) {
+        const fresh = recFor(s, al);
+        if (!fresh) continue;
+        const r = await fresh.apply(k => chosen.has(`${al.id}:${k}`), user || 'Organizer');
+        before = before ?? r.before;
+      }
+    } else {
+      before = (await open.rec.apply(k => chosen.has(k), user || 'Organizer')).before;
+    }
     s.commit();
     setBusy(false);
     setOpenId(null);
     onPreview(null);
     if (before) onApplied(before, notes);
-    setAlerts(alerts.map(x => (x.id === open.al.id ? { ...x, status: 'done' } : x)));
+    const doneIds = open.al.id === 'all' ? new Set(shown.map(x => x.al.id)) : new Set([open.al.id]);
+    setAlerts(alerts.map(x => (doneIds.has(x.id) ? { ...x, status: 'done' } : x)));
   };
 
   return (
     <>
       <div className="wx-alerts">
+        {allRec && (
+          <div className={`wx-alert wx-all${openId === 'all' ? ' open' : ''}`}>
+            <div className="wx-alert-row">
+              <span className="wx-alert-ic"><Icon name="sparkle" size={18} /></span>
+              <div className="wx-alert-text"><b>Handle all {shown.length} at once</b><span>One plan for every problem below</span></div>
+              <button className={openId === 'all' ? '' : 'primary'} onClick={() => show(openId === 'all' ? null : 'all')}>
+                {openId === 'all' ? 'Close preview' : <><Icon name="sparkle" size={15} /> Overall recommendation</>}
+              </button>
+            </div>
+          </div>
+        )}
         {shown.map(({ al, rec }) => {
           const isOpen = open?.al.id === al.id;
           return (

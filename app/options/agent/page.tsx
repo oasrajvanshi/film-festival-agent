@@ -109,7 +109,7 @@ function C() {
 
 // ---------------------------------------------------------------- D. four capabilities, each with a small working visual
 function D() {
-  const k = useTick(1600, 2);
+  const k = useTick(1500, 2);
   return (
     <div className="opt-d">
       <div className="opt-copy">

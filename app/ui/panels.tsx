@@ -1,7 +1,7 @@
 'use client';
 
 import { DayCalendar } from './daycal';
-import { ProblemTrigger, WeatherAlerts, type Preview } from './weatherplan';
+import { ProblemTrigger, WeatherAlerts, useAlerts, type Preview } from './weatherplan';
 import { useMemo, useState } from 'react';
 import { DEFAULT_SHEET, readSetup, type AgentStore } from './useAgent';
 import { riskSummary, type WeatherHour } from '../../src/agent/weather';
@@ -71,13 +71,13 @@ export function Overview({ s, user }: P) {
     }
   }
   const calEvents = preview ? preview.events : showOriginal && hasOriginal ? original! : undefined;
-  const dateLabel = new Date(`${f.dates[day]}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const [alerts] = useAlerts();
+  const problems = alerts.filter(x => x.status === 'open').length;
   return (
     <div className="today">
       <section className="hero has-photo">
         <HeroPhoto k="organizer" />
-        <div className="eyebrow">Day {day} · {dateLabel} · {fmt(s.clock)}</div>
-        <h2>{s.festivalName}</h2>
+        <h2>{problems ? `${problems} problem${problems === 1 ? '' : 's'} need${problems === 1 ? 's' : ''} you` : s.festivalName}</h2>
       </section>
 
       <ProblemTrigger />
