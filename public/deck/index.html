@@ -206,14 +206,15 @@
 
   /* 10 · evaluation: the four steps as Sundance-colour tiles, run on the Sundance 2027 plan */
   .ev-head { display: flex; align-items: center; justify-content: space-between; }
-  .ev-on { display: block; font-size: 22px; color: var(--text); margin-top: 34px; }
-  .ev-on b { color: var(--cream); }
-  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 30px; }
-  .step { border-radius: 18px; padding: 24px 24px 26px; color: #fff; min-height: 250px; display: flex; flex-direction: column; font-family: 'Archivo', 'Helvetica Neue', Arial, sans-serif; }
-  .step .n { font-size: 22px; font-weight: 700; opacity: .8; }
-  .step b { display: block; font-size: 26px; font-weight: 700; line-height: 1.12; letter-spacing: -.01em; margin-top: auto; }
-  .step p { margin: 10px 0 0; font-size: 18px; line-height: 1.4; color: rgba(255, 255, 255, .88); }
-  .step.r { background: #d9452c; } .step.p { background: #7d3cc8; } .step.b { background: #2f6fd6; } .step.g { background: #2f7a4d; }
+  .ev-mid { flex: 1; display: grid; grid-template-columns: 1fr 1.1fr; gap: 80px; align-items: center; }
+  .ev-flags { list-style: none; margin: 0; padding: 0; display: grid; gap: 34px; }
+  .ev-flags li { display: flex; align-items: center; gap: 22px; }
+  .ev-ic { width: 72px; height: 72px; border-radius: 18px; display: grid; place-items: center; flex: none; color: #fff; background: #d9452c; }
+  .ev-flags li:nth-child(2) .ev-ic { background: #2f6fd6; }
+  .ev-ic svg { width: 36px; height: 36px; }
+  .ev-flags b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 36px; line-height: 1.1; color: var(--cream); }
+  .ev-flags em { display: block; font-style: normal; font-size: 21px; color: var(--muted); margin-top: 6px; }
+  .ev-say { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 38px; line-height: 1.25; color: var(--cream); text-wrap: balance; }
   .scores { margin-top: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
   .score { border-radius: 18px; border: 1px solid var(--line-2); padding: 20px 24px; background: rgba(40, 27, 21, .5); }
   .score b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 40px; color: var(--cream); line-height: 1; }
@@ -425,12 +426,12 @@
       <p class="label-top rise">Evaluation</p>
       <img class="sd-logo small rise" style="--d:1" src="/deck/sundance-logo.svg" alt="Sundance Film Festival 2027" />
     </div>
-    <p class="ev-on rise" style="--d:1">Every test runs on <b>the Sundance 2027 plan</b>: 11 days, 13 venues, 559 events.</p>
-    <div class="steps">
-      <div class="step r rise" style="--d:2"><span class="n">1</span><b>Invent emergencies at Sundance</b><p>Medical calls, a projector failing, guest clashes.</p></div>
-      <div class="step p rise" style="--d:3"><span class="n">2</span><b>Simulate them on the festival</b><p>Across all 11 days, again and again.</p></div>
-      <div class="step b rise" style="--d:4"><span class="n">3</span><b>Check every reaction</b><p>Right people, right message, nothing public without a yes.</p></div>
-      <div class="step g rise" style="--d:5"><span class="n">4</span><b>Fix and repeat</b><p>Until Usher handles all of them.</p></div>
+    <div class="ev-mid">
+      <ul class="ev-flags">
+        <li class="rise" style="--d:2"><span class="ev-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z" fill="currentColor"/></svg></span><span><b>Medical emergencies</b><em>three different kinds</em></span></li>
+        <li class="rise" style="--d:3"><span class="ev-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="7" width="15" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="12.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M17.5 10.5l4-2.5v9l-4-2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 21h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span><b>AV failures</b><em>a projector fails, flagged by IT staff</em></span></li>
+      </ul>
+      <p class="ev-say rise" style="--d:4">We invent simulated emergencies at Sundance, then make sure Usher reacts to every change perfectly.</p>
     </div>
     <div class="scores">
       <div class="score rise" style="--d:5"><b>5 / 5</b><span>schedule changes reached the right people</span></div>
