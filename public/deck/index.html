@@ -200,8 +200,14 @@
   /* 9 · standing agent, any software */
   .s-api { flex-direction: row; align-items: center; gap: 40px; }
   .s-api .left { width: 640px; }
-  .api-logos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 40px; }
-  .api-logos img { display: block; width: 100%; height: auto; border-radius: 14px; }
+  .s-api { padding-bottom: 210px; }
+  .api-band { position: absolute; left: 120px; right: 120px; bottom: 64px; height: 104px; display: flex; align-items: center; gap: 56px; border-top: 1px solid rgba(241, 236, 226, .14); padding-top: 22px; }
+  .api-band .lbl { font-family: var(--f-mono); font-size: 18px; letter-spacing: .02em; color: var(--amber-2); white-space: nowrap; }
+  .api-band ul { flex: 1; display: flex; justify-content: space-between; align-items: center; list-style: none; margin: 0; padding: 0; }
+  .api-band li { position: relative; display: flex; align-items: center; justify-content: center; height: 64px; }
+  .api-band img { display: block; width: auto; opacity: .92; }
+  .api-band li.applied img { opacity: 1; }
+  .api-band li.applied em { position: absolute; left: 50%; top: -22px; transform: translateX(-50%); white-space: nowrap; font-style: normal; font-family: var(--f-mono); font-size: 13px; letter-spacing: .03em; color: #1a120d; background: var(--amber-2); padding: 3px 10px; border-radius: 999px; }
   .s-api .net { flex: 1; height: 100%; }
   .s-api .net svg { width: 100%; height: 100%; overflow: visible; }
   .net-line { stroke: rgba(201, 152, 99, .55); stroke-width: 2; stroke-dasharray: 6 8; animation: dash 1.4s linear infinite; }
@@ -405,13 +411,6 @@
     <div class="left">
       <p class="kicker rise">A standing agent</p>
       <h2 class="rise" style="--d:1;font-size:46px">Plugs into any API-friendly software festivals already use.</h2>
-      <div class="api-logos rise" style="--d:2">
-        <img src="/deck/logos/eventive.png" alt="Eventive, applied for" />
-        <img src="/deck/logos/elevent.png" alt="Elevent" />
-        <img src="/deck/logos/eventival.png" alt="Eventival" />
-        <img src="/deck/logos/filmfreeway.png" alt="FilmFreeway" />
-        <img src="/deck/logos/filmchief.png" alt="Filmchief" />
-      </div>
     </div>
     <div class="net rise" style="--d:2">
       <svg viewBox="0 0 760 640" role="img" aria-label="Usher in the middle, connected to the schedule, door scanning, email, text and push, flights, weather, transit and volunteer software.">
@@ -433,6 +432,16 @@
         </g>
         <g class="net-hub"><circle class="ring" cx="380" cy="320" r="110"/><circle cx="380" cy="320" r="110"/><text x="380" y="338" text-anchor="middle">Usher</text></g>
       </svg>
+    </div>
+    <div class="api-band rise" style="--d:3">
+      <span class="lbl">Works with</span>
+      <ul>
+        <li class="applied"><img src="/deck/logos/eventive.png" alt="Eventive" style="height:38px" /><em>Applied for</em></li>
+        <li><img src="/deck/logos/elevent.png" alt="Elevent" style="height:42px" /></li>
+        <li><img src="/deck/logos/eventival.png" alt="Eventival" style="height:62px" /></li>
+        <li><img src="/deck/logos/filmfreeway.png" alt="FilmFreeway" style="height:40px" /></li>
+        <li><img src="/deck/logos/filmchief.png" alt="Filmchief" style="height:44px" /></li>
+      </ul>
     </div>
   </section>
 
