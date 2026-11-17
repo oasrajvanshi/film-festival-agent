@@ -68,6 +68,18 @@ function AppInner({ demo }: { demo: Demo | null }) {
     return () => window.removeEventListener('resize', r);
   }, []);
   const setDevice = (d: Device) => { writeDevice(d); setDeviceState(d); };
+  // The sample festival is a demo: every reload of the organizer's screen starts it over,
+  // untouched and with nothing solved yet. Phone frames (?demoframe, ?inframe, ?viewas) only follow.
+  const startedOver = useRef(false);
+  useEffect(() => {
+    if (startedOver.current || !ready || who?.kind !== 'organizer') return;
+    const q = new URLSearchParams(location.search);
+    if (q.has('demoframe') || q.has('inframe') || q.has('viewas')) return;
+    const sample = s.shared ? !!s.pub?.sample : (s.sheet?.source ?? 'built-in') === 'built-in';
+    if (!sample) return;
+    startedOver.current = true;
+    s.reset().then(() => s.commit());
+  }, [ready, who, s.pub, s.sheet]); // eslint-disable-line react-hooks/exhaustive-deps
   const pending = s.agent.queue.filter(q => q.status === 'pending').length;
   const flags = s.agent.flags.length;
   const day = Number(Object.entries(f.dates).find(([, d]) => s.clock.startsWith(d))?.[0] ?? 1) as DayNumber;
