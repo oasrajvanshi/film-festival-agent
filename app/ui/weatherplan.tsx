@@ -147,7 +147,7 @@ export function ProblemTrigger({ s }: { s: AgentStore }) {
         if (live) { resetAlerts(); return; }
         // Every run starts from the untouched schedule, so a rehearsal never leaves the real demo half-applied.
         setBusy(true);
-        try { await s.reset(); } finally { setBusy(false); }
+        try { await s.reset(); } catch { /* still bring the problems on */ } finally { setBusy(false); }
         bringProblems(); logProblems(s); s.commit();
       }}>
         <Icon name={live ? 'check' : 'bolt'} size={14} /> {live ? 'Calm things down' : 'Bring on the problems'}
@@ -435,7 +435,9 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
   const approve = async () => {
     if (!open) return;
     setBusy(true);
-    const t0 = Date.now();
+    // The agent visibly works for a moment first; the changes are applied and saved together
+    // right after, so nothing read from the server in between can undo them.
+    await new Promise(r => setTimeout(r, 3300));
     const chosen = new Set(open.rec.items.filter(i => !off.has(i.key)).map(i => i.key));
     const notes = open.rec.preview(off)?.notes ?? {};
     let before: FestivalEvent[] | null = null;
@@ -450,11 +452,11 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
         before = before ?? r.before;
       }
     } else {
-      before = (await open.rec.apply(k => chosen.has(k), user || 'Organizer')).before;
+      // Rebuilt on the live agent: the one drawn on screen may predate a sync during the wait.
+      const live = recFor(s, open.al) ?? open.rec;
+      before = (await live.apply(k => chosen.has(k), user || 'Organizer')).before;
     }
     });
-    // Give the agent a visible moment of work (3.5 s) before the changes land everywhere at once.
-    await new Promise(r => setTimeout(r, Math.max(0, 3500 - (Date.now() - t0))));
     s.agent.log.add(`approved-${open.al.id}-${Date.now()}`, 'approval', `${user || 'Organizer'} approved "${open.rec.title}": ${chosen.size} of ${open.rec.items.length} changes (${open.rec.items.filter(i => chosen.has(i.key)).map(i => i.text).join('; ')})`);
     s.commit();
     setBusy(false);

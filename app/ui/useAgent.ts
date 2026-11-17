@@ -26,6 +26,8 @@ const KEY = 'ffa-state-v1';
 const SETUP_KEY = 'ffa-setup-v1';
 const WHO_KEY = 'ffa-who-v1';
 const FID_KEY = 'ffa-fid-v1';
+/** The deck's own private copy of the sample festival (shared mode). */
+const DECK_FID_KEY = 'usher-deck-fid';
 const TOKEN_KEY = 'ffa-token-v1';
 /** The demo opens on the morning the producer's flight is cancelled (Day 2). */
 const SAMPLE_CLOCK = SCENARIOS.clock;
@@ -47,6 +49,8 @@ export const readWho = () => ls.get<Who>(WHO_KEY);
 /** Signing out also forgets this device's session. */
 export function writeWho(w: Who | null) { ls.set(WHO_KEY, w); if (!w) ls.set(TOKEN_KEY, null); }
 export const readFid = () => ls.get<string>(FID_KEY);
+/** True for the festival the deck made for itself: a demo, safe to start over. */
+export const isDeckFestival = (fid: string | null) => !!fid && ls.get<string>(DECK_FID_KEY) === fid;
 
 export const remoteLlm: LlmClient = {
   model: 'server',
@@ -182,6 +186,10 @@ export function useAgent() {
   // Keep every device current: organizers check the version often, others refresh their slice.
   useEffect(() => {
     if (mode !== 'shared' || !who) return;
+    // The deck's phone frame follows the organizer frame beside it (live snapshots, then a pull once
+    // each save lands). Polling on its own could read a half-saved state and wipe the alerts.
+    const q = new URLSearchParams(location.search);
+    if (q.get('demoframe') === '1' && (q.get('as') ?? 'organizer') !== 'organizer') return;
     const organizer = who.kind === 'organizer';
     const t = setInterval(async () => {
       if (document.hidden || saving.current) return;
@@ -420,42 +428,53 @@ export function useAgent() {
   const signOut = useCallback(() => { setWho(null); }, []);
 
   /**
-   * The presentation's demo frames, on a device that has never signed in: open the
-   * public sample and sign in as its organizer, so the deck never stops at a code screen.
-   * Never used for a real festival.
+   * The presentation's demo frames, on a device that has never signed in. Local: the built-in
+   * sample, as its organizer. Shared: a private copy of the sample that only this deck knows
+   * (nobody else opening the public demo can change or reset it). The organizer frame makes the
+   * copy; the phone frame beside it waits for it and joins. Never used for a real festival.
    */
   const demoSignIn = useCallback(async () => {
     if (whoRef.current) return true;
-    const tom = () => directory(agentRef.current!.f).find(w => w.kind === 'organizer' && w.name === SCENARIOS.organizer)
-      ?? directory(agentRef.current!.f).find(w => w.kind === 'organizer');
     if (modeRef.current !== 'shared') {
       if (sheetRef.current.source !== 'built-in') return false;
       if (!readSetup()) writeSetup({ festivalName: FESTIVAL_NAME, city: 'Boulder', approver: 'Operations lead', channels: ['push', 'email'], onboardedAt: new Date().toISOString() });
-      const w = tom();
+      const all = directory(agentRef.current!.f).filter(w => w.kind === 'organizer');
+      const w = all.find(x => x.name === SCENARIOS.organizer) ?? all[0];
       if (w) { setWho({ ...w, code: '' }); bump(); }
       return !!w;
     }
-    if (fidRef.current) {
-      const p = await api<PublicInfo>('GET', { action: 'public', f: fidRef.current });
-      if (p.ok && !p.body.sample) return false;
+    const q = new URLSearchParams(location.search);
+    const follower = (q.get('as') ?? 'organizer') !== 'organizer';
+    const join = async (fid: string) => {
+      const p = await api<PublicInfo>('GET', { action: 'public', f: fid });
+      if (!p.ok) return false;
+      fidRef.current = fid; ls.set(FID_KEY, fid); setPub(p.body);
+      setWho(readWho()); whoRef.current = readWho();
+      await pull(); bump();
+      return true;
+    };
+    if (follower) {
+      // Wait (up to 20 s) for the organizer frame to make the deck's copy and sign in.
+      for (let i = 0; i < 40; i++) {
+        const fid = ls.get<string>(DECK_FID_KEY);
+        if (fid && ls.get<string>(TOKEN_KEY) && readWho() && readFid() === fid) return join(fid);
+        await new Promise(r => setTimeout(r, 500));
+      }
+      return false;
     }
-    if (!fidRef.current || readFid() !== fidRef.current) {
-      await openSample();
-      fidRef.current = readFid();
-    }
-    if (!fidRef.current) return false;
-    const p = await api<PublicInfo>('GET', { action: 'public', f: fidRef.current });
-    if (!p.ok || !p.body.sample) return false;
-    setPub(p.body);
-    // The public sample opens any profile with any code.
-    const r = await api<{ ok: boolean; token?: string; who?: Who }>('POST', { action: 'signin-verify', f: fidRef.current, kind: 'organizer', code: 'DEMO' });
-    if (!r.body.ok || !r.body.token || !r.body.who) return false;
+    const setup: Setup = { festivalName: FESTIVAL_NAME, city: 'Boulder', approver: SCENARIOS.organizer, channels: ['push', 'email'], onboardedAt: new Date().toISOString() };
+    const a = new FestivalAgent(buildSundance(), null, () => SAMPLE_CLOCK);
+    a.sweepClashes();
+    const r = await api<{ fid: string; token: string; who: Who }>('POST', { action: 'create', snapshot: a.snapshot(), clock: SAMPLE_CLOCK, sheet: { source: 'built-in', errors: [], warnings: [] }, setup });
+    if (!r.ok || !r.body.token) return false;
+    writeSetup(setup);
+    clearFestivalLocal();
     ls.set(TOKEN_KEY, r.body.token);
-    setWho(r.body.who);
-    await pull();
-    bump();
-    return true;
-  }, [openSample, pull]);
+    ls.set(WHO_KEY, r.body.who);
+    ls.set(DECK_FID_KEY, r.body.fid);
+    ls.set(FID_KEY, r.body.fid);
+    return join(r.body.fid);
+  }, [pull]);
 
   // ---------------------------------------------------------------- actions others can take
   /** A door scan. Shared: checked on the server against everyone's passes. */
@@ -484,7 +503,9 @@ export function useAgent() {
   }, [pull]);
 
   return {
-    agent: agentRef.current!, version, commit, clock, setClock, reset, llmInfo, useModel, setUseModel, sheet, loadSheet, goLive, openSample,
+    // A getter: code holding this object across an await (a reset, a demo wait) still reaches the live agent.
+    get agent() { return agentRef.current!; },
+    version, commit, clock, setClock, reset, llmInfo, useModel, setUseModel, sheet, loadSheet, goLive, openSample,
     mode, shared: mode === 'shared', pub, who, fid: fidRef.current, notice, requestCode, verifyCode, signOut, demoSignIn, signInAs: setWho, scan, arrive, call, pull,
     festivalName: pub?.name ?? agentRef.current!.f.name,
   };

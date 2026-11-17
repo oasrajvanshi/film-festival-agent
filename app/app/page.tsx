@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { readSetup, useAgent, writeSetup, writeWho } from '../ui/useAgent';
+import { isDeckFestival, readSetup, useAgent, writeSetup, writeWho } from '../ui/useAgent';
 import { clearFestivalLocal } from '../ui/localkeys';
 import { Approvals, Ask, Briefs, Data, Feeds, Log, Overview, Scan } from '../ui/panels';
 import { DemoShell, backToOrganizer, demoPerson, useDemo, type Demo } from '../ui/demo';
@@ -75,6 +75,8 @@ function AppInner({ demo }: { demo: Demo | null }) {
     setAutoIn('trying');
     s.demoSignIn().then(ok => { if (!ok) setAutoIn('failed'); }).catch(() => setAutoIn('failed'));
   }, [ready, who, demo?.framed, autoIn]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Signed in: if the session is ever lost later, the frame signs in again rather than staying blank.
+  useEffect(() => { if (who && autoIn === 'trying') setAutoIn('idle'); }, [who, autoIn]);
   // The sample festival is a demo: every reload of the organizer's screen starts it over,
   // untouched and with nothing solved yet. Phone frames (?demoframe, ?inframe, ?viewas) only follow.
   const startedOver = useRef(false);
@@ -82,11 +84,12 @@ function AppInner({ demo }: { demo: Demo | null }) {
     if (startedOver.current || !ready || who?.kind !== 'organizer') return;
     const q = new URLSearchParams(location.search);
     if (q.has('inframe') || q.has('viewas') || (q.has('demoframe') && (q.get('as') ?? 'organizer') !== 'organizer')) return;
-    const sample = s.shared ? !!s.pub?.sample : (s.sheet?.source ?? 'built-in') === 'built-in';
+    // Shared: only the deck's own copy starts over (never the public sample others may be using).
+    const sample = s.shared ? isDeckFestival(s.fid) : (s.sheet?.source ?? 'built-in') === 'built-in';
     if (!sample) return;
     startedOver.current = true;
     s.reset().then(() => s.commit());
-  }, [ready, who, s.pub, s.sheet]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ready, who, s.pub, s.sheet, s.fid]); // eslint-disable-line react-hooks/exhaustive-deps
   const pending = s.agent.queue.filter(q => q.status === 'pending').length;
   const flags = s.agent.flags.length;
   const day = Number(Object.entries(f.dates).find(([, d]) => s.clock.startsWith(d))?.[0] ?? 1) as DayNumber;

@@ -75,16 +75,54 @@ function scheduleAnswer(f: Festival, question: string): Answer | null {
 export const MIN_SCORE = 2.5;
 
 /** The festival's schedule and venues as short lines a model can read. */
-export function scheduleDigest(f: Festival, max = 160): string {
+export function scheduleDigest(f: Festival, max = 160, question = ''): string {
   const venue = (id: string) => f.venues.find(v => v.id === id);
   const who = (ids: string[]) => ids.map(id => f.people.find(p => p.id === id)?.name).filter(Boolean).join(', ');
   const day = (d: number) => new Date(`${f.dates[d]}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
-  const lines = [...f.events].sort((a, b) => a.start.localeCompare(b.start)).slice(0, max).map(e =>
-    `- Day ${e.day} (${day(e.day)}) ${clock(e.start)}–${clock(e.end)}: ${e.kind} "${e.title}" at ${venue(e.venueId)?.name ?? e.venueId}${e.room ? `, ${e.room}` : ''}`
-    + `${e.guestIds.length ? `; with ${who(e.guestIds)}` : ''}${e.restriction ? `; ${e.restriction.replace('_', ' ')}` : ''}${e.status === 'cancelled' ? '; CANCELLED' : ''}`);
+  const pick = relevantEvents(f, question);
+  const events = (pick ?? [...f.events]).sort((a, b) => a.start.localeCompare(b.start)).slice(0, pick ? 220 : max);
+  // Grouped by day, so each line stays short; the model has a size limit.
+  const lines: string[] = [];
+  let last = -1;
+  for (const e of events) {
+    if (e.day !== last) { lines.push(`Day ${e.day}, ${day(e.day)}:`); last = e.day; }
+    lines.push(`- ${clock(e.start)}–${clock(e.end)} ${e.kind === 'qa' ? 'Q&A' : e.kind} "${e.title}" at ${venue(e.venueId)?.name ?? e.venueId}`
+      + `${e.guestIds.length ? `; with ${who(e.guestIds)}` : ''}${e.restriction ? `; ${e.restriction.replace('_', ' ')}` : ''}${e.status === 'cancelled' ? '; CANCELLED' : ''}`);
+  }
   const venues = f.venues.map(v => `- ${v.name}: ${v.address}${v.capacity ? `, ${v.capacity} seats` : ''}`);
-  const films = f.films.map(x => `- "${x.title}" dir. ${x.director}, ${x.runtimeMin} min`);
-  return `Festival: ${f.name}\nVenues:\n${venues.join('\n')}\nFilms:\n${films.join('\n')}\nSchedule:\n${lines.join('\n')}`;
+  const films = f.films.map(x => `"${x.title}"`);
+  let schedule = lines.join('\n');
+  if (schedule.length > DIGEST_CHARS) schedule = `${schedule.slice(0, DIGEST_CHARS).replace(/\n[^\n]*$/, '')}\n(more events not shown)`;
+  const scope = pick ? 'Schedule (the days, venues, films and people the question mentions)' : `Schedule (first ${events.length} events)`;
+  return `Festival: ${f.name}\nDates: ${Object.keys(f.dates).map(d => `Day ${d} = ${day(Number(d))}`).join('; ')}\nVenues:\n${venues.join('\n')}\nFilms: ${films.join(', ')}\n${scope}:\n${schedule}`;
+}
+
+/** Keeps the request under the model's size limit (Groq rejects very large prompts). */
+const DIGEST_CHARS = 7000;
+
+/** The events a question is about: days, venues, films or people it names. Null when it names none. */
+export function relevantEvents(f: Festival, question: string): Festival['events'] | null {
+  const q = ` ${question.toLowerCase()} `;
+  if (!q.trim()) return null;
+  const days = new Set<number>();
+  const WD = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  for (const [d, iso] of Object.entries(f.dates)) {
+    const dt = new Date(`${iso}T12:00:00Z`);
+    const wd = WD[dt.getUTCDay()];
+    const md = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' }).toLowerCase(); // "jan 23"
+    const mdl = dt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', timeZone: 'UTC' }).toLowerCase(); // "january 23"
+    if (q.includes(wd) || new RegExp(`\\b${wd.slice(0, 3)}\\b`).test(q) || q.includes(md) || q.includes(mdl) || q.includes(iso) || new RegExp(`\\bday ${d}\\b`).test(q)) days.add(Number(d));
+  }
+  const words = (s: string) => s.toLowerCase().split(/[^a-z0-9]+/).filter(w => w.length > 3 && !['theater', 'theatre', 'auditorium', 'center', 'school', 'high', 'film', 'festival', 'hall'].includes(w));
+  const venueIds = new Set(f.venues.filter(v => q.includes(v.name.toLowerCase()) || words(v.name).some(w => q.includes(` ${w}`))).map(v => v.id));
+  const filmIds = new Set(f.films.filter(x => q.includes(x.title.toLowerCase())).map(x => x.id));
+  const personIds = new Set(f.people.filter(p => p.name.length > 3 && (q.includes(p.name.toLowerCase()) || (p.name.split(' ').length > 1 && q.includes(` ${p.name.split(' ').slice(-1)[0].toLowerCase()}`)))).map(p => p.id));
+  if (!days.size && !venueIds.size && !filmIds.size && !personIds.size) return null;
+  return f.events.filter(e =>
+    (!days.size || days.has(e.day))
+    && (!venueIds.size || venueIds.has(e.venueId) || !!(filmIds.size || personIds.size))
+    && (!filmIds.size || (e.filmId && filmIds.has(e.filmId)) || !!personIds.size && e.guestIds.some(g => personIds.has(g)))
+    && (!personIds.size || e.guestIds.some(g => personIds.has(g)) || (!!e.filmId && filmIds.has(e.filmId))));
 }
 
 export async function answerQuestion(f: Festival, question: string, llm: LlmClient | null = null): Promise<Answer> {
@@ -99,7 +137,7 @@ export async function answerQuestion(f: Festival, question: string, llm: LlmClie
           + 'If they let you answer, including a "no", set known to true and answer in one to three plain, friendly sentences with exact times, dates and venue names. '
           + 'Set known to false if they do not cover the question. Never guess or add facts. '
           + 'Reply as JSON: {"known": boolean, "answer": string, "cite": [source numbers, or "schedule"]}.' },
-        { role: 'user', content: `Official sources:\n${sources.length ? sources.map((s, i) => `[${i + 1}] ${s.title}: ${s.text}`).join('\n') : '(none matched)'}\n\n${scheduleDigest(f)}\n\nQuestion: ${question}` },
+        { role: 'user', content: `Official sources:\n${sources.length ? sources.map((s, i) => `[${i + 1}] ${s.title}: ${s.text}`).join('\n') : '(none matched)'}\n\n${scheduleDigest(f, 160, question)}\n\nQuestion: ${question}` },
       ], { json: true });
       const parsed = extractJson(raw) as { known?: boolean | string; answer?: string; cite?: (number | string)[] | number | string };
       if (parsed.known === false || parsed.known === 'false' || !parsed.answer) return { known: false, text: IDK, citations: [], via: 'llm' };
