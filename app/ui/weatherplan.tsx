@@ -431,6 +431,8 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
     const chosen = new Set(open.rec.items.filter(i => !off.has(i.key)).map(i => i.key));
     const notes = open.rec.preview(off)?.notes ?? {};
     let before: FestivalEvent[] | null = null;
+    // Approving is instant: the wording was already checked, so the model isn't asked to rephrase again.
+    await s.agent.withoutModel(async () => {
     if (open.al.id === 'all') {
       // One after another, each re-planned on top of the last, so they never undo each other.
       for (const { al } of shown) {
@@ -442,6 +444,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
     } else {
       before = (await open.rec.apply(k => chosen.has(k), user || 'Organizer')).before;
     }
+    });
     s.agent.log.add(`approved-${open.al.id}-${Date.now()}`, 'approval', `${user || 'Organizer'} approved "${open.rec.title}": ${chosen.size} of ${open.rec.items.length} changes (${open.rec.items.filter(i => chosen.has(i.key)).map(i => i.text).join('; ')})`);
     s.commit();
     setBusy(false);

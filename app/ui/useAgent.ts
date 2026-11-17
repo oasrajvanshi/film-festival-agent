@@ -249,6 +249,8 @@ export function useAgent() {
     if (modeRef.current === 'shared') {
       bump();
       if (whoRef.current?.kind !== 'organizer') return;
+      // Phones open in this browser (the presenting view) get the new plan now, before the server round-trip.
+      try { live.current?.postMessage({ kind: 'snapshot', state: { agent: agentRef.current!.snapshot(), clock: clockRef.current, board: readBoard() } }); } catch { /* too large or closed */ }
       dirty.current = true;
       if (!saving.current) saving.current = pushState().finally(() => { saving.current = null; });
       return;
@@ -276,7 +278,20 @@ export function useAgent() {
         bump();
       } catch { /* keep what we have */ }
     };
-    if (ch) ch.onmessage = e => { if (e.data?.kind === 'state' || e.data?.kind === 'pull') reload(); };
+    if (ch) ch.onmessage = e => {
+      if (e.data?.kind === 'snapshot' && e.data.state) {
+        // Another screen in this browser just changed the plan: show it now; the server copy follows.
+        try {
+          agentRef.current = FestivalAgent.restore(e.data.state.agent, null, now);
+          if (e.data.state.board) writeBoard(e.data.state.board);
+          clockRef.current = e.data.state.clock || clockRef.current;
+          setClockState(clockRef.current);
+          bump();
+        } catch { /* keep what we have */ }
+        return;
+      }
+      if (e.data?.kind === 'state' || e.data?.kind === 'pull') reload();
+    };
     // Other tabs, and browsers without BroadcastChannel: the storage event.
     const onStorage = (e: StorageEvent) => {
       if (e.key === KEY && modeRef.current !== 'shared') reload();

@@ -312,6 +312,11 @@ export class FestivalAgent {
   }
 
   setLlm(llm: LlmClient | null) { this.llm = llm; }
+  /** Run something without the model (e.g. approving a recommendation whose wording is already set): fast and deterministic. */
+  async withoutModel<T>(fn: () => Promise<T>): Promise<T> {
+    const keep = this.llm; this.llm = null;
+    try { return await fn(); } finally { this.llm = keep; }
+  }
 
   // --- Human decisions --------------------------------------------------
 
