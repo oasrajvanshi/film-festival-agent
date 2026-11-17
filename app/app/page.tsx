@@ -75,14 +75,6 @@ function AppInner({ demo }: { demo: Demo | null }) {
     setAutoIn('trying');
     s.demoSignIn().then(ok => { if (!ok) setAutoIn('failed'); }).catch(() => setAutoIn('failed'));
   }, [ready, who, demo?.framed, autoIn]); // eslint-disable-line react-hooks/exhaustive-deps
-  // A deck frame still on another festival (e.g. the public sample, from before the deck had its
-  // own copy) moves to the deck's private copy once, so nobody else can change the live demo.
-  const moved = useRef(false);
-  useEffect(() => {
-    if (moved.current || !ready || !demo?.framed || !s.shared || !who || isDeckFestival(s.fid)) return;
-    moved.current = true;
-    void s.demoSignIn(true);
-  }, [ready, who, s.fid, s.shared, demo?.framed]); // eslint-disable-line react-hooks/exhaustive-deps
   // Signed in: if the session is ever lost later, the frame signs in again rather than staying blank.
   useEffect(() => { if (who && autoIn === 'trying') setAutoIn('idle'); }, [who, autoIn]);
   // The sample festival is a demo: every reload of the organizer's screen starts it over,

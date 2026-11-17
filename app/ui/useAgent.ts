@@ -97,7 +97,10 @@ export function useAgent() {
 
   if (!agentRef.current) agentRef.current = new FestivalAgent(buildSundance(), null, now);
 
-  const setWho = (w: Who | null) => { whoRef.current = w; setWhoState(w); writeWho(w); };
+  // The deck's phone frame shares its sign-in with the organizer frame beside it: it never clears
+  // that shared sign-in (a stray rejected request there must not sign the presenter out).
+  const follower = typeof window !== 'undefined' && (() => { const q = new URLSearchParams(location.search); return q.get('demoframe') === '1' && (q.get('as') ?? 'organizer') !== 'organizer'; })();
+  const setWho = (w: Who | null) => { whoRef.current = w; setWhoState(w); if (w || !follower) writeWho(w); };
   const bump = () => setVersion(v => v + 1);
 
   /** Replace what this device holds with the server's copy. */
@@ -433,8 +436,8 @@ export function useAgent() {
    * (nobody else opening the public demo can change or reset it). The organizer frame makes the
    * copy; the phone frame beside it waits for it and joins. Never used for a real festival.
    */
-  const demoSignIn = useCallback(async (move = false) => {
-    if (whoRef.current && !move) return true;
+  const demoSignIn = useCallback(async () => {
+    if (whoRef.current) return true;
     if (modeRef.current !== 'shared') {
       if (sheetRef.current.source !== 'built-in') return false;
       if (!readSetup()) writeSetup({ festivalName: FESTIVAL_NAME, city: 'Boulder', approver: 'Operations lead', channels: ['push', 'email'], onboardedAt: new Date().toISOString() });
@@ -457,8 +460,7 @@ export function useAgent() {
       // Wait (up to 20 s) for the organizer frame to make the deck's copy and sign in.
       for (let i = 0; i < 40; i++) {
         const fid = ls.get<string>(DECK_FID_KEY);
-        if (fid && ls.get<string>(TOKEN_KEY) && readWho() && readFid() === fid && fid !== fidRef.current) return join(fid);
-        if (fid && fid === fidRef.current && !move) return join(fid);
+        if (fid && ls.get<string>(TOKEN_KEY) && readWho() && readFid() === fid) return join(fid);
         await new Promise(r => setTimeout(r, 500));
       }
       return false;
