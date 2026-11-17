@@ -7,6 +7,8 @@ import { FestivalAgent } from '../agent/agent';
 import { PROFILES, accessCode, directory, type ProfileKind, type Who } from '../access/profiles';
 import type { Festival, Person } from '../core/types';
 import type { Kv } from './kv';
+import { buildSundance } from '../data/sundance';
+import { FESTIVAL_NAME, SCENARIOS } from '../data/sundance2027';
 
 export type Snapshot = ReturnType<FestivalAgent['snapshot']>;
 export interface SheetStatus { source: string; sheet?: string; loadedAt?: string; errors: string[]; warnings: string[]; message?: string }
@@ -59,7 +61,29 @@ export function trimSnapshot(s: Snapshot): Snapshot {
   return s.log.length > LOG_CAP ? { ...s, log: s.log.slice(-LOG_CAP) } : s;
 }
 
-export async function loadFest(kv: Kv, fid: string) { return kv.get<FestRecord>(FKEY(fid)); }
+export async function loadFest(kv: Kv, fid: string) {
+  const rec = await kv.get<FestRecord>(FKEY(fid));
+  // The shared demo always runs the current built-in sample: a copy saved from an older
+  // sample (e.g. Harbor Lights before the Sundance switch) is replaced on first read.
+  if (rec && fid === SAMPLE_FID && (rec.initial.festival.name !== FESTIVAL_NAME || (rec as FestRecord & { sampleVersion?: string }).sampleVersion !== SAMPLE_VERSION)) {
+    const fresh = freshSample();
+    await saveFest(kv, fresh);
+    return fresh;
+  }
+  return rec;
+}
+
+/** Bumped with the built-in demo festival, so the shared demo on the server is rebuilt. */
+export const SAMPLE_VERSION = 'sundance-2027-v5';
+export function freshSample(): FestRecord {
+  const festival = buildSundance();
+  const agent = new FestivalAgent(festival, null, () => SCENARIOS.clock);
+  agent.sweepClashes();
+  const setup: Setup = { festivalName: FESTIVAL_NAME, city: 'Boulder', approver: SCENARIOS.organizer, channels: ['push', 'email'], onboardedAt: new Date().toISOString() };
+  const rec = newRecord({ id: SAMPLE_FID, festival, snapshot: agent.snapshot(), clock: SCENARIOS.clock, sheet: { source: 'built-in', errors: [], warnings: [] }, setup, sample: true });
+  (rec as FestRecord & { sampleVersion?: string }).sampleVersion = SAMPLE_VERSION;
+  return rec;
+}
 export async function saveFest(kv: Kv, rec: FestRecord) {
   rec.updatedAt = new Date().toISOString();
   rec.state.agent = trimSnapshot(rec.state.agent);

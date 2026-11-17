@@ -128,7 +128,7 @@ export async function POST(req: Request) {
     if (sample) {
       const have = await loadFest(kv, SAMPLE_FID);
       // Keep the shared sample, unless the built-in sample has since changed (e.g. a new demo festival).
-      if (have && have.initial.festival.name === snapshot.f.name) return json({ fid: SAMPLE_FID });
+      if (have) return json({ fid: SAMPLE_FID }); // loadFest keeps the shared demo on the current sample
     }
     const id = sample ? SAMPLE_FID : newId(8);
     const rec = newRecord({ id, festival: snapshot.f, snapshot, clock: String(b.clock ?? ''), sheet: b.sheet as FestRecord['state']['sheet'], setup, sample });
