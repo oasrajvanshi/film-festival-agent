@@ -13,7 +13,7 @@ import { AccessCodes, Feedback, PersonalApp, SignIn } from '../ui/profiles';
 import { ScanDesk } from '../ui/presence';
 import { directory, type Who } from '../../src/access/profiles';
 import { useTheme } from '../ui/live';
-import { IPhone, PhoneFrame, inFrame, isWide, readDevice, toParent, writeDevice, type Device } from '../ui/phoneframe';
+import { PhoneFrame, inFrame, isWide, readDevice, toParent, writeDevice, type Device } from '../ui/phoneframe';
 import type { DayNumber } from '../../src/core/types';
 import { festivalDays } from '../../src/core/types';
 
@@ -56,11 +56,6 @@ function AppInner({ demo }: { demo: Demo | null }) {
   const [viewasId, setViewasId] = useState<string | null>(null);
   // Light or dark, remembered on this device (the organizer's tool only; people's phone apps stay dark).
   const [theme, setTheme] = useTheme();
-  // A live phone beside the dashboard, for presenting (remembered on this device).
-  const [split, setSplitState] = useState(false);
-  const [splitWho, setSplitWho] = useState<'attendee' | 'staff'>('attendee');
-  useEffect(() => { try { setSplitState(localStorage.getItem('usher-split') === '1'); } catch { /* private mode */ } }, []);
-  const setSplit = (on: boolean) => { setSplitState(on); try { localStorage.setItem('usher-split', on ? '1' : '0'); } catch { /* private mode */ } };
   useEffect(() => {
     document.documentElement.classList.toggle('org-light', theme === 'light');
     return () => document.documentElement.classList.remove('org-light');
@@ -218,7 +213,6 @@ function AppInner({ demo }: { demo: Demo | null }) {
           <button className="ghost small theme-btn" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} title={theme === 'light' ? 'Dark mode' : 'Light mode'} aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}>
             <Icon name={theme === 'light' ? 'moon' : 'sun'} size={15} /> {theme === 'light' ? 'Dark' : 'Light'}
           </button>
-          <button className={`ghost small${split ? ' on' : ''}`} onClick={() => setSplit(!split)} title="Show an attendee's or volunteer's phone beside this screen, live"><Icon name="ticket" size={15} /> {split ? 'Hide phone' : 'Show phone'}</button>
           <button className="ghost small" onClick={() => setDevice('phone')} title="See the organizer app on a phone"><Icon name="home" size={15} /> Phone view</button>
           <button className="ghost" onClick={() => setSheet('settings')} title="Settings">
             <span className={`model-dot ${s.useModel && s.llmInfo.available ? 'on' : ''}`} /> {user} <Icon name="gear" size={16} />
@@ -279,23 +273,5 @@ function AppInner({ demo }: { demo: Demo | null }) {
       </>}
     </div>
   );
-  // Presenting: the organizer's screen with a live phone beside it, both on the same festival.
-  if (split && wide && !framed) {
-    return (
-      <div className={`split${theme === 'light' ? ' light' : ''}`}>
-        {shellEl}
-        <aside className="split-phone" aria-label="Live phone">
-          <div className="split-seg" role="tablist" aria-label="Whose phone">
-            {(['attendee', 'staff'] as const).map(k => (
-              <button key={k} role="tab" aria-selected={splitWho === k} className={splitWho === k ? 'on' : ''} onClick={() => setSplitWho(k)}>{k === 'attendee' ? 'Attendee' : 'Volunteer'}</button>
-            ))}
-            <button className="split-x" aria-label="Hide the phone" onClick={() => setSplit(false)}><Icon name="x" size={14} /></button>
-          </div>
-          <IPhone key={splitWho} src={`/app?demoframe=1&as=${splitWho}`} title={`Usher on ${splitWho === 'attendee' ? 'an attendee' : 'a volunteer'}'s phone`} />
-          <p className="split-note">{splitWho === 'attendee' ? 'Jane, attendee' : 'Tova Jessop, volunteer'} · live</p>
-        </aside>
-      </div>
-    );
-  }
   return shellEl;
 }
