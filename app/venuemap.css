@@ -417,3 +417,9 @@
   -webkit-mask-image: linear-gradient(180deg, rgba(0, 0, 0, .06) 0%, rgba(0, 0, 0, .1) 20%, rgba(0, 0, 0, .55) 60%, #000 100%);
   mask-image: linear-gradient(180deg, rgba(0, 0, 0, .06) 0%, rgba(0, 0, 0, .1) 20%, rgba(0, 0, 0, .55) 60%, #000 100%); }
 .shell.light .dcal-ev.moved::before { opacity: .16; }
+/* Light mode, revised: the picture is clearly visible, solid at the bottom and fading out toward the title at the top. */
+.shell.light .dcal-ev::before { opacity: .62; filter: saturate(.95);
+  -webkit-mask-image: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .75) 40%, rgba(0, 0, 0, .3) 75%, rgba(0, 0, 0, .12) 100%);
+  mask-image: linear-gradient(0deg, #000 0%, rgba(0, 0, 0, .75) 40%, rgba(0, 0, 0, .3) 75%, rgba(0, 0, 0, .12) 100%); }
+.shell.light .dcal-ev.moved::before { opacity: .5; }
+.shell.light .dcal-ev b { text-shadow: 0 1px 0 rgba(255, 255, 255, .7); }
