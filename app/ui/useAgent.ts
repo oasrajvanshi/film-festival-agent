@@ -433,8 +433,8 @@ export function useAgent() {
    * (nobody else opening the public demo can change or reset it). The organizer frame makes the
    * copy; the phone frame beside it waits for it and joins. Never used for a real festival.
    */
-  const demoSignIn = useCallback(async () => {
-    if (whoRef.current) return true;
+  const demoSignIn = useCallback(async (move = false) => {
+    if (whoRef.current && !move) return true;
     if (modeRef.current !== 'shared') {
       if (sheetRef.current.source !== 'built-in') return false;
       if (!readSetup()) writeSetup({ festivalName: FESTIVAL_NAME, city: 'Boulder', approver: 'Operations lead', channels: ['push', 'email'], onboardedAt: new Date().toISOString() });
@@ -457,7 +457,8 @@ export function useAgent() {
       // Wait (up to 20 s) for the organizer frame to make the deck's copy and sign in.
       for (let i = 0; i < 40; i++) {
         const fid = ls.get<string>(DECK_FID_KEY);
-        if (fid && ls.get<string>(TOKEN_KEY) && readWho() && readFid() === fid) return join(fid);
+        if (fid && ls.get<string>(TOKEN_KEY) && readWho() && readFid() === fid && fid !== fidRef.current) return join(fid);
+        if (fid && fid === fidRef.current && !move) return join(fid);
         await new Promise(r => setTimeout(r, 500));
       }
       return false;
