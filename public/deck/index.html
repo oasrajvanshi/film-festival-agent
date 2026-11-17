@@ -200,6 +200,8 @@
   /* 9 · standing agent, any software */
   .s-api { flex-direction: row; align-items: center; gap: 40px; }
   .s-api .left { width: 640px; }
+  .api-logos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 40px; }
+  .api-logos img { display: block; width: 100%; height: auto; border-radius: 14px; }
   .s-api .net { flex: 1; height: 100%; }
   .s-api .net svg { width: 100%; height: 100%; overflow: visible; }
   .net-line { stroke: rgba(201, 152, 99, .55); stroke-width: 2; stroke-dasharray: 6 8; animation: dash 1.4s linear infinite; }
@@ -403,6 +405,13 @@
     <div class="left">
       <p class="kicker rise">A standing agent</p>
       <h2 class="rise" style="--d:1;font-size:46px">Plugs into any API-friendly software festivals already use.</h2>
+      <div class="api-logos rise" style="--d:2">
+        <img src="/deck/logos/eventive.png" alt="Eventive, applied for" />
+        <img src="/deck/logos/elevent.png" alt="Elevent" />
+        <img src="/deck/logos/eventival.png" alt="Eventival" />
+        <img src="/deck/logos/filmfreeway.png" alt="FilmFreeway" />
+        <img src="/deck/logos/filmchief.png" alt="Filmchief" />
+      </div>
     </div>
     <div class="net rise" style="--d:2">
       <svg viewBox="0 0 760 640" role="img" aria-label="Usher in the middle, connected to the schedule, door scanning, email, text and push, flights, weather, transit and volunteer software.">
