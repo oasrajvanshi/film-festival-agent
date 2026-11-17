@@ -15,7 +15,7 @@ import { FESTIVAL_NAME, SCENARIOS } from '../../src/data/sundance2027';
 import type { LlmClient, ChatMessage } from '../../src/llm/ollama';
 import type { Festival } from '../../src/core/types';
 import type { ScanResult } from '../../src/rules/access';
-import type { ProfileKind, Who } from '../../src/access/profiles';
+import { directory, type ProfileKind, type Who } from '../../src/access/profiles';
 import { rebuildFromTabs, type SheetMapping } from '../../src/onboard/workbook';
 
 export const DEFAULT_SHEET = 'https://docs.google.com/spreadsheets/d/18Pp1GAMQz__QzyvKYlddcR-agiG1p7rH5QJq8NV9lNM/edit';
@@ -419,6 +419,43 @@ export function useAgent() {
   }, [pull]);
   const signOut = useCallback(() => { setWho(null); }, []);
 
+  /**
+   * The presentation's demo frames, on a device that has never signed in: open the
+   * public sample and sign in as its organizer, so the deck never stops at a code screen.
+   * Never used for a real festival.
+   */
+  const demoSignIn = useCallback(async () => {
+    if (whoRef.current) return true;
+    const tom = () => directory(agentRef.current!.f).find(w => w.kind === 'organizer' && w.name === SCENARIOS.organizer)
+      ?? directory(agentRef.current!.f).find(w => w.kind === 'organizer');
+    if (modeRef.current !== 'shared') {
+      if (sheetRef.current.source !== 'built-in') return false;
+      const w = tom();
+      if (w) { setWho({ ...w, code: '' }); bump(); }
+      return !!w;
+    }
+    if (fidRef.current) {
+      const p = await api<PublicInfo>('GET', { action: 'public', f: fidRef.current });
+      if (p.ok && !p.body.sample) return false;
+    }
+    if (!fidRef.current || readFid() !== fidRef.current) {
+      await openSample();
+      fidRef.current = readFid();
+    }
+    if (!fidRef.current) return false;
+    const p = await api<PublicInfo>('GET', { action: 'public', f: fidRef.current });
+    if (!p.ok || !p.body.sample) return false;
+    setPub(p.body);
+    // The public sample opens any profile with any code.
+    const r = await api<{ ok: boolean; token?: string; who?: Who }>('POST', { action: 'signin-verify', f: fidRef.current, kind: 'organizer', code: 'DEMO' });
+    if (!r.body.ok || !r.body.token || !r.body.who) return false;
+    ls.set(TOKEN_KEY, r.body.token);
+    setWho(r.body.who);
+    await pull();
+    bump();
+    return true;
+  }, [openSample, pull]);
+
   // ---------------------------------------------------------------- actions others can take
   /** A door scan. Shared: checked on the server against everyone's passes. */
   const scan = useCallback(async (qr: string, eventId: string): Promise<ScanResult> => {
@@ -447,7 +484,7 @@ export function useAgent() {
 
   return {
     agent: agentRef.current!, version, commit, clock, setClock, reset, llmInfo, useModel, setUseModel, sheet, loadSheet, goLive, openSample,
-    mode, shared: mode === 'shared', pub, who, fid: fidRef.current, notice, requestCode, verifyCode, signOut, signInAs: setWho, scan, arrive, call, pull,
+    mode, shared: mode === 'shared', pub, who, fid: fidRef.current, notice, requestCode, verifyCode, signOut, demoSignIn, signInAs: setWho, scan, arrive, call, pull,
     festivalName: pub?.name ?? agentRef.current!.f.name,
   };
 }

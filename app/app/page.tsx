@@ -68,13 +68,20 @@ function AppInner({ demo }: { demo: Demo | null }) {
     return () => window.removeEventListener('resize', r);
   }, []);
   const setDevice = (d: Device) => { writeDevice(d); setDeviceState(d); };
+  // The deck's demo frames sign in to the public sample by themselves, even in a fresh browser.
+  const [autoIn, setAutoIn] = useState<'idle' | 'trying' | 'failed'>('idle');
+  useEffect(() => {
+    if (!ready || who || !demo?.framed || autoIn !== 'idle') return;
+    setAutoIn('trying');
+    s.demoSignIn().then(ok => { if (!ok) setAutoIn('failed'); }).catch(() => setAutoIn('failed'));
+  }, [ready, who, demo?.framed, autoIn]); // eslint-disable-line react-hooks/exhaustive-deps
   // The sample festival is a demo: every reload of the organizer's screen starts it over,
   // untouched and with nothing solved yet. Phone frames (?demoframe, ?inframe, ?viewas) only follow.
   const startedOver = useRef(false);
   useEffect(() => {
     if (startedOver.current || !ready || who?.kind !== 'organizer') return;
     const q = new URLSearchParams(location.search);
-    if (q.has('demoframe') || q.has('inframe') || q.has('viewas')) return;
+    if (q.has('inframe') || q.has('viewas') || (q.has('demoframe') && (q.get('as') ?? 'organizer') !== 'organizer')) return;
     const sample = s.shared ? !!s.pub?.sample : (s.sheet?.source ?? 'built-in') === 'built-in';
     if (!sample) return;
     startedOver.current = true;
@@ -183,6 +190,7 @@ function AppInner({ demo }: { demo: Demo | null }) {
 
   function signOut() { s.signOut(); setViewAs(null); setSheet(null); window.scrollTo({ top: 0 }); }
   if (!ready) return null;
+  if (!who && demo?.framed && autoIn !== 'failed') return null; // signing in to the sample, a moment
   if (!who) return <SignIn s={s} onIn={w => { if (w.kind === 'organizer') setUser(w.name); }} />;
   if (who.kind !== 'organizer') {
     if (!framed && wide) return <PhoneFrame src="/app?inframe=1" title={`Usher for ${who.name}`} onMessage={m => { if (m.signedOut) location.reload(); }} />;
