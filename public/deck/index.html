@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Usher · Presentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Montserrat:wght@600;700;800&family=DM+Mono:wght@400;500&family=Limelight&display=swap" />
+<style>
+  /* Usher's landing look: umber dark, cream type, one amber light, velvet red for trouble, film grain. */
+  :root {
+    --bg: #120b09; --bg-2: #1a110e; --panel: #1c1310; --line: rgba(236, 226, 208, .12); --line-2: rgba(236, 226, 208, .22);
+    --cream: #efe5d3; --text: #e4d8c5; --muted: #a8937e; --amber: #c99863; --amber-2: #e3b784; --red: #c4382f; --velvet: #a3221d;
+    --f-word: 'Limelight', serif; --f-display: 'Montserrat', 'Futura', sans-serif; --f-ui: 'Archivo', 'Helvetica Neue', Arial, sans-serif; --f-mono: 'DM Mono', ui-monospace, monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #0b0706; color: var(--text); font-family: var(--f-ui); -webkit-font-smoothing: antialiased; overflow: hidden; }
+  body::after { content: ""; position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: .08; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+
+  /* The stage: 1600 x 900, scaled to the window. */
+  .stage { position: absolute; left: 50%; top: 50%; width: 1600px; height: 900px; transform-origin: center; }
+  .slide { position: absolute; inset: 0; padding: 96px 120px; display: flex; flex-direction: column; background: var(--bg); overflow: hidden;
+    opacity: 0; visibility: hidden; transition: opacity .55s cubic-bezier(.2, .8, .2, 1), visibility 0s .55s; }
+  .slide.on { opacity: 1; visibility: visible; transition: opacity .55s cubic-bezier(.2, .8, .2, 1); }
+  .slide .rise { opacity: 0; transform: translateY(24px); transition: opacity .7s cubic-bezier(.2, .8, .2, 1), transform .7s cubic-bezier(.2, .8, .2, 1); transition-delay: calc(var(--d, 0) * 110ms + 120ms); }
+  .slide.on .rise { opacity: 1; transform: none; }
+
+  /* Type: few sizes, all large. */
+  .kicker { font-family: var(--f-mono); font-size: 22px; letter-spacing: .02em; color: var(--amber-2); margin: 0 0 18px; }
+  h1, h2 { font-family: var(--f-display); font-weight: 800; color: var(--cream); margin: 0; letter-spacing: -.01em; line-height: .98; text-wrap: balance; }
+  h1 { font-size: 92px; }
+  h2 { font-size: 72px; }
+  .lead { font-size: 30px; line-height: 1.4; color: var(--text); margin: 24px 0 0; max-width: 30ch; text-wrap: pretty; }
+  .word { font-family: var(--f-word); font-weight: 400; color: #f1ece2; line-height: .9; }
+
+  /* Film strip edges, like the landing hero. */
+  .strip { position: absolute; left: 0; right: 0; height: 40px; z-index: 2; }
+  .strip { background: repeating-linear-gradient(90deg, transparent 0 22px, rgba(239, 229, 211, .78) 22px 40px, transparent 40px 58px); -webkit-mask: linear-gradient(#000 0 0) center / 100% 16px no-repeat; mask: linear-gradient(#000 0 0) center / 100% 16px no-repeat; }
+  .strip.top { top: 26px; } .strip.bot { bottom: 26px; }
+
+  /* 1 · opening */
+  .s-open { padding: 0; justify-content: center; align-items: flex-start; }
+  .s-open .bg { position: absolute; inset: 0; background: url(/hl/hall.jpg) center 40% / cover; filter: sepia(.25) brightness(.55); transform: scale(1.06); transition: transform 8s linear; }
+  .s-open.on .bg { transform: scale(1); }
+  .s-open .shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(12, 7, 5, .92) 0%, rgba(12, 7, 5, .55) 55%, rgba(12, 7, 5, .2) 100%); }
+  .s-open .in { position: relative; padding: 0 140px; }
+  .s-open .word { font-size: 230px; }
+  .s-open .tag { font-family: var(--f-display); font-weight: 700; font-size: 40px; color: rgba(241, 236, 226, .86); margin-top: 22px; line-height: 1.2; }
+  .s-open .where { font-family: var(--f-mono); font-size: 24px; color: var(--amber-2); margin-top: 48px; }
+
+  /* 2 · problem */
+  .chain { flex: 1; display: grid; grid-template-columns: 1fr 160px 1fr; align-items: center; gap: 0; margin-top: 40px; }
+  .pcard { border: 1px solid var(--line-2); border-radius: 28px; padding: 48px 48px 52px; background: linear-gradient(160deg, rgba(40, 27, 21, .65), rgba(20, 13, 10, .7)); min-height: 380px; display: flex; flex-direction: column; justify-content: space-between; }
+  .pcard.root { border-color: rgba(196, 56, 47, .7); background: linear-gradient(160deg, rgba(120, 30, 24, .32), rgba(30, 12, 10, .7)); }
+  .pcard .who { font-family: var(--f-mono); font-size: 22px; color: var(--muted); }
+  .pcard.root .who { color: #f0938a; }
+  .pcard b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 54px; line-height: 1.02; color: var(--cream); margin-top: 14px; }
+  .pcard p { margin: 0; font-size: 28px; line-height: 1.38; color: var(--text); }
+  .because { display: grid; justify-items: center; gap: 10px; font-family: var(--f-mono); font-size: 20px; color: var(--amber-2); }
+  .because svg { width: 120px; height: 40px; }
+
+  /* 3 · personas: two big figures growing up from the bottom edge, names beside them */
+  .s-per { padding: 96px 120px 0; }
+  .s-per .floor { position: absolute; left: 0; right: 0; bottom: 0; height: 220px; background: linear-gradient(180deg, rgba(201, 152, 99, 0), rgba(201, 152, 99, .1)); }
+  .per { position: absolute; bottom: 0; height: 100%; }
+  .per img { position: absolute; bottom: -30px; height: 690px; width: auto; filter: drop-shadow(0 30px 50px rgba(0, 0, 0, .55)); }
+  .per .txt { position: absolute; bottom: 120px; }
+  .per .name { font-family: var(--f-word); font-size: 124px; line-height: .85; color: #f1ece2; }
+  .per .role { font-family: var(--f-mono); font-size: 26px; color: var(--amber-2); margin-top: 14px; }
+  .per .need { font-size: 30px; line-height: 1.35; color: var(--text); margin-top: 22px; max-width: 13ch; }
+  .per.jane { left: 90px; width: 700px; } .per.jane img { left: 0; } .per.jane .txt { left: 290px; }
+  .per.tom { right: 90px; width: 700px; } .per.tom img { right: 0; } .per.tom .txt { right: 290px; text-align: right; }
+  .per.tom .need { margin-left: auto; }
+  .both { position: absolute; right: 120px; top: 110px; font-family: var(--f-mono); font-size: 24px; color: var(--muted); }
+
+  /* 4 · Sundance */
+  .s-sun { flex-direction: row; gap: 60px; align-items: stretch; }
+  .s-sun .left { width: 600px; display: flex; flex-direction: column; }
+  .nums { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 30px; margin-top: auto; }
+  .nums div b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 76px; line-height: 1; color: var(--cream); }
+  .nums div span { font-size: 24px; color: var(--muted); }
+  .s-sun .map { flex: 1; position: relative; border-radius: 26px; overflow: hidden; border: 1px solid var(--line-2); background: #150e0b; }
+  .s-sun .map img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .s-sun .map .scrawl { position: absolute; right: 30px; bottom: 26px; font-family: var(--f-display); font-weight: 800; font-size: 40px; color: var(--cream); background: rgba(18, 11, 9, .82); padding: 14px 22px; border-radius: 16px; transform: rotate(-2deg); }
+
+  /* 5 · emergencies */
+  .emerg { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 36px; margin-top: 46px; }
+  .ecard { position: relative; border-radius: 28px; overflow: hidden; border: 1px solid rgba(196, 56, 47, .55); display: flex; flex-direction: column; justify-content: flex-end; padding: 44px; min-height: 470px; }
+  .ecard .ph { position: absolute; inset: 0; background: center / cover; filter: sepia(.2) brightness(.45); }
+  .ecard .ph::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(18, 11, 9, .1) 0%, rgba(18, 11, 9, .92) 75%); }
+  .ecard > * { position: relative; }
+  .ecard .when { font-family: var(--f-mono); font-size: 22px; color: #f0938a; }
+  .ecard b { font-family: var(--f-display); font-weight: 800; font-size: 50px; line-height: 1.05; color: var(--cream); margin: 12px 0 14px; display: block; }
+  .ecard p { margin: 0; font-size: 26px; line-height: 1.4; color: var(--text); }
+  .ecard .pulse { position: absolute; top: 34px; right: 34px; width: 18px; height: 18px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 0 rgba(196, 56, 47, .7); animation: pulse 1.6s infinite; }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 18px rgba(196, 56, 47, 0); } 100% { box-shadow: 0 0 0 0 rgba(196, 56, 47, 0); } }
+
+  /* macOS window frame, for the landing page and the live dashboard */
+  .mac { position: relative; border-radius: 16px; overflow: hidden; background: #1d1d1f; box-shadow: 0 40px 90px rgba(0, 0, 0, .6), 0 0 0 1px rgba(255, 255, 255, .09); display: flex; flex-direction: column; }
+  .mac-bar { flex: none; height: 44px; display: flex; align-items: center; gap: 9px; padding: 0 16px; background: linear-gradient(#2b2a2b, #232223); border-bottom: 1px solid #111; }
+  .mac-bar i { width: 13px; height: 13px; border-radius: 50%; display: block; }
+  .mac-bar i:nth-child(1) { background: #ff5f57; } .mac-bar i:nth-child(2) { background: #febc2e; } .mac-bar i:nth-child(3) { background: #28c840; }
+  .mac-url { margin: 0 auto; transform: translateX(-30px); min-width: 380px; height: 28px; border-radius: 8px; background: #3a393a; color: #c9c6c6; font: 14px/28px var(--f-ui); text-align: center; padding: 0 16px; }
+  .mac-view { position: relative; flex: 1; overflow: hidden; background: #120b09; }
+  .mac-view iframe { position: absolute; left: 0; top: 0; border: 0; transform-origin: 0 0; background: #120b09; }
+
+  /* 6 · product */
+  .s-prod { padding: 70px 120px 60px; }
+  .s-prod .row { display: flex; align-items: baseline; justify-content: space-between; gap: 40px; }
+  .s-prod .mac { margin-top: 34px; flex: 1; }
+
+  /* 7 · live demo */
+  .s-live { padding: 54px 70px 50px; }
+  .s-live .row { display: flex; align-items: baseline; gap: 28px; }
+  .s-live .live-dot { display: inline-flex; align-items: center; gap: 10px; font-family: var(--f-mono); font-size: 22px; color: #7ee08a; }
+  .s-live .live-dot::before { content: ""; width: 12px; height: 12px; border-radius: 50%; background: #3fb950; box-shadow: 0 0 0 5px rgba(63, 185, 80, .2); animation: blink 1.6s infinite; }
+  @keyframes blink { 50% { opacity: .35; } }
+  .demo { flex: 1; display: flex; gap: 34px; margin-top: 26px; min-height: 0; }
+  .demo .mac { flex: 1; }
+  .phone { flex: none; width: 352px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .phone .body { position: relative; width: 352px; height: 726px; border-radius: 54px; padding: 11px; background: #0a0a0a; box-shadow: 0 0 0 2px #2a2a2a, 0 40px 80px rgba(0, 0, 0, .6); }
+  .phone .screen { position: relative; width: 100%; height: 100%; border-radius: 44px; overflow: hidden; background: #120b09; }
+  .phone iframe { position: absolute; left: 0; top: 0; border: 0; width: 402px; height: 803px; transform-origin: 0 0; }
+  .label { font-family: var(--f-mono); font-size: 20px; color: var(--muted); }
+  .label b { color: var(--cream); font-weight: 500; }
+
+  /* 8 · flow */
+  .flow { flex: 1; margin-top: 30px; }
+  .flow svg { width: 100%; height: 100%; overflow: visible; }
+  .fl-node rect { fill: rgba(40, 27, 21, .85); stroke: var(--line-2); stroke-width: 1.5; }
+  .fl-node.agent rect { fill: rgba(201, 152, 99, .14); stroke: var(--amber); }
+  .fl-node.human rect { fill: rgba(239, 229, 211, .95); stroke: none; }
+  .fl-node text { font-family: var(--f-display); font-weight: 800; font-size: 30px; fill: var(--cream); }
+  .fl-node.human text { fill: #1b120e; }
+  .fl-node .sub { font-family: var(--f-ui); font-weight: 500; font-size: 21px; fill: var(--muted); }
+  .fl-node.human .sub { fill: #5b4636; }
+  .fl-line { fill: none; stroke: var(--amber); stroke-width: 2.5; stroke-dasharray: 8 9; animation: dash 1.2s linear infinite; }
+  .fl-line.back { stroke: rgba(239, 229, 211, .35); }
+  @keyframes dash { to { stroke-dashoffset: -34; } }
+  .fl-src text { font-family: var(--f-ui); font-weight: 600; font-size: 22px; fill: var(--text); }
+  .fl-src rect { fill: none; stroke: var(--line-2); stroke-width: 1.2; }
+  .fl-cap { font-family: var(--f-mono); font-size: 20px; fill: var(--amber-2); }
+
+  /* 9 · standing agent, any software */
+  .s-api { flex-direction: row; align-items: center; gap: 40px; }
+  .s-api .left { width: 640px; }
+  .s-api .net { flex: 1; height: 100%; }
+  .s-api .net svg { width: 100%; height: 100%; overflow: visible; }
+  .net-line { stroke: rgba(201, 152, 99, .55); stroke-width: 2; stroke-dasharray: 6 8; animation: dash 1.4s linear infinite; }
+  .net-node rect { fill: rgba(40, 27, 21, .85); stroke: var(--line-2); }
+  .net-node text { font-family: var(--f-ui); font-weight: 600; font-size: 22px; fill: var(--cream); }
+  .net-hub circle { fill: #1b120e; stroke: var(--amber); stroke-width: 2.5; }
+  .net-hub text { font-family: var(--f-word); font-size: 54px; fill: #f1ece2; }
+  .net-hub .ring { fill: none; stroke: rgba(201, 152, 99, .35); stroke-width: 1.5; animation: ring 2.6s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes ring { from { transform: scale(.85); opacity: .9; } to { transform: scale(1.35); opacity: 0; } }
+
+  /* 10 · evaluation */
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; margin-top: 54px; }
+  .step { border-top: 3px solid var(--amber); padding-top: 22px; }
+  .step .n { font-family: var(--f-mono); font-size: 22px; color: var(--amber-2); }
+  .step b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 36px; line-height: 1.1; color: var(--cream); margin-top: 10px; }
+  .step p { margin: 12px 0 0; font-size: 24px; line-height: 1.4; color: var(--muted); }
+  .scores { margin-top: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; }
+  .score { border-radius: 22px; border: 1px solid var(--line-2); padding: 26px 28px; background: rgba(40, 27, 21, .5); }
+  .score b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 56px; color: var(--cream); line-height: 1; }
+  .score span { display: block; font-size: 22px; color: var(--muted); margin-top: 10px; line-height: 1.3; }
+
+  /* 11 · thanks */
+  .s-end { justify-content: center; align-items: center; text-align: center; padding: 0; }
+  .s-end .bg { position: absolute; inset: 0; background: url(/hl/audience.jpg) center / cover; filter: sepia(.3) brightness(.4); }
+  .s-end .in { position: relative; }
+  .s-end .word { font-size: 200px; }
+  .s-end .q { font-family: var(--f-display); font-weight: 700; font-size: 44px; line-height: 1.25; color: var(--cream); margin: 40px auto 0; max-width: 24ch; }
+
+  /* Controls: keyboard first; small arrows and a slim progress bar. */
+  .nav { position: fixed; right: 20px; bottom: 16px; z-index: 80; display: flex; gap: 8px; align-items: center; font: 13px var(--f-mono); color: rgba(239, 229, 211, .55); }
+  .nav button { width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(239, 229, 211, .2); background: rgba(18, 11, 9, .7); color: var(--cream); font-size: 16px; cursor: pointer; }
+  .nav button:hover { border-color: var(--amber); }
+  .bar { position: fixed; left: 0; bottom: 0; height: 3px; z-index: 80; background: var(--amber); transition: width .5s cubic-bezier(.2, .8, .2, 1); }
+  @media (prefers-reduced-motion: reduce) { .slide, .slide .rise, .s-open .bg { transition: none; } .fl-line, .net-line { animation: none; } }
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <!-- 1 · Opening up · Oas -->
+  <section class="slide s-open" data-title="Opening">
+    <div class="bg"></div><div class="shade"></div><div class="strip top"></div><div class="strip bot"></div>
+    <div class="in">
+      <div class="word rise">Usher</div>
+      <div class="tag rise" style="--d:1">The film festival<br />change management agent.</div>
+      <div class="where rise" style="--d:2">Sundance Film Festival 2027 · Boulder, Colorado</div>
+    </div>
+  </section>
+
+  <!-- 2 · Problem · David -->
+  <section class="slide" data-title="Problem">
+    <p class="kicker rise">The problem</p>
+    <h2 class="rise" style="--d:1">A bad festival day starts backstage.</h2>
+    <div class="chain">
+      <div class="pcard rise" style="--d:2">
+        <span class="who">Attendees</span>
+        <div><b>A messy experience</b><p>Late, wrong or missing updates. Empty seats, missed talks.</p></div>
+      </div>
+      <div class="because rise" style="--d:3">
+        <svg viewBox="0 0 120 40" aria-hidden="true"><path d="M4 20H108M94 8l14 12-14 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        caused by
+      </div>
+      <div class="pcard root rise" style="--d:4">
+        <span class="who">The management team</span>
+        <div><b>Changes run by hand</b><p>Schedule, email, chat and briefs live in four places.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · Two personas · David -->
+  <section class="slide s-per" data-title="Two personas">
+    <div class="floor"></div>
+    <p class="kicker rise">Two people, one festival</p>
+    <h2 class="rise" style="--d:1">Meet Jane and Tom.</h2>
+    <span class="both rise" style="--d:1">Both at Sundance 2027</span>
+    <div class="per jane rise" style="--d:2">
+      <img src="jane.png" alt="Jane, illustrated" />
+      <div class="txt"><div class="name">Jane</div><div class="role">Attendee</div><p class="need">Wants her day to just work.</p></div>
+    </div>
+    <div class="per tom rise" style="--d:3">
+      <img src="tom.png" alt="Tom, illustrated" />
+      <div class="txt"><div class="name">Tom</div><div class="role">Festival manager</div><p class="need">Keeps 11 days on track.</p></div>
+    </div>
+  </section>
+
+  <!-- 4 · Sundance · David -->
+  <section class="slide s-sun" data-title="Sundance">
+    <div class="left">
+      <p class="kicker rise">Sundance Film Festival</p>
+      <h2 class="rise" style="--d:1;font-size:60px">The biggest independent film festival moves to Boulder.</h2>
+      <div class="nums">
+        <div class="rise" style="--d:2"><b>11</b><span>days, Jan 21–31</span></div>
+        <div class="rise" style="--d:3"><b>13</b><span>venues</span></div>
+        <div class="rise" style="--d:4"><b>100+</b><span>films</span></div>
+        <div class="rise" style="--d:5"><b>85k</b><span>visitors</span></div>
+      </div>
+    </div>
+    <div class="map rise" style="--d:2">
+      <img src="boulder.svg" alt="The 13 festival venues on Boulder's streets" />
+      <div class="scrawl">This is so complicated.</div>
+    </div>
+  </section>
+
+  <!-- 5 · Emergencies · Oas -->
+  <section class="slide" data-title="Emergencies">
+    <p class="kicker rise">Then</p>
+    <h2 class="rise" style="--d:1">Something goes wrong.</h2>
+    <div class="emerg">
+      <div class="ecard rise" style="--d:2"><div class="ph" style="background-image:url(/hl/snow.jpg)"></div><span class="pulse"></span>
+        <span class="when">Saturday · 1:00 to 7:00 pm</span><b>Snow</b><p>6 to 9 inches on the busiest day. 28 screenings, 70 plans.</p></div>
+      <div class="ecard rise" style="--d:3"><div class="ph" style="background-image:url(/hl/ev/talk-stage.jpg)"></div><span class="pulse"></span>
+        <span class="when">Friday · 2:00 pm</span><b>A key producer can't make it</b><p>Her flight is cancelled. A talk and a premiere are waiting.</p></div>
+    </div>
+  </section>
+
+  <!-- 6 · Product · Oas -->
+  <section class="slide s-prod" data-title="Usher">
+    <div class="row">
+      <h2 class="rise">Usher takes care of everything.</h2>
+    </div>
+    <div class="mac rise" style="--d:2" data-lve-skip>
+      <div class="mac-bar"><i></i><i></i><i></i><span class="mac-url">film-festival-agent.vercel.app</span></div>
+      <div class="mac-view"><iframe data-src="/" data-w="1440" title="Usher landing page"></iframe></div>
+    </div>
+  </section>
+
+  <!-- 7 · Live demo · Oas -->
+  <section class="slide s-live" data-title="Live demo">
+    <div class="row">
+      <h2 class="rise" style="font-size:60px">Live demo</h2>
+      <span class="live-dot rise" style="--d:1">Tom approves, Jane's phone updates</span>
+    </div>
+    <div class="demo rise" style="--d:2" data-lve-skip>
+      <div class="mac">
+        <div class="mac-bar"><i></i><i></i><i></i><span class="mac-url">Usher · Tom Whitaker, festival manager</span></div>
+        <div class="mac-view"><iframe data-src="/app#today" data-w="1280" title="Usher for the organizer"></iframe></div>
+      </div>
+      <div class="phone">
+        <div class="body"><div class="screen"><iframe data-src="/app?demoframe=1&amp;as=attendee" data-w="402" title="Usher on Jane's phone"></iframe></div></div>
+        <span class="label"><b>Jane</b> · attendee</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 · Flow · Oas -->
+  <section class="slide" data-title="How it works">
+    <p class="kicker rise">How the agent works</p>
+    <h2 class="rise" style="--d:1">Always on. You stay in charge.</h2>
+    <div class="flow rise" style="--d:2">
+      <svg viewBox="0 0 1360 520" role="img" aria-label="Usher reads every feed, spots the change, flags it, recommends a plan, you approve, and it acts on your behalf, then keeps watching.">
+        <!-- what it reads -->
+        <g class="fl-src">
+          <rect x="0" y="40" width="200" height="62" rx="31"/><text x="100" y="80" text-anchor="middle">Email</text>
+          <rect x="0" y="122" width="200" height="62" rx="31"/><text x="100" y="162" text-anchor="middle">Flights</text>
+          <rect x="0" y="204" width="200" height="62" rx="31"/><text x="100" y="244" text-anchor="middle">Weather</text>
+          <rect x="0" y="286" width="200" height="62" rx="31"/><text x="100" y="326" text-anchor="middle">Schedule</text>
+          <rect x="0" y="368" width="200" height="62" rx="31"/><text x="100" y="408" text-anchor="middle">Door scans</text>
+        </g>
+        <path class="fl-line" d="M200 71 C 250 71, 250 235, 290 235"/>
+        <path class="fl-line" d="M200 153 C 250 153, 250 235, 290 235"/>
+        <path class="fl-line" d="M200 235 L 290 235"/>
+        <path class="fl-line" d="M200 317 C 250 317, 250 235, 290 235"/>
+        <path class="fl-line" d="M200 399 C 250 399, 250 235, 290 235"/>
+        <g class="fl-node agent"><rect x="290" y="175" width="230" height="120" rx="22"/><text x="405" y="230" text-anchor="middle">Reads it all</text><text class="sub" x="405" y="264" text-anchor="middle">every change</text></g>
+        <path class="fl-line" d="M520 235 L 570 235"/>
+        <g class="fl-node agent"><rect x="570" y="175" width="180" height="120" rx="22"/><text x="660" y="230" text-anchor="middle">Flags</text><text class="sub" x="660" y="264" text-anchor="middle">what it touches</text></g>
+        <path class="fl-line" d="M750 235 L 800 235"/>
+        <g class="fl-node agent"><rect x="800" y="175" width="200" height="120" rx="22"/><text x="900" y="230" text-anchor="middle">Recommends</text><text class="sub" x="900" y="264" text-anchor="middle">a new plan</text></g>
+        <path class="fl-line" d="M1000 235 L 1050 235"/>
+        <g class="fl-node human"><rect x="1050" y="175" width="150" height="120" rx="22"/><text x="1125" y="230" text-anchor="middle">You</text><text class="sub" x="1125" y="264" text-anchor="middle">approve</text></g>
+        <path class="fl-line" d="M1200 235 L 1250 235"/>
+        <g class="fl-node agent"><rect x="1250" y="175" width="110" height="120" rx="22"/><text x="1305" y="230" text-anchor="middle">Acts</text><text class="sub" x="1305" y="264" text-anchor="middle">for you</text></g>
+        <!-- and keeps watching -->
+        <path class="fl-line back" d="M1305 295 C 1305 470, 405 470, 405 295"/>
+        <text class="fl-cap" x="855" y="498" text-anchor="middle">then keeps watching</text>
+        <text class="fl-cap" x="855" y="140" text-anchor="middle">nothing reaches the public without a yes</text>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 9 · API · Oas -->
+  <section class="slide s-api" data-title="Fits in">
+    <div class="left">
+      <p class="kicker rise">A standing agent</p>
+      <h2 class="rise" style="--d:1">Plugs into the software festivals already use.</h2>
+      <p class="lead rise" style="--d:2">Any API-friendly tool. Usher does the work.</p>
+    </div>
+    <div class="net rise" style="--d:2">
+      <svg viewBox="0 0 760 640" role="img" aria-label="Usher in the middle, connected to ticketing, scheduling, email, text and push, flights, weather, transit and volunteer software.">
+        <g>
+          <line class="net-line" x1="380" y1="320" x2="380" y2="60"/><line class="net-line" x1="380" y1="320" x2="620" y2="130"/>
+          <line class="net-line" x1="380" y1="320" x2="690" y2="320"/><line class="net-line" x1="380" y1="320" x2="620" y2="510"/>
+          <line class="net-line" x1="380" y1="320" x2="380" y2="580"/><line class="net-line" x1="380" y1="320" x2="140" y2="510"/>
+          <line class="net-line" x1="380" y1="320" x2="70" y2="320"/><line class="net-line" x1="380" y1="320" x2="140" y2="130"/>
+        </g>
+        <g class="net-node">
+          <rect x="300" y="32" width="160" height="56" rx="28"/><text x="380" y="68" text-anchor="middle">Ticketing</text>
+          <rect x="540" y="102" width="160" height="56" rx="28"/><text x="620" y="138" text-anchor="middle">Schedule</text>
+          <rect x="610" y="292" width="150" height="56" rx="28"/><text x="685" y="328" text-anchor="middle">Email</text>
+          <rect x="530" y="482" width="180" height="56" rx="28"/><text x="620" y="518" text-anchor="middle">Text &amp; push</text>
+          <rect x="310" y="552" width="140" height="56" rx="28"/><text x="380" y="588" text-anchor="middle">Flights</text>
+          <rect x="60" y="482" width="160" height="56" rx="28"/><text x="140" y="518" text-anchor="middle">Weather</text>
+          <rect x="0" y="292" width="140" height="56" rx="28"/><text x="70" y="328" text-anchor="middle">Transit</text>
+          <rect x="40" y="102" width="200" height="56" rx="28"/><text x="140" y="138" text-anchor="middle">Volunteer rota</text>
+        </g>
+        <g class="net-hub"><circle class="ring" cx="380" cy="320" r="110"/><circle cx="380" cy="320" r="110"/><text x="380" y="338" text-anchor="middle">Usher</text></g>
+      </svg>
+    </div>
+  </section>
+
+  <!-- 10 · Evaluation · Henry -->
+  <section class="slide" data-title="Evaluation">
+    <p class="kicker rise">Evaluation</p>
+    <h2 class="rise" style="--d:1">We tried to break it.</h2>
+    <div class="steps">
+      <div class="step rise" style="--d:2"><span class="n">1</span><b>Invent emergencies</b><p>Medical calls, a projector failing, guest clashes.</p></div>
+      <div class="step rise" style="--d:3"><span class="n">2</span><b>Simulate them</b><p>On a whole festival, again and again.</p></div>
+      <div class="step rise" style="--d:4"><span class="n">3</span><b>Check every reaction</b><p>Right people, right message, nothing public without a yes.</p></div>
+      <div class="step rise" style="--d:5"><span class="n">4</span><b>Fix and repeat</b><p>Until it handles all of them.</p></div>
+    </div>
+    <div class="scores">
+      <div class="score rise" style="--d:5"><b>5 / 5</b><span>schedule changes reached the right people</span></div>
+      <div class="score rise" style="--d:6"><b>3 / 3</b><span>planted guest clashes flagged</span></div>
+      <div class="score rise" style="--d:7"><b>20 / 20</b><span>door scans across every pass</span></div>
+      <div class="score rise" style="--d:8"><b>10 / 10</b><span>questions answered from official documents</span></div>
+    </div>
+  </section>
+
+  <!-- 11 · Feedback -->
+  <section class="slide s-end" data-title="Thank you">
+    <div class="bg"></div><div class="strip top"></div><div class="strip bot"></div>
+    <div class="in">
+      <div class="word rise">Thank you</div>
+      <p class="q rise" style="--d:1">At a festival this complicated, would you use Usher?</p>
+    </div>
+  </section>
+</div>
+
+<div class="nav" data-lve-skip><span id="count">1 / 11</span><button id="prev" aria-label="Previous slide">‹</button><button id="next" aria-label="Next slide">›</button></div>
+<div class="bar" id="bar"></div>
+
+<script>
+  // Fit the 1600 x 900 stage to the window.
+  const stage = document.getElementById('stage');
+  const fit = () => { const s = Math.min(innerWidth / 1600, innerHeight / 900); stage.style.transform = `translate(-50%, -50%) scale(${s})`; };
+  addEventListener('resize', fit); fit();
+
+  const slides = [...document.querySelectorAll('.slide')];
+  let cur = 0;
+  // Embedded pages load when their slide is first shown, scaled to fill their frame.
+  const scaleFrames = () => document.querySelectorAll('iframe[data-src]').forEach(f => {
+    const box = f.parentElement; const w = Number(f.dataset.w);
+    const s = box.clientWidth / w;
+    f.style.width = `${w}px`; f.style.height = `${box.clientHeight / s}px`; f.style.transform = `scale(${s})`;
+  });
+  const show = i => {
+    cur = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach((s, k) => s.classList.toggle('on', k === cur));
+    slides[cur].querySelectorAll('iframe[data-src]').forEach(f => { if (!f.src) f.src = f.dataset.src; });
+    requestAnimationFrame(scaleFrames);
+    document.getElementById('count').textContent = `${cur + 1} / ${slides.length}`;
+    document.getElementById('bar').style.width = `${((cur + 1) / slides.length) * 100}%`;
+    try { history.replaceState(null, '', `#${cur + 1}`); } catch {}
+  };
+  addEventListener('resize', scaleFrames);
+  const onKey = e => {
+    const t = e.target;
+    if (t && t.closest && t.closest('[contenteditable="true"], input, textarea, select')) return;
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); show(cur + 1); }
+    if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); show(cur - 1); }
+    if (e.key === 'Home') show(0);
+    if (e.key === 'End') show(slides.length - 1);
+  };
+  addEventListener('keydown', onKey);
+  // The embedded app and landing page are on the same site: a clicker or arrow key works even when they have focus.
+  document.querySelectorAll('iframe[data-src]').forEach(f => f.addEventListener('load', () => { try { f.contentWindow.addEventListener('keydown', onKey); } catch {} }));
+  document.getElementById('prev').onclick = () => show(cur - 1);
+  document.getElementById('next').onclick = () => show(cur + 1);
+  show((Number(location.hash.slice(1)) || 1) - 1);
+  addEventListener('hashchange', () => { const n = Number(location.hash.slice(1)); if (n && n - 1 !== cur) show(n - 1); });
+</script>
+<script src="live-editor.js" defer></script>
+</body>
+</html>
