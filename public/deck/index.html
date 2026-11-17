@@ -31,10 +31,12 @@
   /* Type: few sizes, all large. */
   .kicker { font-family: var(--f-mono); font-size: 22px; letter-spacing: .02em; color: var(--amber-2); margin: 0 0 18px; }
   h1, h2 { font-family: var(--f-display); font-weight: 800; color: var(--cream); margin: 0; letter-spacing: -.01em; line-height: .98; text-wrap: balance; }
-  h1 { font-size: 92px; }
-  h2 { font-size: 72px; }
-  .lead { font-size: 30px; line-height: 1.4; color: var(--text); margin: 24px 0 0; max-width: 30ch; text-wrap: pretty; }
+  h1 { font-size: 84px; }
+  h2 { font-size: 58px; }
+  .lead { font-size: 26px; line-height: 1.4; color: var(--text); margin: 24px 0 0; max-width: 30ch; text-wrap: pretty; }
   .word { font-family: var(--f-word); font-weight: 400; color: #f1ece2; line-height: .9; }
+
+  .label-top { font-family: var(--f-mono); font-size: 24px; letter-spacing: .02em; color: var(--amber-2); margin: 0; }
 
   /* Film strip edges, like the landing hero. */
   .strip { position: absolute; left: 0; right: 0; height: 40px; z-index: 2; }
@@ -51,24 +53,26 @@
   .s-open .tag { font-family: var(--f-display); font-weight: 700; font-size: 40px; color: rgba(241, 236, 226, .86); margin-top: 22px; line-height: 1.2; }
   .s-open .where { font-family: var(--f-mono); font-size: 24px; color: var(--amber-2); margin-top: 48px; }
 
-  /* 2 · problem */
-  .chain { flex: 1; display: grid; grid-template-columns: 1fr 160px 1fr; align-items: center; gap: 0; margin-top: 40px; }
-  .pcard { border: 1px solid var(--line-2); border-radius: 28px; padding: 48px 48px 52px; background: linear-gradient(160deg, rgba(40, 27, 21, .65), rgba(20, 13, 10, .7)); min-height: 380px; display: flex; flex-direction: column; justify-content: space-between; }
-  .pcard.root { border-color: rgba(196, 56, 47, .7); background: linear-gradient(160deg, rgba(120, 30, 24, .32), rgba(30, 12, 10, .7)); }
-  .pcard .who { font-family: var(--f-mono); font-size: 22px; color: var(--muted); }
+  /* 2 · problem: three levels, from what attendees feel to the root cause */
+  .chain { flex: 1; display: grid; grid-template-columns: 1fr 96px 1fr 96px 1fr; align-items: center; margin-top: 34px; }
+  .pcard { border: 1px solid var(--line-2); border-radius: 26px; padding: 36px 34px 40px; background: linear-gradient(160deg, rgba(40, 27, 21, .65), rgba(20, 13, 10, .7)); height: 400px; display: flex; flex-direction: column; justify-content: space-between; }
+  .pcard.mid { border-color: rgba(227, 183, 132, .45); }
+  .pcard.root { border-color: rgba(196, 56, 47, .7); background: linear-gradient(160deg, rgba(120, 30, 24, .34), rgba(30, 12, 10, .72)); }
+  .pcard .who { font-family: var(--f-mono); font-size: 21px; color: var(--muted); }
+  .pcard.mid .who { color: var(--amber-2); }
   .pcard.root .who { color: #f0938a; }
-  .pcard b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 54px; line-height: 1.02; color: var(--cream); margin-top: 14px; }
-  .pcard p { margin: 0; font-size: 28px; line-height: 1.38; color: var(--text); }
-  .because { display: grid; justify-items: center; gap: 10px; font-family: var(--f-mono); font-size: 20px; color: var(--amber-2); }
-  .because svg { width: 120px; height: 40px; }
+  .pcard b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 38px; line-height: 1.08; color: var(--cream); }
+  .pcard p { margin: 14px 0 0; font-size: 22px; line-height: 1.42; color: var(--text); }
+  .because { display: grid; justify-items: center; gap: 8px; font-family: var(--f-mono); font-size: 18px; color: var(--amber-2); text-align: center; }
+  .because svg { width: 64px; height: 30px; }
 
   /* 3 · personas: two big figures growing up from the bottom edge, names beside them */
   .s-per { padding: 96px 120px 0; }
   .s-per .floor { position: absolute; left: 0; right: 0; bottom: 0; height: 220px; background: linear-gradient(180deg, rgba(201, 152, 99, 0), rgba(201, 152, 99, .1)); }
   .per { position: absolute; bottom: 0; height: 100%; }
   .per img { position: absolute; bottom: -30px; height: 690px; width: auto; filter: drop-shadow(0 30px 50px rgba(0, 0, 0, .55)); }
-  .per .txt { position: absolute; bottom: 120px; }
-  .per .name { font-family: var(--f-word); font-size: 124px; line-height: .85; color: #f1ece2; }
+  .per .txt { position: absolute; bottom: 170px; }
+  .per .name { font-family: var(--f-word); font-size: 116px; line-height: .85; color: #f1ece2; }
   .per .role { font-family: var(--f-mono); font-size: 26px; color: var(--amber-2); margin-top: 14px; }
   .per .need { font-size: 30px; line-height: 1.35; color: var(--text); margin-top: 22px; max-width: 13ch; }
   .per.jane { left: 90px; width: 700px; } .per.jane img { left: 0; } .per.jane .txt { left: 290px; }
@@ -76,15 +80,20 @@
   .per.tom .need { margin-left: auto; }
   .both { position: absolute; right: 120px; top: 110px; font-family: var(--f-mono); font-size: 24px; color: var(--muted); }
 
-  /* 4 · Sundance */
-  .s-sun { flex-direction: row; gap: 60px; align-items: stretch; }
-  .s-sun .left { width: 600px; display: flex; flex-direction: column; }
-  .nums { display: grid; grid-template-columns: 1fr 1fr; gap: 26px 30px; margin-top: auto; }
-  .nums div b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 76px; line-height: 1; color: var(--cream); }
-  .nums div span { font-size: 24px; color: var(--muted); }
-  .s-sun .map { flex: 1; position: relative; border-radius: 26px; overflow: hidden; border: 1px solid var(--line-2); background: #150e0b; }
-  .s-sun .map img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .s-sun .map .scrawl { position: absolute; right: 30px; bottom: 26px; font-family: var(--f-display); font-weight: 800; font-size: 40px; color: var(--cream); background: rgba(18, 11, 9, .82); padding: 14px 22px; border-radius: 16px; transform: rotate(-2deg); }
+  /* 4 · Sundance: borrowing the festival's 2027 look, a black wordmark box and flat colour tiles */
+  .sd-word { display: inline-block; background: #000; color: #fff; border-radius: 14px; padding: 16px 22px 18px; font: 700 34px/1.02 'Archivo', 'Helvetica Neue', Arial, sans-serif; letter-spacing: -.02em; }
+  .sd-word.small { font-size: 22px; padding: 11px 15px 12px; border-radius: 10px; }
+  .s-sun { flex-direction: row; gap: 44px; align-items: stretch; padding: 70px 90px 70px 110px; }
+  .s-sun .left { width: 520px; display: flex; flex-direction: column; gap: 26px; }
+  .s-sun .move { font-family: var(--f-display); font-weight: 800; font-size: 40px; line-height: 1.1; color: var(--cream); margin: 4px 0 0; }
+  .s-sun .move em { font-style: normal; color: var(--amber-2); }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: auto; }
+  .tile { border-radius: 16px; padding: 18px 20px 20px; color: #fff; min-height: 128px; display: flex; flex-direction: column; justify-content: space-between; font-family: 'Archivo', 'Helvetica Neue', Arial, sans-serif; }
+  .tile b { font-size: 52px; font-weight: 700; line-height: 1; letter-spacing: -.02em; }
+  .tile span { font-size: 21px; font-weight: 600; }
+  .tile.r { background: #d9452c; } .tile.p { background: #7d3cc8; } .tile.b { background: #2f6fd6; } .tile.g { background: #2f7a4d; }
+  .s-sun .mac { flex: 1; }
+  .s-sun .scrawl { position: absolute; right: 24px; bottom: 22px; z-index: 2; font-family: var(--f-display); font-weight: 800; font-size: 34px; color: #fff; background: #d9452c; padding: 12px 20px; border-radius: 14px; transform: rotate(-2.5deg); box-shadow: 0 14px 30px rgba(0, 0, 0, .35); }
 
   /* 5 · emergencies */
   .emerg { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 36px; margin-top: 46px; }
@@ -93,8 +102,8 @@
   .ecard .ph::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(18, 11, 9, .1) 0%, rgba(18, 11, 9, .92) 75%); }
   .ecard > * { position: relative; }
   .ecard .when { font-family: var(--f-mono); font-size: 22px; color: #f0938a; }
-  .ecard b { font-family: var(--f-display); font-weight: 800; font-size: 50px; line-height: 1.05; color: var(--cream); margin: 12px 0 14px; display: block; }
-  .ecard p { margin: 0; font-size: 26px; line-height: 1.4; color: var(--text); }
+  .ecard b { font-family: var(--f-display); font-weight: 800; font-size: 42px; line-height: 1.05; color: var(--cream); margin: 12px 0 14px; display: block; }
+  .ecard p { margin: 0; font-size: 23px; line-height: 1.4; color: var(--text); }
   .ecard .pulse { position: absolute; top: 34px; right: 34px; width: 18px; height: 18px; border-radius: 50%; background: var(--red); box-shadow: 0 0 0 0 rgba(196, 56, 47, .7); animation: pulse 1.6s infinite; }
   @keyframes pulse { 70% { box-shadow: 0 0 0 18px rgba(196, 56, 47, 0); } 100% { box-shadow: 0 0 0 0 rgba(196, 56, 47, 0); } }
 
@@ -128,12 +137,12 @@
   .label b { color: var(--cream); font-weight: 500; }
 
   /* 8 · flow */
-  .flow { flex: 1; margin-top: 30px; }
+  .flow { flex: 1; margin-top: 10px; display: flex; align-items: center; }
   .flow svg { width: 100%; height: 100%; overflow: visible; }
   .fl-node rect { fill: rgba(40, 27, 21, .85); stroke: var(--line-2); stroke-width: 1.5; }
   .fl-node.agent rect { fill: rgba(201, 152, 99, .14); stroke: var(--amber); }
   .fl-node.human rect { fill: rgba(239, 229, 211, .95); stroke: none; }
-  .fl-node text { font-family: var(--f-display); font-weight: 800; font-size: 30px; fill: var(--cream); }
+  .fl-node text { font-family: var(--f-display); font-weight: 800; font-size: 28px; fill: var(--cream); }
   .fl-node.human text { fill: #1b120e; }
   .fl-node .sub { font-family: var(--f-ui); font-weight: 500; font-size: 21px; fill: var(--muted); }
   .fl-node.human .sub { fill: #5b4636; }
@@ -142,7 +151,7 @@
   @keyframes dash { to { stroke-dashoffset: -34; } }
   .fl-src text { font-family: var(--f-ui); font-weight: 600; font-size: 22px; fill: var(--text); }
   .fl-src rect { fill: none; stroke: var(--line-2); stroke-width: 1.2; }
-  .fl-cap { font-family: var(--f-mono); font-size: 20px; fill: var(--amber-2); }
+  .fl-cap { font-family: var(--f-mono); font-size: 26px; fill: var(--amber-2); }
 
   /* 9 · standing agent, any software */
   .s-api { flex-direction: row; align-items: center; gap: 40px; }
@@ -157,16 +166,20 @@
   .net-hub .ring { fill: none; stroke: rgba(201, 152, 99, .35); stroke-width: 1.5; animation: ring 2.6s ease-out infinite; transform-box: fill-box; transform-origin: center; }
   @keyframes ring { from { transform: scale(.85); opacity: .9; } to { transform: scale(1.35); opacity: 0; } }
 
-  /* 10 · evaluation */
-  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; margin-top: 54px; }
-  .step { border-top: 3px solid var(--amber); padding-top: 22px; }
-  .step .n { font-family: var(--f-mono); font-size: 22px; color: var(--amber-2); }
-  .step b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 36px; line-height: 1.1; color: var(--cream); margin-top: 10px; }
-  .step p { margin: 12px 0 0; font-size: 24px; line-height: 1.4; color: var(--muted); }
-  .scores { margin-top: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 26px; }
-  .score { border-radius: 22px; border: 1px solid var(--line-2); padding: 26px 28px; background: rgba(40, 27, 21, .5); }
-  .score b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 56px; color: var(--cream); line-height: 1; }
-  .score span { display: block; font-size: 22px; color: var(--muted); margin-top: 10px; line-height: 1.3; }
+  /* 10 · evaluation: the four steps as Sundance-colour tiles, run on the Sundance 2027 plan */
+  .ev-head { display: flex; align-items: center; justify-content: space-between; }
+  .ev-on { display: block; font-size: 24px; color: var(--text); margin-top: 34px; }
+  .ev-on b { color: var(--cream); }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 30px; }
+  .step { border-radius: 18px; padding: 24px 24px 26px; color: #fff; min-height: 250px; display: flex; flex-direction: column; font-family: 'Archivo', 'Helvetica Neue', Arial, sans-serif; }
+  .step .n { font-size: 22px; font-weight: 700; opacity: .8; }
+  .step b { display: block; font-size: 30px; font-weight: 700; line-height: 1.12; letter-spacing: -.01em; margin-top: auto; }
+  .step p { margin: 10px 0 0; font-size: 20px; line-height: 1.4; color: rgba(255, 255, 255, .88); }
+  .step.r { background: #d9452c; } .step.p { background: #7d3cc8; } .step.b { background: #2f6fd6; } .step.g { background: #2f7a4d; }
+  .scores { margin-top: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .score { border-radius: 18px; border: 1px solid var(--line-2); padding: 20px 24px; background: rgba(40, 27, 21, .5); }
+  .score b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 44px; color: var(--cream); line-height: 1; }
+  .score span { display: block; font-size: 20px; color: var(--muted); margin-top: 8px; line-height: 1.3; }
 
   /* 11 · thanks */
   .s-end { justify-content: center; align-items: center; text-align: center; padding: 0; }
@@ -202,15 +215,17 @@
     <h2 class="rise" style="--d:1">A bad festival day starts backstage.</h2>
     <div class="chain">
       <div class="pcard rise" style="--d:2">
-        <span class="who">Attendees</span>
-        <div><b>A messy experience</b><p>Late, wrong or missing updates. Empty seats, missed talks.</p></div>
+        <span class="who">What attendees feel</span>
+        <div><b>A messy festival</b><p>Late, wrong or missing updates. Empty seats, missed talks.</p></div>
       </div>
-      <div class="because rise" style="--d:3">
-        <svg viewBox="0 0 120 40" aria-hidden="true"><path d="M4 20H108M94 8l14 12-14 12" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        caused by
+      <div class="because rise" style="--d:3"><svg viewBox="0 0 64 30" aria-hidden="true"><path d="M60 15H6M18 4 6 15l12 11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>because</div>
+      <div class="pcard mid rise" style="--d:4">
+        <span class="who">What organizers do</span>
+        <div><b>Out of step</b><p>Every team hears about a change at a different time.</p></div>
       </div>
-      <div class="pcard root rise" style="--d:4">
-        <span class="who">The management team</span>
+      <div class="because rise" style="--d:5"><svg viewBox="0 0 64 30" aria-hidden="true"><path d="M60 15H6M18 4 6 15l12 11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>because</div>
+      <div class="pcard root rise" style="--d:6">
+        <span class="who">The root cause</span>
         <div><b>Changes run by hand</b><p>Schedule, email, chat and briefs live in four places.</p></div>
       </div>
     </div>
@@ -219,33 +234,34 @@
   <!-- 3 · Two personas · David -->
   <section class="slide s-per" data-title="Two personas">
     <div class="floor"></div>
-    <p class="kicker rise">Two people, one festival</p>
     <h2 class="rise" style="--d:1">Meet Jane and Tom.</h2>
     <span class="both rise" style="--d:1">Both at Sundance 2027</span>
     <div class="per jane rise" style="--d:2">
       <img src="jane.png" alt="Jane, illustrated" />
-      <div class="txt"><div class="name">Jane</div><div class="role">Attendee</div><p class="need">Wants her day to just work.</p></div>
+      <div class="txt"><div class="name">Jane</div><div class="role">Attendee</div></div>
     </div>
     <div class="per tom rise" style="--d:3">
       <img src="tom.png" alt="Tom, illustrated" />
-      <div class="txt"><div class="name">Tom</div><div class="role">Festival manager</div><p class="need">Keeps 11 days on track.</p></div>
+      <div class="txt"><div class="name">Tom</div><div class="role">Festival manager</div></div>
     </div>
   </section>
 
   <!-- 4 · Sundance · David -->
   <section class="slide s-sun" data-title="Sundance">
     <div class="left">
-      <p class="kicker rise">Sundance Film Festival</p>
-      <h2 class="rise" style="--d:1;font-size:60px">The biggest independent film festival moves to Boulder.</h2>
-      <div class="nums">
-        <div class="rise" style="--d:2"><b>11</b><span>days, Jan 21–31</span></div>
-        <div class="rise" style="--d:3"><b>13</b><span>venues</span></div>
-        <div class="rise" style="--d:4"><b>100+</b><span>films</span></div>
-        <div class="rise" style="--d:5"><b>85k</b><span>visitors</span></div>
+      <p class="label-top rise">Sundance Film Festival</p>
+      <div class="rise" style="--d:1"><span class="sd-word">Sundance<br />Film Festival<br />2027</span></div>
+      <p class="move rise" style="--d:2">The biggest independent film festival, <em>now in Boulder.</em></p>
+      <div class="tiles">
+        <div class="tile r rise" style="--d:3"><b>11</b><span>days · Jan 21–31</span></div>
+        <div class="tile p rise" style="--d:4"><b>13</b><span>venues</span></div>
+        <div class="tile b rise" style="--d:5"><b>100+</b><span>films</span></div>
+        <div class="tile g rise" style="--d:6"><b>85k</b><span>visitors</span></div>
       </div>
     </div>
-    <div class="map rise" style="--d:2">
-      <img src="boulder.svg" alt="The 13 festival venues on Boulder's streets" />
+    <div class="mac rise" style="--d:2" data-lve-skip>
+      <div class="mac-bar"><i></i><i></i><i></i><span class="mac-url">festival.sundance.org/media/maps</span></div>
+      <div class="mac-view"><iframe data-src="https://sunins.mcbmap.com/27map" data-w="1280" title="Sundance Film Festival 2027 map"></iframe></div>
       <div class="scrawl">This is so complicated.</div>
     </div>
   </section>
@@ -293,10 +309,9 @@
 
   <!-- 8 · Flow · Oas -->
   <section class="slide" data-title="How it works">
-    <p class="kicker rise">How the agent works</p>
-    <h2 class="rise" style="--d:1">Always on. You stay in charge.</h2>
-    <div class="flow rise" style="--d:2">
-      <svg viewBox="0 0 1360 520" role="img" aria-label="Usher reads every feed, spots the change, flags it, recommends a plan, you approve, and it acts on your behalf, then keeps watching.">
+    <p class="label-top rise">How the agent works</p>
+    <div class="flow rise" style="--d:1">
+      <svg viewBox="0 0 1460 540" role="img" aria-label="Usher reads every feed, spots the change, flags it, recommends a plan, you approve, and it acts on your behalf, then keeps watching.">
         <!-- what it reads -->
         <g class="fl-src">
           <rect x="0" y="40" width="200" height="62" rx="31"/><text x="100" y="80" text-anchor="middle">Email</text>
@@ -311,18 +326,18 @@
         <path class="fl-line" d="M200 317 C 250 317, 250 235, 290 235"/>
         <path class="fl-line" d="M200 399 C 250 399, 250 235, 290 235"/>
         <g class="fl-node agent"><rect x="290" y="175" width="230" height="120" rx="22"/><text x="405" y="230" text-anchor="middle">Reads it all</text><text class="sub" x="405" y="264" text-anchor="middle">every change</text></g>
-        <path class="fl-line" d="M520 235 L 570 235"/>
-        <g class="fl-node agent"><rect x="570" y="175" width="180" height="120" rx="22"/><text x="660" y="230" text-anchor="middle">Flags</text><text class="sub" x="660" y="264" text-anchor="middle">what it touches</text></g>
-        <path class="fl-line" d="M750 235 L 800 235"/>
-        <g class="fl-node agent"><rect x="800" y="175" width="200" height="120" rx="22"/><text x="900" y="230" text-anchor="middle">Recommends</text><text class="sub" x="900" y="264" text-anchor="middle">a new plan</text></g>
-        <path class="fl-line" d="M1000 235 L 1050 235"/>
-        <g class="fl-node human"><rect x="1050" y="175" width="150" height="120" rx="22"/><text x="1125" y="230" text-anchor="middle">You</text><text class="sub" x="1125" y="264" text-anchor="middle">approve</text></g>
-        <path class="fl-line" d="M1200 235 L 1250 235"/>
-        <g class="fl-node agent"><rect x="1250" y="175" width="110" height="120" rx="22"/><text x="1305" y="230" text-anchor="middle">Acts</text><text class="sub" x="1305" y="264" text-anchor="middle">for you</text></g>
+        <path class="fl-line" d="M520 235 L 556 235"/>
+        <g class="fl-node agent"><rect x="556" y="175" width="200" height="120" rx="22"/><text x="656" y="230" text-anchor="middle">Flags</text><text class="sub" x="656" y="264" text-anchor="middle">what it touches</text></g>
+        <path class="fl-line" d="M756 235 L 792 235"/>
+        <g class="fl-node agent"><rect x="792" y="175" width="260" height="120" rx="22"/><text x="922" y="230" text-anchor="middle">Recommends</text><text class="sub" x="922" y="264" text-anchor="middle">a new plan</text></g>
+        <path class="fl-line" d="M1052 235 L 1088 235"/>
+        <g class="fl-node human"><rect x="1088" y="175" width="170" height="120" rx="22"/><text x="1173" y="230" text-anchor="middle">You</text><text class="sub" x="1173" y="264" text-anchor="middle">approve</text></g>
+        <path class="fl-line" d="M1258 235 L 1294 235"/>
+        <g class="fl-node agent"><rect x="1294" y="175" width="160" height="120" rx="22"/><text x="1374" y="230" text-anchor="middle">Acts</text><text class="sub" x="1374" y="264" text-anchor="middle">for you</text></g>
         <!-- and keeps watching -->
-        <path class="fl-line back" d="M1305 295 C 1305 470, 405 470, 405 295"/>
-        <text class="fl-cap" x="855" y="498" text-anchor="middle">then keeps watching</text>
-        <text class="fl-cap" x="855" y="140" text-anchor="middle">nothing reaches the public without a yes</text>
+        <path class="fl-line back" d="M1374 295 C 1374 470, 405 470, 405 295"/>
+        <text class="fl-cap" x="872" y="138" text-anchor="middle">Usher keeps watching all the changes</text>
+        <text class="fl-cap" x="890" y="508" text-anchor="middle">address the changes with recommendations approved by a human manager</text>
       </svg>
     </div>
   </section>
@@ -331,7 +346,7 @@
   <section class="slide s-api" data-title="Fits in">
     <div class="left">
       <p class="kicker rise">A standing agent</p>
-      <h2 class="rise" style="--d:1">Plugs into the software festivals already use.</h2>
+      <h2 class="rise" style="--d:1;font-size:52px">Plugs into the software festivals already use.</h2>
       <p class="lead rise" style="--d:2">Any API-friendly tool. Usher does the work.</p>
     </div>
     <div class="net rise" style="--d:2">
@@ -359,13 +374,16 @@
 
   <!-- 10 · Evaluation · Henry -->
   <section class="slide" data-title="Evaluation">
-    <p class="kicker rise">Evaluation</p>
-    <h2 class="rise" style="--d:1">We tried to break it.</h2>
+    <div class="ev-head">
+      <p class="label-top rise">Evaluation</p>
+      <span class="sd-word small rise" style="--d:1">Sundance<br />Film Festival<br />2027</span>
+    </div>
+    <p class="ev-on rise" style="--d:1">Every test runs on <b>the Sundance 2027 plan</b>: 11 days, 13 venues, 559 events.</p>
     <div class="steps">
-      <div class="step rise" style="--d:2"><span class="n">1</span><b>Invent emergencies</b><p>Medical calls, a projector failing, guest clashes.</p></div>
-      <div class="step rise" style="--d:3"><span class="n">2</span><b>Simulate them</b><p>On a whole festival, again and again.</p></div>
-      <div class="step rise" style="--d:4"><span class="n">3</span><b>Check every reaction</b><p>Right people, right message, nothing public without a yes.</p></div>
-      <div class="step rise" style="--d:5"><span class="n">4</span><b>Fix and repeat</b><p>Until it handles all of them.</p></div>
+      <div class="step r rise" style="--d:2"><span class="n">1</span><b>Invent emergencies at Sundance</b><p>Medical calls, a projector failing, guest clashes.</p></div>
+      <div class="step p rise" style="--d:3"><span class="n">2</span><b>Simulate them on the festival</b><p>Across all 11 days, again and again.</p></div>
+      <div class="step b rise" style="--d:4"><span class="n">3</span><b>Check every reaction</b><p>Right people, right message, nothing public without a yes.</p></div>
+      <div class="step g rise" style="--d:5"><span class="n">4</span><b>Fix and repeat</b><p>Until Usher handles all of them.</p></div>
     </div>
     <div class="scores">
       <div class="score rise" style="--d:5"><b>5 / 5</b><span>schedule changes reached the right people</span></div>
