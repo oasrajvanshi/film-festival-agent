@@ -9,6 +9,7 @@ import qrcode from 'qrcode-generator';
 import { readWho, writeWho, type AgentStore } from './useAgent';
 import { EventThumb, Faces } from './media';
 import { AttendeeApp } from './attendee';
+import { PushBanner, useArrivals, useTheme } from './live';
 import { Icon } from './icons';
 import { Ask, BriefView } from './panels';
 import { MyArrival, ScanDesk } from './presence';
@@ -208,8 +209,14 @@ function PeopleApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who; onOut: 
   const profile = PROFILES.find(p => p.kind === who.kind)!;
   const day = dayOf(s.clock, f.dates);
   const P = { s, user: who.name, go: noop };
+  // Live: updates approved on the organizer's screen pop up here as they arrive.
+  const [arrived, clearArrived] = useArrivals(inbox);
+  const [pushes, setPushes] = useState<typeof inbox>([]);
+  useEffect(() => { if (arrived.length) { setPushes(arrived); clearArrived(); } }, [arrived.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [theme, setTheme] = useTheme();
   return (
-    <div className="me">
+    <div className={`me${theme === 'light' ? ' light' : ''}`}>
+      <PushBanner msgs={pushes} onOpen={() => setTab('updates')} onDone={() => setPushes([])} />
       {viewAs && <div className="viewas-bar"><Icon name="eye" size={16} /> Viewing as {who.name} ({profile.label}). <button className="small" onClick={onOut}>Back to organizer</button></div>}
       <header className="me-head">
         <div className="brand-mark"><Icon name="film" size={18} /></div>
@@ -218,6 +225,7 @@ function PeopleApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who; onOut: 
           <div className="me-sub">{profile.label} · {who.name}</div>
         </div>
         <span className="chip">Day {day} · {fmt(s.clock)}</span>
+        <button className="ghost small" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} aria-label={theme === 'light' ? 'Dark mode' : 'Light mode'}><Icon name={theme === 'light' ? 'moon' : 'sun'} size={16} /></button>
         {!viewAs && <button className="ghost small" onClick={onOut} aria-label="Sign out"><Icon name="logout" /></button>}
       </header>
       <nav className="me-tabs" aria-label="Sections">

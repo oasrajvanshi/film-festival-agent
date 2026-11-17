@@ -8,11 +8,11 @@ import type { AgentStore } from './useAgent';
 import { addMinutes, clock as fmt, toMinutes } from '../../src/core/time';
 import type { DayNumber, FestivalEvent } from '../../src/core/types';
 import '../daycal.css';
-import { EventThumb, Faces } from './media';
+import { Faces, eventImage } from './media';
 import { useLateGuests } from './weatherplan';
 
 /** Pixels per hour: dense enough to see most of a day at once. */
-const HOUR = 58;
+const HOUR_PX = 58;
 
 /** A time whose "am"/"pm" can be hidden where the hour labels already say it (narrow phone columns). */
 const tm = (iso: string) => { const t = fmt(iso); const m = /^(.*?)(\s?[ap]m)$/i.exec(t); return m ? <>{m[1]}<span className="ampm">{m[2]}</span></> : t; };
@@ -23,18 +23,34 @@ const tm = (iso: string) => { const t = fmt(iso); const m = /^(.*?)(\s?[ap]m)$/i
  * `animate`, moved cards slide between their old and new time every 1.5
  * seconds, over a dashed outline of where they were.
  */
-type CalProps = { s: AgentStore; day: DayNumber; events?: FestivalEvent[]; was?: Record<string, string>; notes?: Record<string, string>; animate?: boolean };
+type CalProps = {
+  s: AgentStore; day: DayNumber; events?: FestivalEvent[]; was?: Record<string, string>; notes?: Record<string, string>; animate?: boolean;
+  /** Changes that don't move an event, animated in the preview loop: 'video' or 'seats:N'. */
+  marks?: Record<string, string>;
+  /** Only these venues (the map's venue cards). */
+  only?: string[];
+  /** Only events touching this stretch of the day, in minutes from midnight. */
+  window?: [number, number];
+  /** Smaller hours and no venue header row (the card around it names the venue). */
+  compact?: boolean;
+  /** Click an event to see its details; the picked one is outlined. */
+  onPick?: (id: string) => void;
+  picked?: string | null;
+};
 
 /** The venue grid, on every screen size (it scrolls sideways on a phone). */
 export function DayCalendar(props: CalProps) {
   return <GridCalendar {...props} />;
 }
 
-function GridCalendar({ s, day, events: over, was, notes, animate }: {
-  s: AgentStore; day: DayNumber; events?: FestivalEvent[]; was?: Record<string, string>; notes?: Record<string, string>; animate?: boolean;
-}) {
+function GridCalendar({ s, day, events: over, was, notes, animate, only, window: win, compact, marks, onPick, picked }: CalProps) {
   const f = s.agent.f;
-  const events = useMemo(() => (over ?? f.events).filter(e => e.day === day).sort((a, b) => a.start.localeCompare(b.start)), [f, over, day, s.version]); // eslint-disable-line react-hooks/exhaustive-deps
+  const HOUR = compact ? 40 : HOUR_PX;
+  const onlyKey = only?.join() ?? '';
+  const events = useMemo(() => (over ?? f.events)
+    .filter(e => e.day === day && (!only || only.includes(e.venueId)))
+    .filter(e => !win || (toMinutes(e.end) > win[0] && toMinutes(e.start) < win[1]) || (was?.[e.id] && toMinutes(was[e.id]) < win[1]))
+    .sort((a, b) => a.start.localeCompare(b.start)), [f, over, day, s.version, onlyKey, win?.[0], win?.[1]]); // eslint-disable-line react-hooks/exhaustive-deps
   // Preview loop: false shows the old times, true the new ones.
   const [atNew, setAtNew] = useState(true);
   // Each loop jumps back to the old times without animating, then slides forward: only old → new is ever shown.
@@ -88,8 +104,8 @@ function GridCalendar({ s, day, events: over, was, notes, animate }: {
   const onDay = s.clock.slice(0, 10) === f.dates[day];
   const guests = (ids: string[]) => ids.map(id => f.people.find(p => p.id === id)?.name).filter(Boolean).join(', ');
   return (
-    <div ref={box} className={`dcal${animate ? ' previewing' : ''}${snap ? ' snap' : ''}`} style={{ ['--cols' as string]: venues.length, ['--hours' as string]: span / 60, ['--h' as string]: `${(span / 60) * HOUR}px` }}>
-      <div className="dcal-head"><span />{venues.map(v => <span key={v.id} title={v.name}>{v.name}</span>)}</div>
+    <div ref={box} className={`dcal${animate ? ' previewing' : ''}${snap ? ' snap' : ''}${compact ? ' compact' : ''}`} style={{ ['--cols' as string]: venues.length, ['--hours' as string]: span / 60, ['--h' as string]: `${(span / 60) * HOUR}px` }}>
+      {!compact && <div className="dcal-head"><span />{venues.map(v => <span key={v.id} title={v.name}>{v.name}</span>)}</div>}
       <div className="dcal-body">
         <div className="dcal-hours">{hours.map(m => <b key={m} style={{ top: `${((m - t0) / span) * 100}%` }}>{fmt(`2000-01-01T${String(Math.floor(m / 60) % 24).padStart(2, '0')}:00`).replace(':00', '')}</b>)}</div>
         {hours.map(m => <div key={m} className="dcal-line" style={{ top: `${((m - t0) / span) * 100}%` }} />)}
@@ -105,12 +121,18 @@ function GridCalendar({ s, day, events: over, was, notes, animate }: {
               const live = onDay && now >= toMinutes(e.start) && now < toMinutes(e.end);
               const o = oldOf(e);
               const at = animate && o && !atNew ? o : e;
+              // Who is on stage: shown on every card (under the title, or beside it on a short one), unless a swap is playing.
+              const curEv = f.events.find(x => x.id === e.id);
+              const playing = animate && (!!marks?.[e.id] || (!!curEv && e.guestIds.some(g => !curEv.guestIds.includes(g))));
+              const people = !playing && e.guestIds.length > 0;
               return (
-                <div key={e.id} className={`dcal-ev k-${e.kind}${short ? ' short' : ''}${mins >= 75 ? ' tall' : ''}${flagged.has(e.id) ? ' hot' : ''}${o || notes?.[e.id] ? ' moved' : ''}${e.status === 'cancelled' ? ' off' : ''}${live ? ' live' : ''}`}
-                  style={place(at.start, at.end)}
+                <div key={e.id} className={`dcal-ev k-${e.kind}${short ? ' short' : ''}${mins >= 75 ? ' tall' : ''}${flagged.has(e.id) ? ' hot' : ''}${o || notes?.[e.id] ? ' moved' : ''}${e.status === 'cancelled' ? ' off' : ''}${live ? ' live' : ''}${people && !short ? ' has-people' : ''}${onPick ? ' pickable' : ''}${picked === e.id ? ' picked' : ''}`}
+                  style={{ ...place(at.start, at.end), ['--img' as string]: `url(${eventImage(e)})` }}
+                  role={onPick ? 'button' : undefined} tabIndex={onPick ? 0 : undefined}
+                  onClick={onPick ? () => onPick(e.id) : undefined}
+                  onKeyDown={onPick ? ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); onPick(e.id); } } : undefined}
                   title={`${e.title}, ${fmt(e.start)} to ${fmt(e.end)}${e.guestIds.length ? `, with ${guests(e.guestIds)}` : ''}`}>
                   <div className="dcal-main">
-                    {!short && <EventThumb e={e} size={26} />}
                     <div className="dcal-txt">
                       <b>{e.title}</b>
                       <small>{o && <s>{tm(o.start)}</s>}{tm(e.start)}{!short && mins >= 60 ? '' : <> to {tm(e.end)}</>}</small>
@@ -118,21 +140,46 @@ function GridCalendar({ s, day, events: over, was, notes, animate }: {
                     {(() => {
                       const cur = f.events.find(x => x.id === e.id);
                       const incoming = animate && cur ? e.guestIds.filter(g => !cur.guestIds.includes(g)) : [];
-                      const outgoing = incoming.length ? e.guestIds.filter(g => late.has(g)) : [];
+                      const outgoing = incoming.length ? cur!.guestIds.filter(g => late.has(g)) : [];
+                      const mark = animate ? marks?.[e.id] : undefined;
+                      if (mark === 'video') {
+                        // The absent guest's seat on stage becomes a screen: avatar out, video in.
+                        const gone = (cur?.guestIds ?? e.guestIds).find(g => late.has(g));
+                        const name = gone ? f.people.find(p => p.id === gone)?.name ?? '' : '';
+                        const ini = name.split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+                        return (
+                          <span className={`dcal-swap dcal-video ${atNew ? 'is-new' : 'is-old'}`} title={`${name} joins by video`}>
+                            <i className="out">{ini}</i>
+                            <span className="arr">→</span>
+                            <i className="in"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2.5" y="6" width="13" height="12" rx="2.5" /><path d="m15.5 10.5 6-3.5v10l-6-3.5" /></svg></i>
+                          </span>
+                        );
+                      }
+                      if (mark?.startsWith('seats:')) {
+                        // Held seats lift off the card and go to the waitlist.
+                        const n = Math.min(6, Number(mark.slice(6)) || 4);
+                        return (
+                          <span className={`dcal-seats ${atNew ? 'is-new' : 'is-old'}`} title={`${n} held seats go to the waitlist`}>
+                            {Array.from({ length: n }, (_, i) => <i key={i} style={{ ['--k' as string]: i }} />)}
+                            <b>+{n}</b>
+                          </span>
+                        );
+                      }
                       if (incoming.length && outgoing.length) {
                         const who = (id: string) => f.people.find(p => p.id === id)?.name ?? '';
                         const ini = (id: string) => who(id).split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
                         return (
-                          <span className={`dcal-swap ${atNew ? 'is-new' : 'is-old'}`} title={`${who(incoming[0])} opens, ${who(outgoing[0])} joins later`}>
+                          <span className={`dcal-swap ${atNew ? 'is-new' : 'is-old'}`} title={`${who(incoming[0])} steps in for ${who(outgoing[0])}`}>
                             <i className="out">{ini(outgoing[0])}</i>
                             <span className="arr">→</span>
                             <i className="in">{ini(incoming[0])}</i>
                           </span>
                         );
                       }
-                      return !short && e.guestIds.length > 0 ? <Faces s={s} ids={e.guestIds} size={18} max={3} /> : null;
+                      return short && people ? <Faces s={s} ids={e.guestIds} size={15} max={3} /> : null;
                     })()}
                   </div>
+                  {people && !short && <div className="dcal-people"><Faces s={s} ids={e.guestIds} size={19} max={4} /></div>}
                   {notes?.[e.id] && <em className="dcal-note">{notes[e.id]}</em>}
                   {flagged.has(e.id) && <span className="tag">Flag</span>}
                   {e.status === 'cancelled' && <span className="tag">Off</span>}

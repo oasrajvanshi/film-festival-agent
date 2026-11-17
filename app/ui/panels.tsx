@@ -1,8 +1,11 @@
 'use client';
 
 import { DayCalendar } from './daycal';
+import { DayStrip, VenueMap } from './venuemap';
+import { EventDetail } from './eventdetail';
 import { boardChanged } from './localkeys';
-import { ProblemTrigger, WeatherAlerts, problemsBroughtOn, resetAlerts, useAlerts, type Preview } from './weatherplan';
+import { ProblemTrigger, WeatherAlerts, hasDemoProblems, problemsBroughtOn, resetAlerts, useAlerts, useLateGuests, type Preview } from './weatherplan';
+import { roster } from '../../src/agent/presence';
 import { useEffect, useMemo, useState } from 'react';
 import { DEFAULT_SHEET, readSetup, type AgentStore } from './useAgent';
 import { riskSummary, type WeatherHour } from '../../src/agent/weather';
@@ -16,9 +19,9 @@ import { evalRandomFestivals } from '../../src/eval/fuzz';
 import type { Recommendation } from '../../src/agent/recommend';
 import { Icon } from './icons';
 import { buildBrief } from '../../src/agent/briefs';
-import { HeroPhoto, PhotoBand } from './photos';
+import { PhotoBand } from './photos';
 
-type P = { s: AgentStore; user: string; go: (page: 'today' | 'approvals' | 'here' | 'scan' | 'schedule' | 'ask' | 'briefs' | 'feeds' | 'log' | 'data') => void };
+type P = { s: AgentStore; user: string; go: (page: 'today' | 'approvals' | 'scan' | 'ask' | 'briefs' | 'feeds' | 'log' | 'data') => void };
 
 const dayOf = (iso: string, dates: Record<DayNumber, string>): DayNumber =>
   Number(Object.entries(dates).find(([, d]) => iso.startsWith(d))?.[0] ?? 1) as DayNumber;
@@ -44,6 +47,13 @@ export function Overview({ s, user, go }: P) {
     try { const v = typeof window !== 'undefined' && localStorage.getItem('usher-original-plan-v1'); return v ? JSON.parse(v) : null; } catch { return null; }
   });
   const [showOriginal, setShowOriginal] = useState(false);
+  // The event opened from the calendar or the map; its details show under the calendar.
+  const [detail, setDetail] = useState<string | null>(null);
+  // Calendar or map; remembered on this device.
+  const [view, setViewState] = useState<'cal' | 'map'>(() => {
+    try { return typeof window !== 'undefined' && localStorage.getItem('usher-cal-view') === 'map' ? 'map' : 'cal'; } catch { return 'cal'; }
+  });
+  const setView = (v: 'cal' | 'map') => { setViewState(v); try { localStorage.setItem('usher-cal-view', v); } catch { /* private mode */ } };
   const [kept, setKept] = useState<Record<string, string>>(() => {
     try { const v = typeof window !== 'undefined' && localStorage.getItem('usher-plan-notes-v1'); return v ? JSON.parse(v) : {}; } catch { return {}; }
   });
@@ -82,47 +92,104 @@ export function Overview({ s, user, go }: P) {
   }
   const calEvents = preview ? preview.events : showOriginal && hasOriginal ? original! : undefined;
   const [alerts] = useAlerts();
+  // Keep the chosen day's tab in view (long festivals scroll their tabs sideways).
+  useEffect(() => {
+    const tab = document.querySelector<HTMLElement>('.cal-top .day-strip .on');
+    const bar = tab?.parentElement;
+    if (tab && bar) bar.scrollTo({ left: tab.offsetLeft - bar.clientWidth / 2 + tab.offsetWidth / 2, behavior: 'smooth' });
+  }, [calDay]);
   // Opening the app starts calm: problems left over from before (on this device or the server)
   // are cleared until the organizer brings them on with the bottom-left button.
   useEffect(() => {
     if (!problemsBroughtOn() && alerts.length) resetAlerts();
   }, [alerts]);
-  const problems = problemsBroughtOn() ? alerts.filter(x => x.status === 'open').length : 0;
   return (
     <div className="today">
-      {/* Once problems are up, the alerts take the banner's place. */}
-      {!problems && (
-        <section className="hero has-photo">
-          <HeroPhoto k="organizer" />
-          <h2>{s.festivalName}</h2>
-        </section>
-      )}
-
       {/* The demo's scripted problems belong to the sample festival only. */}
-      {f.people.some(p => p.name === 'Pavel Kettering') && <ProblemTrigger />}
+      {hasDemoProblems(s) && <ProblemTrigger s={s} />}
       <WeatherAlerts s={s} user={user}
         onOpen={d => { setCalDay(d); setShowOriginal(false); }}
         onPreview={setPreview} onApplied={keepOriginal} />
 
         <div className="cal-top">
-          <div className="cal-days" role="tablist" aria-label="Festival day">
-            {festivalDays(f).map(d => (
-              <button key={d} role="tab" aria-selected={d === calDay} className={d === calDay ? 'on' : ''} onClick={() => setCalDay(d)}>
-                Day {d} <small>{new Date(`${f.dates[d]}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short' })} {Number(f.dates[d].slice(8))}</small>
+          <DayStrip s={s} day={calDay} onDay={setCalDay} events={calEvents ?? f.events} />
+          <div className="cal-tools">
+            {hasOriginal && !preview && (
+              <button className="cal-orig" aria-pressed={showOriginal} onClick={() => setShowOriginal(!showOriginal)}>
+                <Icon name={showOriginal ? 'calendar' : 'eye'} size={15} /> {showOriginal ? 'Back to new plan' : 'Original plan'}
               </button>
-            ))}
+            )}
+            <div className={`cal-view show-${view}`} role="group" aria-label="View">
+              <i className="cal-view-thumb" aria-hidden="true" />
+              <button className={view === 'cal' ? 'on' : ''} aria-pressed={view === 'cal'} onClick={() => setView('cal')}><Icon name="calendar" size={15} /><span>Calendar</span></button>
+              <button className={view === 'map' ? 'on' : ''} aria-pressed={view === 'map'} onClick={() => setView('map')}><Icon name="map" size={15} /><span>Map</span></button>
+            </div>
           </div>
-          {hasOriginal && !preview && (
-            <button className="cal-orig" aria-pressed={showOriginal} onClick={() => setShowOriginal(!showOriginal)}>
-              <Icon name={showOriginal ? 'calendar' : 'eye'} size={15} /> {showOriginal ? 'Back to new plan' : 'Original plan'}
-            </button>
-          )}
         </div>
-      <div className="card today-cal">
-        <DayCalendar s={s} day={calDay} events={calEvents} was={was} notes={notes} animate={!!preview} />
-      </div>
+      {view === 'cal' ? (
+        <div className="card today-cal">
+          <DayCalendar s={s} day={calDay} events={calEvents} was={was} notes={notes} marks={preview?.marks} animate={!!preview}
+            onPick={id => setDetail(detail === id ? null : id)} picked={detail} />
+        </div>
+      ) : (
+        <VenueMap s={s} day={calDay} onDay={setCalDay} events={calEvents} was={was} notes={notes} marks={preview?.marks} animate={!!preview} onPick={id => setDetail(id)} />
+      )}
+      {detail && <EventDetail s={s} id={detail} events={calEvents ?? f.events} was={was} notes={notes} user={user} onClose={() => setDetail(null)} />}
 
     </div>
+  );
+}
+
+// ------------------------------------------------------------------ the day in numbers (was the Who's here page)
+/** Four small numbers for the chosen day: tickets, the programme, who's checked in, guests on stage. */
+function DayStats({ s, day, events, go }: { s: AgentStore; day: DayNumber; events: FestivalEvent[]; go: P['go'] }) {
+  const f = s.agent.f;
+  const late = useLateGuests(s);
+  const today = events.filter(e => e.day === day && e.status === 'scheduled');
+  const screenings = today.filter(e => e.kind === 'screening' && !e.restriction);
+  const seats = screenings.reduce((n, e) => n + (f.venues.find(v => v.id === e.venueId)?.rooms?.find(r => r.name === e.room)?.capacity ?? f.venues.find(v => v.id === e.venueId)?.capacity ?? 0), 0);
+  const sold = screenings.reduce((n, e) => n + (e.seatsSold ?? 0), 0);
+  const premieres = new Set<string>();
+  for (const e of [...f.events].filter(e => e.kind === 'screening' && e.filmId && !e.restriction).sort((a, b) => a.start.localeCompare(b.start))) if (!premieres.has(e.filmId!)) premieres.add(e.filmId!) && void 0;
+  const firstShow = new Map<string, string>();
+  for (const e of [...f.events].filter(e => e.kind === 'screening' && e.filmId && !e.restriction).sort((a, b) => a.start.localeCompare(b.start))) if (!firstShow.has(e.filmId!)) firstShow.set(e.filmId!, e.id);
+  const prem = screenings.filter(e => firstShow.get(e.filmId!) === e.id).length;
+  const talks = today.filter(e => e.kind === 'panel' || e.kind === 'qa').length;
+  const rows = useMemo(() => roster(f, day), [f, day, s.version]); // eslint-disable-line react-hooks/exhaustive-deps
+  const expected = rows.filter(r => !r.walkIn).length;
+  const here = rows.filter(r => r.arrival).length;
+  const isToday = s.clock.slice(0, 10) === f.dates[day];
+  const past = s.clock.slice(0, 10) > f.dates[day];
+  const onStage = [...new Set(today.flatMap(e => e.guestIds))];
+  const missing = onStage.filter(id => late.has(id));
+  const pct = (a: number, b: number) => (b ? Math.round((a / b) * 100) : 0);
+  const date = new Date(`${f.dates[day]}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  return (
+    <section className="dstats" aria-label={`${date} in numbers`}>
+      <div className="dstat">
+        <small>Tickets sold</small>
+        <b>{sold.toLocaleString('en-US')}</b>
+        <span>of {seats.toLocaleString('en-US')} seats · {pct(sold, seats)}%</span>
+        <i className="dstat-bar"><i style={{ width: `${pct(sold, seats)}%` }} /></i>
+      </div>
+      <div className="dstat">
+        <small>Screenings</small>
+        <b>{screenings.length}</b>
+        <span>{prem} premiere{prem === 1 ? '' : 's'} · {talks} talks &amp; Q&amp;As</span>
+      </div>
+      <div className="dstat">
+        <small>{isToday || past ? 'Checked in' : 'Expected'}</small>
+        <b>{(isToday || past ? here : expected).toLocaleString('en-US')}</b>
+        <span>{isToday || past ? `of ${expected.toLocaleString('en-US')} expected` : 'people on the day\'s list'}</span>
+        {(isToday || past) && <i className="dstat-bar"><i style={{ width: `${pct(here, expected)}%` }} /></i>}
+        <button className="dstat-go" onClick={() => go('scan')}><Icon name="scan" size={13} /> Scan in</button>
+      </div>
+      <div className={`dstat${missing.length ? ' warn' : ''}`}>
+        <small>Guests on stage</small>
+        <b>{onStage.length}</b>
+        <span>{missing.length ? `${missing.map(id => f.people.find(p => p.id === id)?.name).join(', ')} can't make it` : 'All confirmed'}</span>
+      </div>
+    </section>
   );
 }
 
@@ -203,7 +270,7 @@ function FlagList({ s, user, go }: P) {
                     {cover.map(name => (
                       <button key={name} className="small primary" onClick={() => act(() => a.assignCover(fl.id, name, user))}>Give shift to {name}</button>
                     ))}
-                    {toSchedule && <button className="small" onClick={() => go('schedule')}><Icon name="calendar" size={14} />Fix in schedule</button>}
+                    {toSchedule && <button className="small" onClick={() => go('today')}><Icon name="calendar" size={14} />Fix on Overview</button>}
                     <button className="small" onClick={() => act(() => a.resolveFlag(fl.id, user))}><Icon name="check" size={14} />Mark as sorted</button>
                   </div>
                 </div>
@@ -233,7 +300,7 @@ export function WeatherCard({ s, go, compact }: P & { compact?: boolean }) {
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const date = s.clock.slice(0, 10);
-  const city = (typeof window !== 'undefined' && readSetup()?.city) || 'New York';
+  const city = (typeof window !== 'undefined' && readSetup()?.city) || 'Boulder';
   // Forecasts reach about 16 days ahead. Further out, today's real weather is played on the festival day as a preview.
   const daysAway = Math.round((Date.parse(`${date}T12:00:00Z`) - Date.now()) / 864e5);
   const preview = daysAway > 15;
@@ -653,26 +720,91 @@ export function Feeds({ s, go, user }: P) {
 }
 
 // ------------------------------------------------------------------ Outbox & log
-export function Log({ s }: P) {
+const STEP: Record<string, { label: string; icon: string }> = {
+  trigger: { label: 'Saw', icon: 'bolt' }, understand: { label: 'Worked out', icon: 'eye' }, decide: { label: 'Decided', icon: 'sparkle' },
+  act: { label: 'Did', icon: 'check' }, ask: { label: 'Asked you', icon: 'inbox' }, approval: { label: 'Approved', icon: 'users' },
+  tool: { label: 'Tool', icon: 'gear' }, error: { label: 'Blocked', icon: 'alert' },
+};
+type LogFilter = 'all' | 'decisions' | 'messages' | 'scans' | 'questions';
+
+/** Everything the agent did, live: each run as a story (saw → worked out → decided → did or asked → approved). */
+export function Log({ s, go }: P) {
   const { person } = useLookups(s);
+  const today = dayOf(s.clock, s.agent.f.dates);
   const [tab, setTab] = useState<'log' | 'outbox'>('log');
+  const [filter, setFilter] = useState<LogFilter>('all');
+  const [q, setQ] = useState('');
+  const entries = s.agent.log.entries;
+  const isScan = (t: string) => /^(ARRIVED|BACK IN|ALLOW|DENY)\b/.test(t);
+  const keep = (e: (typeof entries)[number]) =>
+    (filter === 'all' ? true
+      : filter === 'decisions' ? ['decide', 'ask', 'approval', 'understand'].includes(e.kind)
+      : filter === 'messages' ? (e.kind === 'act' && !isScan(e.summary)) || e.kind === 'approval'
+      : filter === 'scans' ? isScan(e.summary)
+      : /Question|Answered|don't know/.test(e.summary))
+    && (!q || e.summary.toLowerCase().includes(q.toLowerCase()));
+  // Group into runs, newest first.
+  const runs: { id: string; items: typeof entries }[] = [];
+  for (const e of [...entries].reverse()) {
+    if (!keep(e)) continue;
+    const last = runs[runs.length - 1];
+    if (last && last.id === e.runId) last.items.push(e); else runs.push({ id: e.runId, items: [e] });
+  }
+  const count = (k: string) => entries.filter(e => e.kind === k).length;
+  const when = (at: string) => (at.includes('T') ? `${new Date(`${at.slice(0, 10)}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} · ${fmt(at)}` : at);
+  const chip = (k: LogFilter, label: string) => <button key={k} className={`wh-chip${filter === k ? ' on' : ''}`} onClick={() => setFilter(k)}>{label}</button>;
   return (
-    <div className="card">
-      <div className="row" style={{ marginBottom: 8 }}>
-        <button className={tab === 'log' ? 'primary small' : 'small'} onClick={() => setTab('log')}>Audit log ({s.agent.log.entries.length})</button>
-        <button className={tab === 'outbox' ? 'primary small' : 'small'} onClick={() => setTab('outbox')}>Delivered messages ({s.agent.outbox.length})</button>
-      </div>
-      <div className="scroll">
+    <div className="lg">
+      <h3 className="lg-h">Today in numbers · {new Date(`${s.agent.f.dates[today]}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</h3>
+      <DayStats s={s} day={today} events={s.agent.f.events} go={go} />
+      <h3 className="lg-h">The agent</h3>
+      <section className="dstats lg-stats">
+        <div className="dstat"><small>Agent runs</small><b>{new Set(entries.map(e => e.runId)).size}</b><span><i className="lg-live" /> Live</span></div>
+        <div className="dstat"><small>Decisions</small><b>{count('decide')}</b><span>{count('ask')} waited for a person</span></div>
+        <div className="dstat"><small>Approvals</small><b>{count('approval')}</b><span>by the team</span></div>
+        <div className="dstat"><small>Messages delivered</small><b>{s.agent.outbox.length.toLocaleString('en-US')}</b><span>to phones, email and briefs</span></div>
+      </section>
+      <div className="card">
+        <div className="lg-bar">
+          <div className="cal-view show-cal lg-tabs" role="tablist">
+            <button className={tab === 'log' ? 'on' : ''} onClick={() => setTab('log')}>What the agent did</button>
+            <button className={tab === 'outbox' ? 'on' : ''} onClick={() => setTab('outbox')}>Messages sent</button>
+          </div>
+          {tab === 'log' && <div className="wh-chips">{chip('all', 'Everything')}{chip('decisions', 'Decisions')}{chip('messages', 'Actions')}{chip('scans', 'Door scans')}{chip('questions', 'Questions')}</div>}
+          <span style={{ flex: 1 }} />
+          <input className="wh-find" placeholder="Search the log" value={q} onChange={e => setQ(e.target.value)} />
+        </div>
         {tab === 'log' ? (
-          <table className="stackable"><thead><tr><th>#</th><th>Festival time</th><th>Step</th><th>What happened</th></tr></thead>
-            <tbody>{[...s.agent.log.entries].reverse().slice(0, 300).map(e => (
-              <tr key={e.seq}><td>{e.seq}</td><td style={{ whiteSpace: 'nowrap' }}>{e.at.includes('T') ? `${e.at.slice(5, 10)} ${fmt(e.at)}` : e.at}</td><td><span className="chip">{e.kind}</span></td><td>{e.summary}</td></tr>
-            ))}</tbody></table>
+          <div className="lg-runs">
+            {runs.length === 0 && <p className="muted">Nothing yet. Bring on the problems on Overview, approve a plan, or scan someone in: every step shows up here as it happens.</p>}
+            {runs.slice(0, 120).map((r, i) => (
+              <article key={`${r.id}-${i}`} className="lg-run">
+                <header><b>{when(r.items[r.items.length - 1].at)}</b><span>{r.items[r.items.length - 1].summary}</span></header>
+                <ol>
+                  {[...r.items].reverse().map(e => {
+                    const st = STEP[e.kind] ?? STEP.tool;
+                    return (
+                      <li key={e.seq} className={`k-${e.kind}`}>
+                        <i className="lg-ic"><Icon name={st.icon} size={13} /></i>
+                        <span className="lg-k">{st.label}</span>
+                        <span className="lg-s">{e.summary}</span>
+                        <time>{fmt(e.at.includes('T') ? e.at : `2000-01-01T${e.at.slice(11, 16) || '00:00'}`)}</time>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </article>
+            ))}
+          </div>
         ) : (
-          <table className="stackable"><thead><tr><th>To</th><th>Channel</th><th>Message</th></tr></thead>
-            <tbody>{[...s.agent.outbox].reverse().slice(0, 300).map((d, i) => (
-              <tr key={i}><td>{person(d.personId)?.name}<div className="muted">{person(d.personId)?.role}</div></td><td>{d.channel.replace('_', ' ')}</td><td style={{ whiteSpace: 'pre-wrap' }}>{d.body}</td></tr>
-            ))}</tbody></table>
+          <div className="lg-out">
+            {[...s.agent.outbox].reverse().filter(d => !q || `${d.subject} ${d.body}`.toLowerCase().includes(q.toLowerCase())).slice(0, 200).map((d, i) => (
+              <div className="lg-msg" key={i}>
+                <span className="lg-to"><b>{person(d.personId)?.name ?? d.personId}</b><small>{(person(d.personId)?.role ?? '').replace('_', ' ')} · {d.channel.replace(/_/g, ' ')} · {when(d.at)}</small></span>
+                <span className="lg-body"><b>{d.subject}</b><span>{d.body}</span></span>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>
@@ -686,7 +818,7 @@ export function Evaluation({ s }: P) {
   return (
     <div className="card stack">
       <h2>Evaluation: the proposal's four tests</h2>
-      <p className="muted">These tests check Usher itself, not your festival. They run on the built-in Harbor Lights sample day, without the model, so results are repeatable. Your festival and dashboard are not touched.</p>
+      <p className="muted">These tests check Usher itself, not your festival. They run on a small fixed test festival (Harbor Lights, three days), without the model, so results are repeatable. Your festival and dashboard are not touched.</p>
       <div><button className="primary" disabled={busy} onClick={async () => { setBusy(true); setRes(await runAll(null)); setBusy(false); }}>{busy ? 'Running…' : 'Run all four'}</button></div>
       {res?.map(r => (
         <div key={r.suite} className="card">
@@ -729,7 +861,7 @@ export function Data({ s }: P) {
   const fromSheet = s.sheet.source === 'sheet';
   const [url, setUrl] = useState(fromSheet ? s.sheet.sheet ?? '' : s.sheet.source === 'built-in' ? DEFAULT_SHEET : '');
   const isLink = /^https?:\/\//.test(url);
-  const source = fromSheet ? 'Google Sheet' : s.sheet.source === 'onboarding' ? `Set up from ${s.sheet.sheet ?? 'your files'}` : 'Harbor Lights sample festival';
+  const source = fromSheet ? 'Google Sheet' : s.sheet.source === 'onboarding' ? `Set up from ${s.sheet.sheet ?? 'your files'}` : 'Sundance 2027 sample festival';
   const [busy, setBusy] = useState<string | null>(null);
   const run = async (mode: 'replace' | 'sync') => { setBusy(mode); await s.loadSheet(url, mode); setBusy(null); };
   const f = s.agent.f;

@@ -26,7 +26,7 @@ export const ACCESS_RULES: Record<PassType, Admits> = {
 export const PASS_LABELS: Record<PassType, string> = {
   day_pass: 'Day pass',
   single_ticket: 'Single-screening ticket',
-  three_day: '3-day pass',
+  three_day: 'Festival pass',
   vip: 'VIP pass',
   industry: 'Industry badge',
   press: 'Press badge',

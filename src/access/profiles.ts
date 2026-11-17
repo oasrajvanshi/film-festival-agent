@@ -149,4 +149,4 @@ export function lookupForCode(f: Festival, kind: ProfileKind, name: string, emai
 }
 
 /** The sample festival's people shown first (the demo, and any code in the demo): each has a full first day. */
-export const DEMO_PEOPLE = ['Mira Galloway', 'Tova Jessop', 'Bright Booth AV'];
+export const DEMO_PEOPLE = ['Jane', 'Tova Jessop', 'Bright Booth AV', 'Tom Whitaker', 'Mira Galloway'];

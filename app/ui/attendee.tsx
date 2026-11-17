@@ -8,7 +8,7 @@
 //   Ask      questions about the festival.
 // Your pass sits under your initials, top right.
 
-import { useMemo, useState, type ReactElement } from 'react';
+import { useEffect, useMemo, useState, type ReactElement } from 'react';
 import qrcode from 'qrcode-generator';
 import type { AgentStore } from './useAgent';
 import type { Who } from '../../src/access/profiles';
@@ -22,6 +22,8 @@ import { Icon } from './icons';
 import { Ask } from './panels';
 import { MyArrival } from './presence';
 import { useAlerts } from './weatherplan';
+import { CityBase, DayStrip, frameFor, usePlaced } from './venuemap';
+import { PushBanner, UPDATE_ICON, UPDATE_LABEL, updateKind, useArrivals, useTheme } from './live';
 
 type Why = 'Ticket' | 'Saved';
 type Plan = { e: FestivalEvent; why: Why };
@@ -30,6 +32,8 @@ type Tab = 'plan' | 'map' | 'updates' | 'ask';
 const tod = (iso: string) => Number(iso.slice(11, 13)) * 60 + Number(iso.slice(14, 16));
 const hm = (date: string, mins: number) => `${date}T${String(Math.floor(mins / 60)).padStart(2, '0')}:${String(mins % 60).padStart(2, '0')}`;
 const readOriginal = (): FestivalEvent[] => { try { const v = localStorage.getItem('usher-original-plan-v1'); return v ? JSON.parse(v) : []; } catch { return []; } };
+/** What changed about an event besides its time (a stand-in, a video guest), as the organizer approved it. */
+const readNotes = (): Record<string, string> => { try { const v = localStorage.getItem('usher-plan-notes-v1'); return v ? JSON.parse(v) : {}; } catch { return {}; } };
 const venueName = (f: Festival, id: string) => f.venues.find(v => v.id === id)?.name ?? id;
 const walk = (f: Festival, a: string, b: string) => (a === b ? 0 : f.travel?.[a]?.[b] ?? 20);
 
@@ -71,6 +75,13 @@ export function AttendeeApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who
   const [seen, setSeen] = useState(0);
   const unread = Math.max(0, inbox.length - seen);
   const go = (t: Tab) => { setTab(t); if (t === 'updates') setSeen(inbox.length); window.scrollTo({ top: 0 }); };
+  // Live: an update approved on the organizer's screen arrives here as a push, and the newest one waits on the Plan.
+  const [arrived, clearArrived] = useArrivals(inbox);
+  const [pushes, setPushes] = useState<typeof inbox>([]);
+  useEffect(() => { if (arrived.length) { setPushes(arrived); clearArrived(); setLatestOpen(true); } }, [arrived.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [latestOpen, setLatestOpen] = useState(true);
+  const latest = inbox[inbox.length - 1];
+  const [theme, setTheme] = useTheme();
 
   // Change the plan here at once; on a shared festival the server keeps it (only your own plan).
   const change = (add: string | null, remove: string | null) => {
@@ -81,7 +92,8 @@ export function AttendeeApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who
   };
 
   return (
-    <div className={`at at-on-${tab}`}>
+    <div className={`at at-on-${tab}${theme === 'light' ? ' light' : ''}`}>
+      <PushBanner msgs={pushes} onOpen={() => go('updates')} onDone={() => setPushes([])} />
       {/* The whole app sits on a cinema photo, darkened so the cards read on top. */}
       <div className="at-photo" aria-hidden="true" style={{ backgroundImage: 'url(/hl/audience.jpg)' }} />
       {viewAs && <div className="viewas-bar"><Icon name="eye" size={16} /> Viewing as {who.name}. <button className="small" onClick={onOut}>Back to organizer</button></div>}
@@ -90,25 +102,29 @@ export function AttendeeApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who
           <div className="at-fest">{s.festivalName}</div>
           <div className="at-sub">{who.name}</div>
         </div>
+        <button className="at-theme" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} aria-label={theme === 'light' ? 'Dark mode' : 'Light mode'} title={theme === 'light' ? 'Dark mode' : 'Light mode'}><Icon name={theme === 'light' ? 'moon' : 'sun'} size={16} /></button>
         <button className="at-me" onClick={() => { opened(); setMe(true); }} aria-label="Your pass" title="Your pass">{who.name.split(/\s+/).slice(0, 2).map(w => w[0]).join('')}</button>
       </header>
 
       {(tab === 'plan' || tab === 'map') && (
         <div className="at-body at-days-wrap">
-          <div className="at-days" role="tablist" aria-label="Day">
-            {days.map(d => {
-              const date = new Date(`${f.dates[d]}T12:00:00`);
-              return (
-                <button key={d} role="tab" aria-selected={d === day} className={d === day ? 'on' : ''} onClick={() => setDay(d)}>
-                  <b>{date.getDate()}</b><span>{date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
-                </button>
-              );
-            })}
-          </div>
+          {/* The same day buttons as the organizer's: weekday over date, a bar for how full your day is. */}
+          <DayStrip s={s} day={day} onDay={setDay} events={plans.map(p => p.e)} />
         </div>
       )}
 
       <main className="at-body">
+        {tab === 'plan' && latest && latestOpen && (
+          <div className="at-latest one">
+            <span className={`at-latest-ic k-${updateKind(latest)}`}><Icon name={UPDATE_ICON[updateKind(latest)]} size={14} /></span>
+            {/* One line here; the full message waits in Updates. */}
+            <button className="at-latest-line" onClick={() => go('updates')}>
+              <b>{latest.subject}</b>
+              <small>{fmt(latest.at)} · Details in Updates ›</small>
+            </button>
+            <button className="at-latest-x" aria-label="Dismiss" onClick={() => setLatestOpen(false)}><Icon name="x" size={14} /></button>
+          </div>
+        )}
         {tab === 'plan' && <PlanView s={s} who={who} plans={plans} day={day} change={change} />}
         {tab === 'map' && <MapView s={s} plans={plans} day={day} />}
         {tab === 'updates' && <Updates s={s} who={who} />}
@@ -153,6 +169,7 @@ function useRisk(s: AgentStore, day: DayNumber): { risk: WeatherRisk; label: str
 function PlanView({ s, who, plans, day, change }: { s: AgentStore; who: Who; plans: Plan[]; day: DayNumber; change: (add: string | null, remove: string | null) => void }) {
   const f = s.agent.f;
   const original = useMemo(() => readOriginal(), [s.version]); // eslint-disable-line react-hooks/exhaustive-deps
+  const changeNotes = useMemo(() => Object.fromEntries(Object.entries(readNotes()).filter(([, n]) => n !== 'Changed' && !/held seats/.test(n))), [s.version]); // eslint-disable-line react-hooks/exhaustive-deps
   const [open, setOpen] = useState<FestivalEvent | null>(null);
   const [deciding, setDeciding] = useState(false);
   const [kept, setKept] = useState<Record<string, boolean>>({});
@@ -191,7 +208,7 @@ function PlanView({ s, who, plans, day, change }: { s: AgentStore; who: Who; pla
   mine.forEach((p, i) => {
     const prev = mine[i - 1];
     const hour = hourLabel(p.e.start);
-    if (hour !== lastHour) { rows.push(<h4 className="msch-h" key={`h-${p.e.id}`}>{hour}</h4>); lastHour = hour; }
+    if (hour !== lastHour) lastHour = hour;
     if (prev) {
       const trip = walk(f, prev.e.venueId, p.e.venueId);
       const gap = tod(p.e.start) - tod(prev.e.end);
@@ -218,9 +235,10 @@ function PlanView({ s, who, plans, day, change }: { s: AgentStore; who: Who; pla
     const off = p.e.status === 'cancelled';
     const clash = prev && p.e.status === 'scheduled' && prev.e.status === 'scheduled' && tod(p.e.start) < tod(prev.e.end) ? prev : null;
     const risky = decision?.p.e.id === p.e.id;
-    const note = off ? 'Cancelled' : clash ? `Overlaps ${clash.e.title}` : w && p.why === 'Ticket' ? 'Seat held' : '';
+    const changed = changeNotes[p.e.id];
+    const note = off ? 'Cancelled' : clash ? `Overlaps ${clash.e.title}` : changed ? changed : w ? (p.why === 'Ticket' ? `Now ${fmt(p.e.start)} · seat held` : `Now ${fmt(p.e.start)}`) : '';
     rows.push(
-      <button key={p.e.id} className={`msch-ev${w ? ' moved' : ''}${off ? ' off' : ''}${risky ? ' risk' : ''}${clash ? ' clash' : ''}`}
+      <button key={p.e.id} className={`msch-ev${w || changed ? ' moved' : ''}${off ? ' off' : ''}${risky ? ' risk' : ''}${clash ? ' clash' : ''}`}
         style={{ ['--vc' as string]: venueTone(f, p.e.venueId) }} onClick={() => { opened(); setOpen(p.e); }}>
         <span className="msch-time">{w && <s>{fmt(w)}</s>}<b>{fmt(p.e.start)}</b><small>{fmt(p.e.end)}</small></span>
         <EventThumb e={p.e} size={40} />
@@ -256,10 +274,6 @@ function PlanView({ s, who, plans, day, change }: { s: AgentStore; who: Who; pla
           <i>Decide</i>
         </button>
       )}
-      <div className="at-dayhead">
-        <b>{new Date(`${f.dates[day]}T12:00:00`).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</b>
-        <span>{mine.length ? `${mine.length} on your plan` : 'Nothing planned'}</span>
-      </div>
       {mine.length === 0 ? <div className="at-empty">Nothing on your plan this day.</div> : <div className="msch apl">{rows}</div>}
 
       {open && (
@@ -300,12 +314,12 @@ function PlanView({ s, who, plans, day, change }: { s: AgentStore; who: Who; pla
 }
 
 // ---------------------------------------------------------------- map
-/** Where the sample's venues sit on the harbour; any other venue is placed around them. */
-const SPOTS: Record<string, [number, number]> = { 'v-harbor': [78, 132], 'v-pier9': [150, 84], 'v-canal': [212, 196], 'v-river': [288, 128] };
-
 function MapView({ s, plans, day }: { s: AgentStore; plans: Plan[]; day: DayNumber }) {
   const f = s.agent.f;
-  const spot = (id: string, i: number): [number, number] => SPOTS[id] ?? [70 + (i * 73) % 240, 70 + (i * 57) % 150];
+  // The venues on the city's own streets; the frame fits them, with room for names.
+  const placed = usePlaced(f.venues);
+  const fr = frameFor(placed.filter(p => p.v.lat != null).map(p => [p.x, p.y]), 300, 260 / 360, 360);
+  const spot = (id: string): [number, number] => { const p = placed.find(x => x.v.id === id); return p ? [p.x, p.y] : [fr.x0 + 40, fr.y1 - 40]; };
   const mine = plans.filter(p => p.e.day === day && p.e.status === 'scheduled');
   const stops = mine.map(p => p.e.venueId).filter((v, i, a) => i === 0 || a[i - 1] !== v);
   const [pick, setPick] = useState<string | null>(stops[0] ?? null);
@@ -316,21 +330,22 @@ function MapView({ s, plans, day }: { s: AgentStore; plans: Plan[]; day: DayNumb
   const nowOn = sel && onDay ? f.events.find(e => e.venueId === sel.id && e.status === 'scheduled' && tod(e.start) - 30 <= now && now < tod(e.end)) : null;
   const firstStop = sel ? stops.indexOf(sel.id) : -1;
   const from = firstStop > 0 ? stops[firstStop - 1] : null;
+  const u = fr.u;
   return (
     <>
       <div className="at-map">
-        <svg viewBox="0 0 360 260" role="img" aria-label="Map of the festival venues and your route">
-          <path className="at-water" d="M0 190 C 60 170, 110 215, 170 232 S 300 238, 360 214 V260 H0z" />
-          {[[0, 60, 360, 40], [0, 160, 360, 150], [120, 0, 104, 260], [250, 0, 262, 260]].map(([x1, y1, x2, y2], i) => <line key={i} className="at-street" x1={x1} y1={y1} x2={x2} y2={y2} />)}
-          {stops.length > 1 && <polyline className="at-route" points={stops.map((v, i) => spot(v, i).join(',')).join(' ')} />}
-          {f.venues.map((v, i) => {
-            const [x, y] = spot(v.id, i);
+        <svg viewBox={fr.vb} preserveAspectRatio="xMidYMid slice" role="img" aria-label="Map of the festival venues and your route">
+          <CityBase {...fr} />
+          {stops.length > 1 && <polyline className="at-route" points={stops.map(v => spot(v).join(',')).join(' ')} />}
+          {f.venues.map(v => {
+            const [x, y] = spot(v.id);
             const n = stops.indexOf(v.id);
+            const left = x > (fr.x0 + fr.x1) / 2 + (fr.x1 - fr.x0) * 0.2;
             return (
-              <g key={v.id} className={`at-pin${pick === v.id ? ' on' : ''}${n >= 0 ? ' mine' : ''}`} onClick={() => setPick(v.id)} transform={`translate(${x} ${y})`}>
-                <circle r={n >= 0 ? 13 : 8} />
-                {n >= 0 && <text className="at-pin-n" y="4.5" textAnchor="middle">{n + 1}</text>}
-                <text className="at-pin-l" y={n >= 0 ? 28 : 22} textAnchor="middle">{v.name}</text>
+              <g key={v.id} className={`at-pin${pick === v.id ? ' on' : ''}${n >= 0 ? ' mine' : ''}`} onClick={() => setPick(v.id)} transform={`translate(${x} ${y}) scale(${u})`}>
+                <circle r={n >= 0 ? 11 : 6} />
+                {n >= 0 && <text className="at-pin-n" y="4" textAnchor="middle">{n + 1}</text>}
+                {(n >= 0 || pick === v.id) && <text className="at-pin-l" x={left ? -15 : 15} y="4" textAnchor={left ? 'end' : 'start'}>{v.name}</text>}
               </g>
             );
           })}
@@ -359,7 +374,7 @@ function Updates({ s, who }: { s: AgentStore; who: Who }) {
       {inbox.length === 0 && <div className="at-empty">Nothing yet. If a change affects your plan, it shows up here.</div>}
       {inbox.map((m, i) => (
         <div className="at-msg" key={i}>
-          <span className="at-alert-ic"><Icon name={/cancel/i.test(m.subject) ? 'x' : /weather|snow|storm|heat/i.test(m.subject) ? 'cloud' : 'calendar'} size={16} /></span>
+          <span className={`at-alert-ic k-${updateKind(m)}`} title={UPDATE_LABEL[updateKind(m)]}><Icon name={UPDATE_ICON[updateKind(m)]} size={16} /></span>
           <div><b>{m.subject}</b><small>{fmt(m.at)}</small><p>{m.body}</p></div>
         </div>
       ))}

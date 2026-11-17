@@ -10,7 +10,8 @@ import { boardChanged, clearFestivalLocal, readBoard, writeBoard, type Board } f
 import type { ArrivalResult } from '../../src/agent/presence';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { FestivalAgent } from '../../src/agent/agent';
-import { buildFestival } from '../../src/data/seed';
+import { buildSundance } from '../../src/data/sundance';
+import { FESTIVAL_NAME, SCENARIOS } from '../../src/data/sundance2027';
 import type { LlmClient, ChatMessage } from '../../src/llm/ollama';
 import type { Festival } from '../../src/core/types';
 import type { ScanResult } from '../../src/rules/access';
@@ -26,7 +27,13 @@ const SETUP_KEY = 'ffa-setup-v1';
 const WHO_KEY = 'ffa-who-v1';
 const FID_KEY = 'ffa-fid-v1';
 const TOKEN_KEY = 'ffa-token-v1';
-const SAMPLE_CLOCK = '2027-04-15T09:00';
+/** The demo opens on the morning the producer's flight is cancelled (Day 2). */
+const SAMPLE_CLOCK = SCENARIOS.clock;
+/** Bumped whenever the built-in demo festival changes, so a demo saved in this browser is rebuilt. */
+const SAMPLE_VERSION = 'sundance-2027-v5';
+/** Every Usher screen open in this browser (the organizer, a phone frame, another tab) hears each saved change at once. */
+const LIVE = 'usher-live';
+const liveChannel = () => { try { return typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(LIVE) : null; } catch { return null; } };
 
 /** What the festival chose during onboarding. */
 export interface Setup { festivalName: string; city: string; approver: string; channels: string[]; onboardedAt: string; sheetUrl?: string; sheetMapping?: SheetMapping }
@@ -84,7 +91,7 @@ export function useAgent() {
   const dirty = useRef(false);
   const now = useCallback(() => clockRef.current, []);
 
-  if (!agentRef.current) agentRef.current = new FestivalAgent(buildFestival(), null, now);
+  if (!agentRef.current) agentRef.current = new FestivalAgent(buildSundance(), null, now);
 
   const setWho = (w: Who | null) => { whoRef.current = w; setWhoState(w); writeWho(w); };
   const bump = () => setVersion(v => v + 1);
@@ -122,8 +129,12 @@ export function useAgent() {
         modeRef.current = 'local'; setMode('local');
         try {
           const raw = localStorage.getItem(KEY);
-          if (raw) {
-            const s = JSON.parse(raw);
+          const saved = raw ? JSON.parse(raw) : null;
+          // A demo saved from an older version of the sample is rebuilt; festivals people set up are kept.
+          const stale = saved && (!saved.sheet || saved.sheet.source === 'built-in') && saved.sampleVersion !== SAMPLE_VERSION;
+          if (stale) { localStorage.removeItem(KEY); clearFestivalLocal(); }
+          if (raw && !stale) {
+            const s = saved;
             agentRef.current = FestivalAgent.restore(s.agent, null, now);
             clockRef.current = s.clock ?? clockRef.current;
             if (s.sheet) setSheet(s.sheet);
@@ -225,6 +236,7 @@ export function useAgent() {
       }
       setNotice('');
       serverVersion.current = r.body.version;
+      live.current?.postMessage({ kind: 'pull' });
       if (r.body.merged && r.body.state && !dirty.current) {
         hydrate({ version: r.body.version, state: r.body.state });
         setNotice('Merged with changes made on another device.');
@@ -241,9 +253,38 @@ export function useAgent() {
       if (!saving.current) saving.current = pushState().finally(() => { saving.current = null; });
       return;
     }
-    try { localStorage.setItem(KEY, JSON.stringify({ agent: agentRef.current!.snapshot(), clock: clockRef.current, sheet: sheetRef.current })); } catch { /* ignore */ }
+    try { localStorage.setItem(KEY, JSON.stringify({ agent: agentRef.current!.snapshot(), clock: clockRef.current, sheet: sheetRef.current, sampleVersion: SAMPLE_VERSION })); } catch { /* ignore */ }
     bump();
+    live.current?.postMessage({ kind: 'state' });
   }, [pushState]);
+
+  // Live: another screen in this browser saved a change (the organizer approved a plan, an
+  // attendee changed their plan). Take it at once, so every open app shows the same festival.
+  const live = useRef<BroadcastChannel | null>(null);
+  useEffect(() => {
+    const ch = liveChannel();
+    live.current = ch;
+    const reload = () => {
+      if (modeRef.current === 'shared') { void pull(); return; }
+      try {
+        const raw = localStorage.getItem(KEY);
+        if (!raw) return;
+        const st = JSON.parse(raw);
+        agentRef.current = FestivalAgent.restore(st.agent, null, now);
+        clockRef.current = st.clock ?? clockRef.current;
+        setClockState(clockRef.current);
+        bump();
+      } catch { /* keep what we have */ }
+    };
+    if (ch) ch.onmessage = e => { if (e.data?.kind === 'state' || e.data?.kind === 'pull') reload(); };
+    // Other tabs, and browsers without BroadcastChannel: the storage event.
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === KEY && modeRef.current !== 'shared') reload();
+      else if (e.key && e.key.startsWith('usher-')) bump();
+    };
+    window.addEventListener('storage', onStorage);
+    return () => { ch?.close(); live.current = null; window.removeEventListener('storage', onStorage); };
+  }, [now, pull]);
   // The organizer raised or handled alerts, or approved a plan: save that too.
   useEffect(() => {
     const on = () => commit();
@@ -261,7 +302,7 @@ export function useAgent() {
       return;
     }
     try { localStorage.removeItem(KEY); } catch { /* ignore */ }
-    agentRef.current = new FestivalAgent(buildFestival(), null, now);
+    agentRef.current = new FestivalAgent(buildSundance(), null, now);
     agentRef.current.sweepClashes();
     clockRef.current = SAMPLE_CLOCK;
     setClockState(clockRef.current);
@@ -304,12 +345,12 @@ export function useAgent() {
 
   /** The public sample festival. Everyone shares one copy in shared mode. */
   const openSample = useCallback(async () => {
-    const setup: Setup = { festivalName: 'Harbor Lights Film Festival', city: 'New York', approver: 'Operations lead', channels: ['push', 'email'], onboardedAt: new Date().toISOString() };
+    const setup: Setup = { festivalName: FESTIVAL_NAME, city: 'Boulder', approver: 'Operations lead', channels: ['push', 'email'], onboardedAt: new Date().toISOString() };
     writeSetup(setup); writeWho(null);
     clearFestivalLocal();
     // Local mode: start the sample fresh rather than restoring an older festival.
     if (modeRef.current !== 'shared') { try { localStorage.removeItem(KEY); } catch { /* ignore */ } return; }
-    const a = new FestivalAgent(buildFestival(), null, () => SAMPLE_CLOCK);
+    const a = new FestivalAgent(buildSundance(), null, () => SAMPLE_CLOCK);
     a.sweepClashes();
     const r = await api<{ fid: string }>('POST', { action: 'create', sample: true, snapshot: a.snapshot(), clock: SAMPLE_CLOCK, sheet: { source: 'built-in', errors: [], warnings: [] }, setup });
     if (r.ok) ls.set(FID_KEY, r.body.fid);

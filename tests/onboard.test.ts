@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { buildTables, dayFrom, guessKind, matchColumns, normPass, type Upload } from '../src/onboard/mapping';
 import { parseCsv, tablesToFestival } from '../src/data/sheet';
-import { buildFestival } from '../src/data/seed';
+import { buildSundance } from '../src/data/sundance';
+import { DATES, FESTIVAL_NAME } from '../src/data/sundance2027';
 
 const files = readdirSync('public/samples').filter(n => n.endsWith('.csv'));
 const uploads: Upload[] = files.map(name => {
@@ -25,11 +26,11 @@ describe('onboarding from a festival’s own exports', () => {
     expect(m).toMatchObject({ title: 'Event', date: 'Date', start: 'Showtime', end: 'Ends', venue: 'Theatre', type: 'Category', guests: 'In-Person Guests', id: 'Session Code' });
   });
   it('rebuilds the same festival', () => {
-    const r = buildTables({ name: 'Harbor Lights Film Festival', startDate: '2027-04-15', days: 3 }, uploads);
+    const r = buildTables({ name: FESTIVAL_NAME, startDate: DATES[1], days: Object.keys(DATES).length }, uploads);
     expect(r.unresolved).toEqual([]);
     const res = tablesToFestival(r.tables);
     expect(res.errors).toEqual([]);
-    const a = res.festival!, b = buildFestival();
+    const a = res.festival!, b = buildSundance();
     expect([a.events.length, a.films.length, a.venues.length, a.people.length, a.tickets.length, a.bookings.length, a.shifts.length])
       .toEqual([b.events.length, b.films.length, b.venues.length, b.people.length, b.tickets.length, b.bookings.length, b.shifts.length]);
     expect(a.passes.map(p => p.type).sort()).toEqual(b.passes.map(p => p.type).sort());

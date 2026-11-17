@@ -1,7 +1,7 @@
 // Server-side proxy to Ollama so the API key never reaches the browser.
 import { llmFromEnv, type ChatMessage } from '../../../src/llm';
 import { answerQuestion } from '../../../src/agent/answer';
-import { buildFestival } from '../../../src/data/seed';
+import { buildSundance } from '../../../src/data/sundance';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -19,7 +19,7 @@ export async function GET(req: Request) {
       // ?q= runs one question through the agent (built-in festival) and shows the raw model reply.
       let raw = '';
       const spy = { model: llm.model, chat: async (m: ChatMessage[], o?: { json?: boolean }) => (raw = await llm.chat(m, o)) };
-      const answer = await answerQuestion(buildFestival(), q.slice(0, 300), spy);
+      const answer = await answerQuestion(buildSundance(), q.slice(0, 300), spy);
       return Response.json({ provider: llm.provider, model: llm.model, ms: Date.now() - t0, answer, raw: raw.slice(0, 600) });
     }
     try {

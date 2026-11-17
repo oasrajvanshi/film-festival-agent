@@ -11,7 +11,7 @@ export const OFFICIAL_DOCS: OfficialDoc[] = [
     sections: [
       { heading: 'Day pass', body: 'A Day Pass admits the holder to public screenings and Q&As on the day printed on the pass. It does not admit to panels, the Industry Market, press screenings or receptions.' },
       { heading: 'Single-screening ticket', body: 'A Single-Screening Ticket admits one person to the one screening named on the ticket, including the Q&A that follows it.' },
-      { heading: '3-day pass', body: 'A 3-Day Pass admits the holder to all public screenings, Q&As and panels on all three festival days. It does not admit to the Industry Market, press screenings or receptions.' },
+      { heading: 'Festival pass', body: 'A Festival Pass admits the holder to all public screenings, Q&As and panels on all three festival days. It does not admit to the Industry Market, press screenings or receptions.' },
       { heading: 'VIP pass', body: 'A VIP Pass admits the holder to all public screenings, Q&As, panels and the evening Filmmaker Reception on all three days. It does not admit to the Industry Market or press screenings.' },
       { heading: 'Industry badge', body: 'An Industry Badge admits the holder to all public screenings, Q&As, panels and the Industry Market. It does not admit to press screenings or receptions.' },
       { heading: 'Press badge', body: 'A Press Badge admits the holder to all public screenings, Q&As, panels and press screenings. It does not admit to the Industry Market or receptions.' },

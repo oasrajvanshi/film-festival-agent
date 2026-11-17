@@ -1,70 +1,565 @@
 Session Code,Event,Date,Showtime,Ends,Theatre,Category,In-Person Guests,Admission,Status
-S051,Press screening: Borrowed Season,"Thu, Apr 15",8:00 AM,9:48 AM,Riverside Studio,Screening,,Press only,Confirmed
-S064,"Industry Market, Day 1","Thu, Apr 15",9:00 AM,10:45 AM,Pier 9 Hall,Market,,Industry only,Confirmed
-S001,Salt Houses,"Thu, Apr 15",10:00 AM,11:30 AM,Harbor Theater,Screening,Luca Hollis,Public,Confirmed
-S028,Last Rooms,"Thu, Apr 15",10:00 AM,11:36 AM,Canal Street Cinema,Screening,,Public,Confirmed
-S045,Wild Weather,"Thu, Apr 15",10:00 AM,11:31 AM,Riverside Studio,Screening,,Public,Confirmed
-S054,Financing the Independent Feature,"Thu, Apr 15",11:00 AM,12:00 PM,Pier 9 Hall,Panel,Hiro Abara; Mira Jessop; Nico Thibault,Public,Confirmed
-S002,Q&A: Salt Houses,"Thu, Apr 15",11:30 AM,11:50 AM,Harbor Theater,Q&A,Luca Hollis,Public,Confirmed
-S013,Open Gods,"Thu, Apr 15",12:30 PM,2:12 PM,Harbor Theater,Screening,Femi Hollis,Public,Confirmed
-S034,Silver Water,"Thu, Apr 15",12:30 PM,2:17 PM,Canal Street Cinema,Screening,,Public,Confirmed
-S055,Documentary Ethics Now,"Thu, Apr 15",1:30 PM,2:30 PM,Pier 9 Hall,Panel,Nico Thibault; Yara Hollis; Luca Pell,Public,Confirmed
-S014,Q&A: Open Gods,"Thu, Apr 15",2:12 PM,2:32 PM,Harbor Theater,Q&A,Femi Hollis,Public,Confirmed
-S003,Wild Tide,"Thu, Apr 15",3:00 PM,4:17 PM,Riverside Studio,Screening,Sami Whitlock,Public,Confirmed
-S023,Late Country,"Thu, Apr 15",3:00 PM,4:41 PM,Harbor Theater,Screening,,Public,Confirmed
-S040,Quiet Animals,"Thu, Apr 15",3:00 PM,4:29 PM,Canal Street Cinema,Screening,,Public,Confirmed
-S056,Selling at Markets,"Thu, Apr 15",4:00 PM,5:00 PM,Pier 9 Hall,Panel,Luca Pell; Luca Hollis; Pavel Kettering,Public,Confirmed
-S004,Q&A: Wild Tide,"Thu, Apr 15",4:17 PM,4:37 PM,Riverside Studio,Q&A,Sami Whitlock,Public,Confirmed
-S015,Last Gods,"Thu, Apr 15",5:30 PM,6:57 PM,Riverside Studio,Screening,Elif Galloway,Public,Confirmed
-S029,Last Light,"Thu, Apr 15",5:30 PM,6:53 PM,Harbor Theater,Screening,,Public,Confirmed
-S046,Bright Weather,"Thu, Apr 15",5:30 PM,7:10 PM,Canal Street Cinema,Screening,,Public,Confirmed
-S057,Writing for Small Budgets,"Thu, Apr 15",6:30 PM,7:30 PM,Pier 9 Hall,Panel,Sami Whitlock; Pavel Kettering; Luca Abara,Public,Confirmed
-S016,Q&A: Last Gods,"Thu, Apr 15",6:57 PM,7:17 PM,Riverside Studio,Q&A,Elif Galloway,Public,Confirmed
-S024,Last Harbor,"Thu, Apr 15",8:00 PM,9:21 PM,Riverside Studio,Screening,,Public,Confirmed
-S035,Paper Bridges,"Thu, Apr 15",8:00 PM,9:23 PM,Harbor Theater,Screening,,Public,Confirmed
-S065,"Filmmaker Reception, Day 1","Thu, Apr 15",8:00 PM,10:00 PM,Pier 9 Hall,Activity,,Vip only,Confirmed
-S052,Press screening: Open Gods,"Fri, Apr 16",8:00 AM,9:42 AM,Riverside Studio,Screening,,Press only,Confirmed
-S066,"Industry Market, Day 2","Fri, Apr 16",9:00 AM,10:45 AM,Pier 9 Hall,Market,,Industry only,Confirmed
-S005,Borrowed Tide,"Fri, Apr 16",10:00 AM,11:42 AM,Canal Street Cinema,Screening,Pavel Kettering,Public,Confirmed
-S030,Late Letters,"Fri, Apr 16",10:00 AM,11:36 AM,Riverside Studio,Screening,,Public,Confirmed
-S041,Paper Animals,"Fri, Apr 16",10:00 AM,11:35 AM,Harbor Theater,Screening,,Public,Confirmed
-S058,Distribution After Streaming,"Fri, Apr 16",11:00 AM,12:00 PM,Pier 9 Hall,Panel,Luca Abara; Greta Okafor; Jonah Quarles,Public,Confirmed
-S006,Q&A: Borrowed Tide,"Fri, Apr 16",11:42 AM,12:02 PM,Canal Street Cinema,Q&A,Pavel Kettering,Public,Confirmed
-S017,Lost Animals,"Fri, Apr 16",12:30 PM,2:20 PM,Canal Street Cinema,Screening,Mira Hollis,Public,Confirmed
-S036,Last Fields,"Fri, Apr 16",12:30 PM,2:00 PM,Riverside Studio,Screening,,Public,Confirmed
-S047,Small Weather,"Fri, Apr 16",12:30 PM,1:47 PM,Harbor Theater,Screening,,Public,Confirmed
-S059,Festival Strategy 101,"Fri, Apr 16",1:30 PM,2:30 PM,Pier 9 Hall,Panel,Jonah Quarles; Femi Hollis; Elif Galloway,Public,Confirmed
-S018,Q&A: Lost Animals,"Fri, Apr 16",2:20 PM,2:40 PM,Canal Street Cinema,Q&A,Mira Hollis,Public,Confirmed
-S025,Salt Bridges,"Fri, Apr 16",3:00 PM,4:35 PM,Canal Street Cinema,Screening,,Public,Confirmed
-S042,Iron Country,"Fri, Apr 16",3:00 PM,4:48 PM,Riverside Studio,Screening,,Public,Confirmed
-S060,Sound on a Shoestring,"Fri, Apr 16",4:00 PM,5:00 PM,Pier 9 Hall,Panel,Elif Galloway; Mira Hollis; Xavi Quarles,Public,Confirmed
-S007,Borrowed Season,"Fri, Apr 16",5:30 PM,7:18 PM,Harbor Theater,Screening,Luca Abara,Public,Confirmed
-S031,Hollow Water,"Fri, Apr 16",5:30 PM,7:13 PM,Canal Street Cinema,Screening,,Public,Confirmed
-S048,Night Bridges,"Fri, Apr 16",5:30 PM,6:54 PM,Riverside Studio,Screening,,Public,Confirmed
-S061,The Producer's Toolkit,"Fri, Apr 16",6:30 PM,7:30 PM,Pier 9 Hall,Panel,Xavi Quarles; Hiro Abara; Mira Jessop,Public,Confirmed
-S008,Q&A: Borrowed Season,"Fri, Apr 16",7:18 PM,7:38 PM,Harbor Theater,Q&A,Luca Abara,Public,Confirmed
-S019,Far Rooms,"Fri, Apr 16",8:00 PM,9:27 PM,Harbor Theater,Screening,Xavi Quarles,Public,Confirmed
-S037,Northern Signal,"Fri, Apr 16",8:00 PM,9:48 PM,Canal Street Cinema,Screening,,Public,Confirmed
-S067,"Filmmaker Reception, Day 2","Fri, Apr 16",8:00 PM,10:00 PM,Pier 9 Hall,Activity,,Vip only,Confirmed
-S020,Q&A: Far Rooms,"Fri, Apr 16",9:27 PM,9:47 PM,Harbor Theater,Q&A,Xavi Quarles,Public,Confirmed
-S053,Press screening: Far Rooms,"Sat, Apr 17",8:00 AM,9:27 AM,Riverside Studio,Screening,,Press only,Confirmed
-S068,"Industry Market, Day 3","Sat, Apr 17",9:00 AM,10:45 AM,Pier 9 Hall,Market,,Industry only,Confirmed
-S009,Quiet Gods,"Sat, Apr 17",10:00 AM,11:16 AM,Riverside Studio,Screening,Greta Okafor,Public,Confirmed
-S026,Silver Gods,"Sat, Apr 17",10:00 AM,11:42 AM,Harbor Theater,Screening,,Public,Confirmed
-S043,Hollow Harbor,"Sat, Apr 17",10:00 AM,11:47 AM,Canal Street Cinema,Screening,,Public,Confirmed
-S062,Archival Rights Explained,"Sat, Apr 17",11:00 AM,12:00 PM,Pier 9 Hall,Panel,Mira Jessop; Nico Thibault; Yara Hollis,Public,Confirmed
-S010,Q&A: Quiet Gods,"Sat, Apr 17",11:16 AM,11:36 AM,Riverside Studio,Q&A,Greta Okafor,Public,Confirmed
-S021,Last Orchard,"Sat, Apr 17",12:30 PM,2:04 PM,Riverside Studio,Screening,,Public,Confirmed
-S032,Open Bridges,"Sat, Apr 17",12:30 PM,2:03 PM,Harbor Theater,Screening,,Public,Confirmed
-S049,Wild Shore,"Sat, Apr 17",12:30 PM,2:16 PM,Canal Street Cinema,Screening,,Public,Confirmed
-S063,"First Features, First Mistakes","Sat, Apr 17",1:30 PM,2:30 PM,Pier 9 Hall,Panel,Yara Hollis; Luca Pell; Luca Hollis,Public,Confirmed
-S027,Second Country,"Sat, Apr 17",3:00 PM,4:39 PM,Riverside Studio,Screening,,Public,Confirmed
-S038,Hollow Season,"Sat, Apr 17",3:00 PM,4:23 PM,Harbor Theater,Screening,,Public,Confirmed
-S011,Bright Kingdom,"Sat, Apr 17",5:30 PM,7:00 PM,Canal Street Cinema,Screening,Jonah Quarles,Public,Confirmed
-S033,Borrowed Water,"Sat, Apr 17",5:30 PM,6:56 PM,Riverside Studio,Screening,,Public,Confirmed
-S044,Late Tide,"Sat, Apr 17",5:30 PM,7:10 PM,Harbor Theater,Screening,,Public,Confirmed
-S012,Q&A: Bright Kingdom,"Sat, Apr 17",7:00 PM,7:20 PM,Canal Street Cinema,Q&A,Jonah Quarles,Public,Confirmed
-S022,Low Tide,"Sat, Apr 17",8:00 PM,9:29 PM,Canal Street Cinema,Screening,,Public,Confirmed
-S039,Second Kingdom,"Sat, Apr 17",8:00 PM,9:38 PM,Riverside Studio,Screening,,Public,Confirmed
-S050,Silver Rooms,"Sat, Apr 17",8:00 PM,9:31 PM,Harbor Theater,Screening,,Public,Confirmed
-S069,"Filmmaker Reception, Day 3","Sat, Apr 17",8:00 PM,10:00 PM,Pier 9 Hall,Activity,,Vip only,Confirmed
+S140,Night Shift at the Diner,"Thu, Jan 21",12:30 PM,1:51 PM,Casey Middle School Auditorium,Screening,Greta Ivers,Public,Confirmed
+S141,Q&A: Night Shift at the Diner,"Thu, Jan 21",1:51 PM,2:16 PM,Casey Middle School Auditorium,Q&A,Greta Ivers,Public,Confirmed
+S013,The Orchard Keepers,"Thu, Jan 21",2:45 PM,4:20 PM,Boulder High School Auditorium,Screening,Bodhi Ibarra,Public,Confirmed
+S132,Cardinal,"Thu, Jan 21",3:15 PM,5:24 PM,Boulder Theater,Screening,Mira Navarro,Public,Confirmed
+S014,Q&A: The Orchard Keepers,"Thu, Jan 21",4:20 PM,4:45 PM,Boulder High School Auditorium,Q&A,Bodhi Ibarra,Public,Confirmed
+S133,Q&A: Cardinal,"Thu, Jan 21",5:24 PM,5:49 PM,Boulder Theater,Q&A,Mira Navarro,Public,Confirmed
+S023,The Weight of Snow,"Thu, Jan 21",6:00 PM,7:59 PM,Boulder Theater,Screening,,Public,Confirmed
+S079,The Hum,"Thu, Jan 21",6:30 PM,7:53 PM,Casey Middle School Auditorium,Screening,Zuri Bellweather,Public,Confirmed
+S080,Q&A: The Hum,"Thu, Jan 21",7:53 PM,8:18 PM,Casey Middle School Auditorium,Q&A,Zuri Bellweather,Public,Confirmed
+S167,Heirloom,"Thu, Jan 21",9:00 PM,10:32 PM,Boulder High School Auditorium,Screening,Hiro Bellweather,Public,Confirmed
+S153,Everything Under the Pines,"Thu, Jan 21",9:30 PM,11:06 PM,Cinemark Century Boulder,Screening,Femi Lowry,Public,Confirmed
+S168,Q&A: Heirloom,"Thu, Jan 21",10:32 PM,10:57 PM,Boulder High School Auditorium,Q&A,Hiro Bellweather,Public,Confirmed
+S154,Q&A: Everything Under the Pines,"Thu, Jan 21",11:06 PM,11:31 PM,Cinemark Century Boulder,Q&A,Femi Lowry,Public,Confirmed
+S028,Copper Valley,"Fri, Jan 22",8:30 AM,10:06 AM,Muenzinger Auditorium,Screening,Nico Sandoval,Public,Confirmed
+S528,P&I: The Orchard Keepers,"Fri, Jan 22",8:30 AM,10:05 AM,Cinemark Century Boulder,Screening,,Press only,Confirmed
+S030,"Mother Tongue, Father Land","Fri, Jan 22",9:30 AM,11:16 AM,eTown Hall,Screening,Freya Whitlock,Public,Confirmed
+S557,Industry office hours,"Fri, Jan 22",9:30 AM,11:00 AM,The Rink · Festival HQ,Market,,Industry only,Confirmed
+S029,Q&A: Copper Valley,"Fri, Jan 22",10:06 AM,10:31 AM,Muenzinger Auditorium,Q&A,Nico Sandoval,Public,Confirmed
+S535,The State of the Documentary,"Fri, Jan 22",11:00 AM,12:00 PM,Old Main,Panel,Bram Lowry; Idris Bellweather; Amara Ulloa,Public,Confirmed
+S031,"Q&A: Mother Tongue, Father Land","Fri, Jan 22",11:16 AM,11:41 AM,eTown Hall,Q&A,Freya Whitlock,Public,Confirmed
+S063,Howl at Nothing,"Fri, Jan 22",11:30 AM,1:02 PM,Boulder High School Auditorium,Screening,Paloma Ibarra,Public,Confirmed
+S112,The Bees of Brooklyn,"Fri, Jan 22",11:30 AM,1:10 PM,Macky Auditorium,Screening,Ada Abara,Public,Confirmed
+S130,Bright Fever,"Fri, Jan 22",12:00 PM,2:02 PM,Chautauqua Auditorium,Screening,Bram Toivonen,Public,Confirmed
+S088,Thin Ice,"Fri, Jan 22",12:30 PM,2:03 PM,Casey Middle School Auditorium,Screening,Eamon Chaudhry,Public,Confirmed
+S064,Q&A: Howl at Nothing,"Fri, Jan 22",1:02 PM,1:27 PM,Boulder High School Auditorium,Q&A,Paloma Ibarra,Public,Confirmed
+S113,Q&A: The Bees of Brooklyn,"Fri, Jan 22",1:10 PM,1:35 PM,Macky Auditorium,Q&A,Ada Abara,Public,Confirmed
+S534,Cinema Café: Producers on Getting Independent Films Made,"Fri, Jan 22",2:00 PM,3:00 PM,Canyon Theater,Panel,Wren Thibault; Dana Whitfield; Omar Okafor,Public,Confirmed
+S131,Q&A: Bright Fever,"Fri, Jan 22",2:02 PM,2:27 PM,Chautauqua Auditorium,Q&A,Bram Toivonen,Public,Confirmed
+S089,Q&A: Thin Ice,"Fri, Jan 22",2:03 PM,2:28 PM,Casey Middle School Auditorium,Q&A,Eamon Chaudhry,Public,Confirmed
+S536,The Big Conversation: Who Gets to Make Films Now,"Fri, Jan 22",4:30 PM,5:30 PM,Canyon Theater,Panel,Tova Mbeki; Xavi Chaudhry; Maren Navarro,Public,Confirmed
+S085,Leaving Mesa Verde,"Fri, Jan 22",5:45 PM,7:13 PM,Muenzinger Auditorium,Screening,Uri Ivers,Public,Confirmed
+S001,The Weight of Snow,"Fri, Jan 22",6:00 PM,7:52 PM,Boulder Theater,Screening,Dana Whitfield; Ravi Castellanos; Vera Brennick,Public,Confirmed
+S058,Ghost Ranch Radio,"Fri, Jan 22",6:00 PM,7:48 PM,Roe Green Theatre,Screening,Elif Ibarra,Public,Confirmed
+S098,Low Sun,"Fri, Jan 22",6:00 PM,7:49 PM,Macky Auditorium,Screening,Nadia Szabo,Public,Confirmed
+S468,Cardinal,"Fri, Jan 22",6:15 PM,8:24 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S136,Rust Belt Requiem,"Fri, Jan 22",6:30 PM,8:30 PM,Chautauqua Auditorium,Screening,Vera Lowry,Public,Confirmed
+S151,Feral,"Fri, Jan 22",6:30 PM,8:15 PM,Casey Middle School Auditorium,Screening,Gael Yoon,Public,Confirmed
+S086,Q&A: Leaving Mesa Verde,"Fri, Jan 22",7:13 PM,7:38 PM,Muenzinger Auditorium,Q&A,Uri Ivers,Public,Confirmed
+S059,Q&A: Ghost Ranch Radio,"Fri, Jan 22",7:48 PM,8:13 PM,Roe Green Theatre,Q&A,Elif Ibarra,Public,Confirmed
+S099,Q&A: Low Sun,"Fri, Jan 22",7:49 PM,8:14 PM,Macky Auditorium,Q&A,Nadia Szabo,Public,Confirmed
+S002,Q&A: The Weight of Snow,"Fri, Jan 22",7:52 PM,8:17 PM,Boulder Theater,Q&A,Dana Whitfield; Ravi Castellanos; Vera Brennick,Public,Confirmed
+S152,Q&A: Feral,"Fri, Jan 22",8:15 PM,8:40 PM,Casey Middle School Auditorium,Q&A,Gael Yoon,Public,Confirmed
+S137,Q&A: Rust Belt Requiem,"Fri, Jan 22",8:30 PM,8:55 PM,Chautauqua Auditorium,Q&A,Vera Lowry,Public,Confirmed
+S142,Night Swimmers,"Fri, Jan 22",9:00 PM,10:41 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S164,All the Rooms We Lived In,"Fri, Jan 22",9:00 PM,10:37 PM,Boulder High School Auditorium,Screening,Dario Szabo,Public,Confirmed
+S157,Borrowed Light,"Fri, Jan 22",9:15 PM,10:47 PM,Boulder Theater,Screening,,Public,Confirmed
+S077,Under the Same Moon Again,"Fri, Jan 22",9:30 PM,10:52 PM,Casey Middle School Auditorium,Screening,Elif Ivers,Public,Confirmed
+S102,The Last Video Store in Laramie,"Fri, Jan 22",9:30 PM,11:23 PM,Macky Auditorium,Screening,Bodhi Yamada,Public,Confirmed
+S520,Heirloom,"Fri, Jan 22",9:30 PM,11:02 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S480,Night Shift at the Diner,"Fri, Jan 22",9:45 PM,11:06 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S165,Q&A: All the Rooms We Lived In,"Fri, Jan 22",10:37 PM,11:02 PM,Boulder High School Auditorium,Q&A,Dario Szabo,Public,Confirmed
+S078,Q&A: Under the Same Moon Again,"Fri, Jan 22",10:52 PM,11:17 PM,Casey Middle School Auditorium,Q&A,Elif Ivers,Public,Confirmed
+S103,Q&A: The Last Video Store in Laramie,"Fri, Jan 22",11:23 PM,11:48 PM,Macky Auditorium,Q&A,Bodhi Yamada,Public,Confirmed
+S019,Dead Air,"Sat, Jan 23",8:30 AM,10:05 AM,Boulder High School Auditorium,Screening,Lena Quarles,Public,Confirmed
+S393,Thin Ice,"Sat, Jan 23",8:30 AM,10:03 AM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S529,P&I: The Weight of Snow,"Sat, Jan 23",8:30 AM,10:22 AM,Cinemark Century Boulder,Screening,,Press only,Confirmed
+S116,The Understudies,"Sat, Jan 23",9:00 AM,10:59 AM,Boulder Theater,Screening,Gael Petrakis,Public,Confirmed
+S481,Night Shift at the Diner,"Sat, Jan 23",9:00 AM,10:21 AM,Roe Green Theatre,Screening,,Public,Confirmed
+S003,In the Year of the Locust,"Sat, Jan 23",9:30 AM,11:26 AM,eTown Hall,Screening,Idris Farrow,Public,Confirmed
+S149,Paper Lanterns,"Sat, Jan 23",9:30 AM,11:06 AM,Casey Middle School Auditorium,Screening,Oona Nakamura,Public,Confirmed
+S558,Industry office hours,"Sat, Jan 23",9:30 AM,11:00 AM,The Rink · Festival HQ,Market,,Industry only,Confirmed
+S020,Q&A: Dead Air,"Sat, Jan 23",10:05 AM,10:30 AM,Boulder High School Auditorium,Q&A,Lena Quarles,Public,Confirmed
+S117,Q&A: The Understudies,"Sat, Jan 23",10:59 AM,11:24 AM,Boulder Theater,Q&A,Gael Petrakis,Public,Confirmed
+S537,Financing Without a Safety Net,"Sat, Jan 23",11:00 AM,12:00 PM,Old Main,Panel,Idris Bellweather; Xavi Vance; Zane Farrow,Public,Confirmed
+S150,Q&A: Paper Lanterns,"Sat, Jan 23",11:06 AM,11:31 AM,Casey Middle School Auditorium,Q&A,Oona Nakamura,Public,Confirmed
+S004,Q&A: In the Year of the Locust,"Sat, Jan 23",11:26 AM,11:51 AM,eTown Hall,Q&A,Idris Farrow,Public,Confirmed
+S052,Second Shift,"Sat, Jan 23",11:30 AM,1:31 PM,Boulder High School Auditorium,Screening,Kaia Kaplan,Public,Confirmed
+S069,Common Ground,"Sat, Jan 23",11:30 AM,1:16 PM,Muenzinger Auditorium,Screening,Celeste Achterberg,Public,Confirmed
+S124,The Return of Rosa Ruiz,"Sat, Jan 23",11:30 AM,1:27 PM,Macky Auditorium,Screening,Yara Achterberg,Public,Confirmed
+S096,What the River Took,"Sat, Jan 23",12:00 PM,2:00 PM,Chautauqua Auditorium,Screening,Bodhi Oyelaran,Public,Confirmed
+S368,The Hum,"Sat, Jan 23",12:00 PM,1:23 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S021,The Long Quiet,"Sat, Jan 23",12:15 PM,1:45 PM,Boulder Theater,Screening,Wren Okafor,Public,Confirmed
+S081,Little Fires Inside,"Sat, Jan 23",12:30 PM,2:20 PM,Casey Middle School Auditorium,Screening,Joaquin Castell,Public,Confirmed
+S070,Q&A: Common Ground,"Sat, Jan 23",1:16 PM,1:41 PM,Muenzinger Auditorium,Q&A,Celeste Achterberg,Public,Confirmed
+S125,Q&A: The Return of Rosa Ruiz,"Sat, Jan 23",1:27 PM,1:52 PM,Macky Auditorium,Q&A,Yara Achterberg,Public,Confirmed
+S053,Q&A: Second Shift,"Sat, Jan 23",1:31 PM,1:56 PM,Boulder High School Auditorium,Q&A,Kaia Kaplan,Public,Confirmed
+S022,Q&A: The Long Quiet,"Sat, Jan 23",1:45 PM,2:10 PM,Boulder Theater,Q&A,Wren Okafor,Public,Confirmed
+S097,Q&A: What the River Took,"Sat, Jan 23",2:00 PM,2:25 PM,Chautauqua Auditorium,Q&A,Bodhi Oyelaran,Public,Confirmed
+S538,Episodic Storytelling Now,"Sat, Jan 23",2:00 PM,3:00 PM,Canyon Theater,Panel,Wren Thibault; Ayla Galloway; Idris Okafor,Public,Confirmed
+S082,Q&A: Little Fires Inside,"Sat, Jan 23",2:20 PM,2:45 PM,Casey Middle School Auditorium,Q&A,Joaquin Castell,Public,Confirmed
+S508,Everything Under the Pines,"Sat, Jan 23",2:30 PM,4:06 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S501,Feral,"Sat, Jan 23",2:45 PM,4:30 PM,Boulder High School Auditorium,Screening,Gael Yoon,Public,Confirmed
+S320,Ghost Ranch Radio,"Sat, Jan 23",3:00 PM,4:48 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S386,Leaving Mesa Verde,"Sat, Jan 23",3:00 PM,4:28 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S100,Dogs of the Mesa,"Sat, Jan 23",3:15 PM,5:03 PM,Boulder Theater,Screening,Uma Brightwater,Public,Confirmed
+S087,Bone Orchard,"Sat, Jan 23",3:30 PM,4:52 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S502,Q&A: Feral,"Sat, Jan 23",4:30 PM,4:55 PM,Boulder High School Auditorium,Q&A,Gael Yoon,Public,Confirmed
+S539,Power of Story: Native Voices on Screen,"Sat, Jan 23",4:30 PM,5:30 PM,Old Main,Panel,Bram Lowry; Lena Quarles; Wren Okafor,Public,Confirmed
+S101,Q&A: Dogs of the Mesa,"Sat, Jan 23",5:03 PM,5:28 PM,Boulder Theater,Q&A,Uma Brightwater,Public,Confirmed
+S039,Sister Moon Motel,"Sat, Jan 23",6:00 PM,7:50 PM,Roe Green Theatre,Screening,Dalia Galloway,Public,Confirmed
+S047,The Midnight Projectionist,"Sat, Jan 23",6:00 PM,7:57 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S073,Visiting Hours,"Sat, Jan 23",6:00 PM,7:48 PM,Dairy Arts Center,Screening,Callum Dunmore,Public,Confirmed
+S464,Bright Fever,"Sat, Jan 23",6:00 PM,8:02 PM,Macky Auditorium,Screening,Bram Toivonen,Public,Confirmed
+S094,Salt Flats,"Sat, Jan 23",6:30 PM,8:28 PM,Chautauqua Auditorium,Screening,Nico Okafor,Public,Confirmed
+S145,"Holy Water, Hard Water","Sat, Jan 23",6:30 PM,8:09 PM,eTown Hall,Screening,Sami Lindqvist,Public,Confirmed
+S410,Low Sun,"Sat, Jan 23",6:30 PM,8:19 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S074,Q&A: Visiting Hours,"Sat, Jan 23",7:48 PM,8:13 PM,Dairy Arts Center,Q&A,Callum Dunmore,Public,Confirmed
+S040,Q&A: Sister Moon Motel,"Sat, Jan 23",7:50 PM,8:15 PM,Roe Green Theatre,Q&A,Dalia Galloway,Public,Confirmed
+S465,Q&A: Bright Fever,"Sat, Jan 23",8:02 PM,8:27 PM,Macky Auditorium,Q&A,Bram Toivonen,Public,Confirmed
+S146,"Q&A: Holy Water, Hard Water","Sat, Jan 23",8:09 PM,8:34 PM,eTown Hall,Q&A,Sami Lindqvist,Public,Confirmed
+S095,Q&A: Salt Flats,"Sat, Jan 23",8:28 PM,8:53 PM,Chautauqua Auditorium,Q&A,Nico Okafor,Public,Confirmed
+S024,The Ferryman's Daughter,"Sat, Jan 23",9:00 PM,10:46 PM,Roe Green Theatre,Screening,Tova Eskew,Public,Confirmed
+S476,Rust Belt Requiem,"Sat, Jan 23",9:00 PM,11:00 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S517,All the Rooms We Lived In,"Sat, Jan 23",9:00 PM,10:37 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S126,The Glass Coast,"Sat, Jan 23",9:15 PM,11:10 PM,Boulder Theater,Screening,Ayla Mbeki,Public,Confirmed
+S158,Tidewater,"Sat, Jan 23",9:30 PM,10:57 PM,Cinemark Century Boulder,Screening,Priya Chaudhry,Public,Confirmed
+S254,"Mother Tongue, Father Land","Sat, Jan 23",9:30 PM,11:16 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S518,Heirloom,"Sat, Jan 23",9:30 PM,11:02 PM,Macky Auditorium,Screening,Hiro Bellweather,Public,Confirmed
+S025,Q&A: The Ferryman's Daughter,"Sat, Jan 23",10:46 PM,11:11 PM,Roe Green Theatre,Q&A,Tova Eskew,Public,Confirmed
+S159,Q&A: Tidewater,"Sat, Jan 23",10:57 PM,11:22 PM,Cinemark Century Boulder,Q&A,Priya Chaudhry,Public,Confirmed
+S519,Q&A: Heirloom,"Sat, Jan 23",11:02 PM,11:27 PM,Macky Auditorium,Q&A,Hiro Bellweather,Public,Confirmed
+S127,Q&A: The Glass Coast,"Sat, Jan 23",11:10 PM,11:35 PM,Boulder Theater,Q&A,Ayla Mbeki,Public,Confirmed
+S009,Two Suns,"Sun, Jan 24",8:30 AM,10:05 AM,Boulder High School Auditorium,Screening,Tariq Jessop,Public,Confirmed
+S530,P&I: In the Year of the Locust,"Sun, Jan 24",8:30 AM,10:26 AM,Cinemark Century Boulder,Screening,,Press only,Confirmed
+S056,Desert Bloom,"Sun, Jan 24",9:00 AM,10:34 AM,Dairy Arts Center,Screening,Joaquin Dahl,Public,Confirmed
+S375,Little Fires Inside,"Sun, Jan 24",9:00 AM,10:50 AM,Roe Green Theatre,Screening,,Public,Confirmed
+S441,The Understudies,"Sun, Jan 24",9:00 AM,10:59 AM,Boulder Theater,Screening,,Public,Confirmed
+S251,Copper Valley,"Sun, Jan 24",9:30 AM,11:06 AM,eTown Hall,Screening,,Public,Confirmed
+S507,Everything Under the Pines,"Sun, Jan 24",9:30 AM,11:06 AM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S559,Industry office hours,"Sun, Jan 24",9:30 AM,11:00 AM,The Rink · Festival HQ,Market,,Industry only,Confirmed
+S010,Q&A: Two Suns,"Sun, Jan 24",10:05 AM,10:30 AM,Boulder High School Auditorium,Q&A,Tariq Jessop,Public,Confirmed
+S057,Q&A: Desert Bloom,"Sun, Jan 24",10:34 AM,10:59 AM,Dairy Arts Center,Q&A,Joaquin Dahl,Public,Confirmed
+S540,Composers and Sound Designers Roundtable,"Sun, Jan 24",11:00 AM,12:00 PM,Canyon Theater,Panel,Tova Mbeki; Bodhi Kettering; Amara Thibault,Public,Confirmed
+S007,All the Rooms We Lived In,"Sun, Jan 24",11:30 AM,1:03 PM,Macky Auditorium,Screening,Tariq Thibault,Public,Confirmed
+S169,The Orchard Keepers,"Sun, Jan 24",11:30 AM,12:51 PM,Boulder High School Auditorium,Screening,Farah Petrakis,Public,Confirmed
+S183,The Weight of Snow,"Sun, Jan 24",11:30 AM,1:22 PM,Muenzinger Auditorium,Screening,Dana Whitfield; Ravi Castellanos; Vera Brennick,Public,Confirmed
+S497,Paper Lanterns,"Sun, Jan 24",11:45 AM,1:21 PM,Cinemark Century Boulder,Screening,Oona Nakamura,Public,Confirmed
+S354,Visiting Hours,"Sun, Jan 24",12:00 PM,1:48 PM,Roe Green Theatre,Screening,Callum Dunmore,Public,Confirmed
+S366,Under the Same Moon Again,"Sun, Jan 24",12:00 PM,1:22 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S411,Low Sun,"Sun, Jan 24",12:00 PM,1:49 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S036,Signal Fire,"Sun, Jan 24",12:30 PM,2:21 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S232,The Long Quiet,"Sun, Jan 24",12:30 PM,2:00 PM,eTown Hall,Screening,,Public,Confirmed
+S170,Q&A: The Orchard Keepers,"Sun, Jan 24",12:51 PM,1:16 PM,Boulder High School Auditorium,Q&A,Farah Petrakis,Public,Confirmed
+S008,Q&A: All the Rooms We Lived In,"Sun, Jan 24",1:03 PM,1:28 PM,Macky Auditorium,Q&A,Tariq Thibault,Public,Confirmed
+S498,Q&A: Paper Lanterns,"Sun, Jan 24",1:21 PM,1:46 PM,Cinemark Century Boulder,Q&A,Oona Nakamura,Public,Confirmed
+S184,Q&A: The Weight of Snow,"Sun, Jan 24",1:22 PM,1:47 PM,Muenzinger Auditorium,Q&A,Dana Whitfield; Ravi Castellanos; Vera Brennick,Public,Confirmed
+S355,Q&A: Visiting Hours,"Sun, Jan 24",1:48 PM,2:13 PM,Roe Green Theatre,Q&A,Callum Dunmore,Public,Confirmed
+S541,From Lab to Festival: Developing a Script,"Sun, Jan 24",2:00 PM,3:00 PM,Old Main,Panel,Idris Bellweather; Elif Ibarra; Bram Kaplan,Public,Confirmed
+S191,In the Year of the Locust,"Sun, Jan 24",2:30 PM,4:26 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S017,Where the Antelope Sleep,"Sun, Jan 24",2:45 PM,4:36 PM,Macky Auditorium,Screening,Bodhi Kettering,Public,Confirmed
+S026,Good Neighbors,"Sun, Jan 24",3:00 PM,4:33 PM,Roe Green Theatre,Screening,Amara Thibault,Public,Confirmed
+S459,The Glass Coast,"Sun, Jan 24",3:00 PM,4:55 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S503,Feral,"Sun, Jan 24",3:00 PM,4:45 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S110,Teeth,"Sun, Jan 24",3:15 PM,5:06 PM,Boulder Theater,Screening,Nadia Coronado,Public,Confirmed
+S120,The Choir Boys of Gary,"Sun, Jan 24",3:15 PM,5:10 PM,Chautauqua Auditorium,Screening,Oona Okafor,Public,Confirmed
+S143,The Cartographer,"Sun, Jan 24",3:30 PM,4:54 PM,eTown Hall,Screening,Dev Rourke,Public,Confirmed
+S278,Sister Moon Motel,"Sun, Jan 24",3:30 PM,5:20 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S542,Distribution After the Festival,"Sun, Jan 24",4:30 PM,5:30 PM,Canyon Theater,Panel,Wren Thibault; Celeste Wojcik; Oona Yoon,Public,Confirmed
+S027,Q&A: Good Neighbors,"Sun, Jan 24",4:33 PM,4:58 PM,Roe Green Theatre,Q&A,Amara Thibault,Public,Confirmed
+S018,Q&A: Where the Antelope Sleep,"Sun, Jan 24",4:36 PM,5:01 PM,Macky Auditorium,Q&A,Bodhi Kettering,Public,Confirmed
+S144,Q&A: The Cartographer,"Sun, Jan 24",4:54 PM,5:19 PM,eTown Hall,Q&A,Dev Rourke,Public,Confirmed
+S111,Q&A: Teeth,"Sun, Jan 24",5:06 PM,5:31 PM,Boulder Theater,Q&A,Nadia Coronado,Public,Confirmed
+S121,Q&A: The Choir Boys of Gary,"Sun, Jan 24",5:10 PM,5:35 PM,Chautauqua Auditorium,Q&A,Oona Okafor,Public,Confirmed
+S015,Saltwater Hymns,"Sun, Jan 24",6:00 PM,7:30 PM,Macky Auditorium,Screening,Priya Lowry,Public,Confirmed
+S092,Our Lady of the Interstate,"Sun, Jan 24",6:00 PM,7:51 PM,Boulder Theater,Screening,Oona Yoon,Public,Confirmed
+S318,Ghost Ranch Radio,"Sun, Jan 24",6:00 PM,7:48 PM,Roe Green Theatre,Screening,Elif Ibarra,Public,Confirmed
+S405,Salt Flats,"Sun, Jan 24",6:00 PM,7:58 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S147,Soft Animals,"Sun, Jan 24",6:15 PM,7:51 PM,Cinemark Century Boulder,Screening,Priya Whitlock,Public,Confirmed
+S084,Field Notes for a Flood,"Sun, Jan 24",6:30 PM,8:18 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S214,The Orchard Keepers,"Sun, Jan 24",6:30 PM,8:05 PM,eTown Hall,Screening,,Public,Confirmed
+S482,Night Swimmers,"Sun, Jan 24",6:30 PM,8:11 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S016,Q&A: Saltwater Hymns,"Sun, Jan 24",7:30 PM,7:55 PM,Macky Auditorium,Q&A,Priya Lowry,Public,Confirmed
+S319,Q&A: Ghost Ranch Radio,"Sun, Jan 24",7:48 PM,8:13 PM,Roe Green Theatre,Q&A,Elif Ibarra,Public,Confirmed
+S093,Q&A: Our Lady of the Interstate,"Sun, Jan 24",7:51 PM,8:16 PM,Boulder Theater,Q&A,Oona Yoon,Public,Confirmed
+S148,Q&A: Soft Animals,"Sun, Jan 24",7:51 PM,8:16 PM,Cinemark Century Boulder,Q&A,Priya Whitlock,Public,Confirmed
+S061,Vigil,"Sun, Jan 24",9:00 PM,10:47 PM,Dairy Arts Center,Screening,Bram Kaplan,Public,Confirmed
+S166,Two Suns,"Sun, Jan 24",9:00 PM,10:36 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S466,Bright Fever,"Sun, Jan 24",9:00 PM,11:02 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S090,Northbound,"Sun, Jan 24",9:15 PM,11:09 PM,Boulder Theater,Screening,Celeste Wojcik,Public,Confirmed
+S122,How to Leave Tulsa,"Sun, Jan 24",9:30 PM,11:15 PM,Macky Auditorium,Screening,Eamon Pell,Public,Confirmed
+S334,Howl at Nothing,"Sun, Jan 24",9:30 PM,11:02 PM,eTown Hall,Screening,,Public,Confirmed
+S513,Borrowed Light,"Sun, Jan 24",9:30 PM,11:02 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S516,Tidewater,"Sun, Jan 24",9:30 PM,10:57 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S395,Thin Ice,"Sun, Jan 24",9:45 PM,11:18 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S062,Q&A: Vigil,"Sun, Jan 24",10:47 PM,11:12 PM,Dairy Arts Center,Q&A,Bram Kaplan,Public,Confirmed
+S091,Q&A: Northbound,"Sun, Jan 24",11:09 PM,11:34 PM,Boulder Theater,Q&A,Celeste Wojcik,Public,Confirmed
+S123,Q&A: How to Leave Tulsa,"Sun, Jan 24",11:15 PM,11:40 PM,Macky Auditorium,Q&A,Eamon Pell,Public,Confirmed
+S060,Shadow Country,"Mon, Jan 25",8:30 AM,10:05 AM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S401,Our Lady of the Interstate,"Mon, Jan 25",8:30 AM,10:21 AM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S531,P&I: All the Rooms We Lived In,"Mon, Jan 25",8:30 AM,10:03 AM,Cinemark Century Boulder,Screening,,Press only,Confirmed
+S314,Desert Bloom,"Mon, Jan 25",9:00 AM,10:34 AM,Dairy Arts Center,Screening,,Public,Confirmed
+S394,Thin Ice,"Mon, Jan 25",9:00 AM,10:33 AM,Roe Green Theatre,Screening,,Public,Confirmed
+S420,The Last Video Store in Laramie,"Mon, Jan 25",9:00 AM,10:53 AM,Boulder Theater,Screening,,Public,Confirmed
+S138,The Inheritance Machine,"Mon, Jan 25",9:30 AM,10:57 AM,Casey Middle School Auditorium,Screening,Dalia Abara,Public,Confirmed
+S432,Teeth,"Mon, Jan 25",9:30 AM,11:21 AM,eTown Hall,Screening,,Public,Confirmed
+S560,Industry office hours,"Mon, Jan 25",9:30 AM,11:00 AM,The Rink · Festival HQ,Market,,Industry only,Confirmed
+S139,Q&A: The Inheritance Machine,"Mon, Jan 25",10:57 AM,11:22 AM,Casey Middle School Auditorium,Q&A,Dalia Abara,Public,Confirmed
+S543,Climate on Screen,"Mon, Jan 25",11:00 AM,12:00 PM,Old Main,Panel,Bram Lowry; Paloma Yoon; Ayla Mbeki,Public,Confirmed
+S065,Seven Ways to Disappear,"Mon, Jan 25",11:30 AM,1:26 PM,Boulder High School Auditorium,Screening,Gael Navarro,Public,Confirmed
+S413,Dogs of the Mesa,"Mon, Jan 25",11:30 AM,1:18 PM,Macky Auditorium,Screening,Uma Brightwater,Public,Confirmed
+S454,The Return of Rosa Ruiz,"Mon, Jan 25",11:30 AM,1:27 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S382,Field Notes for a Flood,"Mon, Jan 25",11:45 AM,1:33 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S075,Smoke and Mirrors and Smoke,"Mon, Jan 25",12:00 PM,1:26 PM,Dairy Arts Center,Screening,Elif Okafor,Public,Confirmed
+S171,Saltwater Hymns,"Mon, Jan 25",12:00 PM,1:24 PM,Chautauqua Auditorium,Screening,Elan Lowry,Public,Confirmed
+S255,"Mother Tongue, Father Land","Mon, Jan 25",12:00 PM,1:46 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S469,Cardinal,"Mon, Jan 25",12:15 PM,2:24 PM,Boulder Theater,Screening,,Public,Confirmed
+S219,Where the Antelope Sleep,"Mon, Jan 25",12:30 PM,2:21 PM,eTown Hall,Screening,Bodhi Kettering,Public,Confirmed
+S327,Vigil,"Mon, Jan 25",12:30 PM,2:17 PM,Casey Middle School Auditorium,Screening,Bram Kaplan,Public,Confirmed
+S414,Q&A: Dogs of the Mesa,"Mon, Jan 25",1:18 PM,1:43 PM,Macky Auditorium,Q&A,Uma Brightwater,Public,Confirmed
+S172,Q&A: Saltwater Hymns,"Mon, Jan 25",1:24 PM,1:49 PM,Chautauqua Auditorium,Q&A,Elan Lowry,Public,Confirmed
+S066,Q&A: Seven Ways to Disappear,"Mon, Jan 25",1:26 PM,1:51 PM,Boulder High School Auditorium,Q&A,Gael Navarro,Public,Confirmed
+S076,Q&A: Smoke and Mirrors and Smoke,"Mon, Jan 25",1:26 PM,1:51 PM,Dairy Arts Center,Q&A,Elif Okafor,Public,Confirmed
+S544,Archival Footage and Fair Use,"Mon, Jan 25",2:00 PM,3:00 PM,Canyon Theater,Panel,Tova Mbeki; Dev Rourke; Wren Thibault,Public,Confirmed
+S328,Q&A: Vigil,"Mon, Jan 25",2:17 PM,2:42 PM,Casey Middle School Auditorium,Q&A,Bram Kaplan,Public,Confirmed
+S220,Q&A: Where the Antelope Sleep,"Mon, Jan 25",2:21 PM,2:46 PM,eTown Hall,Q&A,Bodhi Kettering,Public,Confirmed
+S438,The Bees of Brooklyn,"Mon, Jan 25",2:30 PM,4:10 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S293,The Midnight Projectionist,"Mon, Jan 25",2:45 PM,4:42 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S479,Night Shift at the Diner,"Mon, Jan 25",2:45 PM,4:06 PM,Macky Auditorium,Screening,,Public,Confirmed
+S071,Here Lies Margo,"Mon, Jan 25",3:00 PM,4:28 PM,Dairy Arts Center,Screening,Elan Bellweather,Public,Confirmed
+S308,Second Shift,"Mon, Jan 25",3:00 PM,5:01 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S106,Lullaby for a Drone,"Mon, Jan 25",3:15 PM,5:19 PM,Chautauqua Auditorium,Screening,Oona Petrakis,Public,Confirmed
+S457,The Glass Coast,"Mon, Jan 25",3:15 PM,5:10 PM,Boulder Theater,Screening,Ayla Mbeki,Public,Confirmed
+S240,The Ferryman's Daughter,"Mon, Jan 25",3:30 PM,5:16 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S072,Q&A: Here Lies Margo,"Mon, Jan 25",4:28 PM,4:53 PM,Dairy Arts Center,Q&A,Elan Bellweather,Public,Confirmed
+S545,Actors in Conversation,"Mon, Jan 25",4:30 PM,5:30 PM,Old Main,Panel,Idris Bellweather; Bram Lowry; Tova Mbeki,Public,Confirmed
+S458,Q&A: The Glass Coast,"Mon, Jan 25",5:10 PM,5:35 PM,Boulder Theater,Q&A,Ayla Mbeki,Public,Confirmed
+S107,Q&A: Lullaby for a Drone,"Mon, Jan 25",5:19 PM,5:44 PM,Chautauqua Auditorium,Q&A,Oona Petrakis,Public,Confirmed
+S045,Small Hours,"Mon, Jan 25",5:45 PM,7:11 PM,Muenzinger Auditorium,Screening,Rafa Sato,Public,Confirmed
+S037,Unmarked,"Mon, Jan 25",6:00 PM,7:39 PM,Roe Green Theatre,Screening,Nadia Eskew,Public,Confirmed
+S118,A House on Arapahoe,"Mon, Jan 25",6:00 PM,8:10 PM,Macky Auditorium,Screening,Paloma Yoon,Public,Confirmed
+S358,Visiting Hours,"Mon, Jan 25",6:00 PM,7:48 PM,Boulder Theater,Screening,,Public,Confirmed
+S485,The Cartographer,"Mon, Jan 25",6:00 PM,7:24 PM,Dairy Arts Center,Screening,Dev Rourke,Public,Confirmed
+S216,Saltwater Hymns,"Mon, Jan 25",6:15 PM,7:45 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S032,Hollow Mountain,"Mon, Jan 25",6:30 PM,7:59 PM,Casey Middle School Auditorium,Screening,Saoirse Delacroix,Public,Confirmed
+S475,Rust Belt Requiem,"Mon, Jan 25",6:30 PM,8:30 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S483,Night Swimmers,"Mon, Jan 25",6:30 PM,8:11 PM,eTown Hall,Screening,,Public,Confirmed
+S046,Q&A: Small Hours,"Mon, Jan 25",7:11 PM,7:36 PM,Muenzinger Auditorium,Q&A,Rafa Sato,Public,Confirmed
+S486,Q&A: The Cartographer,"Mon, Jan 25",7:24 PM,7:49 PM,Dairy Arts Center,Q&A,Dev Rourke,Public,Confirmed
+S038,Q&A: Unmarked,"Mon, Jan 25",7:39 PM,8:04 PM,Roe Green Theatre,Q&A,Nadia Eskew,Public,Confirmed
+S033,Q&A: Hollow Mountain,"Mon, Jan 25",7:59 PM,8:24 PM,Casey Middle School Auditorium,Q&A,Saoirse Delacroix,Public,Confirmed
+S119,Q&A: A House on Arapahoe,"Mon, Jan 25",8:10 PM,8:35 PM,Macky Auditorium,Q&A,Paloma Yoon,Public,Confirmed
+S011,Heirloom,"Mon, Jan 25",9:00 PM,10:58 PM,Boulder High School Auditorium,Screening,Uma Lowry,Public,Confirmed
+S034,A Year Without Winter,"Mon, Jan 25",9:00 PM,10:24 PM,Roe Green Theatre,Screening,Esme Coronado,Public,Confirmed
+S269,Signal Fire,"Mon, Jan 25",9:00 PM,10:51 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S389,Bone Orchard,"Mon, Jan 25",9:00 PM,10:22 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S108,"Paradise, Nevada","Mon, Jan 25",9:15 PM,11:13 PM,Boulder Theater,Screening,Uri Achterberg,Public,Confirmed
+S346,Common Ground,"Mon, Jan 25",9:30 PM,11:16 PM,Macky Auditorium,Screening,,Public,Confirmed
+S372,Little Fires Inside,"Mon, Jan 25",9:30 PM,11:20 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S406,Salt Flats,"Mon, Jan 25",9:30 PM,11:28 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S495,Soft Animals,"Mon, Jan 25",9:30 PM,11:06 PM,eTown Hall,Screening,,Public,Confirmed
+S449,The Choir Boys of Gary,"Mon, Jan 25",9:45 PM,11:40 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S035,Q&A: A Year Without Winter,"Mon, Jan 25",10:24 PM,10:49 PM,Roe Green Theatre,Q&A,Esme Coronado,Public,Confirmed
+S012,Q&A: Heirloom,"Mon, Jan 25",10:58 PM,11:23 PM,Boulder High School Auditorium,Q&A,Uma Lowry,Public,Confirmed
+S109,"Q&A: Paradise, Nevada","Mon, Jan 25",11:13 PM,11:38 PM,Boulder Theater,Q&A,Uri Achterberg,Public,Confirmed
+S256,"Mother Tongue, Father Land","Tue, Jan 26",8:30 AM,10:16 AM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S532,P&I: Heirloom,"Tue, Jan 26",8:30 AM,10:28 AM,Cinemark Century Boulder,Screening,,Press only,Confirmed
+S048,Dear Tomorrow,"Tue, Jan 26",9:00 AM,10:53 AM,Roe Green Theatre,Screening,Freya Zielinski,Public,Confirmed
+S408,What the River Took,"Tue, Jan 26",9:00 AM,11:00 AM,Dairy Arts Center,Screening,,Public,Confirmed
+S470,Cardinal,"Tue, Jan 26",9:00 AM,11:09 AM,Boulder Theater,Screening,,Public,Confirmed
+S210,Heirloom,"Tue, Jan 26",9:30 AM,11:28 AM,eTown Hall,Screening,,Public,Confirmed
+S446,The Choir Boys of Gary,"Tue, Jan 26",9:30 AM,11:25 AM,Casey Middle School Auditorium,Screening,Oona Okafor,Public,Confirmed
+S561,Industry office hours,"Tue, Jan 26",9:30 AM,11:00 AM,The Rink · Festival HQ,Market,,Industry only,Confirmed
+S049,Q&A: Dear Tomorrow,"Tue, Jan 26",10:53 AM,11:18 AM,Roe Green Theatre,Q&A,Freya Zielinski,Public,Confirmed
+S546,Boulder Welcomes the Festival: A Community Conversation,"Tue, Jan 26",11:00 AM,12:00 PM,Canyon Theater,Panel,Wren Thibault; Amara Ulloa; Omar Okafor,Public,Confirmed
+S447,Q&A: The Choir Boys of Gary,"Tue, Jan 26",11:25 AM,11:50 AM,Casey Middle School Auditorium,Q&A,Oona Okafor,Public,Confirmed
+S104,The Body Electric,"Tue, Jan 26",11:30 AM,1:31 PM,Macky Auditorium,Screening,Rafa Thibault,Public,Confirmed
+S264,A Year Without Winter,"Tue, Jan 26",11:30 AM,12:54 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S292,The Midnight Projectionist,"Tue, Jan 26",11:30 AM,1:27 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S489,"Holy Water, Hard Water","Tue, Jan 26",11:45 AM,1:24 PM,Cinemark Century Boulder,Screening,Sami Lindqvist,Public,Confirmed
+S041,Static,"Tue, Jan 26",12:00 PM,1:35 PM,Roe Green Theatre,Screening,Mira Brennick,Public,Confirmed
+S054,Every Kind of Weather,"Tue, Jan 26",12:00 PM,1:56 PM,Dairy Arts Center,Screening,Vera Hollis,Public,Confirmed
+S173,Where the Antelope Sleep,"Tue, Jan 26",12:00 PM,1:23 PM,Chautauqua Auditorium,Screening,Joaquin Yamada,Public,Confirmed
+S455,The Return of Rosa Ruiz,"Tue, Jan 26",12:15 PM,2:12 PM,Boulder Theater,Screening,,Public,Confirmed
+S043,Kingdom of Small Things,"Tue, Jan 26",12:30 PM,1:58 PM,Casey Middle School Auditorium,Screening,Rune Ekwueme,Public,Confirmed
+S290,Small Hours,"Tue, Jan 26",12:30 PM,1:56 PM,eTown Hall,Screening,,Public,Confirmed
+S174,Q&A: Where the Antelope Sleep,"Tue, Jan 26",1:23 PM,1:48 PM,Chautauqua Auditorium,Q&A,Joaquin Yamada,Public,Confirmed
+S490,"Q&A: Holy Water, Hard Water","Tue, Jan 26",1:24 PM,1:49 PM,Cinemark Century Boulder,Q&A,Sami Lindqvist,Public,Confirmed
+S105,Q&A: The Body Electric,"Tue, Jan 26",1:31 PM,1:56 PM,Macky Auditorium,Q&A,Rafa Thibault,Public,Confirmed
+S042,Q&A: Static,"Tue, Jan 26",1:35 PM,2:00 PM,Roe Green Theatre,Q&A,Mira Brennick,Public,Confirmed
+S055,Q&A: Every Kind of Weather,"Tue, Jan 26",1:56 PM,2:21 PM,Dairy Arts Center,Q&A,Vera Hollis,Public,Confirmed
+S044,Q&A: Kingdom of Small Things,"Tue, Jan 26",1:58 PM,2:23 PM,Casey Middle School Auditorium,Q&A,Rune Ekwueme,Public,Confirmed
+S547,"Live Podcast Recording: The Week in Park City, Now Boulder","Tue, Jan 26",2:00 PM,3:00 PM,Old Main,Panel,Bram Lowry; Maren Navarro; Nico Kaplan,Public,Confirmed
+S270,Signal Fire,"Tue, Jan 26",2:30 PM,4:21 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S323,Shadow Country,"Tue, Jan 26",2:45 PM,4:20 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S384,Leaving Mesa Verde,"Tue, Jan 26",2:45 PM,4:13 PM,Macky Auditorium,Screening,,Public,Confirmed
+S067,Ironwood,"Tue, Jan 26",3:00 PM,4:58 PM,Roe Green Theatre,Screening,Maren Quarles,Public,Confirmed
+S249,Copper Valley,"Tue, Jan 26",3:00 PM,4:36 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S440,The Understudies,"Tue, Jan 26",3:00 PM,4:59 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S114,Blue Hour Bakery,"Tue, Jan 26",3:15 PM,5:15 PM,Chautauqua Auditorium,Screening,Freya Yoon,Public,Confirmed
+S134,Wildfire Season,"Tue, Jan 26",3:15 PM,5:09 PM,Boulder Theater,Screening,Priya Ulloa,Public,Confirmed
+S083,Undertow,"Tue, Jan 26",3:30 PM,5:00 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S488,The Cartographer,"Tue, Jan 26",3:30 PM,4:54 PM,eTown Hall,Screening,,Public,Confirmed
+S548,International Co-Productions,"Tue, Jan 26",4:30 PM,5:30 PM,Canyon Theater,Panel,Tova Mbeki; Zane Farrow; Oona Lindqvist,Public,Confirmed
+S068,Q&A: Ironwood,"Tue, Jan 26",4:58 PM,5:23 PM,Roe Green Theatre,Q&A,Maren Quarles,Public,Confirmed
+S135,Q&A: Wildfire Season,"Tue, Jan 26",5:09 PM,5:34 PM,Boulder Theater,Q&A,Priya Ulloa,Public,Confirmed
+S115,Q&A: Blue Hour Bakery,"Tue, Jan 26",5:15 PM,5:40 PM,Chautauqua Auditorium,Q&A,Freya Yoon,Public,Confirmed
+S212,The Orchard Keepers,"Tue, Jan 26",5:45 PM,7:20 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S005,Afterglow Drive,"Tue, Jan 26",6:00 PM,7:40 PM,Macky Auditorium,Screening,Tova Zielinski,Public,Confirmed
+S050,A Map of Nowhere,"Tue, Jan 26",6:00 PM,7:33 PM,Roe Green Theatre,Screening,Yara Sandoval,Public,Confirmed
+S339,Seven Ways to Disappear,"Tue, Jan 26",6:00 PM,7:56 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S392,Thin Ice,"Tue, Jan 26",6:00 PM,7:33 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S396,Northbound,"Tue, Jan 26",6:00 PM,7:54 PM,Boulder Theater,Screening,,Public,Confirmed
+S427,Lullaby for a Drone,"Tue, Jan 26",6:15 PM,8:19 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S128,Last Call at the Blue Moon,"Tue, Jan 26",6:30 PM,8:26 PM,Chautauqua Auditorium,Screening,Yusuf Lowry,Public,Confirmed
+S155,The Tallest Man in Oaxaca,"Tue, Jan 26",6:30 PM,7:52 PM,eTown Hall,Screening,Priya Hollis,Public,Confirmed
+S484,Night Swimmers,"Tue, Jan 26",6:30 PM,8:11 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S051,Q&A: A Map of Nowhere,"Tue, Jan 26",7:33 PM,7:58 PM,Roe Green Theatre,Q&A,Yara Sandoval,Public,Confirmed
+S006,Q&A: Afterglow Drive,"Tue, Jan 26",7:40 PM,8:05 PM,Macky Auditorium,Q&A,Tova Zielinski,Public,Confirmed
+S156,Q&A: The Tallest Man in Oaxaca,"Tue, Jan 26",7:52 PM,8:17 PM,eTown Hall,Q&A,Priya Hollis,Public,Confirmed
+S129,Q&A: Last Call at the Blue Moon,"Tue, Jan 26",8:26 PM,8:51 PM,Chautauqua Auditorium,Q&A,Yusuf Lowry,Public,Confirmed
+S162,Afterglow Drive,"Tue, Jan 26",9:00 PM,10:36 PM,Boulder High School Auditorium,Screening,Luca Achterberg,Public,Confirmed
+S185,The Weight of Snow,"Tue, Jan 26",9:00 PM,10:52 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S227,Dead Air,"Tue, Jan 26",9:00 PM,10:35 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S241,The Ferryman's Daughter,"Tue, Jan 26",9:00 PM,10:46 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S204,Two Suns,"Tue, Jan 26",9:15 PM,10:50 PM,Boulder Theater,Screening,,Public,Confirmed
+S160,In the Year of the Locust,"Tue, Jan 26",9:30 PM,10:57 PM,Cinemark Century Boulder,Screening,Celeste Haddad,Public,Confirmed
+S450,How to Leave Tulsa,"Tue, Jan 26",9:30 PM,11:15 PM,Macky Auditorium,Screening,Eamon Pell,Public,Confirmed
+S499,Paper Lanterns,"Tue, Jan 26",9:30 PM,11:06 PM,eTown Hall,Screening,,Public,Confirmed
+S231,The Long Quiet,"Tue, Jan 26",9:45 PM,11:15 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S163,Q&A: Afterglow Drive,"Tue, Jan 26",10:36 PM,11:01 PM,Boulder High School Auditorium,Q&A,Luca Achterberg,Public,Confirmed
+S161,Q&A: In the Year of the Locust,"Tue, Jan 26",10:57 PM,11:22 PM,Cinemark Century Boulder,Q&A,Celeste Haddad,Public,Confirmed
+S451,Q&A: How to Leave Tulsa,"Tue, Jan 26",11:15 PM,11:40 PM,Macky Auditorium,Q&A,Eamon Pell,Public,Confirmed
+S385,Leaving Mesa Verde,"Wed, Jan 27",8:30 AM,9:58 AM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S424,Lullaby for a Drone,"Wed, Jan 27",8:30 AM,10:34 AM,Boulder High School Auditorium,Screening,Oona Petrakis,Public,Confirmed
+S533,P&I: Afterglow Drive,"Wed, Jan 27",8:30 AM,10:10 AM,Cinemark Century Boulder,Screening,,Press only,Confirmed
+S271,Unmarked,"Wed, Jan 27",9:00 AM,10:39 AM,Dairy Arts Center,Screening,,Public,Confirmed
+S371,The Hum,"Wed, Jan 27",9:00 AM,10:23 AM,Roe Green Theatre,Screening,,Public,Confirmed
+S471,Wildfire Season,"Wed, Jan 27",9:00 AM,10:54 AM,Boulder Theater,Screening,,Public,Confirmed
+S244,Good Neighbors,"Wed, Jan 27",9:30 AM,11:03 AM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S505,Everything Under the Pines,"Wed, Jan 27",9:30 AM,11:06 AM,eTown Hall,Screening,Femi Lowry,Public,Confirmed
+S562,Industry office hours,"Wed, Jan 27",9:30 AM,11:00 AM,The Rink · Festival HQ,Market,,Industry only,Confirmed
+S425,Q&A: Lullaby for a Drone,"Wed, Jan 27",10:34 AM,10:59 AM,Boulder High School Auditorium,Q&A,Oona Petrakis,Public,Confirmed
+S549,"Short Films, Long Careers","Wed, Jan 27",11:00 AM,12:00 PM,Old Main,Panel,Idris Bellweather; Priya Chaudhry; Wren Thibault,Public,Confirmed
+S506,Q&A: Everything Under the Pines,"Wed, Jan 27",11:06 AM,11:31 AM,eTown Hall,Q&A,Femi Lowry,Public,Confirmed
+S192,In the Year of the Locust,"Wed, Jan 27",11:30 AM,1:26 PM,Macky Auditorium,Screening,,Public,Confirmed
+S419,The Last Video Store in Laramie,"Wed, Jan 27",11:30 AM,1:23 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S521,The Orchard Keepers,"Wed, Jan 27",11:30 AM,12:51 PM,Boulder High School Auditorium,Screening,Farah Petrakis,Public,Confirmed
+S233,The Long Quiet,"Wed, Jan 27",12:00 PM,1:30 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S279,Static,"Wed, Jan 27",12:00 PM,1:35 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S347,Common Ground,"Wed, Jan 27",12:00 PM,1:46 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S379,Undertow,"Wed, Jan 27",12:15 PM,1:45 PM,Boulder Theater,Screening,,Public,Confirmed
+S335,Howl at Nothing,"Wed, Jan 27",12:30 PM,2:02 PM,eTown Hall,Screening,,Public,Confirmed
+S365,Under the Same Moon Again,"Wed, Jan 27",12:30 PM,1:52 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S522,Q&A: The Orchard Keepers,"Wed, Jan 27",12:51 PM,1:16 PM,Boulder High School Auditorium,Q&A,Farah Petrakis,Public,Confirmed
+S550,Making a Midnight Movie,"Wed, Jan 27",2:00 PM,3:00 PM,Canyon Theater,Panel,Wren Thibault; Bram Lowry; Tova Mbeki,Public,Confirmed
+S460,The Glass Coast,"Wed, Jan 27",2:30 PM,4:25 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S311,Every Kind of Weather,"Wed, Jan 27",2:45 PM,4:41 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S350,Here Lies Margo,"Wed, Jan 27",2:45 PM,4:13 PM,Macky Auditorium,Screening,,Public,Confirmed
+S416,Dogs of the Mesa,"Wed, Jan 27",3:00 PM,4:48 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S428,"Paradise, Nevada","Wed, Jan 27",3:00 PM,4:58 PM,Dairy Arts Center,Screening,Uri Achterberg,Public,Confirmed
+S448,The Choir Boys of Gary,"Wed, Jan 27",3:00 PM,4:55 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S259,Hollow Mountain,"Wed, Jan 27",3:15 PM,4:44 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S511,The Tallest Man in Oaxaca,"Wed, Jan 27",3:15 PM,4:37 PM,Boulder Theater,Screening,,Public,Confirmed
+S301,A Map of Nowhere,"Wed, Jan 27",3:30 PM,5:03 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S362,Smoke and Mirrors and Smoke,"Wed, Jan 27",3:30 PM,4:56 PM,eTown Hall,Screening,,Public,Confirmed
+S551,Critics in Conversation,"Wed, Jan 27",4:30 PM,5:30 PM,Old Main,Panel,Bram Lowry; Idris Bellweather; Amara Ulloa,Public,Confirmed
+S429,"Q&A: Paradise, Nevada","Wed, Jan 27",4:58 PM,5:23 PM,Dairy Arts Center,Q&A,Uri Achterberg,Public,Confirmed
+S380,Field Notes for a Flood,"Wed, Jan 27",5:45 PM,7:33 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S196,Afterglow Drive,"Wed, Jan 27",6:00 PM,7:40 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S201,All the Rooms We Lived In,"Wed, Jan 27",6:00 PM,7:33 PM,Macky Auditorium,Screening,,Public,Confirmed
+S356,Visiting Hours,"Wed, Jan 27",6:00 PM,7:48 PM,Boulder Theater,Screening,,Public,Confirmed
+S492,"Holy Water, Hard Water","Wed, Jan 27",6:00 PM,7:39 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S235,The Weight of Snow,"Wed, Jan 27",6:15 PM,8:14 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S296,Dear Tomorrow,"Wed, Jan 27",6:30 PM,8:23 PM,Casey Middle School Auditorium,Screening,Freya Zielinski,Public,Confirmed
+S403,Salt Flats,"Wed, Jan 27",6:30 PM,8:28 PM,eTown Hall,Screening,Nico Okafor,Public,Confirmed
+S463,Last Call at the Blue Moon,"Wed, Jan 27",6:30 PM,8:26 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S297,Q&A: Dear Tomorrow,"Wed, Jan 27",8:23 PM,8:48 PM,Casey Middle School Auditorium,Q&A,Freya Zielinski,Public,Confirmed
+S404,Q&A: Salt Flats,"Wed, Jan 27",8:28 PM,8:53 PM,eTown Hall,Q&A,Nico Okafor,Public,Confirmed
+S324,Shadow Country,"Wed, Jan 27",9:00 PM,10:35 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S474,Rust Belt Requiem,"Wed, Jan 27",9:00 PM,11:00 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S493,Soft Animals,"Wed, Jan 27",9:00 PM,10:36 PM,Muenzinger Auditorium,Screening,Priya Whitlock,Public,Confirmed
+S514,Tidewater,"Wed, Jan 27",9:00 PM,10:27 PM,Dairy Arts Center,Screening,Priya Chaudhry,Public,Confirmed
+S423,The Body Electric,"Wed, Jan 27",9:15 PM,11:16 PM,Boulder Theater,Screening,,Public,Confirmed
+S336,Seven Ways to Disappear,"Wed, Jan 27",9:30 PM,11:26 PM,eTown Hall,Screening,Gael Navarro,Public,Confirmed
+S341,Ironwood,"Wed, Jan 27",9:30 PM,11:28 PM,Casey Middle School Auditorium,Screening,Maren Quarles,Public,Confirmed
+S388,Bone Orchard,"Wed, Jan 27",9:30 PM,10:52 PM,Macky Auditorium,Screening,,Public,Confirmed
+S478,The Inheritance Machine,"Wed, Jan 27",9:30 PM,10:57 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S329,Vigil,"Wed, Jan 27",9:45 PM,11:32 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S515,Q&A: Tidewater,"Wed, Jan 27",10:27 PM,10:52 PM,Dairy Arts Center,Q&A,Priya Chaudhry,Public,Confirmed
+S494,Q&A: Soft Animals,"Wed, Jan 27",10:36 PM,11:01 PM,Muenzinger Auditorium,Q&A,Priya Whitlock,Public,Confirmed
+S337,Q&A: Seven Ways to Disappear,"Wed, Jan 27",11:26 PM,11:51 PM,eTown Hall,Q&A,Gael Navarro,Public,Confirmed
+S342,Q&A: Ironwood,"Wed, Jan 27",11:28 PM,11:53 PM,Casey Middle School Auditorium,Q&A,Maren Quarles,Public,Confirmed
+S195,Afterglow Drive,"Thu, Jan 28",8:30 AM,10:10 AM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S283,Kingdom of Small Things,"Thu, Jan 28",8:30 AM,9:58 AM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S300,Dear Tomorrow,"Thu, Jan 28",9:00 AM,10:53 AM,Roe Green Theatre,Screening,,Public,Confirmed
+S409,What the River Took,"Thu, Jan 28",9:00 AM,11:00 AM,Boulder Theater,Screening,,Public,Confirmed
+S412,Low Sun,"Thu, Jan 28",9:00 AM,10:49 AM,Dairy Arts Center,Screening,,Public,Confirmed
+S245,Good Neighbors,"Thu, Jan 28",9:30 AM,11:03 AM,eTown Hall,Screening,,Public,Confirmed
+S383,Field Notes for a Flood,"Thu, Jan 28",9:30 AM,11:18 AM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S563,Industry office hours,"Thu, Jan 28",9:30 AM,11:00 AM,The Rink · Festival HQ,Market,,Industry only,Confirmed
+S552,Documentary Ethics and Consent,"Thu, Jan 28",11:00 AM,12:00 PM,Canyon Theater,Panel,Tova Mbeki; Ayla Galloway; Idris Okafor,Public,Confirmed
+S276,Sister Moon Motel,"Thu, Jan 28",11:30 AM,1:20 PM,Macky Auditorium,Screening,,Public,Confirmed
+S361,Smoke and Mirrors and Smoke,"Thu, Jan 28",11:30 AM,12:56 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S524,Saltwater Hymns,"Thu, Jan 28",11:30 AM,12:54 PM,Muenzinger Auditorium,Screening,Elan Lowry,Public,Confirmed
+S374,Little Fires Inside,"Thu, Jan 28",11:45 AM,1:35 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S252,"Mother Tongue, Father Land","Thu, Jan 28",12:00 PM,1:46 PM,Dairy Arts Center,Screening,Freya Whitlock,Public,Confirmed
+S304,A Map of Nowhere,"Thu, Jan 28",12:00 PM,1:33 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S442,A House on Arapahoe,"Thu, Jan 28",12:00 PM,2:10 PM,Roe Green Theatre,Screening,Paloma Yoon,Public,Confirmed
+S461,Last Call at the Blue Moon,"Thu, Jan 28",12:15 PM,2:11 PM,Boulder Theater,Screening,,Public,Confirmed
+S222,Where the Antelope Sleep,"Thu, Jan 28",12:30 PM,2:21 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S487,The Cartographer,"Thu, Jan 28",12:30 PM,1:54 PM,eTown Hall,Screening,,Public,Confirmed
+S525,Q&A: Saltwater Hymns,"Thu, Jan 28",12:54 PM,1:19 PM,Muenzinger Auditorium,Q&A,Elan Lowry,Public,Confirmed
+S253,"Q&A: Mother Tongue, Father Land","Thu, Jan 28",1:46 PM,2:11 PM,Dairy Arts Center,Q&A,Freya Whitlock,Public,Confirmed
+S553,The Craft of Editing,"Thu, Jan 28",2:00 PM,3:00 PM,Old Main,Panel,Idris Bellweather; Wren Okafor; Saoirse Delacroix,Public,Confirmed
+S443,Q&A: A House on Arapahoe,"Thu, Jan 28",2:10 PM,2:35 PM,Roe Green Theatre,Q&A,Paloma Yoon,Public,Confirmed
+S330,Vigil,"Thu, Jan 28",2:30 PM,4:17 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S177,Fool's Fire,"Thu, Jan 28",2:45 PM,3:40 PM,Macky Auditorium,Screening,,Public,Confirmed
+S213,The Orchard Keepers,"Thu, Jan 28",2:45 PM,4:20 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S357,Visiting Hours,"Thu, Jan 28",3:00 PM,4:48 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S402,Our Lady of the Interstate,"Thu, Jan 28",3:00 PM,4:51 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S175,Better Luck Tomorrow,"Thu, Jan 28",3:15 PM,4:53 PM,Boulder Theater,Screening,,Public,Confirmed
+S257,Hollow Mountain,"Thu, Jan 28",3:15 PM,4:44 PM,Chautauqua Auditorium,Screening,Saoirse Delacroix,Public,Confirmed
+S332,Howl at Nothing,"Thu, Jan 28",3:30 PM,5:02 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S390,Bone Orchard,"Thu, Jan 28",3:30 PM,4:52 PM,eTown Hall,Screening,,Public,Confirmed
+S554,Cinematographers Roundtable,"Thu, Jan 28",4:30 PM,5:30 PM,Canyon Theater,Panel,Wren Thibault; Esme Coronado; Paloma Yoon,Public,Confirmed
+S258,Q&A: Hollow Mountain,"Thu, Jan 28",4:44 PM,5:09 PM,Chautauqua Auditorium,Q&A,Saoirse Delacroix,Public,Confirmed
+S349,Common Ground,"Thu, Jan 28",5:45 PM,7:31 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S197,All the Rooms We Lived In,"Thu, Jan 28",6:00 PM,7:33 PM,Dairy Arts Center,Screening,Tariq Thibault,Public,Confirmed
+S202,Two Suns,"Thu, Jan 28",6:00 PM,7:35 PM,Boulder Theater,Screening,,Public,Confirmed
+S387,Leaving Mesa Verde,"Thu, Jan 28",6:00 PM,7:28 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S452,How to Leave Tulsa,"Thu, Jan 28",6:00 PM,7:45 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S473,Wildfire Season,"Thu, Jan 28",6:00 PM,7:54 PM,Macky Auditorium,Screening,,Public,Confirmed
+S352,Here Lies Margo,"Thu, Jan 28",6:15 PM,7:43 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S321,Ghost Ranch Radio,"Thu, Jan 28",6:30 PM,8:18 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S367,Under the Same Moon Again,"Thu, Jan 28",6:30 PM,7:52 PM,eTown Hall,Screening,,Public,Confirmed
+S198,Q&A: All the Rooms We Lived In,"Thu, Jan 28",7:33 PM,7:58 PM,Dairy Arts Center,Q&A,Tariq Thibault,Public,Confirmed
+S218,Saltwater Hymns,"Thu, Jan 28",9:00 PM,10:30 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S229,The Long Quiet,"Thu, Jan 28",9:00 PM,10:30 PM,Roe Green Theatre,Screening,Wren Okafor,Public,Confirmed
+S234,The Weight of Snow,"Thu, Jan 28",9:00 PM,10:59 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S262,A Year Without Winter,"Thu, Jan 28",9:00 PM,10:24 PM,Muenzinger Auditorium,Screening,Esme Coronado,Public,Confirmed
+S477,The Inheritance Machine,"Thu, Jan 28",9:15 PM,10:42 PM,Boulder Theater,Screening,,Public,Confirmed
+S187,The Weight of Snow,"Thu, Jan 28",9:30 PM,11:22 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S208,Heirloom,"Thu, Jan 28",9:30 PM,11:28 PM,Macky Auditorium,Screening,,Public,Confirmed
+S273,Unmarked,"Thu, Jan 28",9:30 PM,11:09 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S344,Ironwood,"Thu, Jan 28",9:30 PM,11:28 PM,eTown Hall,Screening,,Public,Confirmed
+S431,"Paradise, Nevada","Thu, Jan 28",9:45 PM,11:43 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S263,Q&A: A Year Without Winter,"Thu, Jan 28",10:24 PM,10:49 PM,Muenzinger Auditorium,Q&A,Esme Coronado,Public,Confirmed
+S230,Q&A: The Long Quiet,"Thu, Jan 28",10:30 PM,10:55 PM,Roe Green Theatre,Q&A,Wren Okafor,Public,Confirmed
+S261,Hollow Mountain,"Fri, Jan 29",8:30 AM,9:59 AM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S281,Static,"Fri, Jan 29",8:30 AM,10:05 AM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S291,Small Hours,"Fri, Jan 29",9:00 AM,10:26 AM,Boulder Theater,Screening,,Public,Confirmed
+S343,Ironwood,"Fri, Jan 29",9:00 AM,10:58 AM,Dairy Arts Center,Screening,,Public,Confirmed
+S377,Undertow,"Fri, Jan 29",9:30 AM,11:00 AM,eTown Hall,Screening,,Public,Confirmed
+S564,Industry office hours,"Fri, Jan 29",9:30 AM,11:00 AM,The Rink · Festival HQ,Market,,Industry only,Confirmed
+S555,Festival Strategy for New Filmmakers,"Fri, Jan 29",11:00 AM,12:00 PM,Old Main,Panel,Bram Lowry; Idris Bellweather; Amara Ulloa,Public,Confirmed
+S325,Shadow Country,"Fri, Jan 29",11:30 AM,1:05 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S417,The Last Video Store in Laramie,"Fri, Jan 29",11:30 AM,1:23 PM,Macky Auditorium,Screening,Bodhi Yamada,Public,Confirmed
+S444,A House on Arapahoe,"Fri, Jan 29",11:30 AM,1:40 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S199,All the Rooms We Lived In,"Fri, Jan 29",11:45 AM,1:18 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S305,Second Shift,"Fri, Jan 29",12:00 PM,2:01 PM,Roe Green Theatre,Screening,Kaia Kaplan,Public,Confirmed
+S316,Desert Bloom,"Fri, Jan 29",12:00 PM,1:34 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S523,The Orchard Keepers,"Fri, Jan 29",12:00 PM,1:21 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S294,The Midnight Projectionist,"Fri, Jan 29",12:15 PM,2:12 PM,Boulder Theater,Screening,,Public,Confirmed
+S407,What the River Took,"Fri, Jan 29",12:30 PM,2:30 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S462,Last Call at the Blue Moon,"Fri, Jan 29",12:30 PM,2:26 PM,eTown Hall,Screening,,Public,Confirmed
+S418,Q&A: The Last Video Store in Laramie,"Fri, Jan 29",1:23 PM,1:48 PM,Macky Auditorium,Q&A,Bodhi Yamada,Public,Confirmed
+S556,Youth Media in Colorado,"Fri, Jan 29",2:00 PM,3:00 PM,Canyon Theater,Panel,Tova Mbeki; Xavi Chaudhry; Maren Navarro,Public,Confirmed
+S306,Q&A: Second Shift,"Fri, Jan 29",2:01 PM,2:26 PM,Roe Green Theatre,Q&A,Kaia Kaplan,Public,Confirmed
+S526,Better Luck Tomorrow,"Fri, Jan 29",2:30 PM,4:08 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S179,Real Women Have Curves,"Fri, Jan 29",2:45 PM,4:15 PM,Macky Auditorium,Screening,,Public,Confirmed
+S421,The Body Electric,"Fri, Jan 29",2:45 PM,4:46 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S186,The Weight of Snow,"Fri, Jan 29",3:00 PM,4:52 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S359,Smoke and Mirrors and Smoke,"Fri, Jan 29",3:00 PM,4:26 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S456,The Return of Rosa Ruiz,"Fri, Jan 29",3:00 PM,4:57 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S453,How to Leave Tulsa,"Fri, Jan 29",3:15 PM,5:00 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S509,The Tallest Man in Oaxaca,"Fri, Jan 29",3:15 PM,4:37 PM,Boulder Theater,Screening,Priya Hollis,Public,Confirmed
+S238,The Ferryman's Daughter,"Fri, Jan 29",3:30 PM,5:16 PM,Casey Middle School Auditorium,Screening,Tova Eskew,Public,Confirmed
+S285,Kingdom of Small Things,"Fri, Jan 29",3:30 PM,4:58 PM,eTown Hall,Screening,,Public,Confirmed
+S510,Q&A: The Tallest Man in Oaxaca,"Fri, Jan 29",4:37 PM,5:02 PM,Boulder Theater,Q&A,Priya Hollis,Public,Confirmed
+S239,Q&A: The Ferryman's Daughter,"Fri, Jan 29",5:16 PM,5:41 PM,Casey Middle School Auditorium,Q&A,Tova Eskew,Public,Confirmed
+S236,The Weight of Snow,"Fri, Jan 29",5:45 PM,7:44 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S182,Memento,"Fri, Jan 29",6:00 PM,7:53 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S310,Every Kind of Weather,"Fri, Jan 29",6:00 PM,7:56 PM,Boulder Theater,Screening,,Public,Confirmed
+S435,The Bees of Brooklyn,"Fri, Jan 29",6:00 PM,7:40 PM,Boulder High School Auditorium,Screening,Ada Abara,Public,Confirmed
+S500,Paper Lanterns,"Fri, Jan 29",6:00 PM,7:36 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S565,Awards night,"Fri, Jan 29",6:00 PM,8:30 PM,Macky Auditorium,Activity,,Vip only,Confirmed
+S266,A Year Without Winter,"Fri, Jan 29",6:15 PM,7:39 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S211,The Orchard Keepers,"Fri, Jan 29",6:30 PM,8:05 PM,eTown Hall,Screening,,Public,Confirmed
+S331,Vigil,"Fri, Jan 29",6:30 PM,8:17 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S373,Little Fires Inside,"Fri, Jan 29",6:30 PM,8:20 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S436,Q&A: The Bees of Brooklyn,"Fri, Jan 29",7:40 PM,8:05 PM,Boulder High School Auditorium,Q&A,Ada Abara,Public,Confirmed
+S250,Copper Valley,"Fri, Jan 29",9:00 PM,10:36 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S277,Sister Moon Motel,"Fri, Jan 29",9:00 PM,10:50 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S370,The Hum,"Fri, Jan 29",9:00 PM,10:23 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S512,Borrowed Light,"Fri, Jan 29",9:00 PM,10:32 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S226,Dead Air,"Fri, Jan 29",9:15 PM,10:50 PM,Boulder Theater,Screening,,Public,Confirmed
+S205,Two Suns,"Fri, Jan 29",9:30 PM,11:05 PM,Macky Auditorium,Screening,,Public,Confirmed
+S206,Heirloom,"Fri, Jan 29",9:30 PM,11:28 PM,eTown Hall,Screening,Uma Lowry,Public,Confirmed
+S302,A Map of Nowhere,"Fri, Jan 29",9:30 PM,11:03 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S504,Feral,"Fri, Jan 29",9:30 PM,11:15 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S434,Teeth,"Fri, Jan 29",9:45 PM,11:36 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S207,Q&A: Heirloom,"Fri, Jan 29",11:28 PM,11:53 PM,eTown Hall,Q&A,Uma Lowry,Public,Confirmed
+S246,Good Neighbors,"Sat, Jan 30",8:30 AM,10:03 AM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S315,Desert Bloom,"Sat, Jan 30",8:30 AM,10:04 AM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S309,Second Shift,"Sat, Jan 30",9:00 AM,11:01 AM,Boulder Theater,Screening,,Public,Confirmed
+S326,Shadow Country,"Sat, Jan 30",9:00 AM,10:35 AM,Dairy Arts Center,Screening,,Public,Confirmed
+S378,Undertow,"Sat, Jan 30",9:00 AM,10:30 AM,Roe Green Theatre,Screening,,Public,Confirmed
+S247,Copper Valley,"Sat, Jan 30",9:30 AM,11:06 AM,Casey Middle School Auditorium,Screening,Nico Sandoval,Public,Confirmed
+S282,Static,"Sat, Jan 30",9:30 AM,11:05 AM,eTown Hall,Screening,,Public,Confirmed
+S248,Q&A: Copper Valley,"Sat, Jan 30",11:06 AM,11:31 AM,Casey Middle School Auditorium,Q&A,Nico Sandoval,Public,Confirmed
+S322,Ghost Ranch Radio,"Sat, Jan 30",11:30 AM,1:18 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S348,Common Ground,"Sat, Jan 30",11:30 AM,1:16 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S439,The Understudies,"Sat, Jan 30",11:30 AM,1:29 PM,Macky Auditorium,Screening,,Public,Confirmed
+S237,The Weight of Snow,"Sat, Jan 30",11:45 AM,1:44 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S176,Dogtown and Z-Boys,"Sat, Jan 30",12:00 PM,1:31 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S363,Under the Same Moon Again,"Sat, Jan 30",12:00 PM,1:22 PM,Dairy Arts Center,Screening,Elif Ivers,Public,Confirmed
+S415,Dogs of the Mesa,"Sat, Jan 30",12:00 PM,1:48 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S472,Wildfire Season,"Sat, Jan 30",12:15 PM,2:09 PM,Boulder Theater,Screening,,Public,Confirmed
+S313,Every Kind of Weather,"Sat, Jan 30",12:30 PM,2:26 PM,eTown Hall,Screening,,Public,Confirmed
+S445,A House on Arapahoe,"Sat, Jan 30",12:30 PM,2:40 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S364,Q&A: Under the Same Moon Again,"Sat, Jan 30",1:22 PM,1:47 PM,Dairy Arts Center,Q&A,Elif Ivers,Public,Confirmed
+S433,Teeth,"Sat, Jan 30",2:30 PM,4:21 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S267,Signal Fire,"Sat, Jan 30",2:45 PM,4:36 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S426,Lullaby for a Drone,"Sat, Jan 30",2:45 PM,4:49 PM,Macky Auditorium,Screening,,Public,Confirmed
+S289,Small Hours,"Sat, Jan 30",3:00 PM,4:26 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S345,Ironwood,"Sat, Jan 30",3:00 PM,4:58 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S467,Bright Fever,"Sat, Jan 30",3:00 PM,5:02 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S430,"Paradise, Nevada","Sat, Jan 30",3:15 PM,5:13 PM,Boulder Theater,Screening,,Public,Confirmed
+S496,Soft Animals,"Sat, Jan 30",3:15 PM,4:51 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S217,Saltwater Hymns,"Sat, Jan 30",3:30 PM,5:00 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S338,Seven Ways to Disappear,"Sat, Jan 30",3:30 PM,5:26 PM,eTown Hall,Screening,,Public,Confirmed
+S223,Where the Antelope Sleep,"Sat, Jan 30",5:45 PM,7:36 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S188,In the Year of the Locust,"Sat, Jan 30",6:00 PM,7:56 PM,Boulder High School Auditorium,Screening,Idris Farrow,Public,Confirmed
+S194,Afterglow Drive,"Sat, Jan 30",6:00 PM,7:40 PM,Boulder Theater,Screening,,Public,Confirmed
+S333,Howl at Nothing,"Sat, Jan 30",6:00 PM,7:32 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S391,Bone Orchard,"Sat, Jan 30",6:00 PM,7:22 PM,Macky Auditorium,Screening,,Public,Confirmed
+S527,Memento,"Sat, Jan 30",6:00 PM,7:53 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S399,Our Lady of the Interstate,"Sat, Jan 30",6:15 PM,8:06 PM,Cinemark Century Boulder,Screening,Oona Yoon,Public,Confirmed
+S228,Dead Air,"Sat, Jan 30",6:30 PM,8:05 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S274,Unmarked,"Sat, Jan 30",6:30 PM,8:09 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S286,Kingdom of Small Things,"Sat, Jan 30",6:30 PM,7:58 PM,eTown Hall,Screening,,Public,Confirmed
+S189,Q&A: In the Year of the Locust,"Sat, Jan 30",7:56 PM,8:21 PM,Boulder High School Auditorium,Q&A,Idris Farrow,Public,Confirmed
+S400,Q&A: Our Lady of the Interstate,"Sat, Jan 30",8:06 PM,8:31 PM,Cinemark Century Boulder,Q&A,Oona Yoon,Public,Confirmed
+S360,Smoke and Mirrors and Smoke,"Sat, Jan 30",9:00 PM,10:26 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S381,Field Notes for a Flood,"Sat, Jan 30",9:00 PM,10:48 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S437,The Bees of Brooklyn,"Sat, Jan 30",9:00 PM,10:40 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S491,"Holy Water, Hard Water","Sat, Jan 30",9:00 PM,10:39 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S353,Here Lies Margo,"Sat, Jan 30",9:15 PM,10:43 PM,Boulder Theater,Screening,,Public,Confirmed
+S299,Dear Tomorrow,"Sat, Jan 30",9:30 PM,11:23 PM,Macky Auditorium,Screening,,Public,Confirmed
+S369,The Hum,"Sat, Jan 30",9:30 PM,10:53 PM,eTown Hall,Screening,,Public,Confirmed
+S398,Northbound,"Sat, Jan 30",9:30 PM,11:24 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S422,The Body Electric,"Sat, Jan 30",9:30 PM,11:31 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S193,Afterglow Drive,"Sun, Jan 31",11:30 AM,1:10 PM,Macky Auditorium,Screening,,Public,Confirmed
+S224,Dead Air,"Sun, Jan 31",11:30 AM,1:05 PM,Boulder High School Auditorium,Screening,Lena Quarles,Public,Confirmed
+S265,A Year Without Winter,"Sun, Jan 31",11:30 AM,12:54 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S242,The Ferryman's Daughter,"Sun, Jan 31",11:45 AM,1:31 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S180,Swoon,"Sun, Jan 31",12:00 PM,1:22 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S243,Good Neighbors,"Sun, Jan 31",12:00 PM,1:33 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S287,Small Hours,"Sun, Jan 31",12:00 PM,1:26 PM,Chautauqua Auditorium,Screening,Rafa Sato,Public,Confirmed
+S221,Where the Antelope Sleep,"Sun, Jan 31",12:15 PM,2:06 PM,Boulder Theater,Screening,,Public,Confirmed
+S190,In the Year of the Locust,"Sun, Jan 31",12:30 PM,2:26 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S203,Two Suns,"Sun, Jan 31",12:30 PM,2:05 PM,eTown Hall,Screening,,Public,Confirmed
+S225,Q&A: Dead Air,"Sun, Jan 31",1:05 PM,1:30 PM,Boulder High School Auditorium,Q&A,Lena Quarles,Public,Confirmed
+S288,Q&A: Small Hours,"Sun, Jan 31",1:26 PM,1:51 PM,Chautauqua Auditorium,Q&A,Rafa Sato,Public,Confirmed
+S200,All the Rooms We Lived In,"Sun, Jan 31",2:30 PM,4:03 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S260,Hollow Mountain,"Sun, Jan 31",2:45 PM,4:14 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S307,Second Shift,"Sun, Jan 31",2:45 PM,4:46 PM,Macky Auditorium,Screening,,Public,Confirmed
+S272,Unmarked,"Sun, Jan 31",3:00 PM,4:39 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S275,Sister Moon Motel,"Sun, Jan 31",3:00 PM,4:50 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S295,The Midnight Projectionist,"Sun, Jan 31",3:00 PM,4:57 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S181,Y tu mamá también,"Sun, Jan 31",3:15 PM,5:01 PM,Boulder Theater,Screening,,Public,Confirmed
+S351,Here Lies Margo,"Sun, Jan 31",3:15 PM,4:43 PM,Chautauqua Auditorium,Screening,,Public,Confirmed
+S280,Static,"Sun, Jan 31",3:30 PM,5:05 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S312,Every Kind of Weather,"Sun, Jan 31",3:30 PM,5:26 PM,eTown Hall,Screening,,Public,Confirmed
+S209,Heirloom,"Sun, Jan 31",5:45 PM,7:43 PM,Muenzinger Auditorium,Screening,,Public,Confirmed
+S178,Nitrate Kisses,"Sun, Jan 31",6:00 PM,7:07 PM,Boulder Theater,Screening,,Public,Confirmed
+S215,Saltwater Hymns,"Sun, Jan 31",6:00 PM,7:30 PM,Roe Green Theatre,Screening,,Public,Confirmed
+S298,Dear Tomorrow,"Sun, Jan 31",6:00 PM,7:53 PM,Dairy Arts Center,Screening,,Public,Confirmed
+S317,Desert Bloom,"Sun, Jan 31",6:00 PM,7:34 PM,Boulder High School Auditorium,Screening,,Public,Confirmed
+S340,Seven Ways to Disappear,"Sun, Jan 31",6:00 PM,7:56 PM,Macky Auditorium,Screening,,Public,Confirmed
+S303,A Map of Nowhere,"Sun, Jan 31",6:15 PM,7:48 PM,Cinemark Century Boulder,Screening,,Public,Confirmed
+S268,Signal Fire,"Sun, Jan 31",6:30 PM,8:21 PM,eTown Hall,Screening,,Public,Confirmed
+S284,Kingdom of Small Things,"Sun, Jan 31",6:30 PM,7:58 PM,Casey Middle School Auditorium,Screening,,Public,Confirmed
+S376,Undertow,"Sun, Jan 31",6:30 PM,8:00 PM,Chautauqua Auditorium,Screening,,Public,Confirmed

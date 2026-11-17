@@ -15,7 +15,7 @@ import { PlanDemo } from './sitedemo';
 
 // ---------------------------------------------------------------- the calendar (1 pm to 7 pm, four venues)
 
-const VENUES = ['Harbor Theater', 'Canal Street Cinema', 'Pier 9 Hall', 'Riverside Studio'];
+const VENUES = ['Boulder Theater', 'Macky Auditorium', 'Canyon Theater', 'eTown Hall'];
 const T0 = 13 * 60, T1 = 19 * 60;
 const m = (hm: string) => Number(hm.slice(0, 2)) * 60 + Number(hm.slice(3));
 const pct = (hm: string) => Math.max(0, (m(hm) - T0) / (T1 - T0)) * 100;
@@ -24,19 +24,19 @@ const h12 = (hm: string) => { const h = Number(hm.slice(0, 2)); return `${h % 12
 
 interface Ev { col: number; t: string; s: string; e: string; kind?: 'panel'; move?: number; swap?: boolean; who?: string; img: string; faces?: string[] }
 const EVENTS: Ev[] = [
-  { col: 0, t: 'Open Gods', s: '12:30', e: '14:12', who: 'Femi Hollis', img: 'f-07', faces: ['Femi Hollis'] },
-  { col: 0, t: 'Q&A: Open Gods', s: '14:12', e: '14:32', img: 'talk-qa' },
-  { col: 0, t: 'Late Country', s: '15:00', e: '16:41', move: 15, img: 'f-13' },
-  { col: 0, t: 'Last Light', s: '17:30', e: '18:53', img: 'f-19' },
-  { col: 1, t: 'Silver Water', s: '12:30', e: '14:17', img: 'f-24' },
-  { col: 1, t: 'Quiet Animals', s: '15:00', e: '16:29', move: 15, img: 'f-30' },
-  { col: 1, t: 'Bright Weather', s: '17:30', e: '19:10', img: 'f-36' },
-  { col: 2, t: 'Documentary Ethics Now', s: '13:30', e: '14:30', kind: 'panel', who: 'Nico Thibault, Yara Hollis', img: 'talk-speaker', faces: ['Nico Thibault', 'Yara Hollis', 'Luca Pell'] },
-  { col: 2, t: 'Selling at Markets', s: '16:00', e: '17:00', kind: 'panel', swap: true, img: 'talk-stage', faces: ['Pavel Kettering', 'Luca Pell', 'Luca Hollis'] },
-  { col: 2, t: 'Writing for Small Budgets', s: '18:30', e: '19:30', kind: 'panel', img: 'talk-speaker', faces: ['Pavel Kettering', 'Sami Whitlock', 'Luca Abara'] },
-  { col: 3, t: 'Wild Tide', s: '15:00', e: '16:17', move: 15, who: 'Sami Whitlock', img: 'f-02', faces: ['Sami Whitlock'] },
-  { col: 3, t: 'Q&A: Wild Tide', s: '16:17', e: '16:37', move: 15, img: 'talk-qa' },
-  { col: 3, t: 'Last Gods', s: '17:30', e: '18:57', who: 'Elif Galloway', img: 'f-08', faces: ['Elif Galloway'] },
+  { col: 0, t: 'The Weight of Snow', s: '12:30', e: '14:12', who: 'Femi Hollis', img: 'f-07', faces: ['Femi Hollis'] },
+  { col: 0, t: 'Q&A: The Weight of Snow', s: '14:12', e: '14:32', img: 'talk-qa' },
+  { col: 0, t: 'Low Sun', s: '15:00', e: '16:41', move: 15, img: 'f-13' },
+  { col: 0, t: 'Borrowed Light', s: '17:30', e: '18:53', img: 'f-19' },
+  { col: 1, t: 'Saltwater Hymns', s: '12:30', e: '14:17', img: 'f-24' },
+  { col: 1, t: 'Soft Animals', s: '15:00', e: '16:29', move: 15, img: 'f-30' },
+  { col: 1, t: 'Every Kind of Weather', s: '17:30', e: '19:10', img: 'f-36' },
+  { col: 2, t: 'The State of the Documentary', s: '13:30', e: '14:30', kind: 'panel', who: 'Nico Thibault, Ravi Castellanos', img: 'talk-speaker', faces: ['Nico Thibault', 'Ravi Castellanos', 'Luca Pell'] },
+  { col: 2, t: 'Cinema Café: Producers', s: '16:00', e: '17:00', kind: 'panel', swap: true, img: 'talk-stage', faces: ['Dana Whitfield', 'Luca Pell', 'Luca Hollis'] },
+  { col: 2, t: 'Financing Without a Net', s: '18:30', e: '19:30', kind: 'panel', img: 'talk-speaker', faces: ['Dana Whitfield', 'Sami Whitlock', 'Luca Abara'] },
+  { col: 3, t: 'Night Swimmers', s: '15:00', e: '16:17', move: 15, who: 'Sami Whitlock', img: 'f-02', faces: ['Sami Whitlock'] },
+  { col: 3, t: 'Q&A: Night Swimmers', s: '16:17', e: '16:37', move: 15, img: 'talk-qa' },
+  { col: 3, t: 'Copper Valley', s: '17:30', e: '18:57', who: 'Elif Galloway', img: 'f-08', faces: ['Elif Galloway'] },
 ];
 
 const TONES = ['#b9825a', '#8f6a4f', '#a4744e', '#7d5b46', '#c39367', '#6f5a4e'];
@@ -71,15 +71,15 @@ function Cal({ id, rich }: { id: string; rich?: boolean }) {
                       </div>
                       {!short && e.faces && (
                         <span className="s-faces">
-                          {e.swap && <i className="in" data-in style={{ display: 'none', background: tone('Yara Hollis') }}>YH</i>}
-                          {e.faces.map(n => <i key={n} className={n === 'Pavel Kettering' ? 'late' : ''} data-late={n === 'Pavel Kettering' ? '' : undefined} style={{ background: tone(n) }} title={n}>{initials(n)}</i>)}
+                          {e.swap && <i className="in" data-in style={{ display: 'none', background: tone('Ravi Castellanos') }}>YH</i>}
+                          {e.faces.map(n => <i key={n} className={n === 'Dana Whitfield' ? 'late' : ''} data-late={n === 'Dana Whitfield' ? '' : undefined} style={{ background: tone(n) }} title={n}>{initials(n)}</i>)}
                         </span>
                       )}
-                      {e.swap && <em className="s-ev-note" data-out>Pavel Kettering is running late</em>}
+                      {e.swap && <em className="s-ev-note" data-out>Dana Whitfield can't make it</em>}
                     </> : <>
                       <b>{e.t}</b>
                       <small data-time>{h12(e.s)} to {h12(e.e)}</small>
-                      {e.swap ? <em><ins data-in style={{ display: 'none' }}>Yara Hollis opens · </ins>Luca Pell, <span data-out>Pavel Kettering</span></em> : e.who && <em>{e.who}</em>}
+                      {e.swap ? <em><ins data-in style={{ display: 'none' }}>Ravi Castellanos · </ins>Luca Pell, <span data-out>Dana Whitfield</span></em> : e.who && <em>{e.who}</em>}
                     </>}
                     {e.move && <span className="tag" data-tag>+{e.move} min</span>}
                   </div>
@@ -332,10 +332,10 @@ export default function Site() {
           </div>
           {/* The problems as the product raises them: alerts with the agent's recommendation. */}
           <div className="s-float s-float-alert" data-hero-float>
-            <span className="ic">!</span><span><b>Thunderstorms 3:00 to 6:00 pm</b></span>
+            <span className="ic">!</span><span><b>Snow 1:00 to 7:00 pm</b></span>
           </div>
           <div className="s-float s-float-alert late" data-hero-float>
-            <span className="ic"><Bell /></span><span><b>Pavel Kettering is running late</b></span>
+            <span className="ic"><Bell /></span><span><b>Dana Whitfield can't make it</b></span>
           </div>
         </div>
         <div className="s-scrollcue" aria-hidden="true">Scroll<i /></div>
@@ -352,21 +352,21 @@ export default function Site() {
         <div className="s-prob-row s-risk-cards">
           <article className="s-prob-item s-risk-card">
             <div className="s-risk-pic"><div className="s-risk-img" style={{ backgroundImage: 'url(/hl/snow.jpg)' }} /></div>
-            <p className="s-risk-k"><i className="ap wx">❄</i>Weather · Thursday</p>
-            <h3>Snow from 2:00 to 7:00 pm</h3>
+            <p className="s-risk-k"><i className="ap wx">❄</i>Weather · Saturday</p>
+            <h3>Snow from 1:00 to 7:00 pm</h3>
             <ul>
-              <li><b>Harbor Loop shuttle</b> runs 12 min late</li>
+              <li><b>HOP bus</b> runs 12 min late</li>
               <li><b>3 screenings</b> start with people still outside</li>
               <li><b>3 door teams</b> need new instructions</li>
             </ul>
           </article>
           <article className="s-prob-item s-risk-card">
             <div className="s-risk-pic"><div className="s-risk-img" style={{ backgroundImage: 'url(/hl/hall.jpg)' }} /></div>
-            <p className="s-risk-k"><i className="ap late">!</i>Late guest · 3:40 pm</p>
-            <h3>Pavel Kettering is stuck on the bridge</h3>
+            <p className="s-risk-k"><i className="ap late">!</i>Flight cancelled · 7:10 am</p>
+            <h3>Dana Whitfield&apos;s flight is cancelled</h3>
             <ul>
-              <li><b>4:00 panel</b> has no speaker</li>
-              <li><b>6:30 talk</b> is at risk</li>
+              <li><b>2:00 talk</b> has no producer</li>
+              <li><b>6:00 premiere Q&amp;A</b> is at risk</li>
               <li><b>2 other panelists</b> don&apos;t know yet</li>
             </ul>
           </article>
@@ -383,40 +383,40 @@ export default function Site() {
             <figure className="s-prob-item s-tool t-sheets" data-tool>
               <figcaption><i className="ap sheets" />Google Sheets</figcaption>
               <div className="win">
-                <div className="win-bar"><b>Harbor Lights 2027 · Schedule</b></div>
+                <div className="win-bar"><b>Sundance 2027 · Schedule</b></div>
                 <table><tbody>
                   <tr><th /><th>A</th><th>B</th><th>C</th></tr>
                   <tr><th>1</th><td className="h">Start</td><td className="h">Event</td><td className="h">Guest</td></tr>
-                  <tr><th>2</th><td className="edit">3:15 pm</td><td>Late Country</td><td>None</td></tr>
-                  <tr><th>3</th><td>4:00 pm</td><td>Selling at Markets</td><td className="clash">Pavel Kettering</td></tr>
-                  <tr><th>4</th><td>4:15 pm</td><td>Q&amp;A: Wild Tide</td><td className="clash">Pavel Kettering</td></tr>
-                  <tr><th>5</th><td>5:30 pm</td><td>Last Light</td><td>None</td></tr>
+                  <tr><th>2</th><td className="edit">3:15 pm</td><td>Low Sun</td><td>None</td></tr>
+                  <tr><th>3</th><td>4:00 pm</td><td>Cinema Café: Producers</td><td className="clash">Dana Whitfield</td></tr>
+                  <tr><th>4</th><td>4:15 pm</td><td>Q&amp;A: Night Swimmers</td><td className="clash">Dana Whitfield</td></tr>
+                  <tr><th>5</th><td>5:30 pm</td><td>Borrowed Light</td><td>None</td></tr>
                 </tbody></table>
               </div>
             </figure>
             <figure className="s-prob-item s-tool t-gmail" data-tool>
               <figcaption><i className="ap gmail" />Gmail</figcaption>
               <div className="win">
-                <div className="row u"><b>Mara Quist</b><span>Pavel is running late, new ETA 4:20</span><em>2:58 pm</em></div>
+                <div className="row u"><b>Mara Quist</b><span>Dana’s flight is cancelled, lands Sat</span><em>2:58 pm</em></div>
                 <div className="row u"><b>Kaia Ivers</b><span>Re: Fwd: schedule v7 FINAL</span><em>2:41 pm</em></div>
                 <div className="row"><b>Lantern Print</b><span>Prints running 15 min late</span><em>1:05 pm</em></div>
-                <div className="row"><b>Box office</b><span>21 people asking about Wild Tide</span><em>12:50 pm</em></div>
+                <div className="row"><b>Box office</b><span>21 people asking about Night Swimmers</span><em>12:50 pm</em></div>
               </div>
             </figure>
             <figure className="s-prob-item s-tool t-word" data-tool>
               <figcaption><i className="ap word" />Word</figcaption>
               <div className="win">
                 <div className="page">
-                  <b>Door brief · Thursday</b>
+                  <b>Door brief · Saturday</b>
                   <p>Doors open <del>2:45</del> <ins>3:00</ins> for the <del>3:00</del> <ins>3:15</ins> screenings.</p>
-                  <p>Shuttle every 20 min from Canal Street.</p>
+                  <p>HOP bus every 10 to 15 min, free.</p>
                 </div>
               </div>
             </figure>
             <figure className="s-prob-item s-tool t-whatsapp" data-tool>
               <figcaption><i className="ap whatsapp" />WhatsApp</figcaption>
               <div className="win">
-                <div className="wa-head"><b>Harbor Lights volunteers</b><span>83 members</span></div>
+                <div className="wa-head"><b>Sundance volunteers</b><span>83 members</span></div>
                 <div className="wa-body">
                   <p className="wa-them"><b>Noor</b>Is the 3:00 still on?</p>
                   <p className="wa-them"><b>Theo</b>Sheet says 3:00, email says 3:15</p>
@@ -434,13 +434,13 @@ export default function Site() {
         <div className="s-sticky">
           <canvas className="s-snowfield" data-snowfield aria-hidden="true" />
           <div className="s-trigger-copy" data-trigger-copy>
-            <span className="s-clock">Thursday · 1:10 pm</span>
+            <span className="s-clock">Saturday · 12:40 pm</span>
             <h2 className="s-h2 s-watch-h">{'Usher keeps an eye on\neverything that could go wrong.'}</h2>
             <p className="s-lead" style={{ textAlign: 'center' }}>It follows the weather, flight arrivals and shuttle times all day. When one of them affects your programme, it shows you exactly what it touches.</p>
           </div>
           <div className="s-flow" data-feeds data-lve-skip>
             <div className="s-flow-col">
-              {[['❄', 'Weather', 'Snow 2:00 to 7:00 pm'], ['✈', 'Flights', 'DL2207 landed 21 min late'], ['◷', 'Shuttle', 'Harbor Loop 12 min late']].map(([ic, k, v]) => (
+              {[['❄', 'Weather', 'Snow 1:00 to 7:00 pm'], ['✈', 'Flights', 'UA JFK→DEN cancelled'], ['◷', 'Shuttle', 'HOP bus 12 min late']].map(([ic, k, v]) => (
                 <div className="s-flow-feed" data-feed-in key={k}><span className="ic">{ic}</span><span><b>{k}</b><small>{v}</small></span></div>
               ))}
             </div>
@@ -449,10 +449,10 @@ export default function Site() {
                 {[50, 150, 250].map(y => <path key={`i${y}`} data-feed="in" d={`M0 ${y} C 60 ${y}, 60 150, 100 150`} />)}
                 {[38, 113, 188, 263].map(y => <path key={`o${y}`} data-feed="out" className="out" d={`M100 150 C 140 150, 140 ${y}, 200 ${y}`} />)}
               </svg>
-              <div className="s-flow-node" data-node><b>Usher</b><small>checks 40 screenings, 312 tickets, 60 shifts</small></div>
+              <div className="s-flow-node" data-node><b>Usher</b><small>checks 559 events, 1,107 plans, 595 shifts</small></div>
             </div>
             <div className="s-flow-col">
-              {[['3 screenings move to 3:15 pm', 'Late Country, Quiet Animals, Wild Tide'], ['21 attendees get their new time', 'Seats held, leave 15 min early'], ['Yara Hollis opens Pavel’s panel', 'He joins at 4:20 pm'], ['3 door teams briefed', 'Hold doors until 3:20 pm']].map(([b2, sm]) => (
+              {[['3 screenings move to 3:15 pm', 'Low Sun, Soft Animals, Night Swimmers'], ['21 attendees get their new time', 'Seats held, leave 15 min early'], ['Ravi Castellanos takes Dana’s seat', 'She joins the Q&A by video'], ['3 door teams briefed', 'Hold doors until 3:20 pm']].map(([b2, sm]) => (
                 <div className="s-flow-out" data-feed-out key={b2}><b>{b2}</b><small>{sm}</small></div>
               ))}
             </div>
@@ -474,7 +474,7 @@ export default function Site() {
       {/* call to action */}
       <footer className="s-footer">
         <div className="s-footer-bg" data-footer-bg />
-        <h2 className="s-h1" data-split-scroll>See how Usher handles a snow day at Harbor Lights.</h2>
+        <h2 className="s-h1" data-split-scroll>See how Usher handles a snow day at Sundance in Boulder.</h2>
         <div className="s-roles" data-reveal>
           <a className="btn primary" href="/onboarding">Try the live demo</a>
         </div>
@@ -533,7 +533,7 @@ function resetHero(cal: Element) {
   if (ev) {
     ev.classList.remove('hot');
     const ins = ev.querySelector<HTMLElement>('[data-in]'); if (ins) ins.style.display = 'none';
-    const out = ev.querySelector<HTMLElement>('[data-out]'); if (out) out.innerHTML = 'Pavel Kettering';
+    const out = ev.querySelector<HTMLElement>('[data-out]'); if (out) out.innerHTML = 'Dana Whitfield';
   }
   gsap.set(cal.querySelectorAll('[data-ghost], [data-snowband]'), { opacity: 0 });
 }
@@ -561,8 +561,8 @@ function swapGuest(cal: Element, on: boolean) {
       const rich = cal.classList.contains('rich');
       if (ins) ins.style.display = on ? (rich ? 'inline-grid' : 'inline') : 'none';
       if (out) {
-        if (rich) out.textContent = on ? 'Yara Hollis opens · Pavel joins 4:20' : 'Pavel Kettering is running late';
-        else out.innerHTML = on ? '<s>Pavel Kettering</s>' : 'Pavel Kettering';
+        if (rich) out.textContent = on ? 'Ravi Castellanos steps in · Dana by video' : 'Dana Whitfield can’t make it';
+        else out.innerHTML = on ? '<s>Dana Whitfield</s>' : 'Dana Whitfield';
       }
     })
     .fromTo(ev, { rotateX: 90 }, { rotateX: 0, duration: 0.5, ease: 'power3.out' });

@@ -49,7 +49,9 @@ export function findGuestClashes(f: Festival): GuestClash[] {
 export function findOrphanedQas(f: Festival): FestivalEvent[] {
   return f.events.filter(q => {
     if (q.kind !== 'qa' || q.status !== 'scheduled') return false;
-    const s = f.events.find(e => e.kind === 'screening' && e.filmId === q.filmId && !e.restriction);
+    // The screening this Q&A follows: the film's showing that day ending closest to the Q&A's start.
+    const s = f.events.filter(e => e.kind === 'screening' && e.filmId === q.filmId && !e.restriction && e.day === q.day)
+      .sort((a, b) => Math.abs(toMinutes(q.start) - toMinutes(a.end)) - Math.abs(toMinutes(q.start) - toMinutes(b.end)))[0];
     return !!s && s.status === 'scheduled' && (s.venueId !== q.venueId || toMinutes(q.start) < toMinutes(s.end));
   });
 }

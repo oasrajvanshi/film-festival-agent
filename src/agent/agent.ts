@@ -110,7 +110,9 @@ export class FestivalAgent {
       const byPerson = new Map<string, NonNullable<Action['messages']>[number]>();
       for (const m of notices.flatMap(a => a.messages ?? [])) {
         const prev = byPerson.get(m.personId);
-        byPerson.set(m.personId, prev ? { ...prev, subject: 'Schedule changes', body: `${prev.body}\n\n${m.body}` } : m);
+        // Keep the first change's one-line subject; say how many more are in the message.
+        const more = prev ? Number(/ \+ (\d+) more$/.exec(prev.subject)?.[1] ?? 0) + 1 : 0;
+        byPerson.set(m.personId, prev ? { ...prev, subject: `${prev.subject.replace(/ \+ \d+ more$/, '')} + ${more} more`, body: `${prev.body}\n\n${m.body}` } : m);
       }
       const merged: Action = { id: `notify-${runId}`, kind: 'notify_people', title: `Notify ${byPerson.size} affected people`,
         rationale: notices.map(a => a.rationale).join(' '), messages: [...byPerson.values()] };

@@ -1183,3 +1183,9 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
   .rec-float { width: auto; padding: 6px 6px 6px 8px; border-radius: 12px; }
   .rec-bar .rec-view, .rec-bar .rec-approve { min-height: 30px; font-size: 12.5px; }
 }
+
+/* ---------------------------------------------------------------- Fix it on a computer: the checklist is always open, Approve under it */
+.rec-float.desk { width: 252px; padding: 10px 10px 10px; }
+.rec-head { display: flex; align-items: center; gap: 6px; padding: 2px 4px 6px; color: var(--accent); font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.rec-float.desk .wx-list { margin: 0 4px 10px; }
+.rec-float.desk .rec-bar .rec-approve { flex: 1; min-height: 38px; font-size: 13.5px; }

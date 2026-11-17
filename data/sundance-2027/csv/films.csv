@@ -1,0 +1,101 @@
+Film ID,Title,Director,Runtime (min),Section,Featured filmmaker IDs
+f-01,The Weight of Snow,Vera Brennick,112,U.S. Dramatic Competition,"p-100, p-101, p-102"
+f-02,In the Year of the Locust,Idris Farrow,116,U.S. Dramatic Competition,p-103
+f-03,Afterglow Drive,Tova Zielinski,100,U.S. Dramatic Competition,p-104
+f-04,All the Rooms We Lived In,Tariq Thibault,93,U.S. Dramatic Competition,p-105
+f-05,Two Suns,Tariq Jessop,95,U.S. Dramatic Competition,p-106
+f-06,Heirloom,Uma Lowry,118,U.S. Dramatic Competition,p-107
+f-07,The Orchard Keepers,Bodhi Ibarra,95,U.S. Dramatic Competition,p-108
+f-08,Saltwater Hymns,Priya Lowry,90,U.S. Dramatic Competition,p-109
+f-09,Where the Antelope Sleep,Bodhi Kettering,111,U.S. Dramatic Competition,p-110
+f-10,Dead Air,Lena Quarles,95,U.S. Dramatic Competition,p-111
+f-11,The Long Quiet,Wren Okafor,90,U.S. Dramatic Competition,p-112
+f-12,The Weight of Snow,Yara Mbeki,119,U.S. Dramatic Competition,
+f-13,The Ferryman's Daughter,Tova Eskew,106,U.S. Documentary Competition,p-113
+f-14,Good Neighbors,Amara Thibault,93,U.S. Documentary Competition,p-114
+f-15,Copper Valley,Nico Sandoval,96,U.S. Documentary Competition,p-115
+f-16,"Mother Tongue, Father Land",Freya Whitlock,106,U.S. Documentary Competition,p-116
+f-17,Hollow Mountain,Saoirse Delacroix,89,U.S. Documentary Competition,p-117
+f-18,A Year Without Winter,Esme Coronado,84,U.S. Documentary Competition,p-118
+f-19,Signal Fire,Anouk Castell,111,U.S. Documentary Competition,
+f-20,Unmarked,Nadia Eskew,99,U.S. Documentary Competition,p-119
+f-21,Sister Moon Motel,Dalia Galloway,110,U.S. Documentary Competition,p-120
+f-22,Static,Mira Brennick,95,U.S. Documentary Competition,p-121
+f-23,Kingdom of Small Things,Rune Ekwueme,88,U.S. Documentary Competition,p-122
+f-24,Small Hours,Rafa Sato,86,U.S. Documentary Competition,p-123
+f-25,The Midnight Projectionist,Nico Yamada,117,World Cinema Dramatic Competition,
+f-26,Dear Tomorrow,Freya Zielinski,113,World Cinema Dramatic Competition,p-124
+f-27,A Map of Nowhere,Yara Sandoval,93,World Cinema Dramatic Competition,p-125
+f-28,Second Shift,Kaia Kaplan,121,World Cinema Dramatic Competition,p-126
+f-29,Every Kind of Weather,Vera Hollis,116,World Cinema Dramatic Competition,p-127
+f-30,Desert Bloom,Joaquin Dahl,94,World Cinema Dramatic Competition,p-128
+f-31,Ghost Ranch Radio,Elif Ibarra,108,World Cinema Dramatic Competition,p-129
+f-32,Shadow Country,Ines Delacroix,95,World Cinema Dramatic Competition,
+f-33,Vigil,Bram Kaplan,107,World Cinema Dramatic Competition,p-130
+f-34,Howl at Nothing,Paloma Ibarra,92,World Cinema Dramatic Competition,p-131
+f-35,Seven Ways to Disappear,Gael Navarro,116,World Cinema Dramatic Competition,p-132
+f-36,Ironwood,Maren Quarles,118,World Cinema Dramatic Competition,p-133
+f-37,Common Ground,Celeste Achterberg,106,World Cinema Documentary Competition,p-134
+f-38,Here Lies Margo,Elan Bellweather,88,World Cinema Documentary Competition,p-135
+f-39,Visiting Hours,Callum Dunmore,108,World Cinema Documentary Competition,p-136
+f-40,Smoke and Mirrors and Smoke,Elif Okafor,86,World Cinema Documentary Competition,p-137
+f-41,Under the Same Moon Again,Elif Ivers,82,World Cinema Documentary Competition,p-138
+f-42,The Hum,Zuri Bellweather,83,World Cinema Documentary Competition,p-139
+f-43,Little Fires Inside,Joaquin Castell,110,World Cinema Documentary Competition,p-140
+f-44,Undertow,Elif Thibault,90,World Cinema Documentary Competition,
+f-45,Field Notes for a Flood,Hiro Brennick,108,World Cinema Documentary Competition,
+f-46,Leaving Mesa Verde,Uri Ivers,88,World Cinema Documentary Competition,p-141
+f-47,Bone Orchard,Freya Petrakis,82,World Cinema Documentary Competition,
+f-48,Thin Ice,Eamon Chaudhry,93,World Cinema Documentary Competition,p-142
+f-49,Northbound,Celeste Wojcik,114,Premieres,p-143
+f-50,Our Lady of the Interstate,Oona Yoon,111,Premieres,p-144
+f-51,Salt Flats,Nico Okafor,118,Premieres,p-145
+f-52,What the River Took,Bodhi Oyelaran,120,Premieres,p-146
+f-53,Low Sun,Nadia Szabo,109,Premieres,p-147
+f-54,Dogs of the Mesa,Uma Brightwater,108,Premieres,p-148
+f-55,The Last Video Store in Laramie,Bodhi Yamada,113,Premieres,p-149
+f-56,The Body Electric,Rafa Thibault,121,Premieres,p-150
+f-57,Lullaby for a Drone,Oona Petrakis,124,Premieres,p-151
+f-58,"Paradise, Nevada",Uri Achterberg,118,Premieres,p-152
+f-59,Teeth,Nadia Coronado,111,Premieres,p-153
+f-60,The Bees of Brooklyn,Ada Abara,100,Premieres,p-154
+f-61,Blue Hour Bakery,Freya Yoon,120,Premieres,p-155
+f-62,The Understudies,Gael Petrakis,119,Premieres,p-156
+f-63,A House on Arapahoe,Paloma Yoon,130,Premieres,p-157
+f-64,The Choir Boys of Gary,Oona Okafor,115,Premieres,p-158
+f-65,How to Leave Tulsa,Eamon Pell,105,Premieres,p-159
+f-66,The Return of Rosa Ruiz,Yara Achterberg,117,Premieres,p-160
+f-67,The Glass Coast,Ayla Mbeki,115,Premieres,p-161
+f-68,Last Call at the Blue Moon,Yusuf Lowry,116,Premieres,p-162
+f-69,Bright Fever,Bram Toivonen,122,Premieres,p-163
+f-70,Cardinal,Mira Navarro,129,Premieres,p-164
+f-71,Wildfire Season,Priya Ulloa,114,Premieres,p-165
+f-72,Rust Belt Requiem,Vera Lowry,120,Premieres,p-166
+f-73,The Inheritance Machine,Dalia Abara,87,NEXT,p-167
+f-74,Night Shift at the Diner,Greta Ivers,81,NEXT,p-168
+f-75,Night Swimmers,Paloma Rahimi,101,NEXT,
+f-76,The Cartographer,Dev Rourke,84,NEXT,p-169
+f-77,"Holy Water, Hard Water",Sami Lindqvist,99,NEXT,p-170
+f-78,Soft Animals,Priya Whitlock,96,NEXT,p-171
+f-79,Paper Lanterns,Oona Nakamura,96,NEXT,p-172
+f-80,Feral,Gael Yoon,105,NEXT,p-173
+f-81,Everything Under the Pines,Femi Lowry,96,NEXT,p-174
+f-82,The Tallest Man in Oaxaca,Priya Hollis,82,NEXT,p-175
+f-83,Borrowed Light,Ada Toivonen,92,Midnight,
+f-84,Tidewater,Priya Chaudhry,87,Midnight,p-176
+f-85,In the Year of the Locust,Celeste Haddad,87,Midnight,p-177
+f-86,Afterglow Drive,Luca Achterberg,96,Midnight,p-178
+f-87,All the Rooms We Lived In,Dario Szabo,97,Midnight,p-179
+f-88,Two Suns,Wren Yoon,96,Midnight,
+f-89,Heirloom,Hiro Bellweather,92,Midnight,p-180
+f-90,The Orchard Keepers,Farah Petrakis,81,Family Matinee,p-181
+f-91,Saltwater Hymns,Elan Lowry,84,Family Matinee,p-182
+f-92,Where the Antelope Sleep,Joaquin Yamada,83,Family Matinee,p-183
+f-93,Better Luck Tomorrow,Justin Lin,98,Legacy,
+f-94,Dogtown and Z-Boys,Stacy Peralta,91,Legacy,
+f-95,Fool's Fire,Julie Taymor,55,Legacy,
+f-96,Nitrate Kisses,Barbara Hammer,67,Legacy,
+f-97,Real Women Have Curves,Patricia Cardoso,90,Legacy,
+f-98,Swoon,Tom Kalin,82,Legacy,
+f-99,Y tu mamá también,Alfonso Cuarón,106,Legacy,
+f-100,Memento,Christopher Nolan,113,Legacy,

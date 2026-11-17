@@ -14,6 +14,13 @@ export interface Venue {
   address: string;
   /** Screens or rooms inside the venue, each with its own seats. */
   rooms?: Room[];
+  /** Where it is, for the map (WGS84). */
+  lat?: number;
+  lng?: number;
+  /** Neighbourhood, e.g. "Downtown" or "CU Boulder campus". */
+  area?: string;
+  /** What the festival uses it for, e.g. "Premieres" or "Festival hub". */
+  use?: string;
 }
 
 export interface Room { name: string; capacity: number }

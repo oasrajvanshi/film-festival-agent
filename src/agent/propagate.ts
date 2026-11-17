@@ -131,7 +131,10 @@ export function planPropagation(f: Festival, change: ScheduleChange): Action[] {
       return {
         personId: person.id,
         channel: preferredChannel(person),
-        subject: `Schedule change: ${ev.title}`,
+        // One line with what, when and where; the body has the rest.
+        subject: change.after && change.before && change.after.status !== 'cancelled' && change.after.start !== change.before.start
+          ? `"${ev.title}" now starts ${clock(change.after.start)} (was ${clock(change.before.start)}) at ${f.venues.find(v => v.id === ev.venueId)?.name ?? 'the venue'}`
+          : change.after?.status === 'cancelled' ? `"${ev.title}" at ${clock(ev.start)} is cancelled` : `Schedule change: ${ev.title}`,
         body: `${what} ${recommendationText(recommendation)}`,
         recommendation,
       };

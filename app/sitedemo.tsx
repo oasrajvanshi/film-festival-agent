@@ -6,7 +6,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-const VENUES = ['Harbor Theater', 'Canal Street Cinema', 'Pier 9 Hall', 'Riverside Studio'];
+const VENUES = ['Boulder Theater', 'Macky Auditorium', 'Canyon Theater', 'eTown Hall'];
 const T0 = 13 * 60, T1 = 19 * 60;
 const m = (hm: string) => Number(hm.slice(0, 2)) * 60 + Number(hm.slice(3));
 const top = (hm: string) => ((m(hm) - T0) / (T1 - T0)) * 100;
@@ -15,16 +15,16 @@ const add = (hm: string, d: number) => { const t = m(hm) + d; return `${String(M
 
 interface Ev { col: number; t: string; s: string; e: string; img: string; move?: number; faces?: string[]; swap?: boolean }
 const EVENTS: Ev[] = [
-  { col: 0, t: 'Open Gods', s: '13:00', e: '14:30', img: 'f-07', faces: ['FH'] },
-  { col: 0, t: 'Late Country', s: '15:00', e: '16:40', img: 'f-13', move: 15 },
-  { col: 0, t: 'Last Light', s: '17:30', e: '18:50', img: 'f-19' },
-  { col: 1, t: 'Silver Water', s: '13:00', e: '14:40', img: 'f-24' },
-  { col: 1, t: 'Quiet Animals', s: '15:00', e: '16:30', img: 'f-30', move: 15 },
-  { col: 1, t: 'Bright Weather', s: '17:30', e: '18:55', img: 'f-36' },
+  { col: 0, t: 'The Weight of Snow', s: '13:00', e: '14:30', img: 'f-07', faces: ['FH'] },
+  { col: 0, t: 'Low Sun', s: '15:00', e: '16:40', img: 'f-13', move: 15 },
+  { col: 0, t: 'Borrowed Light', s: '17:30', e: '18:50', img: 'f-19' },
+  { col: 1, t: 'Saltwater Hymns', s: '13:00', e: '14:40', img: 'f-24' },
+  { col: 1, t: 'Soft Animals', s: '15:00', e: '16:30', img: 'f-30', move: 15 },
+  { col: 1, t: 'Every Kind of Weather', s: '17:30', e: '18:55', img: 'f-36' },
   { col: 2, t: 'Documentary Ethics', s: '13:30', e: '14:30', img: 'talk-speaker', faces: ['NT', 'YH'] },
-  { col: 2, t: 'Selling at Markets', s: '16:00', e: '17:00', img: 'talk-stage', faces: ['PK', 'LP'], swap: true },
-  { col: 3, t: 'Wild Tide', s: '15:00', e: '16:20', img: 'f-02', move: 15, faces: ['SW'] },
-  { col: 3, t: 'Last Gods', s: '17:30', e: '18:55', img: 'f-08' },
+  { col: 2, t: 'Cinema Café: Producers', s: '16:00', e: '17:00', img: 'talk-stage', faces: ['PK', 'LP'], swap: true },
+  { col: 3, t: 'Night Swimmers', s: '15:00', e: '16:20', img: 'f-02', move: 15, faces: ['SW'] },
+  { col: 3, t: 'Copper Valley', s: '17:30', e: '18:55', img: 'f-08' },
 ];
 
 // Four connected steps: the alert, then the agent's recommendation button, then its
@@ -86,14 +86,14 @@ export function PlanDemo() {
     return () => { window.removeEventListener('pd-play', start); io.disconnect(); if (loop) clearInterval(loop); timers.forEach(clearTimeout); };
   }, []);
   const moved = step >= 13;
-  const items = ['Start 3 screenings 15 min later', 'Send 21 people their new time', 'Yara Hollis opens Pavel’s panel'];
+  const items = ['Start 3 screenings 15 min later', 'Send 21 people their new time', 'Ravi Castellanos takes Dana’s seat'];
   return (
     <div ref={box} className={`pd${snap ? ' snap' : ''}`} data-lve-skip aria-label="Usher suggesting a new plan, shown in the product">
       <div className="pd-flow">
         {/* 1. the alert the agent raised */}
         <div className={`pd-alert${step >= 0 ? ' in' : ''}`}>
           <span className="pd-ic">!</span>
-          <span className="pd-alert-t"><b>Thunderstorms 3:00 to 6:00 pm</b><small>Day 1 · and Pavel Kettering is running late</small></span>
+          <span className="pd-alert-t"><b>Snow 1:00 to 7:00 pm</b><small>Day 1 · and Dana Whitfield can't make it</small></span>
         </div>
         <Arrow on={step >= 1} />
         {/* 2. the agent's recommendation */}
@@ -154,7 +154,7 @@ export function PlanDemo() {
       {/* what an attendee sees once it is approved */}
       <div className={`pd-phone${step >= 14 ? ' in' : ''}`}>
         <span className="pd-phone-app">Usher · now</span>
-        <b>Wild Tide now starts at 3:15 pm</b>
+        <b>Night Swimmers now starts at 3:15 pm</b>
         <small>Your seat is held. Leave 15 minutes early; the shuttle is running late.</small>
       </div>
     </div>

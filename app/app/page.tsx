@@ -3,34 +3,35 @@
 import { useEffect, useRef, useState } from 'react';
 import { readSetup, useAgent, writeSetup, writeWho } from '../ui/useAgent';
 import { clearFestivalLocal } from '../ui/localkeys';
-import { Approvals, Ask, Briefs, Data, Feeds, Grid, Log, Overview, Scan } from '../ui/panels';
+import { Approvals, Ask, Briefs, Data, Feeds, Log, Overview, Scan } from '../ui/panels';
 import { DemoShell, backToOrganizer, demoPerson, useDemo, type Demo } from '../ui/demo';
 import { Icon } from '../ui/icons';
 import '../mobile.css';
+import '../light.css';
+import '../live.css';
 import { AccessCodes, Feedback, PersonalApp, SignIn } from '../ui/profiles';
-import { WhosHere } from '../ui/presence';
+import { ScanDesk } from '../ui/presence';
 import { directory, type Who } from '../../src/access/profiles';
-import { PhoneFrame, inFrame, isWide, readDevice, toParent, writeDevice, type Device } from '../ui/phoneframe';
+import { useTheme } from '../ui/live';
+import { IPhone, PhoneFrame, inFrame, isWide, readDevice, toParent, writeDevice, type Device } from '../ui/phoneframe';
 import type { DayNumber } from '../../src/core/types';
 import { festivalDays } from '../../src/core/types';
 
 const PAGES = [
   { id: 'today', label: 'Overview', icon: 'home', group: 'Festival day' },
   { id: 'approvals', label: 'Approvals', icon: 'inbox', group: 'Festival day' },
-  { id: 'here', label: "Who's here", icon: 'scan', group: 'Festival day' },
-  { id: 'schedule', label: 'Schedule', icon: 'calendar', group: 'Festival day' },
+  { id: 'log', label: 'Log', icon: 'list', group: 'Festival day' },
   { id: 'ask', label: 'Ask', icon: 'chat', group: 'Festival day' },
   { id: 'briefs', label: 'Volunteer briefs', icon: 'users', group: 'Team' },
   { id: 'feeds', label: 'Live feeds', icon: 'bolt', group: 'Team' },
   { id: 'codes', label: 'Access codes', icon: 'key', group: 'Team' },
   // Reached from Overview or Settings, not the menu.
-  { id: 'scan', label: 'Door scan', icon: 'scan', group: '' },
-  { id: 'log', label: 'Activity log', icon: 'list', group: '' },
+  { id: 'scan', label: 'Scan in', icon: 'scan', group: '' },
   { id: 'data', label: 'Data', icon: 'sheet', group: '' },
   { id: 'feedback', label: 'Feedback', icon: 'chat', group: '' },
 ] as const;
 type PageId = typeof PAGES[number]['id'];
-const BOTTOM: PageId[] = ['today', 'here', 'schedule'];
+const BOTTOM: PageId[] = ['today', 'approvals', 'log'];
 
 export default function App() {
   const demo = useDemo();
@@ -53,6 +54,17 @@ function AppInner({ demo }: { demo: Demo | null }) {
   const [wide, setWide] = useState(false);
   const [device, setDeviceState] = useState<Device>('desktop');
   const [viewasId, setViewasId] = useState<string | null>(null);
+  // Light or dark, remembered on this device (the organizer's tool only; people's phone apps stay dark).
+  const [theme, setTheme] = useTheme();
+  // A live phone beside the dashboard, for presenting (remembered on this device).
+  const [split, setSplitState] = useState(false);
+  const [splitWho, setSplitWho] = useState<'attendee' | 'staff'>('attendee');
+  useEffect(() => { try { setSplitState(localStorage.getItem('usher-split') === '1'); } catch { /* private mode */ } }, []);
+  const setSplit = (on: boolean) => { setSplitState(on); try { localStorage.setItem('usher-split', on ? '1' : '0'); } catch { /* private mode */ } };
+  useEffect(() => {
+    document.documentElement.classList.toggle('org-light', theme === 'light');
+    return () => document.documentElement.classList.remove('org-light');
+  }, [theme]);
   useEffect(() => {
     setFramed(inFrame()); setDeviceState(readDevice());
     setViewasId(new URLSearchParams(location.search).get('viewas'));
@@ -116,7 +128,8 @@ function AppInner({ demo }: { demo: Demo | null }) {
     if (!ready) return;
     if (s.shared ? !s.fid : !readSetup()) { location.replace('/onboarding'); return; }
   }, [ready, s.shared, s.fid]);
-  useEffect(() => { if (who?.kind === 'organizer') setUser(who.name); }, [who]);
+  // The organizer's name as the festival has it now (a saved sign-in may predate a renamed demo).
+  useEffect(() => { if (who?.kind === 'organizer') setUser(f.people.find(p => p.id === who.id)?.name ?? who.name); }, [who, f]);
   useEffect(() => {
     const fromHash = () => { const h = location.hash.slice(1); if (PAGES.some(p => p.id === h)) setPageState(h as PageId); };
     fromHash();
@@ -149,7 +162,7 @@ function AppInner({ demo }: { demo: Demo | null }) {
       </div>
       <div className="field">More
         <div className="row">
-          {(['log', 'data', 'feedback'] as PageId[]).map(id => <button key={id} className="small" onClick={() => setPage(id)}>{PAGES.find(p => p.id === id)!.label}</button>)}
+          {(['data', 'feedback'] as PageId[]).map(id => <button key={id} className="small" onClick={() => setPage(id)}>{PAGES.find(p => p.id === id)!.label}</button>)}
         </div>
       </div>
       <button className="block" onClick={signOut}><Icon name="logout" size={16} /> Sign out</button>
@@ -179,8 +192,8 @@ function AppInner({ demo }: { demo: Demo | null }) {
   }
   if (!framed && wide && device === 'phone') return <PhoneFrame organizer src="/app?inframe=1" title="Usher for the organizer" onDevice={d => { setDevice(d); location.reload(); }} />;
 
-  return (
-    <div className="shell">
+  const shellEl = (
+    <div className={`shell${theme === 'light' ? ' light' : ''}`}>
       <aside className="side">
         <div className="brand">
           <div className="brand-mark"><Icon name="film" /></div>
@@ -202,7 +215,11 @@ function AppInner({ demo }: { demo: Demo | null }) {
         <header className="topbar">
           <h1>{current.label}</h1>
           <div className="spacer" />
-          <button className="ghost small" onClick={() => setDevice('phone')} title="See the organizer app on a phone"><Icon name="ticket" size={15} /> Phone view</button>
+          <button className="ghost small theme-btn" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} title={theme === 'light' ? 'Dark mode' : 'Light mode'} aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}>
+            <Icon name={theme === 'light' ? 'moon' : 'sun'} size={15} /> {theme === 'light' ? 'Dark' : 'Light'}
+          </button>
+          <button className={`ghost small${split ? ' on' : ''}`} onClick={() => setSplit(!split)} title="Show an attendee's or volunteer's phone beside this screen, live"><Icon name="ticket" size={15} /> {split ? 'Hide phone' : 'Show phone'}</button>
+          <button className="ghost small" onClick={() => setDevice('phone')} title="See the organizer app on a phone"><Icon name="home" size={15} /> Phone view</button>
           <button className="ghost" onClick={() => setSheet('settings')} title="Settings">
             <span className={`model-dot ${s.useModel && s.llmInfo.available ? 'on' : ''}`} /> {user} <Icon name="gear" size={16} />
           </button>
@@ -211,16 +228,15 @@ function AppInner({ demo }: { demo: Demo | null }) {
         <header className="mobile-head">
           <div className="brand-mark"><Icon name="film" size={16} /></div>
           <h1>{current.label}</h1>
+          <button className="ghost small" aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'} onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}><Icon name={theme === 'light' ? 'moon' : 'sun'} /></button>
           <button className="ghost small" aria-label="Settings" onClick={() => setSheet('settings')}><Icon name="gear" /></button>
         </header>
 
         {s.notice && <div className="issues" role="status" style={{ margin: '8px 16px 0' }}>{s.notice}</div>}
         <main className="wrap" key={s.version >= 1 ? 'ready' : 'boot'}>
           {page === 'today' && <Overview {...props} />}
-          {page === 'schedule' && <Grid {...props} />}
           {page === 'approvals' && <Approvals {...props} />}
-          {page === 'here' && <WhosHere s={s} eventScan={<Scan {...props} />} />}
-          {page === 'scan' && <Scan {...props} />}
+          {page === 'scan' && <ScanDesk s={s} event={<Scan {...props} />} />}
           {page === 'briefs' && <Briefs {...props} />}
           {page === 'ask' && <Ask {...props} />}
           {page === 'feeds' && <Feeds {...props} />}
@@ -236,7 +252,7 @@ function AppInner({ demo }: { demo: Demo | null }) {
           const p = PAGES.find(x => x.id === id)!;
           return (
             <button key={id} className={page === id ? 'on' : ''} onClick={() => setPage(id)}>
-              <Icon name={p.icon} size={22} />{p.id === 'here' ? 'Check-in' : p.label}
+              <Icon name={p.icon} size={22} />{p.label}
               {countFor(id) > 0 && <span className="badge">{countFor(id)}</span>}
             </button>
           );
@@ -263,4 +279,23 @@ function AppInner({ demo }: { demo: Demo | null }) {
       </>}
     </div>
   );
+  // Presenting: the organizer's screen with a live phone beside it, both on the same festival.
+  if (split && wide && !framed) {
+    return (
+      <div className={`split${theme === 'light' ? ' light' : ''}`}>
+        {shellEl}
+        <aside className="split-phone" aria-label="Live phone">
+          <div className="split-seg" role="tablist" aria-label="Whose phone">
+            {(['attendee', 'staff'] as const).map(k => (
+              <button key={k} role="tab" aria-selected={splitWho === k} className={splitWho === k ? 'on' : ''} onClick={() => setSplitWho(k)}>{k === 'attendee' ? 'Attendee' : 'Volunteer'}</button>
+            ))}
+            <button className="split-x" aria-label="Hide the phone" onClick={() => setSplit(false)}><Icon name="x" size={14} /></button>
+          </div>
+          <IPhone key={splitWho} src={`/app?demoframe=1&as=${splitWho}`} title={`Usher on ${splitWho === 'attendee' ? 'an attendee' : 'a volunteer'}'s phone`} />
+          <p className="split-note">{splitWho === 'attendee' ? 'Jane, attendee' : 'Tova Jessop, volunteer'} · live</p>
+        </aside>
+      </div>
+    );
+  }
+  return shellEl;
 }

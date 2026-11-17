@@ -1,11 +1,11 @@
-// Writes the mock festival as a festival's *own* exports (their column names,
-// names instead of IDs, 12-hour times), for the onboarding demo:
+// Writes the demo festival (Sundance 2027 in Boulder) as a festival's *own* exports
+// (their column names, names instead of IDs, 12-hour times), for the onboarding demo:
 //   npx tsx scripts/make-samples.ts            → public/samples/*.csv
 import { mkdirSync, writeFileSync } from 'node:fs';
-import { buildFestival } from '../src/data/seed';
+import { buildSundance } from '../src/data/sundance';
 import { PASS_LABELS } from '../src/rules/access';
 
-const f = buildFestival();
+const f = buildSundance();
 const out = 'public/samples';
 mkdirSync(out, { recursive: true });
 
@@ -19,7 +19,7 @@ const t12 = (iso: string) => {
 const dateLabel = (iso: string) => new Date(`${iso.slice(0, 10)}T12:00:00Z`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
 const venue = (id: string) => f.venues.find(v => v.id === id)!.name;
 const person = (id: string) => f.people.find(p => p.id === id)!;
-const phone = (i: number) => `+1 212 555 ${String(1000 + i).slice(-4)}`;
+const phone = (i: number) => `+1 303 555 ${String(1000 + i).slice(-4)}`;
 
 write('program.csv', [
   ['Session Code', 'Event', 'Date', 'Showtime', 'Ends', 'Theatre', 'Category', 'In-Person Guests', 'Admission', 'Status'],

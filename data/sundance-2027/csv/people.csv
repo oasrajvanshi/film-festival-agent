@@ -1,0 +1,388 @@
+Person ID,Name,Role,Email,Channels,Staff role,Crowd opt-in,Phone,Arrives,Departs,Travel note,Skills,Available days
+p-001,Tom Whitaker,festival_staff,tom.whitaker.1@example.test,"app_push, email, sms",director,FALSE,,,,,,
+p-002,Oona Farrow,festival_staff,oona.farrow.2@example.test,"app_push, email, sms",operations,TRUE,,,,,,
+p-003,Joaquin Marchetti,festival_staff,joaquin.marchetti.3@example.test,"app_push, email, sms",operations,FALSE,,,,,,
+p-004,Rune Zielinski,festival_staff,rune.zielinski.4@example.test,"app_push, email, sms",programmer,TRUE,,,,,,
+p-005,Idris Lindqvist,festival_staff,idris.lindqvist.5@example.test,"app_push, email, sms",programmer,TRUE,,,,,,
+p-006,Sami Zielinski,festival_staff,sami.zielinski.6@example.test,"app_push, email, sms",programmer,TRUE,,,,,,
+p-007,Elan Mbeki,festival_staff,elan.mbeki.7@example.test,"app_push, email, sms",transport_operations,TRUE,,,,,,
+p-008,Greta Chaudhry,festival_staff,greta.chaudhry.8@example.test,"app_push, email, sms",guest_relations,TRUE,,,,,,
+p-009,Oona Sandoval,festival_staff,oona.sandoval.9@example.test,"app_push, email, sms",guest_relations,TRUE,,,,,,
+p-010,Femi Kettering,festival_staff,femi.kettering.10@example.test,"app_push, email, sms",press_office,TRUE,,,,,,
+p-011,Joaquin Achterberg,festival_staff,joaquin.achterberg.11@example.test,"app_push, email, sms",industry_office,FALSE,,,,,,
+p-012,Luca Jessop,festival_staff,luca.jessop.12@example.test,"app_push, email, sms",house_manager,TRUE,,,,,,
+p-013,Luca Navarro,festival_staff,luca.navarro.13@example.test,"app_push, email, sms",house_manager,TRUE,,,,,,
+p-014,Uma Vance,festival_staff,uma.vance.14@example.test,"app_push, email, sms",house_manager,FALSE,,,,,,
+p-015,Gael Sandoval,festival_staff,gael.sandoval.15@example.test,"app_push, email, sms",accessibility,TRUE,,,,,,
+p-016,Tova Jessop,volunteer,tova.jessop.16@example.test,"volunteer_brief, app_push, sms",door,TRUE,,,,,,1 2 3 4 5 6 7 8 9 10 11
+p-017,Jonah Dunmore,volunteer,jonah.dunmore.17@example.test,"volunteer_brief, app_push, sms",door,TRUE,,,,,Spanish,1 2 3 4 5 6 7 8
+p-018,Femi Bellweather,volunteer,femi.bellweather.18@example.test,"volunteer_brief, app_push, sms",usher,TRUE,,,,,Mandarin,3 4 5 6 7 8 9
+p-019,Noor Vance,volunteer,noor.vance.19@example.test,"volunteer_brief, app_push, sms",usher,FALSE,,,,,wheelchair assistance,1 2 3 4 5 6 7
+p-020,Iris Lowry,volunteer,iris.lowry.20@example.test,"volunteer_brief, app_push, sms",line_management,TRUE,,,,,first aid,1 2 3 4 5 6 7
+p-021,Uma Ivers,volunteer,uma.ivers.21@example.test,"volunteer_brief, app_push, sms",info_desk,TRUE,,,,,projection,3 4 5 6 7 8 9
+p-022,Ada Valdez,volunteer,ada.valdez.22@example.test,"volunteer_brief, app_push, sms",shuttle_stop,TRUE,,,,,,2 3 4 5 6 7
+p-023,Zane Jessop,volunteer,zane.jessop.23@example.test,"volunteer_brief, app_push, sms",theatre_ops,TRUE,,,,,,2 3 4 5 6 7 8 9
+p-024,Dalia Brightwater,volunteer,dalia.brightwater.24@example.test,"volunteer_brief, app_push, sms",runner,FALSE,,,,,ASL,3 4 5 6 7 8 9 10
+p-025,Priya Castell,volunteer,priya.castell.25@example.test,"volunteer_brief, app_push, sms",box_office,TRUE,,,,,,4 5 6 7 8 9
+p-026,Zane Sandoval,volunteer,zane.sandoval.26@example.test,"volunteer_brief, app_push, sms",door,FALSE,,,,,Spanish,2 3 4 5 6 7 8 9
+p-027,Vera Pell,volunteer,vera.pell.27@example.test,"volunteer_brief, app_push, sms",door,TRUE,,,,,Spanish,2 3 4 5 6 7 8 9
+p-028,Callum Dahl,volunteer,callum.dahl.28@example.test,"volunteer_brief, app_push, sms",usher,TRUE,,,,,,1 2 3 4 5 6
+p-029,Nadia Ivers,volunteer,nadia.ivers.29@example.test,"volunteer_brief, app_push, sms",usher,TRUE,,,,,projection,2 3 4 5 6 7 8
+p-030,Eamon Dunmore,volunteer,eamon.dunmore.30@example.test,"volunteer_brief, app_push, sms",line_management,TRUE,,,,,wheelchair assistance,4 5 6 7 8 9 10 11
+p-031,Tova Lowry,volunteer,tova.lowry.31@example.test,"volunteer_brief, app_push, sms",info_desk,FALSE,,,,,wheelchair assistance,1 2 3 4 5 6
+p-032,Ines Farrow,volunteer,ines.farrow.32@example.test,"volunteer_brief, app_push, sms",shuttle_stop,TRUE,,,,,Mandarin,2 3 4 5 6 7 8 9
+p-033,Rune Pell,volunteer,rune.pell.33@example.test,"volunteer_brief, app_push, sms",theatre_ops,TRUE,,,,,first aid,3 4 5 6 7 8 9 10
+p-034,Mira Brightwater,volunteer,mira.brightwater.34@example.test,"volunteer_brief, app_push, sms",runner,TRUE,,,,,,2 3 4 5 6 7
+p-035,Gael Bellweather,volunteer,gael.bellweather.35@example.test,"volunteer_brief, app_push, sms",box_office,TRUE,,,,,,1 2 3 4 5 6 7 8
+p-036,Yara Kettering,volunteer,yara.kettering.36@example.test,"volunteer_brief, app_push, sms",door,FALSE,,,,,French,4 5 6 7 8 9 10 11
+p-037,Lena Marchetti,volunteer,lena.marchetti.37@example.test,"volunteer_brief, app_push, sms",door,TRUE,,,,,projection,4 5 6 7 8 9 10 11
+p-038,Femi Farrow,volunteer,femi.farrow.38@example.test,"volunteer_brief, app_push, sms",usher,TRUE,,,,,,1 2 3 4 5 6 7
+p-039,Joaquin Delacroix,volunteer,joaquin.delacroix.39@example.test,"volunteer_brief, app_push, sms",usher,FALSE,,,,,ASL,4 5 6 7 8 9 10 11
+p-040,Dalia Navarro,volunteer,dalia.navarro.40@example.test,"volunteer_brief, app_push, sms",line_management,TRUE,,,,,,2 3 4 5 6 7
+p-041,Uma Castell,volunteer,uma.castell.41@example.test,"volunteer_brief, app_push, sms",info_desk,TRUE,,,,,ASL,1 2 3 4 5 6 7
+p-042,Paloma Szabo,volunteer,paloma.szabo.42@example.test,"volunteer_brief, app_push, sms",shuttle_stop,FALSE,,,,,first aid,1 2 3 4 5 6
+p-043,Mira Abara,volunteer,mira.abara.43@example.test,"volunteer_brief, app_push, sms",theatre_ops,TRUE,,,,,Mandarin,2 3 4 5 6 7 8
+p-044,Saoirse Mbeki,volunteer,saoirse.mbeki.44@example.test,"volunteer_brief, app_push, sms",runner,TRUE,,,,,projection,1 2 3 4 5 6 7
+p-045,Hiro Nakamura,volunteer,hiro.nakamura.45@example.test,"volunteer_brief, app_push, sms",box_office,TRUE,,,,,first aid,2 3 4 5 6 7 8
+p-046,Dalia Ibarra,volunteer,dalia.ibarra.46@example.test,"volunteer_brief, app_push, sms",door,TRUE,,,,,,1 2 3 4 5 6 7 8
+p-047,Noor Whitlock,volunteer,noor.whitlock.47@example.test,"volunteer_brief, app_push, sms",door,TRUE,,,,,projection,4 5 6 7 8 9 10
+p-048,Maren Rourke,volunteer,maren.rourke.48@example.test,"volunteer_brief, app_push, sms",usher,TRUE,,,,,,4 5 6 7 8 9
+p-049,Mateo Valdez,volunteer,mateo.valdez.49@example.test,"volunteer_brief, app_push, sms",usher,TRUE,,,,,Spanish,2 3 4 5 6 7
+p-050,Farah Dahl,volunteer,farah.dahl.50@example.test,"volunteer_brief, app_push, sms",line_management,TRUE,,,,,,1 2 3 4 5 6 7 8
+p-051,Rune Yoon,volunteer,rune.yoon.51@example.test,"volunteer_brief, app_push, sms",info_desk,TRUE,,,,,,1 2 3 4 5 6 7
+p-052,Rosa Castell,volunteer,rosa.castell.52@example.test,"volunteer_brief, app_push, sms",shuttle_stop,FALSE,,,,,wheelchair assistance,3 4 5 6 7 8 9 10
+p-053,Xavi Ulloa,volunteer,xavi.ulloa.53@example.test,"volunteer_brief, app_push, sms",theatre_ops,TRUE,,,,,,1 2 3 4 5 6 7 8
+p-054,Ada Brennick,volunteer,ada.brennick.54@example.test,"volunteer_brief, app_push, sms",runner,FALSE,,,,,Mandarin,4 5 6 7 8 9
+p-055,Dario Ibarra,volunteer,dario.ibarra.55@example.test,"volunteer_brief, app_push, sms",box_office,TRUE,,,,,,4 5 6 7 8 9
+p-056,Eamon Ulloa,volunteer,eamon.ulloa.56@example.test,"volunteer_brief, app_push, sms",door,TRUE,,,,,,4 5 6 7 8 9
+p-057,Xavi Rahimi,volunteer,xavi.rahimi.57@example.test,"volunteer_brief, app_push, sms",door,TRUE,,,,,Spanish,4 5 6 7 8 9 10 11
+p-058,Paloma Lindqvist,volunteer,paloma.lindqvist.58@example.test,"volunteer_brief, app_push, sms",usher,FALSE,,,,,driving,4 5 6 7 8 9 10 11
+p-059,Rafa Ivers,volunteer,rafa.ivers.59@example.test,"volunteer_brief, app_push, sms",usher,TRUE,,,,,ASL,2 3 4 5 6 7 8
+p-060,Hiro Okafor,volunteer,hiro.okafor.60@example.test,"volunteer_brief, app_push, sms",line_management,TRUE,,,,,first aid,3 4 5 6 7 8 9 10
+p-061,Noor Sato,volunteer,noor.sato.61@example.test,"volunteer_brief, app_push, sms",info_desk,TRUE,,,,,first aid,3 4 5 6 7 8 9
+p-062,Eamon Bellweather,volunteer,eamon.bellweather.62@example.test,"volunteer_brief, app_push, sms",shuttle_stop,TRUE,,,,,Mandarin,2 3 4 5 6 7 8
+p-063,Idris Vance,volunteer,idris.vance.63@example.test,"volunteer_brief, app_push, sms",theatre_ops,FALSE,,,,,,2 3 4 5 6 7 8 9
+p-064,Cleo Bellweather,volunteer,cleo.bellweather.64@example.test,"volunteer_brief, app_push, sms",runner,TRUE,,,,,Mandarin,2 3 4 5 6 7
+p-065,Vera Ivers,volunteer,vera.ivers.65@example.test,"volunteer_brief, app_push, sms",box_office,TRUE,,,,,ASL,4 5 6 7 8 9 10 11
+p-066,Uri Galloway,volunteer,uri.galloway.66@example.test,"volunteer_brief, app_push, sms",door,TRUE,,,,,,3 4 5 6 7 8 9 10
+p-067,Dalia Mbeki,volunteer,dalia.mbeki.67@example.test,"volunteer_brief, app_push, sms",door,TRUE,,,,,,2 3 4 5 6 7
+p-068,Kofi Coronado,volunteer,kofi.coronado.68@example.test,"volunteer_brief, app_push, sms",usher,TRUE,,,,,,1 2 3 4 5 6
+p-069,Tariq Ibarra,volunteer,tariq.ibarra.69@example.test,"volunteer_brief, app_push, sms",usher,FALSE,,,,,French,2 3 4 5 6 7
+p-070,Farah Ivers,volunteer,farah.ivers.70@example.test,"volunteer_brief, app_push, sms",line_management,FALSE,,,,,,2 3 4 5 6 7 8
+p-071,Farah Quarles,volunteer,farah.quarles.71@example.test,"volunteer_brief, app_push, sms",info_desk,TRUE,,,,,,3 4 5 6 7 8 9
+p-072,Maren Yamada,volunteer,maren.yamada.72@example.test,"volunteer_brief, app_push, sms",shuttle_stop,FALSE,,,,,,3 4 5 6 7 8 9
+p-073,Dev Pell,volunteer,dev.pell.73@example.test,"volunteer_brief, app_push, sms",theatre_ops,TRUE,,,,,,1 2 3 4 5 6 7
+p-074,Ines Hollis,volunteer,ines.hollis.74@example.test,"volunteer_brief, app_push, sms",runner,TRUE,,,,,,3 4 5 6 7 8 9 10
+p-075,Nadia Lowry,volunteer,nadia.lowry.75@example.test,"volunteer_brief, app_push, sms",box_office,TRUE,,,,,,3 4 5 6 7 8 9 10
+p-076,Dev Okafor,volunteer,dev.okafor.76@example.test,"volunteer_brief, app_push, sms",door,FALSE,,,,,,2 3 4 5 6 7 8 9
+p-077,Kofi Vance,volunteer,kofi.vance.77@example.test,"volunteer_brief, app_push, sms",door,TRUE,,,,,driving,2 3 4 5 6 7
+p-078,Noor Bellweather,volunteer,noor.bellweather.78@example.test,"volunteer_brief, app_push, sms",usher,TRUE,,,,,,4 5 6 7 8 9 10
+p-079,Saoirse Abara,volunteer,saoirse.abara.79@example.test,"volunteer_brief, app_push, sms",usher,TRUE,,,,,French,1 2 3 4 5 6
+p-080,Farah Jessop,volunteer,farah.jessop.80@example.test,"volunteer_brief, app_push, sms",line_management,TRUE,,,,,,3 4 5 6 7 8 9 10
+p-081,Ada Yoon,volunteer,ada.yoon.81@example.test,"volunteer_brief, app_push, sms",info_desk,FALSE,,,,,,1 2 3 4 5 6
+p-082,Paloma Dunmore,volunteer,paloma.dunmore.82@example.test,"volunteer_brief, app_push, sms",shuttle_stop,TRUE,,,,,wheelchair assistance,4 5 6 7 8 9 10
+p-083,Omar Kaplan,volunteer,omar.kaplan.83@example.test,"volunteer_brief, app_push, sms",theatre_ops,TRUE,,,,,wheelchair assistance,1 2 3 4 5 6 7 8
+p-084,Hana Ekwueme,volunteer,hana.ekwueme.84@example.test,"volunteer_brief, app_push, sms",runner,FALSE,,,,,wheelchair assistance,1 2 3 4 5 6
+p-085,Noor Castell,volunteer,noor.castell.85@example.test,"volunteer_brief, app_push, sms",box_office,FALSE,,,,,ASL,3 4 5 6 7 8 9
+p-086,Tova Petrakis,volunteer,tova.petrakis.86@example.test,"volunteer_brief, app_push, sms",door,TRUE,,,,,projection,2 3 4 5 6 7 8
+p-087,Ayla Fenwick,volunteer,ayla.fenwick.87@example.test,"volunteer_brief, app_push, sms",door,FALSE,,,,,,4 5 6 7 8 9 10
+p-088,Maren Szabo,volunteer,maren.szabo.88@example.test,"volunteer_brief, app_push, sms",usher,TRUE,,,,,driving,3 4 5 6 7 8
+p-089,Vera Szabo,volunteer,vera.szabo.89@example.test,"volunteer_brief, app_push, sms",usher,TRUE,,,,,Mandarin,2 3 4 5 6 7 8 9
+p-090,Kofi Whitlock,volunteer,kofi.whitlock.90@example.test,"volunteer_brief, app_push, sms",line_management,TRUE,,,,,projection,2 3 4 5 6 7 8
+p-091,Anouk Eskew,volunteer,anouk.eskew.91@example.test,"volunteer_brief, app_push, sms",info_desk,TRUE,,,,,,2 3 4 5 6 7 8 9
+p-092,Wren Quarles,volunteer,wren.quarles.92@example.test,"volunteer_brief, app_push, sms",shuttle_stop,TRUE,,,,,,1 2 3 4 5 6
+p-093,Priya Szabo,volunteer,priya.szabo.93@example.test,"volunteer_brief, app_push, sms",theatre_ops,FALSE,,,,,,2 3 4 5 6 7 8 9
+p-094,Saoirse Yoon,volunteer,saoirse.yoon.94@example.test,"volunteer_brief, app_push, sms",runner,FALSE,,,,,,3 4 5 6 7 8
+p-095,Bram Brennick,volunteer,bram.brennick.95@example.test,"volunteer_brief, app_push, sms",box_office,TRUE,,,,,driving,3 4 5 6 7 8 9
+p-096,Dalia Vance,volunteer,dalia.vance.96@example.test,"volunteer_brief, app_push, sms",door,TRUE,,,,,,1 2 3 4 5 6
+p-097,Elif Achterberg,volunteer,elif.achterberg.97@example.test,"volunteer_brief, app_push, sms",door,FALSE,,,,,,2 3 4 5 6 7 8 9
+p-098,Tova Valdez,volunteer,tova.valdez.98@example.test,"volunteer_brief, app_push, sms",usher,FALSE,,,,,,4 5 6 7 8 9
+p-099,Paloma Kettering,volunteer,paloma.kettering.99@example.test,"volunteer_brief, app_push, sms",usher,TRUE,,,,,,4 5 6 7 8 9 10 11
+p-100,Dana Whitfield,guest,dana.whitfield.100@example.test,"email, sms, app_push",producer,TRUE,,2027-01-22T11:52,,"United JFK→DEN, lands Fri 11:52 am (flight number invented)",,
+p-101,Ravi Castellanos,guest,ravi.castellanos.101@example.test,"email, sms, app_push",producer,TRUE,,2027-01-21T13:20,,Lands DEN Thu 1:20 pm,,
+p-102,Vera Brennick,guest,vera.brennick.102@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-103,Idris Farrow,guest,idris.farrow.103@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-104,Tova Zielinski,guest,tova.zielinski.104@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-105,Tariq Thibault,guest,tariq.thibault.105@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-106,Tariq Jessop,guest,tariq.jessop.106@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-107,Uma Lowry,guest,uma.lowry.107@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-108,Bodhi Ibarra,guest,bodhi.ibarra.108@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-109,Priya Lowry,guest,priya.lowry.109@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-110,Bodhi Kettering,guest,bodhi.kettering.110@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-111,Lena Quarles,guest,lena.quarles.111@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-112,Wren Okafor,guest,wren.okafor.112@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-113,Tova Eskew,guest,tova.eskew.113@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-114,Amara Thibault,guest,amara.thibault.114@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-115,Nico Sandoval,guest,nico.sandoval.115@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-116,Freya Whitlock,guest,freya.whitlock.116@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-117,Saoirse Delacroix,guest,saoirse.delacroix.117@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-118,Esme Coronado,guest,esme.coronado.118@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-119,Nadia Eskew,guest,nadia.eskew.119@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-120,Dalia Galloway,guest,dalia.galloway.120@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-121,Mira Brennick,guest,mira.brennick.121@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-122,Rune Ekwueme,guest,rune.ekwueme.122@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-123,Rafa Sato,guest,rafa.sato.123@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-124,Freya Zielinski,guest,freya.zielinski.124@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-125,Yara Sandoval,guest,yara.sandoval.125@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-126,Kaia Kaplan,guest,kaia.kaplan.126@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-127,Vera Hollis,guest,vera.hollis.127@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-128,Joaquin Dahl,guest,joaquin.dahl.128@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-129,Elif Ibarra,guest,elif.ibarra.129@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-130,Bram Kaplan,guest,bram.kaplan.130@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-131,Paloma Ibarra,guest,paloma.ibarra.131@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-132,Gael Navarro,guest,gael.navarro.132@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-133,Maren Quarles,guest,maren.quarles.133@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-134,Celeste Achterberg,guest,celeste.achterberg.134@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-135,Elan Bellweather,guest,elan.bellweather.135@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-136,Callum Dunmore,guest,callum.dunmore.136@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-137,Elif Okafor,guest,elif.okafor.137@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-138,Elif Ivers,guest,elif.ivers.138@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-139,Zuri Bellweather,guest,zuri.bellweather.139@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-140,Joaquin Castell,guest,joaquin.castell.140@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-141,Uri Ivers,guest,uri.ivers.141@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-142,Eamon Chaudhry,guest,eamon.chaudhry.142@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-143,Celeste Wojcik,guest,celeste.wojcik.143@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-144,Oona Yoon,guest,oona.yoon.144@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-145,Nico Okafor,guest,nico.okafor.145@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-146,Bodhi Oyelaran,guest,bodhi.oyelaran.146@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-147,Nadia Szabo,guest,nadia.szabo.147@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-148,Uma Brightwater,guest,uma.brightwater.148@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-149,Bodhi Yamada,guest,bodhi.yamada.149@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-150,Rafa Thibault,guest,rafa.thibault.150@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-151,Oona Petrakis,guest,oona.petrakis.151@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-152,Uri Achterberg,guest,uri.achterberg.152@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-153,Nadia Coronado,guest,nadia.coronado.153@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-154,Ada Abara,guest,ada.abara.154@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-155,Freya Yoon,guest,freya.yoon.155@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-156,Gael Petrakis,guest,gael.petrakis.156@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-157,Paloma Yoon,guest,paloma.yoon.157@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-158,Oona Okafor,guest,oona.okafor.158@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-159,Eamon Pell,guest,eamon.pell.159@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-160,Yara Achterberg,guest,yara.achterberg.160@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-161,Ayla Mbeki,guest,ayla.mbeki.161@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-162,Yusuf Lowry,guest,yusuf.lowry.162@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-163,Bram Toivonen,guest,bram.toivonen.163@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-164,Mira Navarro,guest,mira.navarro.164@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-165,Priya Ulloa,guest,priya.ulloa.165@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-166,Vera Lowry,guest,vera.lowry.166@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-167,Dalia Abara,guest,dalia.abara.167@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-168,Greta Ivers,guest,greta.ivers.168@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-169,Dev Rourke,guest,dev.rourke.169@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-170,Sami Lindqvist,guest,sami.lindqvist.170@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-171,Priya Whitlock,guest,priya.whitlock.171@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-172,Oona Nakamura,guest,oona.nakamura.172@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-173,Gael Yoon,guest,gael.yoon.173@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-174,Femi Lowry,guest,femi.lowry.174@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-175,Priya Hollis,guest,priya.hollis.175@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-176,Priya Chaudhry,guest,priya.chaudhry.176@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-177,Celeste Haddad,guest,celeste.haddad.177@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-178,Luca Achterberg,guest,luca.achterberg.178@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-179,Dario Szabo,guest,dario.szabo.179@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-180,Hiro Bellweather,guest,hiro.bellweather.180@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-181,Farah Petrakis,guest,farah.petrakis.181@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-182,Elan Lowry,guest,elan.lowry.182@example.test,"email, sms, app_push",director,FALSE,,,,,,
+p-183,Joaquin Yamada,guest,joaquin.yamada.183@example.test,"email, sms, app_push",director,TRUE,,,,,,
+p-184,Wren Thibault,guest,wren.thibault.184@example.test,"email, sms",moderator,TRUE,,,,,,
+p-185,Bram Lowry,guest,bram.lowry.185@example.test,"email, sms",moderator,TRUE,,,,,,
+p-186,Tova Mbeki,guest,tova.mbeki.186@example.test,"email, sms",moderator,TRUE,,,,,,
+p-187,Idris Bellweather,guest,idris.bellweather.187@example.test,"email, sms",moderator,FALSE,,,,,,
+p-188,Amara Ulloa,guest,amara.ulloa.188@example.test,"email, sms",panelist,TRUE,,,,,,
+p-189,Omar Okafor,guest,omar.okafor.189@example.test,"email, sms",panelist,TRUE,,,,,,
+p-190,Xavi Chaudhry,guest,xavi.chaudhry.190@example.test,"email, sms",panelist,FALSE,,,,,,
+p-191,Maren Navarro,guest,maren.navarro.191@example.test,"email, sms",panelist,FALSE,,,,,,
+p-192,Nico Kaplan,guest,nico.kaplan.192@example.test,"email, sms",panelist,TRUE,,,,,,
+p-193,Xavi Vance,guest,xavi.vance.193@example.test,"email, sms",panelist,TRUE,,,,,,
+p-194,Zane Farrow,guest,zane.farrow.194@example.test,"email, sms",panelist,FALSE,,,,,,
+p-195,Oona Lindqvist,guest,oona.lindqvist.195@example.test,"email, sms",panelist,TRUE,,,,,,
+p-196,Ayla Galloway,guest,ayla.galloway.196@example.test,"email, sms",panelist,FALSE,,,,,,
+p-197,Idris Okafor,guest,idris.okafor.197@example.test,"email, sms",panelist,TRUE,,,,,,
+p-198,Jane,attendee,jane.198@example.test,"app_push, email",,TRUE,,,,,,
+p-199,Sami Ulloa,attendee,sami.ulloa.199@example.test,"app_push, email",,TRUE,,,,,,
+p-200,Sami Szabo,attendee,sami.szabo.200@example.test,"app_push, email",,TRUE,,,,,,
+p-201,Bodhi Navarro,attendee,bodhi.navarro.201@example.test,"app_push, email",,TRUE,,,,,,
+p-202,Paloma Vance,attendee,paloma.vance.202@example.test,email,,FALSE,,,,,,
+p-203,Cleo Brennick,attendee,cleo.brennick.203@example.test,"app_push, email",,TRUE,,,,,,
+p-204,Uma Farrow,attendee,uma.farrow.204@example.test,email,,TRUE,,,,,,
+p-205,Omar Yamada,attendee,omar.yamada.205@example.test,email,,FALSE,,,,,,
+p-206,Gael Dunmore,attendee,gael.dunmore.206@example.test,"app_push, email",,TRUE,,,,,,
+p-207,Sami Whitlock,attendee,sami.whitlock.207@example.test,email,,FALSE,,,,,,
+p-208,Elan Eskew,attendee,elan.eskew.208@example.test,"app_push, email",,TRUE,,,,,,
+p-209,Ada Thibault,attendee,ada.thibault.209@example.test,"app_push, email",,FALSE,,,,,,
+p-210,Joaquin Galloway,attendee,joaquin.galloway.210@example.test,"app_push, email",,TRUE,,,,,,
+p-211,Iris Abara,attendee,iris.abara.211@example.test,"app_push, email",,FALSE,,,,,,
+p-212,Noor Delacroix,attendee,noor.delacroix.212@example.test,"app_push, email",,TRUE,,,,,,
+p-213,Noor Jessop,attendee,noor.jessop.213@example.test,"app_push, email",,TRUE,,,,,,
+p-214,Ada Achterberg,attendee,ada.achterberg.214@example.test,"app_push, email",,TRUE,,,,,,
+p-215,Selin Quarles,attendee,selin.quarles.215@example.test,email,,TRUE,,,,,,
+p-216,Saoirse Petrakis,attendee,saoirse.petrakis.216@example.test,"app_push, email",,TRUE,,,,,,
+p-217,Maren Ibarra,attendee,maren.ibarra.217@example.test,email,,FALSE,,,,,,
+p-218,Dario Nakamura,attendee,dario.nakamura.218@example.test,email,,FALSE,,,,,,
+p-219,Dario Quarles,attendee,dario.quarles.219@example.test,"app_push, email",,TRUE,,,,,,
+p-220,Celeste Dahl,attendee,celeste.dahl.220@example.test,"app_push, email",,FALSE,,,,,,
+p-221,Bodhi Valdez,attendee,bodhi.valdez.221@example.test,"app_push, email",,FALSE,,,,,,
+p-222,Elif Coronado,attendee,elif.coronado.222@example.test,email,,TRUE,,,,,,
+p-223,Vera Eskew,attendee,vera.eskew.223@example.test,email,,TRUE,,,,,,
+p-224,Elif Jessop,attendee,elif.jessop.224@example.test,"app_push, email",,FALSE,,,,,,
+p-225,Callum Lindqvist,attendee,callum.lindqvist.225@example.test,"app_push, email",,TRUE,,,,,,
+p-226,Paloma Achterberg,attendee,paloma.achterberg.226@example.test,"app_push, email",,FALSE,,,,,,
+p-227,Lena Chaudhry,attendee,lena.chaudhry.227@example.test,"app_push, email",,FALSE,,,,,,
+p-228,Dalia Toivonen,attendee,dalia.toivonen.228@example.test,email,,TRUE,,,,,,
+p-229,Mateo Jessop,attendee,mateo.jessop.229@example.test,email,,TRUE,,,,,,
+p-230,Tariq Ivers,attendee,tariq.ivers.230@example.test,"app_push, email",,FALSE,,,,,,
+p-231,Mira Kaplan,attendee,mira.kaplan.231@example.test,"app_push, email",,TRUE,,,,,,
+p-232,Luca Kaplan,attendee,luca.kaplan.232@example.test,"app_push, email",,FALSE,,,,,,
+p-233,Maren Achebe,attendee,maren.achebe.233@example.test,"app_push, email",,TRUE,,,,,,
+p-234,Hiro Navarro,attendee,hiro.navarro.234@example.test,email,,TRUE,,,,,,
+p-235,Yara Ekwueme,attendee,yara.ekwueme.235@example.test,"app_push, email",,TRUE,,,,,,
+p-236,Joaquin Bellweather,attendee,joaquin.bellweather.236@example.test,"app_push, email",,TRUE,,,,,,
+p-237,Tova Nakamura,attendee,tova.nakamura.237@example.test,email,,TRUE,,,,,,
+p-238,Quinn Abara,attendee,quinn.abara.238@example.test,email,,FALSE,,,,,,
+p-239,Gael Toivonen,attendee,gael.toivonen.239@example.test,"app_push, email",,TRUE,,,,,,
+p-240,Eamon Rourke,attendee,eamon.rourke.240@example.test,"app_push, email",,TRUE,,,,,,
+p-241,Esme Thibault,attendee,esme.thibault.241@example.test,"app_push, email",,FALSE,,,,,,
+p-242,Vera Galloway,attendee,vera.galloway.242@example.test,"app_push, email",,FALSE,,,,,,
+p-243,Eamon Hollis,attendee,eamon.hollis.243@example.test,email,,TRUE,,,,,,
+p-244,Sami Mbeki,attendee,sami.mbeki.244@example.test,"app_push, email",,TRUE,,,,,,
+p-245,Luca Coronado,attendee,luca.coronado.245@example.test,"app_push, email",,TRUE,,,,,,
+p-246,Quinn Hollis,attendee,quinn.hollis.246@example.test,email,,TRUE,,,,,,
+p-247,Hana Coronado,attendee,hana.coronado.247@example.test,"app_push, email",,FALSE,,,,,,
+p-248,Anouk Haddad,attendee,anouk.haddad.248@example.test,"app_push, email",,TRUE,,,,,,
+p-249,Uma Eskew,attendee,uma.eskew.249@example.test,"app_push, email",,TRUE,,,,,,
+p-250,Oona Rahimi,attendee,oona.rahimi.250@example.test,"app_push, email",,TRUE,,,,,,
+p-251,Yusuf Marchetti,attendee,yusuf.marchetti.251@example.test,"app_push, email",,TRUE,,,,,,
+p-252,Eamon Kaplan,attendee,eamon.kaplan.252@example.test,"app_push, email",,FALSE,,,,,,
+p-253,Sami Achebe,attendee,sami.achebe.253@example.test,email,,TRUE,,,,,,
+p-254,Rafa Marchetti,attendee,rafa.marchetti.254@example.test,"app_push, email",,FALSE,,,,,,
+p-255,Rosa Okafor,attendee,rosa.okafor.255@example.test,"app_push, email",,TRUE,,,,,,
+p-256,Jonah Farrow,attendee,jonah.farrow.256@example.test,"app_push, email",,FALSE,,,,,,
+p-257,Uri Navarro,attendee,uri.navarro.257@example.test,email,,TRUE,,,,,,
+p-258,Lena Whitlock,attendee,lena.whitlock.258@example.test,"app_push, email",,TRUE,,,,,,
+p-259,Rafa Szabo,attendee,rafa.szabo.259@example.test,"app_push, email",,TRUE,,,,,,
+p-260,Oona Dunmore,attendee,oona.dunmore.260@example.test,"app_push, email",,FALSE,,,,,,
+p-261,Elif Abara,attendee,elif.abara.261@example.test,email,,TRUE,,,,,,
+p-262,Idris Sato,attendee,idris.sato.262@example.test,"app_push, email",,TRUE,,,,,,
+p-263,Maren Bellweather,attendee,maren.bellweather.263@example.test,"app_push, email",,TRUE,,,,,,
+p-264,Elan Brightwater,attendee,elan.brightwater.264@example.test,email,,FALSE,,,,,,
+p-265,Jonah Hollis,attendee,jonah.hollis.265@example.test,"app_push, email",,TRUE,,,,,,
+p-266,Femi Valdez,attendee,femi.valdez.266@example.test,"app_push, email",,FALSE,,,,,,
+p-267,Hiro Achterberg,attendee,hiro.achterberg.267@example.test,email,,TRUE,,,,,,
+p-268,Ines Bellweather,attendee,ines.bellweather.268@example.test,"app_push, email",,TRUE,,,,,,
+p-269,Nico Szabo,attendee,nico.szabo.269@example.test,"app_push, email",,FALSE,,,,,,
+p-270,Dalia Coronado,attendee,dalia.coronado.270@example.test,"app_push, email",,TRUE,,,,,,
+p-271,Amara Okafor,attendee,amara.okafor.271@example.test,"app_push, email",,TRUE,,,,,,
+p-272,Quinn Lowry,attendee,quinn.lowry.272@example.test,"app_push, email",,FALSE,,,,,,
+p-273,Jonah Eskew,attendee,jonah.eskew.273@example.test,email,,TRUE,,,,,,
+p-274,Kaia Valdez,attendee,kaia.valdez.274@example.test,"app_push, email",,TRUE,,,,,,
+p-275,Rafa Vance,attendee,rafa.vance.275@example.test,"app_push, email",,FALSE,,,,,,
+p-276,Elan Ekwueme,attendee,elan.ekwueme.276@example.test,"app_push, email",,FALSE,,,,,,
+p-277,Eamon Valdez,attendee,eamon.valdez.277@example.test,"app_push, email",,FALSE,,,,,,
+p-278,Zane Zielinski,attendee,zane.zielinski.278@example.test,email,,TRUE,,,,,,
+p-279,Cleo Pell,attendee,cleo.pell.279@example.test,email,,TRUE,,,,,,
+p-280,Xavi Lindqvist,attendee,xavi.lindqvist.280@example.test,"app_push, email",,TRUE,,,,,,
+p-281,Ines Wojcik,attendee,ines.wojcik.281@example.test,"app_push, email",,TRUE,,,,,,
+p-282,Kofi Abara,attendee,kofi.abara.282@example.test,"app_push, email",,TRUE,,,,,,
+p-283,Paloma Galloway,attendee,paloma.galloway.283@example.test,"app_push, email",,FALSE,,,,,,
+p-284,Luca Nakamura,attendee,luca.nakamura.284@example.test,email,,TRUE,,,,,,
+p-285,Femi Quarles,attendee,femi.quarles.285@example.test,"app_push, email",,TRUE,,,,,,
+p-286,Sami Bellweather,attendee,sami.bellweather.286@example.test,email,,TRUE,,,,,,
+p-287,Rosa Nakamura,attendee,rosa.nakamura.287@example.test,email,,FALSE,,,,,,
+p-288,Eamon Marchetti,attendee,eamon.marchetti.288@example.test,"app_push, email",,TRUE,,,,,,
+p-289,Joaquin Sandoval,attendee,joaquin.sandoval.289@example.test,email,,TRUE,,,,,,
+p-290,Oona Coronado,attendee,oona.coronado.290@example.test,"app_push, email",,TRUE,,,,,,
+p-291,Elif Brightwater,attendee,elif.brightwater.291@example.test,"app_push, email",,TRUE,,,,,,
+p-292,Saoirse Sato,attendee,saoirse.sato.292@example.test,"app_push, email",,TRUE,,,,,,
+p-293,Cleo Navarro,attendee,cleo.navarro.293@example.test,"app_push, email",,FALSE,,,,,,
+p-294,Celeste Ulloa,attendee,celeste.ulloa.294@example.test,email,,TRUE,,,,,,
+p-295,Zuri Dahl,attendee,zuri.dahl.295@example.test,"app_push, email",,TRUE,,,,,,
+p-296,Elif Fenwick,attendee,elif.fenwick.296@example.test,"app_push, email",,TRUE,,,,,,
+p-297,Quinn Sato,attendee,quinn.sato.297@example.test,"app_push, email",,FALSE,,,,,,
+p-298,Iris Ulloa,attendee,iris.ulloa.298@example.test,"app_push, email",,TRUE,,,,,,
+p-299,Hiro Ivers,attendee,hiro.ivers.299@example.test,email,,TRUE,,,,,,
+p-300,Anouk Coronado,attendee,anouk.coronado.300@example.test,"app_push, email",,TRUE,,,,,,
+p-301,Uri Wojcik,attendee,uri.wojcik.301@example.test,email,,TRUE,,,,,,
+p-302,Rafa Lowry,attendee,rafa.lowry.302@example.test,email,,TRUE,,,,,,
+p-303,Ines Ibarra,attendee,ines.ibarra.303@example.test,"app_push, email",,TRUE,,,,,,
+p-304,Dev Castell,attendee,dev.castell.304@example.test,email,,TRUE,,,,,,
+p-305,Hana Eskew,attendee,hana.eskew.305@example.test,email,,TRUE,,,,,,
+p-306,Anouk Valdez,attendee,anouk.valdez.306@example.test,"app_push, email",,TRUE,,,,,,
+p-307,Mateo Rourke,attendee,mateo.rourke.307@example.test,"app_push, email",,TRUE,,,,,,
+p-308,Dario Vance,attendee,dario.vance.308@example.test,email,,FALSE,,,,,,
+p-309,Priya Coronado,attendee,priya.coronado.309@example.test,"app_push, email",,FALSE,,,,,,
+p-310,Ayla Ivers,attendee,ayla.ivers.310@example.test,"app_push, email",,TRUE,,,,,,
+p-311,Farah Chaudhry,attendee,farah.chaudhry.311@example.test,"app_push, email",,TRUE,,,,,,
+p-312,Tariq Navarro,attendee,tariq.navarro.312@example.test,"app_push, email",,TRUE,,,,,,
+p-313,Zuri Valdez,attendee,zuri.valdez.313@example.test,email,,FALSE,,,,,,
+p-314,Paloma Brightwater,attendee,paloma.brightwater.314@example.test,"app_push, email",,FALSE,,,,,,
+p-315,Maren Kaplan,attendee,maren.kaplan.315@example.test,"app_push, email",,FALSE,,,,,,
+p-316,Callum Wojcik,attendee,callum.wojcik.316@example.test,email,,TRUE,,,,,,
+p-317,Farah Bellweather,attendee,farah.bellweather.317@example.test,"app_push, email",,TRUE,,,,,,
+p-318,Rosa Ulloa,attendee,rosa.ulloa.318@example.test,email,,TRUE,,,,,,
+p-319,Sami Dunmore,attendee,sami.dunmore.319@example.test,"app_push, email",,TRUE,,,,,,
+p-320,Cleo Achebe,attendee,cleo.achebe.320@example.test,"app_push, email",,FALSE,,,,,,
+p-321,Noor Abara,attendee,noor.abara.321@example.test,"app_push, email",,FALSE,,,,,,
+p-322,Noor Brennick,attendee,noor.brennick.322@example.test,email,,TRUE,,,,,,
+p-323,Lena Szabo,attendee,lena.szabo.323@example.test,"app_push, email",,FALSE,,,,,,
+p-324,Ayla Kaplan,attendee,ayla.kaplan.324@example.test,email,,TRUE,,,,,,
+p-325,Anouk Farrow,attendee,anouk.farrow.325@example.test,"app_push, email",,FALSE,,,,,,
+p-326,Tariq Chaudhry,attendee,tariq.chaudhry.326@example.test,email,,TRUE,,,,,,
+p-327,Paloma Toivonen,attendee,paloma.toivonen.327@example.test,email,,TRUE,,,,,,
+p-328,Ines Sandoval,attendee,ines.sandoval.328@example.test,"app_push, email",,TRUE,,,,,,
+p-329,Rafa Achebe,attendee,rafa.achebe.329@example.test,"app_push, email",,TRUE,,,,,,
+p-330,Femi Sandoval,industry,femi.sandoval.330@example.test,"app_push, email",,FALSE,,,,,,
+p-331,Omar Rahimi,industry,omar.rahimi.331@example.test,email,,TRUE,,,,,,
+p-332,Jonah Fenwick,industry,jonah.fenwick.332@example.test,"app_push, email",,TRUE,,,,,,
+p-333,Zane Dahl,industry,zane.dahl.333@example.test,"app_push, email",,TRUE,,,,,,
+p-334,Bram Haddad,industry,bram.haddad.334@example.test,"app_push, email",,FALSE,,,,,,
+p-335,Rafa Castell,industry,rafa.castell.335@example.test,"app_push, email",,TRUE,,,,,,
+p-336,Jonah Castell,industry,jonah.castell.336@example.test,email,,FALSE,,,,,,
+p-337,Anouk Rahimi,industry,anouk.rahimi.337@example.test,"app_push, email",,FALSE,,,,,,
+p-338,Tariq Eskew,industry,tariq.eskew.338@example.test,"app_push, email",,FALSE,,,,,,
+p-339,Farah Sandoval,industry,farah.sandoval.339@example.test,"app_push, email",,TRUE,,,,,,
+p-340,Uma Dahl,industry,uma.dahl.340@example.test,"app_push, email",,TRUE,,,,,,
+p-341,Eamon Thibault,industry,eamon.thibault.341@example.test,"app_push, email",,TRUE,,,,,,
+p-342,Ines Lowry,industry,ines.lowry.342@example.test,email,,TRUE,,,,,,
+p-343,Amara Ivers,industry,amara.ivers.343@example.test,"app_push, email",,FALSE,,,,,,
+p-344,Joaquin Zielinski,industry,joaquin.zielinski.344@example.test,"app_push, email",,FALSE,,,,,,
+p-345,Cleo Quarles,industry,cleo.quarles.345@example.test,"app_push, email",,FALSE,,,,,,
+p-346,Zane Ibarra,industry,zane.ibarra.346@example.test,email,,TRUE,,,,,,
+p-347,Ayla Sato,industry,ayla.sato.347@example.test,email,,FALSE,,,,,,
+p-348,Kaia Navarro,industry,kaia.navarro.348@example.test,"app_push, email",,TRUE,,,,,,
+p-349,Celeste Farrow,industry,celeste.farrow.349@example.test,"app_push, email",,TRUE,,,,,,
+p-350,Greta Coronado,industry,greta.coronado.350@example.test,"app_push, email",,TRUE,,,,,,
+p-351,Sami Petrakis,industry,sami.petrakis.351@example.test,"app_push, email",,TRUE,,,,,,
+p-352,Luca Castell,industry,luca.castell.352@example.test,email,,TRUE,,,,,,
+p-353,Bram Pell,industry,bram.pell.353@example.test,email,,TRUE,,,,,,
+p-354,Rosa Fenwick,industry,rosa.fenwick.354@example.test,"app_push, email",,TRUE,,,,,,
+p-355,Yara Zielinski,industry,yara.zielinski.355@example.test,email,,TRUE,,,,,,
+p-356,Esme Ulloa,industry,esme.ulloa.356@example.test,email,,FALSE,,,,,,
+p-357,Rosa Rahimi,industry,rosa.rahimi.357@example.test,"app_push, email",,FALSE,,,,,,
+p-358,Nico Kettering,industry,nico.kettering.358@example.test,"app_push, email",,FALSE,,,,,,
+p-359,Maren Sato,industry,maren.sato.359@example.test,"app_push, email",,TRUE,,,,,,
+p-360,Paloma Coronado,industry,paloma.coronado.360@example.test,"app_push, email",,TRUE,,,,,,
+p-361,Maren Wojcik,industry,maren.wojcik.361@example.test,"app_push, email",,TRUE,,,,,,
+p-362,Hiro Farrow,press,hiro.farrow.362@example.test,"app_push, email",,TRUE,,,,,,
+p-363,Jonah Sato,press,jonah.sato.363@example.test,"app_push, email",,TRUE,,,,,,
+p-364,Quinn Jessop,press,quinn.jessop.364@example.test,"app_push, email",,TRUE,,,,,,
+p-365,Joaquin Yoon,press,joaquin.yoon.365@example.test,"app_push, email",,TRUE,,,,,,
+p-366,Mateo Toivonen,press,mateo.toivonen.366@example.test,"app_push, email",,FALSE,,,,,,
+p-367,Eamon Mbeki,press,eamon.mbeki.367@example.test,"app_push, email",,FALSE,,,,,,
+p-368,Ines Dahl,press,ines.dahl.368@example.test,"app_push, email",,FALSE,,,,,,
+p-369,Omar Lindqvist,press,omar.lindqvist.369@example.test,"app_push, email",,TRUE,,,,,,
+p-370,Yara Brennick,press,yara.brennick.370@example.test,"app_push, email",,TRUE,,,,,,
+p-371,Eamon Dahl,press,eamon.dahl.371@example.test,"app_push, email",,TRUE,,,,,,
+p-372,Kofi Hollis,press,kofi.hollis.372@example.test,"app_push, email",,FALSE,,,,,,
+p-373,Noor Lowry,press,noor.lowry.373@example.test,"app_push, email",,TRUE,,,,,,
+p-374,Greta Farrow,press,greta.farrow.374@example.test,email,,FALSE,,,,,,
+p-375,Mateo Castell,press,mateo.castell.375@example.test,"app_push, email",,TRUE,,,,,,
+p-376,Lena Nakamura,press,lena.nakamura.376@example.test,"app_push, email",,FALSE,,,,,,
+p-377,Sami Quarles,press,sami.quarles.377@example.test,"app_push, email",,TRUE,,,,,,
+p-378,Paloma Haddad,press,paloma.haddad.378@example.test,"app_push, email",,TRUE,,,,,,
+p-379,Dalia Kettering,press,dalia.kettering.379@example.test,"app_push, email",,TRUE,,,,,,
+p-380,Sami Oyelaran,press,sami.oyelaran.380@example.test,"app_push, email",,TRUE,,,,,,
+p-381,Tova Yamada,press,tova.yamada.381@example.test,"app_push, email",,TRUE,,,,,,
+p-382,Elan Pell,press,elan.pell.382@example.test,"app_push, email",,FALSE,,,,,,
+p-383,Zane Thibault,press,zane.thibault.383@example.test,email,,TRUE,,,,,,
+p-384,Quinn Ibarra,press,quinn.ibarra.384@example.test,"app_push, email",,FALSE,,,,,,
+p-385,Zuri Nakamura,press,zuri.nakamura.385@example.test,"app_push, email",,TRUE,,,,,,
+p-386,Amara Kaplan,press,amara.kaplan.386@example.test,"app_push, email",,FALSE,,,,,,
+p-387,Kaia Vance,press,kaia.vance.387@example.test,"app_push, email",,FALSE,,,,,,

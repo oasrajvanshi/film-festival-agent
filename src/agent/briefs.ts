@@ -22,6 +22,10 @@ const ROLE_GUIDANCE: Record<string, string[]> = {
   projection: ['doc-volunteer#Emergencies'],
   security: ['doc-volunteer#Emergencies', 'doc-faq#Bags'],
   runner: ['doc-venues#Shuttle', 'doc-volunteer#Check-in for shifts'],
+  line_management: ['doc-volunteer#Line management', 'doc-access#Waitlist', 'doc-access#Late entry'],
+  shuttle_stop: ['doc-venues#Shuttle', 'doc-faq#Weather'],
+  box_office: ['doc-faq#Box office', 'doc-faq#Refunds', 'doc-access#Waitlist'],
+  theatre_ops: ['doc-volunteer#Emergencies', 'doc-access#Capacity'],
 };
 
 function docLine(f: Festival, ref: string): string | null {

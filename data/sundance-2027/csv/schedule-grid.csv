@@ -1,0 +1,565 @@
+Event ID,Day,Start,End,Type,Title,Venue ID,Film ID,Guest IDs,Restriction,Status,Room,Seats sold,Seats held
+e-140,1,12:30,13:51,screening,Night Shift at the Diner,v-casey,f-74,p-168,,scheduled,,308,42
+e-141,1,13:51,14:16,qa,Q&A: Night Shift at the Diner,v-casey,f-74,p-168,,scheduled,,,
+e-013,1,14:45,16:20,screening,The Orchard Keepers,v-bhs,f-07,p-108,,scheduled,,792,108
+e-132,1,15:15,17:24,screening,Cardinal,v-boulder-theater,f-70,p-164,,scheduled,,748,102
+e-014,1,16:20,16:45,qa,Q&A: The Orchard Keepers,v-bhs,f-07,p-108,,scheduled,,,
+e-133,1,17:24,17:49,qa,Q&A: Cardinal,v-boulder-theater,f-70,p-164,,scheduled,,,
+e-023,1,18:00,19:59,screening,The Weight of Snow,v-boulder-theater,f-12,,,scheduled,,748,102
+e-079,1,18:30,19:53,screening,The Hum,v-casey,f-42,p-139,,scheduled,,308,42
+e-080,1,19:53,20:18,qa,Q&A: The Hum,v-casey,f-42,p-139,,scheduled,,,
+e-167,1,21:00,22:32,screening,Heirloom,v-bhs,f-89,p-180,,scheduled,,792,108
+e-153,1,21:30,23:06,screening,Everything Under the Pines,v-cinemark,f-81,p-174,,scheduled,Auditorium 1,194,26
+e-168,1,22:32,22:57,qa,Q&A: Heirloom,v-bhs,f-89,p-180,,scheduled,,,
+e-154,1,23:06,23:31,qa,Q&A: Everything Under the Pines,v-cinemark,f-81,p-174,,scheduled,Auditorium 1,,
+e-028,2,08:30,10:06,screening,Copper Valley,v-muenzinger,f-15,p-115,,scheduled,,352,48
+e-528,2,08:30,10:05,screening,P&I: The Orchard Keepers,v-cinemark,f-07,,press_only,scheduled,Auditorium 1,,
+e-030,2,09:30,11:16,screening,"Mother Tongue, Father Land",v-etown,f-16,p-116,,scheduled,,194,26
+e-557,2,09:30,11:00,market,Industry office hours,v-rink,,,industry_only,scheduled,,,
+e-029,2,10:06,10:31,qa,Q&A: Copper Valley,v-muenzinger,f-15,p-115,,scheduled,,,
+e-535,2,11:00,12:00,panel,The State of the Documentary,v-old-main,,"p-185, p-187, p-188",,scheduled,,,
+e-031,2,11:16,11:41,qa,"Q&A: Mother Tongue, Father Land",v-etown,f-16,p-116,,scheduled,,,
+e-063,2,11:30,13:02,screening,Howl at Nothing,v-bhs,f-34,p-131,,scheduled,,792,108
+e-112,2,11:30,13:10,screening,The Bees of Brooklyn,v-macky,f-60,p-154,,scheduled,,1792,244
+e-130,2,12:00,14:02,screening,Bright Fever,v-chautauqua,f-69,p-163,,scheduled,,1142,156
+e-088,2,12:30,14:03,screening,Thin Ice,v-casey,f-48,p-142,,scheduled,,308,42
+e-064,2,13:02,13:27,qa,Q&A: Howl at Nothing,v-bhs,f-34,p-131,,scheduled,,,
+e-113,2,13:10,13:35,qa,Q&A: The Bees of Brooklyn,v-macky,f-60,p-154,,scheduled,,,
+e-534,2,14:00,15:00,panel,Cinema Café: Producers on Getting Independent Films Made,v-canyon,,"p-184, p-100, p-189",,scheduled,,,
+e-131,2,14:02,14:27,qa,Q&A: Bright Fever,v-chautauqua,f-69,p-163,,scheduled,,,
+e-089,2,14:03,14:28,qa,Q&A: Thin Ice,v-casey,f-48,p-142,,scheduled,,,
+e-536,2,16:30,17:30,panel,The Big Conversation: Who Gets to Make Films Now,v-canyon,,"p-186, p-190, p-191",,scheduled,,,
+e-085,2,17:45,19:13,screening,Leaving Mesa Verde,v-muenzinger,f-46,p-141,,scheduled,,352,48
+e-001,2,18:00,19:52,screening,The Weight of Snow,v-boulder-theater,f-01,"p-100, p-101, p-102",,scheduled,,748,102
+e-058,2,18:00,19:48,screening,Ghost Ranch Radio,v-roe-green,f-31,p-129,,scheduled,,363,49
+e-098,2,18:00,19:49,screening,Low Sun,v-macky,f-53,p-147,,scheduled,,1792,244
+e-468,2,18:15,20:24,screening,Cardinal,v-cinemark,f-70,,,scheduled,Auditorium 1,193,11
+e-136,2,18:30,20:30,screening,Rust Belt Requiem,v-chautauqua,f-72,p-166,,scheduled,,1144,156
+e-151,2,18:30,20:15,screening,Feral,v-casey,f-80,p-173,,scheduled,,308,42
+e-086,2,19:13,19:38,qa,Q&A: Leaving Mesa Verde,v-muenzinger,f-46,p-141,,scheduled,,,
+e-059,2,19:48,20:13,qa,Q&A: Ghost Ranch Radio,v-roe-green,f-31,p-129,,scheduled,,,
+e-099,2,19:49,20:14,qa,Q&A: Low Sun,v-macky,f-53,p-147,,scheduled,,,
+e-002,2,19:52,20:17,qa,Q&A: The Weight of Snow,v-boulder-theater,f-01,"p-100, p-101, p-102",,scheduled,,,
+e-152,2,20:15,20:40,qa,Q&A: Feral,v-casey,f-80,p-173,,scheduled,,,
+e-137,2,20:30,20:55,qa,Q&A: Rust Belt Requiem,v-chautauqua,f-72,p-166,,scheduled,,,
+e-142,2,21:00,22:41,screening,Night Swimmers,v-dairy,f-75,,,scheduled,Gordon Gamm Theater,215,29
+e-164,2,21:00,22:37,screening,All the Rooms We Lived In,v-bhs,f-87,p-179,,scheduled,,792,108
+e-157,2,21:15,22:47,screening,Borrowed Light,v-boulder-theater,f-83,,,scheduled,,748,102
+e-077,2,21:30,22:52,screening,Under the Same Moon Again,v-casey,f-41,p-138,,scheduled,,308,42
+e-102,2,21:30,23:23,screening,The Last Video Store in Laramie,v-macky,f-55,p-149,,scheduled,,1792,244
+e-520,2,21:30,23:02,screening,Heirloom,v-cinemark,f-89,,,scheduled,Auditorium 1,133,11
+e-480,2,21:45,23:06,screening,Night Shift at the Diner,v-chautauqua,f-74,,,scheduled,,937,65
+e-165,2,22:37,23:02,qa,Q&A: All the Rooms We Lived In,v-bhs,f-87,p-179,,scheduled,,,
+e-078,2,22:52,23:17,qa,Q&A: Under the Same Moon Again,v-casey,f-41,p-138,,scheduled,,,
+e-103,2,23:23,23:48,qa,Q&A: The Last Video Store in Laramie,v-macky,f-55,p-149,,scheduled,,,
+e-019,3,08:30,10:05,screening,Dead Air,v-bhs,f-10,p-111,,scheduled,,792,108
+e-393,3,08:30,10:03,screening,Thin Ice,v-muenzinger,f-48,,,scheduled,,268,20
+e-529,3,08:30,10:22,screening,P&I: The Weight of Snow,v-cinemark,f-01,,press_only,scheduled,Auditorium 1,,
+e-116,3,09:00,10:59,screening,The Understudies,v-boulder-theater,f-62,p-156,,scheduled,,748,102
+e-481,3,09:00,10:21,screening,Night Shift at the Diner,v-roe-green,f-74,,,scheduled,,290,21
+e-003,3,09:30,11:26,screening,In the Year of the Locust,v-etown,f-02,p-103,,scheduled,,194,26
+e-149,3,09:30,11:06,screening,Paper Lanterns,v-casey,f-79,p-172,,scheduled,,305,42
+e-558,3,09:30,11:00,market,Industry office hours,v-rink,,,industry_only,scheduled,,,
+e-020,3,10:05,10:30,qa,Q&A: Dead Air,v-bhs,f-10,p-111,,scheduled,,,
+e-117,3,10:59,11:24,qa,Q&A: The Understudies,v-boulder-theater,f-62,p-156,,scheduled,,,
+e-537,3,11:00,12:00,panel,Financing Without a Safety Net,v-old-main,,"p-187, p-193, p-194",,scheduled,,,
+e-150,3,11:06,11:31,qa,Q&A: Paper Lanterns,v-casey,f-79,p-172,,scheduled,,,
+e-004,3,11:26,11:51,qa,Q&A: In the Year of the Locust,v-etown,f-02,p-103,,scheduled,,,
+e-052,3,11:30,13:31,screening,Second Shift,v-bhs,f-28,p-126,,scheduled,,792,108
+e-069,3,11:30,13:16,screening,Common Ground,v-muenzinger,f-37,p-134,,scheduled,,352,48
+e-124,3,11:30,13:27,screening,The Return of Rosa Ruiz,v-macky,f-66,p-160,,scheduled,,1792,244
+e-096,3,12:00,14:00,screening,What the River Took,v-chautauqua,f-52,p-146,,scheduled,,1144,156
+e-368,3,12:00,13:23,screening,The Hum,v-dairy,f-42,,,scheduled,Gordon Gamm Theater,139,12
+e-021,3,12:15,13:45,screening,The Long Quiet,v-boulder-theater,f-11,p-112,,scheduled,,748,102
+e-081,3,12:30,14:20,screening,Little Fires Inside,v-casey,f-43,p-140,,scheduled,,308,42
+e-070,3,13:16,13:41,qa,Q&A: Common Ground,v-muenzinger,f-37,p-134,,scheduled,,,
+e-125,3,13:27,13:52,qa,Q&A: The Return of Rosa Ruiz,v-macky,f-66,p-160,,scheduled,,,
+e-053,3,13:31,13:56,qa,Q&A: Second Shift,v-bhs,f-28,p-126,,scheduled,,,
+e-022,3,13:45,14:10,qa,Q&A: The Long Quiet,v-boulder-theater,f-11,p-112,,scheduled,,,
+e-097,3,14:00,14:25,qa,Q&A: What the River Took,v-chautauqua,f-52,p-146,,scheduled,,,
+e-538,3,14:00,15:00,panel,Episodic Storytelling Now,v-canyon,,"p-184, p-196, p-197",,scheduled,,,
+e-082,3,14:20,14:45,qa,Q&A: Little Fires Inside,v-casey,f-43,p-140,,scheduled,,,
+e-508,3,14:30,16:06,screening,Everything Under the Pines,v-muenzinger,f-81,,,scheduled,,227,20
+e-501,3,14:45,16:30,screening,Feral,v-bhs,f-80,p-173,,scheduled,,530,45
+e-320,3,15:00,16:48,screening,Ghost Ranch Radio,v-dairy,f-31,,,scheduled,Gordon Gamm Theater,189,12
+e-386,3,15:00,16:28,screening,Leaving Mesa Verde,v-roe-green,f-46,,,scheduled,,296,21
+e-100,3,15:15,17:03,screening,Dogs of the Mesa,v-boulder-theater,f-54,p-148,,scheduled,,748,102
+e-087,3,15:30,16:52,screening,Bone Orchard,v-casey,f-47,,,scheduled,,308,42
+e-502,3,16:30,16:55,qa,Q&A: Feral,v-bhs,f-80,p-173,,scheduled,,,
+e-539,3,16:30,17:30,panel,Power of Story: Native Voices on Screen,v-old-main,,"p-185, p-111, p-112",,scheduled,,,
+e-101,3,17:03,17:28,qa,Q&A: Dogs of the Mesa,v-boulder-theater,f-54,p-148,,scheduled,,,
+e-039,3,18:00,19:50,screening,Sister Moon Motel,v-roe-green,f-21,p-120,,scheduled,,363,49
+e-047,3,18:00,19:57,screening,The Midnight Projectionist,v-bhs,f-25,,,scheduled,,792,108
+e-073,3,18:00,19:48,screening,Visiting Hours,v-dairy,f-39,p-136,,scheduled,Gordon Gamm Theater,215,29
+e-464,3,18:00,20:02,screening,Bright Fever,v-macky,f-69,p-163,,scheduled,,1903,102
+e-094,3,18:30,20:28,screening,Salt Flats,v-chautauqua,f-51,p-145,,scheduled,,1144,156
+e-145,3,18:30,20:09,screening,"Holy Water, Hard Water",v-etown,f-77,p-170,,scheduled,,191,26
+e-410,3,18:30,20:19,screening,Low Sun,v-casey,f-53,,,scheduled,,312,18
+e-074,3,19:48,20:13,qa,Q&A: Visiting Hours,v-dairy,f-39,p-136,,scheduled,Gordon Gamm Theater,,
+e-040,3,19:50,20:15,qa,Q&A: Sister Moon Motel,v-roe-green,f-21,p-120,,scheduled,,,
+e-465,3,20:02,20:27,qa,Q&A: Bright Fever,v-macky,f-69,p-163,,scheduled,,,
+e-146,3,20:09,20:34,qa,"Q&A: Holy Water, Hard Water",v-etown,f-77,p-170,,scheduled,,,
+e-095,3,20:28,20:53,qa,Q&A: Salt Flats,v-chautauqua,f-51,p-145,,scheduled,,,
+e-024,3,21:00,22:46,screening,The Ferryman's Daughter,v-roe-green,f-13,p-113,,scheduled,,363,49
+e-476,3,21:00,23:00,screening,Rust Belt Requiem,v-dairy,f-72,,,scheduled,Gordon Gamm Theater,222,12
+e-517,3,21:00,22:37,screening,All the Rooms We Lived In,v-muenzinger,f-87,,,scheduled,,365,20
+e-126,3,21:15,23:10,screening,The Glass Coast,v-boulder-theater,f-67,p-161,,scheduled,,748,102
+e-158,3,21:30,22:57,screening,Tidewater,v-cinemark,f-84,p-176,,scheduled,Auditorium 1,194,26
+e-254,3,21:30,23:16,screening,"Mother Tongue, Father Land",v-casey,f-16,,,scheduled,,235,18
+e-518,3,21:30,23:02,screening,Heirloom,v-macky,f-89,p-180,,scheduled,,1676,102
+e-025,3,22:46,23:11,qa,Q&A: The Ferryman's Daughter,v-roe-green,f-13,p-113,,scheduled,,,
+e-159,3,22:57,23:22,qa,Q&A: Tidewater,v-cinemark,f-84,p-176,,scheduled,Auditorium 1,,
+e-519,3,23:02,23:27,qa,Q&A: Heirloom,v-macky,f-89,p-180,,scheduled,,,
+e-127,3,23:10,23:35,qa,Q&A: The Glass Coast,v-boulder-theater,f-67,p-161,,scheduled,,,
+e-009,4,08:30,10:05,screening,Two Suns,v-bhs,f-05,p-106,,scheduled,,792,108
+e-530,4,08:30,10:26,screening,P&I: In the Year of the Locust,v-cinemark,f-02,,press_only,scheduled,Auditorium 1,,
+e-056,4,09:00,10:34,screening,Desert Bloom,v-dairy,f-30,p-128,,scheduled,Gordon Gamm Theater,215,29
+e-375,4,09:00,10:50,screening,Little Fires Inside,v-roe-green,f-43,,,scheduled,,377,21
+e-441,4,09:00,10:59,screening,The Understudies,v-boulder-theater,f-62,,,scheduled,,666,43
+e-251,4,09:30,11:06,screening,Copper Valley,v-etown,f-15,,,scheduled,,173,11
+e-507,4,09:30,11:06,screening,Everything Under the Pines,v-casey,f-81,,,scheduled,,251,18
+e-559,4,09:30,11:00,market,Industry office hours,v-rink,,,industry_only,scheduled,,,
+e-010,4,10:05,10:30,qa,Q&A: Two Suns,v-bhs,f-05,p-106,,scheduled,,,
+e-057,4,10:34,10:59,qa,Q&A: Desert Bloom,v-dairy,f-30,p-128,,scheduled,Gordon Gamm Theater,,
+e-540,4,11:00,12:00,panel,Composers and Sound Designers Roundtable,v-canyon,,"p-186, p-110, p-114",,scheduled,,,
+e-007,4,11:30,13:03,screening,All the Rooms We Lived In,v-macky,f-04,p-105,,scheduled,,1792,244
+e-169,4,11:30,12:51,screening,The Orchard Keepers,v-bhs,f-90,p-181,,scheduled,,792,108
+e-183,4,11:30,13:22,screening,The Weight of Snow,v-muenzinger,f-01,"p-100, p-101, p-102",,scheduled,,335,20
+e-497,4,11:45,13:21,screening,Paper Lanterns,v-cinemark,f-79,p-172,,scheduled,Auditorium 1,161,11
+e-354,4,12:00,13:48,screening,Visiting Hours,v-roe-green,f-39,p-136,,scheduled,,278,21
+e-366,4,12:00,13:22,screening,Under the Same Moon Again,v-dairy,f-41,,,scheduled,Gordon Gamm Theater,181,12
+e-411,4,12:00,13:49,screening,Low Sun,v-chautauqua,f-53,,,scheduled,,1010,65
+e-036,4,12:30,14:21,screening,Signal Fire,v-casey,f-19,,,scheduled,,308,42
+e-232,4,12:30,14:00,screening,The Long Quiet,v-etown,f-11,,,scheduled,,201,11
+e-170,4,12:51,13:16,qa,Q&A: The Orchard Keepers,v-bhs,f-90,p-181,,scheduled,,,
+e-008,4,13:03,13:28,qa,Q&A: All the Rooms We Lived In,v-macky,f-04,p-105,,scheduled,,,
+e-498,4,13:21,13:46,qa,Q&A: Paper Lanterns,v-cinemark,f-79,p-172,,scheduled,Auditorium 1,,
+e-184,4,13:22,13:47,qa,Q&A: The Weight of Snow,v-muenzinger,f-01,"p-100, p-101, p-102",,scheduled,,,
+e-355,4,13:48,14:13,qa,Q&A: Visiting Hours,v-roe-green,f-39,p-136,,scheduled,,,
+e-541,4,14:00,15:00,panel,From Lab to Festival: Developing a Script,v-old-main,,"p-187, p-129, p-130",,scheduled,,,
+e-191,4,14:30,16:26,screening,In the Year of the Locust,v-muenzinger,f-02,,,scheduled,,228,20
+e-017,4,14:45,16:36,screening,Where the Antelope Sleep,v-macky,f-09,p-110,,scheduled,,1792,244
+e-026,4,15:00,16:33,screening,Good Neighbors,v-roe-green,f-14,p-114,,scheduled,,363,49
+e-459,4,15:00,16:55,screening,The Glass Coast,v-cinemark,f-67,,,scheduled,Auditorium 1,176,11
+e-503,4,15:00,16:45,screening,Feral,v-dairy,f-80,,,scheduled,Gordon Gamm Theater,165,12
+e-110,4,15:15,17:06,screening,Teeth,v-boulder-theater,f-59,p-153,,scheduled,,748,102
+e-120,4,15:15,17:10,screening,The Choir Boys of Gary,v-chautauqua,f-64,p-158,,scheduled,,1144,156
+e-143,4,15:30,16:54,screening,The Cartographer,v-etown,f-76,p-169,,scheduled,,194,26
+e-278,4,15:30,17:20,screening,Sister Moon Motel,v-casey,f-21,,,scheduled,,322,18
+e-542,4,16:30,17:30,panel,Distribution After the Festival,v-canyon,,"p-184, p-143, p-144",,scheduled,,,
+e-027,4,16:33,16:58,qa,Q&A: Good Neighbors,v-roe-green,f-14,p-114,,scheduled,,,
+e-018,4,16:36,17:01,qa,Q&A: Where the Antelope Sleep,v-macky,f-09,p-110,,scheduled,,,
+e-144,4,16:54,17:19,qa,Q&A: The Cartographer,v-etown,f-76,p-169,,scheduled,,,
+e-111,4,17:06,17:31,qa,Q&A: Teeth,v-boulder-theater,f-59,p-153,,scheduled,,,
+e-121,4,17:10,17:35,qa,Q&A: The Choir Boys of Gary,v-chautauqua,f-64,p-158,,scheduled,,,
+e-015,4,18:00,19:30,screening,Saltwater Hymns,v-macky,f-08,p-109,,scheduled,,1771,244
+e-092,4,18:00,19:51,screening,Our Lady of the Interstate,v-boulder-theater,f-50,p-144,,scheduled,,748,102
+e-318,4,18:00,19:48,screening,Ghost Ranch Radio,v-roe-green,f-31,p-129,,scheduled,,290,21
+e-405,4,18:00,19:58,screening,Salt Flats,v-dairy,f-51,,,scheduled,Gordon Gamm Theater,187,12
+e-147,4,18:15,19:51,screening,Soft Animals,v-cinemark,f-78,p-171,,scheduled,Auditorium 1,194,26
+e-084,4,18:30,20:18,screening,Field Notes for a Flood,v-casey,f-45,,,scheduled,,306,42
+e-214,4,18:30,20:05,screening,The Orchard Keepers,v-etown,f-07,,,scheduled,,138,11
+e-482,4,18:30,20:11,screening,Night Swimmers,v-chautauqua,f-75,,,scheduled,,976,65
+e-016,4,19:30,19:55,qa,Q&A: Saltwater Hymns,v-macky,f-08,p-109,,scheduled,,,
+e-319,4,19:48,20:13,qa,Q&A: Ghost Ranch Radio,v-roe-green,f-31,p-129,,scheduled,,,
+e-093,4,19:51,20:16,qa,Q&A: Our Lady of the Interstate,v-boulder-theater,f-50,p-144,,scheduled,,,
+e-148,4,19:51,20:16,qa,Q&A: Soft Animals,v-cinemark,f-78,p-171,,scheduled,Auditorium 1,,
+e-061,4,21:00,22:47,screening,Vigil,v-dairy,f-33,p-130,,scheduled,Gordon Gamm Theater,215,29
+e-166,4,21:00,22:36,screening,Two Suns,v-bhs,f-88,,,scheduled,,792,108
+e-466,4,21:00,23:02,screening,Bright Fever,v-roe-green,f-69,,,scheduled,,340,21
+e-090,4,21:15,23:09,screening,Northbound,v-boulder-theater,f-49,p-143,,scheduled,,748,102
+e-122,4,21:30,23:15,screening,How to Leave Tulsa,v-macky,f-65,p-159,,scheduled,,1792,244
+e-334,4,21:30,23:02,screening,Howl at Nothing,v-etown,f-34,,,scheduled,,152,11
+e-513,4,21:30,23:02,screening,Borrowed Light,v-cinemark,f-83,,,scheduled,Auditorium 1,147,11
+e-516,4,21:30,22:57,screening,Tidewater,v-casey,f-84,,,scheduled,,328,18
+e-395,4,21:45,23:18,screening,Thin Ice,v-chautauqua,f-48,,,scheduled,,956,65
+e-062,4,22:47,23:12,qa,Q&A: Vigil,v-dairy,f-33,p-130,,scheduled,Gordon Gamm Theater,,
+e-091,4,23:09,23:34,qa,Q&A: Northbound,v-boulder-theater,f-49,p-143,,scheduled,,,
+e-123,4,23:15,23:40,qa,Q&A: How to Leave Tulsa,v-macky,f-65,p-159,,scheduled,,,
+e-060,5,08:30,10:05,screening,Shadow Country,v-bhs,f-32,,,scheduled,,792,108
+e-401,5,08:30,10:21,screening,Our Lady of the Interstate,v-muenzinger,f-50,,,scheduled,,370,20
+e-531,5,08:30,10:03,screening,P&I: All the Rooms We Lived In,v-cinemark,f-04,,press_only,scheduled,Auditorium 1,,
+e-314,5,09:00,10:34,screening,Desert Bloom,v-dairy,f-30,,,scheduled,Gordon Gamm Theater,181,12
+e-394,5,09:00,10:33,screening,Thin Ice,v-roe-green,f-48,,,scheduled,,373,21
+e-420,5,09:00,10:53,screening,The Last Video Store in Laramie,v-boulder-theater,f-55,,,scheduled,,742,43
+e-138,5,09:30,10:57,screening,The Inheritance Machine,v-casey,f-73,p-167,,scheduled,,308,42
+e-432,5,09:30,11:21,screening,Teeth,v-etown,f-59,,,scheduled,,170,11
+e-560,5,09:30,11:00,market,Industry office hours,v-rink,,,industry_only,scheduled,,,
+e-139,5,10:57,11:22,qa,Q&A: The Inheritance Machine,v-casey,f-73,p-167,,scheduled,,,
+e-543,5,11:00,12:00,panel,Climate on Screen,v-old-main,,"p-185, p-157, p-161",,scheduled,,,
+e-065,5,11:30,13:26,screening,Seven Ways to Disappear,v-bhs,f-35,p-132,,scheduled,,792,108
+e-413,5,11:30,13:18,screening,Dogs of the Mesa,v-macky,f-54,p-148,,scheduled,,1532,102
+e-454,5,11:30,13:27,screening,The Return of Rosa Ruiz,v-muenzinger,f-66,,,scheduled,,232,20
+e-382,5,11:45,13:33,screening,Field Notes for a Flood,v-cinemark,f-45,,,scheduled,Auditorium 1,174,11
+e-075,5,12:00,13:26,screening,Smoke and Mirrors and Smoke,v-dairy,f-40,p-137,,scheduled,Gordon Gamm Theater,215,29
+e-171,5,12:00,13:24,screening,Saltwater Hymns,v-chautauqua,f-91,p-182,,scheduled,,1121,156
+e-255,5,12:00,13:46,screening,"Mother Tongue, Father Land",v-roe-green,f-16,,,scheduled,,281,21
+e-469,5,12:15,14:24,screening,Cardinal,v-boulder-theater,f-70,,,scheduled,,611,43
+e-219,5,12:30,14:21,screening,Where the Antelope Sleep,v-etown,f-09,p-110,,scheduled,,178,11
+e-327,5,12:30,14:17,screening,Vigil,v-casey,f-33,p-130,,scheduled,,285,18
+e-414,5,13:18,13:43,qa,Q&A: Dogs of the Mesa,v-macky,f-54,p-148,,scheduled,,,
+e-172,5,13:24,13:49,qa,Q&A: Saltwater Hymns,v-chautauqua,f-91,p-182,,scheduled,,,
+e-066,5,13:26,13:51,qa,Q&A: Seven Ways to Disappear,v-bhs,f-35,p-132,,scheduled,,,
+e-076,5,13:26,13:51,qa,Q&A: Smoke and Mirrors and Smoke,v-dairy,f-40,p-137,,scheduled,Gordon Gamm Theater,,
+e-544,5,14:00,15:00,panel,Archival Footage and Fair Use,v-canyon,,"p-186, p-169, p-184",,scheduled,,,
+e-328,5,14:17,14:42,qa,Q&A: Vigil,v-casey,f-33,p-130,,scheduled,,,
+e-220,5,14:21,14:46,qa,Q&A: Where the Antelope Sleep,v-etown,f-09,p-110,,scheduled,,,
+e-438,5,14:30,16:10,screening,The Bees of Brooklyn,v-muenzinger,f-60,,,scheduled,,338,20
+e-293,5,14:45,16:42,screening,The Midnight Projectionist,v-bhs,f-25,,,scheduled,,661,45
+e-479,5,14:45,16:06,screening,Night Shift at the Diner,v-macky,f-74,,,scheduled,,1886,102
+e-071,5,15:00,16:28,screening,Here Lies Margo,v-dairy,f-38,p-135,,scheduled,Gordon Gamm Theater,215,29
+e-308,5,15:00,17:01,screening,Second Shift,v-cinemark,f-28,,,scheduled,Auditorium 1,124,11
+e-106,5,15:15,17:19,screening,Lullaby for a Drone,v-chautauqua,f-57,p-151,,scheduled,,1144,156
+e-457,5,15:15,17:10,screening,The Glass Coast,v-boulder-theater,f-67,p-161,,scheduled,,691,43
+e-240,5,15:30,17:16,screening,The Ferryman's Daughter,v-casey,f-13,,,scheduled,,202,18
+e-072,5,16:28,16:53,qa,Q&A: Here Lies Margo,v-dairy,f-38,p-135,,scheduled,Gordon Gamm Theater,,
+e-545,5,16:30,17:30,panel,Actors in Conversation,v-old-main,,"p-187, p-185, p-186",,scheduled,,,
+e-458,5,17:10,17:35,qa,Q&A: The Glass Coast,v-boulder-theater,f-67,p-161,,scheduled,,,
+e-107,5,17:19,17:44,qa,Q&A: Lullaby for a Drone,v-chautauqua,f-57,p-151,,scheduled,,,
+e-045,5,17:45,19:11,screening,Small Hours,v-muenzinger,f-24,p-123,,scheduled,,351,48
+e-037,5,18:00,19:39,screening,Unmarked,v-roe-green,f-20,p-119,,scheduled,,363,49
+e-118,5,18:00,20:10,screening,A House on Arapahoe,v-macky,f-63,p-157,,scheduled,,1792,244
+e-358,5,18:00,19:48,screening,Visiting Hours,v-boulder-theater,f-39,,,scheduled,,742,43
+e-485,5,18:00,19:24,screening,The Cartographer,v-dairy,f-76,p-169,,scheduled,Gordon Gamm Theater,173,12
+e-216,5,18:15,19:45,screening,Saltwater Hymns,v-cinemark,f-08,,,scheduled,Auditorium 1,131,11
+e-032,5,18:30,19:59,screening,Hollow Mountain,v-casey,f-17,p-117,,scheduled,,308,42
+e-475,5,18:30,20:30,screening,Rust Belt Requiem,v-chautauqua,f-72,,,scheduled,,784,65
+e-483,5,18:30,20:11,screening,Night Swimmers,v-etown,f-75,,,scheduled,,200,11
+e-046,5,19:11,19:36,qa,Q&A: Small Hours,v-muenzinger,f-24,p-123,,scheduled,,,
+e-486,5,19:24,19:49,qa,Q&A: The Cartographer,v-dairy,f-76,p-169,,scheduled,Gordon Gamm Theater,,
+e-038,5,19:39,20:04,qa,Q&A: Unmarked,v-roe-green,f-20,p-119,,scheduled,,,
+e-033,5,19:59,20:24,qa,Q&A: Hollow Mountain,v-casey,f-17,p-117,,scheduled,,,
+e-119,5,20:10,20:35,qa,Q&A: A House on Arapahoe,v-macky,f-63,p-157,,scheduled,,,
+e-011,5,21:00,22:58,screening,Heirloom,v-bhs,f-06,p-107,,scheduled,,792,108
+e-034,5,21:00,22:24,screening,A Year Without Winter,v-roe-green,f-18,p-118,,scheduled,,360,49
+e-269,5,21:00,22:51,screening,Signal Fire,v-muenzinger,f-19,,,scheduled,,255,20
+e-389,5,21:00,22:22,screening,Bone Orchard,v-dairy,f-47,,,scheduled,Gordon Gamm Theater,224,12
+e-108,5,21:15,23:13,screening,"Paradise, Nevada",v-boulder-theater,f-58,p-152,,scheduled,,748,102
+e-346,5,21:30,23:16,screening,Common Ground,v-macky,f-37,,,scheduled,,1404,102
+e-372,5,21:30,23:20,screening,Little Fires Inside,v-cinemark,f-43,,,scheduled,Auditorium 1,151,11
+e-406,5,21:30,23:28,screening,Salt Flats,v-casey,f-51,,,scheduled,,274,18
+e-495,5,21:30,23:06,screening,Soft Animals,v-etown,f-78,,,scheduled,,145,11
+e-449,5,21:45,23:40,screening,The Choir Boys of Gary,v-chautauqua,f-64,,,scheduled,,1007,65
+e-035,5,22:24,22:49,qa,Q&A: A Year Without Winter,v-roe-green,f-18,p-118,,scheduled,,,
+e-012,5,22:58,23:23,qa,Q&A: Heirloom,v-bhs,f-06,p-107,,scheduled,,,
+e-109,5,23:13,23:38,qa,"Q&A: Paradise, Nevada",v-boulder-theater,f-58,p-152,,scheduled,,,
+e-256,6,08:30,10:16,screening,"Mother Tongue, Father Land",v-muenzinger,f-16,,,scheduled,,291,20
+e-532,6,08:30,10:28,screening,P&I: Heirloom,v-cinemark,f-06,,press_only,scheduled,Auditorium 1,,
+e-048,6,09:00,10:53,screening,Dear Tomorrow,v-roe-green,f-26,p-124,,scheduled,,363,49
+e-408,6,09:00,11:00,screening,What the River Took,v-dairy,f-52,,,scheduled,Gordon Gamm Theater,178,12
+e-470,6,09:00,11:09,screening,Cardinal,v-boulder-theater,f-70,,,scheduled,,501,43
+e-210,6,09:30,11:28,screening,Heirloom,v-etown,f-06,,,scheduled,,203,11
+e-446,6,09:30,11:25,screening,The Choir Boys of Gary,v-casey,f-64,p-158,,scheduled,,288,18
+e-561,6,09:30,11:00,market,Industry office hours,v-rink,,,industry_only,scheduled,,,
+e-049,6,10:53,11:18,qa,Q&A: Dear Tomorrow,v-roe-green,f-26,p-124,,scheduled,,,
+e-546,6,11:00,12:00,panel,Boulder Welcomes the Festival: A Community Conversation,v-canyon,,"p-184, p-188, p-189",,scheduled,,,
+e-447,6,11:25,11:50,qa,Q&A: The Choir Boys of Gary,v-casey,f-64,p-158,,scheduled,,,
+e-104,6,11:30,13:31,screening,The Body Electric,v-macky,f-56,p-150,,scheduled,,1792,244
+e-264,6,11:30,12:54,screening,A Year Without Winter,v-muenzinger,f-18,,,scheduled,,287,20
+e-292,6,11:30,13:27,screening,The Midnight Projectionist,v-bhs,f-25,,,scheduled,,665,45
+e-489,6,11:45,13:24,screening,"Holy Water, Hard Water",v-cinemark,f-77,p-170,,scheduled,Auditorium 1,182,11
+e-041,6,12:00,13:35,screening,Static,v-roe-green,f-22,p-121,,scheduled,,355,49
+e-054,6,12:00,13:56,screening,Every Kind of Weather,v-dairy,f-29,p-127,,scheduled,Gordon Gamm Theater,215,29
+e-173,6,12:00,13:23,screening,Where the Antelope Sleep,v-chautauqua,f-92,p-183,,scheduled,,1144,156
+e-455,6,12:15,14:12,screening,The Return of Rosa Ruiz,v-boulder-theater,f-66,,,scheduled,,621,43
+e-043,6,12:30,13:58,screening,Kingdom of Small Things,v-casey,f-23,p-122,,scheduled,,308,42
+e-290,6,12:30,13:56,screening,Small Hours,v-etown,f-24,,,scheduled,,174,11
+e-174,6,13:23,13:48,qa,Q&A: Where the Antelope Sleep,v-chautauqua,f-92,p-183,,scheduled,,,
+e-490,6,13:24,13:49,qa,"Q&A: Holy Water, Hard Water",v-cinemark,f-77,p-170,,scheduled,Auditorium 1,,
+e-105,6,13:31,13:56,qa,Q&A: The Body Electric,v-macky,f-56,p-150,,scheduled,,,
+e-042,6,13:35,14:00,qa,Q&A: Static,v-roe-green,f-22,p-121,,scheduled,,,
+e-055,6,13:56,14:21,qa,Q&A: Every Kind of Weather,v-dairy,f-29,p-127,,scheduled,Gordon Gamm Theater,,
+e-044,6,13:58,14:23,qa,Q&A: Kingdom of Small Things,v-casey,f-23,p-122,,scheduled,,,
+e-547,6,14:00,15:00,panel,"Live Podcast Recording: The Week in Park City, Now Boulder",v-old-main,,"p-185, p-191, p-192",,scheduled,,,
+e-270,6,14:30,16:21,screening,Signal Fire,v-muenzinger,f-19,,,scheduled,,378,20
+e-323,6,14:45,16:20,screening,Shadow Country,v-bhs,f-32,,,scheduled,,587,45
+e-384,6,14:45,16:13,screening,Leaving Mesa Verde,v-macky,f-46,,,scheduled,,1801,102
+e-067,6,15:00,16:58,screening,Ironwood,v-roe-green,f-36,p-133,,scheduled,,363,49
+e-249,6,15:00,16:36,screening,Copper Valley,v-cinemark,f-15,,,scheduled,Auditorium 1,137,11
+e-440,6,15:00,16:59,screening,The Understudies,v-dairy,f-62,,,scheduled,Gordon Gamm Theater,158,12
+e-114,6,15:15,17:15,screening,Blue Hour Bakery,v-chautauqua,f-61,p-155,,scheduled,,1144,156
+e-134,6,15:15,17:09,screening,Wildfire Season,v-boulder-theater,f-71,p-165,,scheduled,,748,102
+e-083,6,15:30,17:00,screening,Undertow,v-casey,f-44,,,scheduled,,308,42
+e-488,6,15:30,16:54,screening,The Cartographer,v-etown,f-76,,,scheduled,,131,11
+e-548,6,16:30,17:30,panel,International Co-Productions,v-canyon,,"p-186, p-194, p-195",,scheduled,,,
+e-068,6,16:58,17:23,qa,Q&A: Ironwood,v-roe-green,f-36,p-133,,scheduled,,,
+e-135,6,17:09,17:34,qa,Q&A: Wildfire Season,v-boulder-theater,f-71,p-165,,scheduled,,,
+e-115,6,17:15,17:40,qa,Q&A: Blue Hour Bakery,v-chautauqua,f-61,p-155,,scheduled,,,
+e-212,6,17:45,19:20,screening,The Orchard Keepers,v-muenzinger,f-07,,,scheduled,,315,20
+e-005,6,18:00,19:40,screening,Afterglow Drive,v-macky,f-03,p-104,,scheduled,,1792,244
+e-050,6,18:00,19:33,screening,A Map of Nowhere,v-roe-green,f-27,p-125,,scheduled,,363,49
+e-339,6,18:00,19:56,screening,Seven Ways to Disappear,v-bhs,f-35,,,scheduled,,685,45
+e-392,6,18:00,19:33,screening,Thin Ice,v-dairy,f-48,,,scheduled,Gordon Gamm Theater,199,12
+e-396,6,18:00,19:54,screening,Northbound,v-boulder-theater,f-49,,,scheduled,,762,43
+e-427,6,18:15,20:19,screening,Lullaby for a Drone,v-cinemark,f-57,,,scheduled,Auditorium 1,124,11
+e-128,6,18:30,20:26,screening,Last Call at the Blue Moon,v-chautauqua,f-68,p-162,,scheduled,,1144,156
+e-155,6,18:30,19:52,screening,The Tallest Man in Oaxaca,v-etown,f-82,p-175,,scheduled,,194,26
+e-484,6,18:30,20:11,screening,Night Swimmers,v-casey,f-75,,,scheduled,,198,18
+e-051,6,19:33,19:58,qa,Q&A: A Map of Nowhere,v-roe-green,f-27,p-125,,scheduled,,,
+e-006,6,19:40,20:05,qa,Q&A: Afterglow Drive,v-macky,f-03,p-104,,scheduled,,,
+e-156,6,19:52,20:17,qa,Q&A: The Tallest Man in Oaxaca,v-etown,f-82,p-175,,scheduled,,,
+e-129,6,20:26,20:51,qa,Q&A: Last Call at the Blue Moon,v-chautauqua,f-68,p-162,,scheduled,,,
+e-162,6,21:00,22:36,screening,Afterglow Drive,v-bhs,f-86,p-178,,scheduled,,792,108
+e-185,6,21:00,22:52,screening,The Weight of Snow,v-muenzinger,f-01,,,scheduled,,352,20
+e-227,6,21:00,22:35,screening,Dead Air,v-roe-green,f-10,,,scheduled,,231,21
+e-241,6,21:00,22:46,screening,The Ferryman's Daughter,v-dairy,f-13,,,scheduled,Gordon Gamm Theater,173,12
+e-204,6,21:15,22:50,screening,Two Suns,v-boulder-theater,f-05,,,scheduled,,487,43
+e-160,6,21:30,22:57,screening,In the Year of the Locust,v-cinemark,f-85,p-177,,scheduled,Auditorium 1,194,26
+e-450,6,21:30,23:15,screening,How to Leave Tulsa,v-macky,f-65,p-159,,scheduled,,1318,102
+e-499,6,21:30,23:06,screening,Paper Lanterns,v-etown,f-79,,,scheduled,,171,11
+e-231,6,21:45,23:15,screening,The Long Quiet,v-chautauqua,f-11,,,scheduled,,1145,65
+e-163,6,22:36,23:01,qa,Q&A: Afterglow Drive,v-bhs,f-86,p-178,,scheduled,,,
+e-161,6,22:57,23:22,qa,Q&A: In the Year of the Locust,v-cinemark,f-85,p-177,,scheduled,Auditorium 1,,
+e-451,6,23:15,23:40,qa,Q&A: How to Leave Tulsa,v-macky,f-65,p-159,,scheduled,,,
+e-385,7,08:30,09:58,screening,Leaving Mesa Verde,v-muenzinger,f-46,,,scheduled,,314,20
+e-424,7,08:30,10:34,screening,Lullaby for a Drone,v-bhs,f-57,p-151,,scheduled,,687,45
+e-533,7,08:30,10:10,screening,P&I: Afterglow Drive,v-cinemark,f-03,,press_only,scheduled,Auditorium 1,,
+e-271,7,09:00,10:39,screening,Unmarked,v-dairy,f-20,,,scheduled,Gordon Gamm Theater,168,12
+e-371,7,09:00,10:23,screening,The Hum,v-roe-green,f-42,,,scheduled,,228,21
+e-471,7,09:00,10:54,screening,Wildfire Season,v-boulder-theater,f-71,,,scheduled,,665,43
+e-244,7,09:30,11:03,screening,Good Neighbors,v-casey,f-14,,,scheduled,,297,18
+e-505,7,09:30,11:06,screening,Everything Under the Pines,v-etown,f-81,p-174,,scheduled,,201,11
+e-562,7,09:30,11:00,market,Industry office hours,v-rink,,,industry_only,scheduled,,,
+e-425,7,10:34,10:59,qa,Q&A: Lullaby for a Drone,v-bhs,f-57,p-151,,scheduled,,,
+e-549,7,11:00,12:00,panel,"Short Films, Long Careers",v-old-main,,"p-187, p-176, p-184",,scheduled,,,
+e-506,7,11:06,11:31,qa,Q&A: Everything Under the Pines,v-etown,f-81,p-174,,scheduled,,,
+e-192,7,11:30,13:26,screening,In the Year of the Locust,v-macky,f-02,,,scheduled,,1934,102
+e-419,7,11:30,13:23,screening,The Last Video Store in Laramie,v-muenzinger,f-55,,,scheduled,,357,20
+e-521,7,11:30,12:51,screening,The Orchard Keepers,v-bhs,f-90,p-181,,scheduled,,676,45
+e-233,7,12:00,13:30,screening,The Long Quiet,v-chautauqua,f-11,,,scheduled,,1163,65
+e-279,7,12:00,13:35,screening,Static,v-roe-green,f-22,,,scheduled,,365,21
+e-347,7,12:00,13:46,screening,Common Ground,v-dairy,f-37,,,scheduled,Gordon Gamm Theater,215,12
+e-379,7,12:15,13:45,screening,Undertow,v-boulder-theater,f-44,,,scheduled,,557,43
+e-335,7,12:30,14:02,screening,Howl at Nothing,v-etown,f-34,,,scheduled,,129,11
+e-365,7,12:30,13:52,screening,Under the Same Moon Again,v-casey,f-41,,,scheduled,,215,18
+e-522,7,12:51,13:16,qa,Q&A: The Orchard Keepers,v-bhs,f-90,p-181,,scheduled,,,
+e-550,7,14:00,15:00,panel,Making a Midnight Movie,v-canyon,,"p-184, p-185, p-186",,scheduled,,,
+e-460,7,14:30,16:25,screening,The Glass Coast,v-muenzinger,f-67,,,scheduled,,323,20
+e-311,7,14:45,16:41,screening,Every Kind of Weather,v-bhs,f-29,,,scheduled,,512,45
+e-350,7,14:45,16:13,screening,Here Lies Margo,v-macky,f-38,,,scheduled,,1194,102
+e-416,7,15:00,16:48,screening,Dogs of the Mesa,v-roe-green,f-54,,,scheduled,,258,21
+e-428,7,15:00,16:58,screening,"Paradise, Nevada",v-dairy,f-58,p-152,,scheduled,Gordon Gamm Theater,210,12
+e-448,7,15:00,16:55,screening,The Choir Boys of Gary,v-cinemark,f-64,,,scheduled,Auditorium 1,139,11
+e-259,7,15:15,16:44,screening,Hollow Mountain,v-chautauqua,f-17,,,scheduled,,1188,65
+e-511,7,15:15,16:37,screening,The Tallest Man in Oaxaca,v-boulder-theater,f-82,,,scheduled,,757,43
+e-301,7,15:30,17:03,screening,A Map of Nowhere,v-casey,f-27,,,scheduled,,217,18
+e-362,7,15:30,16:56,screening,Smoke and Mirrors and Smoke,v-etown,f-40,,,scheduled,,189,11
+e-551,7,16:30,17:30,panel,Critics in Conversation,v-old-main,,"p-185, p-187, p-188",,scheduled,,,
+e-429,7,16:58,17:23,qa,"Q&A: Paradise, Nevada",v-dairy,f-58,p-152,,scheduled,Gordon Gamm Theater,,
+e-380,7,17:45,19:33,screening,Field Notes for a Flood,v-muenzinger,f-45,,,scheduled,,277,20
+e-196,7,18:00,19:40,screening,Afterglow Drive,v-dairy,f-03,,,scheduled,Gordon Gamm Theater,226,12
+e-201,7,18:00,19:33,screening,All the Rooms We Lived In,v-macky,f-04,,,scheduled,,1481,102
+e-356,7,18:00,19:48,screening,Visiting Hours,v-boulder-theater,f-39,,,scheduled,,637,43
+e-492,7,18:00,19:39,screening,"Holy Water, Hard Water",v-bhs,f-77,,,scheduled,,561,45
+e-235,7,18:15,20:14,screening,The Weight of Snow,v-cinemark,f-12,,,scheduled,Auditorium 1,133,11
+e-296,7,18:30,20:23,screening,Dear Tomorrow,v-casey,f-26,p-124,,scheduled,,289,18
+e-403,7,18:30,20:28,screening,Salt Flats,v-etown,f-51,p-145,,scheduled,,196,11
+e-463,7,18:30,20:26,screening,Last Call at the Blue Moon,v-chautauqua,f-68,,,scheduled,,995,65
+e-297,7,20:23,20:48,qa,Q&A: Dear Tomorrow,v-casey,f-26,p-124,,scheduled,,,
+e-404,7,20:28,20:53,qa,Q&A: Salt Flats,v-etown,f-51,p-145,,scheduled,,,
+e-324,7,21:00,22:35,screening,Shadow Country,v-roe-green,f-32,,,scheduled,,303,21
+e-474,7,21:00,23:00,screening,Rust Belt Requiem,v-bhs,f-72,,,scheduled,,684,45
+e-493,7,21:00,22:36,screening,Soft Animals,v-muenzinger,f-78,p-171,,scheduled,,367,20
+e-514,7,21:00,22:27,screening,Tidewater,v-dairy,f-84,p-176,,scheduled,Gordon Gamm Theater,140,12
+e-423,7,21:15,23:16,screening,The Body Electric,v-boulder-theater,f-56,,,scheduled,,553,43
+e-336,7,21:30,23:26,screening,Seven Ways to Disappear,v-etown,f-35,p-132,,scheduled,,173,11
+e-341,7,21:30,23:28,screening,Ironwood,v-casey,f-36,p-133,,scheduled,,320,18
+e-388,7,21:30,22:52,screening,Bone Orchard,v-macky,f-47,,,scheduled,,1884,102
+e-478,7,21:30,22:57,screening,The Inheritance Machine,v-cinemark,f-73,,,scheduled,Auditorium 1,174,11
+e-329,7,21:45,23:32,screening,Vigil,v-chautauqua,f-33,,,scheduled,,870,65
+e-515,7,22:27,22:52,qa,Q&A: Tidewater,v-dairy,f-84,p-176,,scheduled,Gordon Gamm Theater,,
+e-494,7,22:36,23:01,qa,Q&A: Soft Animals,v-muenzinger,f-78,p-171,,scheduled,,,
+e-337,7,23:26,23:51,qa,Q&A: Seven Ways to Disappear,v-etown,f-35,p-132,,scheduled,,,
+e-342,7,23:28,23:53,qa,Q&A: Ironwood,v-casey,f-36,p-133,,scheduled,,,
+e-195,8,08:30,10:10,screening,Afterglow Drive,v-bhs,f-03,,,scheduled,,532,45
+e-283,8,08:30,09:58,screening,Kingdom of Small Things,v-muenzinger,f-23,,,scheduled,,380,20
+e-300,8,09:00,10:53,screening,Dear Tomorrow,v-roe-green,f-26,,,scheduled,,381,21
+e-409,8,09:00,11:00,screening,What the River Took,v-boulder-theater,f-52,,,scheduled,,630,43
+e-412,8,09:00,10:49,screening,Low Sun,v-dairy,f-53,,,scheduled,Gordon Gamm Theater,157,12
+e-245,8,09:30,11:03,screening,Good Neighbors,v-etown,f-14,,,scheduled,,131,11
+e-383,8,09:30,11:18,screening,Field Notes for a Flood,v-casey,f-45,,,scheduled,,331,18
+e-563,8,09:30,11:00,market,Industry office hours,v-rink,,,industry_only,scheduled,,,
+e-552,8,11:00,12:00,panel,Documentary Ethics and Consent,v-canyon,,"p-186, p-196, p-197",,scheduled,,,
+e-276,8,11:30,13:20,screening,Sister Moon Motel,v-macky,f-21,,,scheduled,,1135,102
+e-361,8,11:30,12:56,screening,Smoke and Mirrors and Smoke,v-bhs,f-40,,,scheduled,,592,45
+e-524,8,11:30,12:54,screening,Saltwater Hymns,v-muenzinger,f-91,p-182,,scheduled,,285,20
+e-374,8,11:45,13:35,screening,Little Fires Inside,v-cinemark,f-43,,,scheduled,Auditorium 1,208,11
+e-252,8,12:00,13:46,screening,"Mother Tongue, Father Land",v-dairy,f-16,p-116,,scheduled,Gordon Gamm Theater,160,12
+e-304,8,12:00,13:33,screening,A Map of Nowhere,v-chautauqua,f-27,,,scheduled,,911,65
+e-442,8,12:00,14:10,screening,A House on Arapahoe,v-roe-green,f-63,p-157,,scheduled,,364,21
+e-461,8,12:15,14:11,screening,Last Call at the Blue Moon,v-boulder-theater,f-68,,,scheduled,,641,43
+e-222,8,12:30,14:21,screening,Where the Antelope Sleep,v-casey,f-09,,,scheduled,,242,18
+e-487,8,12:30,13:54,screening,The Cartographer,v-etown,f-76,,,scheduled,,187,11
+e-525,8,12:54,13:19,qa,Q&A: Saltwater Hymns,v-muenzinger,f-91,p-182,,scheduled,,,
+e-253,8,13:46,14:11,qa,"Q&A: Mother Tongue, Father Land",v-dairy,f-16,p-116,,scheduled,Gordon Gamm Theater,,
+e-553,8,14:00,15:00,panel,The Craft of Editing,v-old-main,,"p-187, p-112, p-117",,scheduled,,,
+e-443,8,14:10,14:35,qa,Q&A: A House on Arapahoe,v-roe-green,f-63,p-157,,scheduled,,,
+e-330,8,14:30,16:17,screening,Vigil,v-muenzinger,f-33,,,scheduled,,303,20
+e-177,8,14:45,15:40,screening,Fool's Fire,v-macky,f-95,,,scheduled,,1792,244
+e-213,8,14:45,16:20,screening,The Orchard Keepers,v-bhs,f-07,,,scheduled,,804,45
+e-357,8,15:00,16:48,screening,Visiting Hours,v-roe-green,f-39,,,scheduled,,290,21
+e-402,8,15:00,16:51,screening,Our Lady of the Interstate,v-cinemark,f-50,,,scheduled,Auditorium 1,191,11
+e-175,8,15:15,16:53,screening,Better Luck Tomorrow,v-boulder-theater,f-93,,,scheduled,,748,102
+e-257,8,15:15,16:44,screening,Hollow Mountain,v-chautauqua,f-17,p-117,,scheduled,,717,65
+e-332,8,15:30,17:02,screening,Howl at Nothing,v-casey,f-34,,,scheduled,,308,18
+e-390,8,15:30,16:52,screening,Bone Orchard,v-etown,f-47,,,scheduled,,188,11
+e-554,8,16:30,17:30,panel,Cinematographers Roundtable,v-canyon,,"p-184, p-118, p-157",,scheduled,,,
+e-258,8,16:44,17:09,qa,Q&A: Hollow Mountain,v-chautauqua,f-17,p-117,,scheduled,,,
+e-349,8,17:45,19:31,screening,Common Ground,v-muenzinger,f-37,,,scheduled,,257,20
+e-197,8,18:00,19:33,screening,All the Rooms We Lived In,v-dairy,f-04,p-105,,scheduled,Gordon Gamm Theater,204,12
+e-202,8,18:00,19:35,screening,Two Suns,v-boulder-theater,f-05,,,scheduled,,700,43
+e-387,8,18:00,19:28,screening,Leaving Mesa Verde,v-roe-green,f-46,,,scheduled,,349,21
+e-452,8,18:00,19:45,screening,How to Leave Tulsa,v-bhs,f-65,,,scheduled,,593,45
+e-473,8,18:00,19:54,screening,Wildfire Season,v-macky,f-71,,,scheduled,,1361,102
+e-352,8,18:15,19:43,screening,Here Lies Margo,v-cinemark,f-38,,,scheduled,Auditorium 1,193,11
+e-321,8,18:30,20:18,screening,Ghost Ranch Radio,v-chautauqua,f-31,,,scheduled,,924,65
+e-367,8,18:30,19:52,screening,Under the Same Moon Again,v-etown,f-41,,,scheduled,,173,11
+e-198,8,19:33,19:58,qa,Q&A: All the Rooms We Lived In,v-dairy,f-04,p-105,,scheduled,Gordon Gamm Theater,,
+e-218,8,21:00,22:30,screening,Saltwater Hymns,v-bhs,f-08,,,scheduled,,691,45
+e-229,8,21:00,22:30,screening,The Long Quiet,v-roe-green,f-11,p-112,,scheduled,,245,21
+e-234,8,21:00,22:59,screening,The Weight of Snow,v-dairy,f-12,,,scheduled,Gordon Gamm Theater,200,12
+e-262,8,21:00,22:24,screening,A Year Without Winter,v-muenzinger,f-18,p-118,,scheduled,,280,20
+e-477,8,21:15,22:42,screening,The Inheritance Machine,v-boulder-theater,f-73,,,scheduled,,782,43
+e-187,8,21:30,23:22,screening,The Weight of Snow,v-cinemark,f-01,,,scheduled,Auditorium 1,200,11
+e-208,8,21:30,23:28,screening,Heirloom,v-macky,f-06,,,scheduled,,1820,102
+e-273,8,21:30,23:09,screening,Unmarked,v-casey,f-20,,,scheduled,,290,18
+e-344,8,21:30,23:28,screening,Ironwood,v-etown,f-36,,,scheduled,,189,11
+e-431,8,21:45,23:43,screening,"Paradise, Nevada",v-chautauqua,f-58,,,scheduled,,1164,65
+e-263,8,22:24,22:49,qa,Q&A: A Year Without Winter,v-muenzinger,f-18,p-118,,scheduled,,,
+e-230,8,22:30,22:55,qa,Q&A: The Long Quiet,v-roe-green,f-11,p-112,,scheduled,,,
+e-261,9,08:30,09:59,screening,Hollow Mountain,v-bhs,f-17,,,scheduled,,847,45
+e-281,9,08:30,10:05,screening,Static,v-muenzinger,f-22,,,scheduled,,254,20
+e-291,9,09:00,10:26,screening,Small Hours,v-boulder-theater,f-24,,,scheduled,,624,43
+e-343,9,09:00,10:58,screening,Ironwood,v-dairy,f-36,,,scheduled,Gordon Gamm Theater,165,12
+e-377,9,09:30,11:00,screening,Undertow,v-etown,f-44,,,scheduled,,200,11
+e-564,9,09:30,11:00,market,Industry office hours,v-rink,,,industry_only,scheduled,,,
+e-555,9,11:00,12:00,panel,Festival Strategy for New Filmmakers,v-old-main,,"p-185, p-187, p-188",,scheduled,,,
+e-325,9,11:30,13:05,screening,Shadow Country,v-muenzinger,f-32,,,scheduled,,317,20
+e-417,9,11:30,13:23,screening,The Last Video Store in Laramie,v-macky,f-55,p-149,,scheduled,,1836,102
+e-444,9,11:30,13:40,screening,A House on Arapahoe,v-bhs,f-63,,,scheduled,,838,45
+e-199,9,11:45,13:18,screening,All the Rooms We Lived In,v-cinemark,f-04,,,scheduled,Auditorium 1,132,11
+e-305,9,12:00,14:01,screening,Second Shift,v-roe-green,f-28,p-126,,scheduled,,266,21
+e-316,9,12:00,13:34,screening,Desert Bloom,v-chautauqua,f-30,,,scheduled,,891,65
+e-523,9,12:00,13:21,screening,The Orchard Keepers,v-dairy,f-90,,,scheduled,Gordon Gamm Theater,152,12
+e-294,9,12:15,14:12,screening,The Midnight Projectionist,v-boulder-theater,f-25,,,scheduled,,749,43
+e-407,9,12:30,14:30,screening,What the River Took,v-casey,f-52,,,scheduled,,260,18
+e-462,9,12:30,14:26,screening,Last Call at the Blue Moon,v-etown,f-68,,,scheduled,,144,11
+e-418,9,13:23,13:48,qa,Q&A: The Last Video Store in Laramie,v-macky,f-55,p-149,,scheduled,,,
+e-556,9,14:00,15:00,panel,Youth Media in Colorado,v-canyon,,"p-186, p-190, p-191",,scheduled,,,
+e-306,9,14:01,14:26,qa,Q&A: Second Shift,v-roe-green,f-28,p-126,,scheduled,,,
+e-526,9,14:30,16:08,screening,Better Luck Tomorrow,v-muenzinger,f-93,,,scheduled,,349,20
+e-179,9,14:45,16:15,screening,Real Women Have Curves,v-macky,f-97,,,scheduled,,1792,244
+e-421,9,14:45,16:46,screening,The Body Electric,v-bhs,f-56,,,scheduled,,696,45
+e-186,9,15:00,16:52,screening,The Weight of Snow,v-dairy,f-01,,,scheduled,Gordon Gamm Theater,187,12
+e-359,9,15:00,16:26,screening,Smoke and Mirrors and Smoke,v-cinemark,f-40,,,scheduled,Auditorium 1,201,11
+e-456,9,15:00,16:57,screening,The Return of Rosa Ruiz,v-roe-green,f-66,,,scheduled,,302,21
+e-453,9,15:15,17:00,screening,How to Leave Tulsa,v-chautauqua,f-65,,,scheduled,,1178,65
+e-509,9,15:15,16:37,screening,The Tallest Man in Oaxaca,v-boulder-theater,f-82,p-175,,scheduled,,697,43
+e-238,9,15:30,17:16,screening,The Ferryman's Daughter,v-casey,f-13,p-113,,scheduled,,312,18
+e-285,9,15:30,16:58,screening,Kingdom of Small Things,v-etown,f-23,,,scheduled,,145,11
+e-510,9,16:37,17:02,qa,Q&A: The Tallest Man in Oaxaca,v-boulder-theater,f-82,p-175,,scheduled,,,
+e-239,9,17:16,17:41,qa,Q&A: The Ferryman's Daughter,v-casey,f-13,p-113,,scheduled,,,
+e-236,9,17:45,19:44,screening,The Weight of Snow,v-muenzinger,f-12,,,scheduled,,331,20
+e-182,9,18:00,19:53,screening,Memento,v-roe-green,f-100,,,scheduled,,363,49
+e-310,9,18:00,19:56,screening,Every Kind of Weather,v-boulder-theater,f-29,,,scheduled,,512,43
+e-435,9,18:00,19:40,screening,The Bees of Brooklyn,v-bhs,f-60,p-154,,scheduled,,772,45
+e-500,9,18:00,19:36,screening,Paper Lanterns,v-dairy,f-79,,,scheduled,Gordon Gamm Theater,135,12
+e-565,9,18:00,20:30,activity,Awards night,v-macky,,,vip_only,scheduled,,,
+e-266,9,18:15,19:39,screening,A Year Without Winter,v-cinemark,f-18,,,scheduled,Auditorium 1,151,11
+e-211,9,18:30,20:05,screening,The Orchard Keepers,v-etown,f-07,,,scheduled,,205,11
+e-331,9,18:30,20:17,screening,Vigil,v-casey,f-33,,,scheduled,,258,18
+e-373,9,18:30,20:20,screening,Little Fires Inside,v-chautauqua,f-43,,,scheduled,,1014,65
+e-436,9,19:40,20:05,qa,Q&A: The Bees of Brooklyn,v-bhs,f-60,p-154,,scheduled,,,
+e-250,9,21:00,22:36,screening,Copper Valley,v-roe-green,f-15,,,scheduled,,312,21
+e-277,9,21:00,22:50,screening,Sister Moon Motel,v-dairy,f-21,,,scheduled,Gordon Gamm Theater,135,12
+e-370,9,21:00,22:23,screening,The Hum,v-muenzinger,f-42,,,scheduled,,337,20
+e-512,9,21:00,22:32,screening,Borrowed Light,v-bhs,f-83,,,scheduled,,777,45
+e-226,9,21:15,22:50,screening,Dead Air,v-boulder-theater,f-10,,,scheduled,,783,43
+e-205,9,21:30,23:05,screening,Two Suns,v-macky,f-05,,,scheduled,,1392,102
+e-206,9,21:30,23:28,screening,Heirloom,v-etown,f-06,p-107,,scheduled,,138,11
+e-302,9,21:30,23:03,screening,A Map of Nowhere,v-cinemark,f-27,,,scheduled,Auditorium 1,180,11
+e-504,9,21:30,23:15,screening,Feral,v-casey,f-80,,,scheduled,,284,18
+e-434,9,21:45,23:36,screening,Teeth,v-chautauqua,f-59,,,scheduled,,1128,65
+e-207,9,23:28,23:53,qa,Q&A: Heirloom,v-etown,f-06,p-107,,scheduled,,,
+e-246,10,08:30,10:03,screening,Good Neighbors,v-muenzinger,f-14,,,scheduled,,244,20
+e-315,10,08:30,10:04,screening,Desert Bloom,v-bhs,f-30,,,scheduled,,786,45
+e-309,10,09:00,11:01,screening,Second Shift,v-boulder-theater,f-28,,,scheduled,,711,43
+e-326,10,09:00,10:35,screening,Shadow Country,v-dairy,f-32,,,scheduled,Gordon Gamm Theater,177,12
+e-378,10,09:00,10:30,screening,Undertow,v-roe-green,f-44,,,scheduled,,265,21
+e-247,10,09:30,11:06,screening,Copper Valley,v-casey,f-15,p-115,,scheduled,,250,18
+e-282,10,09:30,11:05,screening,Static,v-etown,f-22,,,scheduled,,192,11
+e-248,10,11:06,11:31,qa,Q&A: Copper Valley,v-casey,f-15,p-115,,scheduled,,,
+e-322,10,11:30,13:18,screening,Ghost Ranch Radio,v-bhs,f-31,,,scheduled,,611,45
+e-348,10,11:30,13:16,screening,Common Ground,v-muenzinger,f-37,,,scheduled,,295,20
+e-439,10,11:30,13:29,screening,The Understudies,v-macky,f-62,,,scheduled,,1439,102
+e-237,10,11:45,13:44,screening,The Weight of Snow,v-cinemark,f-12,,,scheduled,Auditorium 1,179,11
+e-176,10,12:00,13:31,screening,Dogtown and Z-Boys,v-roe-green,f-94,,,scheduled,,363,49
+e-363,10,12:00,13:22,screening,Under the Same Moon Again,v-dairy,f-41,p-138,,scheduled,Gordon Gamm Theater,212,12
+e-415,10,12:00,13:48,screening,Dogs of the Mesa,v-chautauqua,f-54,,,scheduled,,986,65
+e-472,10,12:15,14:09,screening,Wildfire Season,v-boulder-theater,f-71,,,scheduled,,768,43
+e-313,10,12:30,14:26,screening,Every Kind of Weather,v-etown,f-29,,,scheduled,,154,11
+e-445,10,12:30,14:40,screening,A House on Arapahoe,v-casey,f-63,,,scheduled,,232,18
+e-364,10,13:22,13:47,qa,Q&A: Under the Same Moon Again,v-dairy,f-41,p-138,,scheduled,Gordon Gamm Theater,,
+e-433,10,14:30,16:21,screening,Teeth,v-muenzinger,f-59,,,scheduled,,266,20
+e-267,10,14:45,16:36,screening,Signal Fire,v-bhs,f-19,,,scheduled,,656,45
+e-426,10,14:45,16:49,screening,Lullaby for a Drone,v-macky,f-57,,,scheduled,,1599,102
+e-289,10,15:00,16:26,screening,Small Hours,v-roe-green,f-24,,,scheduled,,324,21
+e-345,10,15:00,16:58,screening,Ironwood,v-dairy,f-36,,,scheduled,Gordon Gamm Theater,136,12
+e-467,10,15:00,17:02,screening,Bright Fever,v-cinemark,f-69,,,scheduled,Auditorium 1,152,11
+e-430,10,15:15,17:13,screening,"Paradise, Nevada",v-boulder-theater,f-58,,,scheduled,,595,43
+e-496,10,15:15,16:51,screening,Soft Animals,v-chautauqua,f-78,,,scheduled,,953,65
+e-217,10,15:30,17:00,screening,Saltwater Hymns,v-casey,f-08,,,scheduled,,303,18
+e-338,10,15:30,17:26,screening,Seven Ways to Disappear,v-etown,f-35,,,scheduled,,194,11
+e-223,10,17:45,19:36,screening,Where the Antelope Sleep,v-muenzinger,f-09,,,scheduled,,345,20
+e-188,10,18:00,19:56,screening,In the Year of the Locust,v-bhs,f-02,p-103,,scheduled,,614,45
+e-194,10,18:00,19:40,screening,Afterglow Drive,v-boulder-theater,f-03,,,scheduled,,509,43
+e-333,10,18:00,19:32,screening,Howl at Nothing,v-roe-green,f-34,,,scheduled,,255,21
+e-391,10,18:00,19:22,screening,Bone Orchard,v-macky,f-47,,,scheduled,,1307,102
+e-527,10,18:00,19:53,screening,Memento,v-dairy,f-100,,,scheduled,Gordon Gamm Theater,168,12
+e-399,10,18:15,20:06,screening,Our Lady of the Interstate,v-cinemark,f-50,p-144,,scheduled,Auditorium 1,197,11
+e-228,10,18:30,20:05,screening,Dead Air,v-chautauqua,f-10,,,scheduled,,762,65
+e-274,10,18:30,20:09,screening,Unmarked,v-casey,f-20,,,scheduled,,224,18
+e-286,10,18:30,19:58,screening,Kingdom of Small Things,v-etown,f-23,,,scheduled,,170,11
+e-189,10,19:56,20:21,qa,Q&A: In the Year of the Locust,v-bhs,f-02,p-103,,scheduled,,,
+e-400,10,20:06,20:31,qa,Q&A: Our Lady of the Interstate,v-cinemark,f-50,p-144,,scheduled,Auditorium 1,,
+e-360,10,21:00,22:26,screening,Smoke and Mirrors and Smoke,v-muenzinger,f-40,,,scheduled,,311,20
+e-381,10,21:00,22:48,screening,Field Notes for a Flood,v-bhs,f-45,,,scheduled,,562,45
+e-437,10,21:00,22:40,screening,The Bees of Brooklyn,v-dairy,f-60,,,scheduled,Gordon Gamm Theater,207,12
+e-491,10,21:00,22:39,screening,"Holy Water, Hard Water",v-roe-green,f-77,,,scheduled,,369,21
+e-353,10,21:15,22:43,screening,Here Lies Margo,v-boulder-theater,f-38,,,scheduled,,594,43
+e-299,10,21:30,23:23,screening,Dear Tomorrow,v-macky,f-26,,,scheduled,,1264,102
+e-369,10,21:30,22:53,screening,The Hum,v-etown,f-42,,,scheduled,,167,11
+e-398,10,21:30,23:24,screening,Northbound,v-cinemark,f-49,,,scheduled,Auditorium 1,124,11
+e-422,10,21:30,23:31,screening,The Body Electric,v-casey,f-56,,,scheduled,,325,18
+e-193,11,11:30,13:10,screening,Afterglow Drive,v-macky,f-03,,,scheduled,,1349,102
+e-224,11,11:30,13:05,screening,Dead Air,v-bhs,f-10,p-111,,scheduled,,792,45
+e-265,11,11:30,12:54,screening,A Year Without Winter,v-muenzinger,f-18,,,scheduled,,266,20
+e-242,11,11:45,13:31,screening,The Ferryman's Daughter,v-cinemark,f-13,,,scheduled,Auditorium 1,189,11
+e-180,11,12:00,13:22,screening,Swoon,v-roe-green,f-98,,,scheduled,,363,49
+e-243,11,12:00,13:33,screening,Good Neighbors,v-dairy,f-14,,,scheduled,Gordon Gamm Theater,223,12
+e-287,11,12:00,13:26,screening,Small Hours,v-chautauqua,f-24,p-123,,scheduled,,789,65
+e-221,11,12:15,14:06,screening,Where the Antelope Sleep,v-boulder-theater,f-09,,,scheduled,,795,43
+e-190,11,12:30,14:26,screening,In the Year of the Locust,v-casey,f-02,,,scheduled,,314,18
+e-203,11,12:30,14:05,screening,Two Suns,v-etown,f-05,,,scheduled,,151,11
+e-225,11,13:05,13:30,qa,Q&A: Dead Air,v-bhs,f-10,p-111,,scheduled,,,
+e-288,11,13:26,13:51,qa,Q&A: Small Hours,v-chautauqua,f-24,p-123,,scheduled,,,
+e-200,11,14:30,16:03,screening,All the Rooms We Lived In,v-muenzinger,f-04,,,scheduled,,345,20
+e-260,11,14:45,16:14,screening,Hollow Mountain,v-bhs,f-17,,,scheduled,,666,45
+e-307,11,14:45,16:46,screening,Second Shift,v-macky,f-28,,,scheduled,,1217,102
+e-272,11,15:00,16:39,screening,Unmarked,v-cinemark,f-20,,,scheduled,Auditorium 1,187,11
+e-275,11,15:00,16:50,screening,Sister Moon Motel,v-dairy,f-21,,,scheduled,Gordon Gamm Theater,155,12
+e-295,11,15:00,16:57,screening,The Midnight Projectionist,v-roe-green,f-25,,,scheduled,,231,21
+e-181,11,15:15,17:01,screening,Y tu mamá también,v-boulder-theater,f-99,,,scheduled,,748,102
+e-351,11,15:15,16:43,screening,Here Lies Margo,v-chautauqua,f-38,,,scheduled,,793,65
+e-280,11,15:30,17:05,screening,Static,v-casey,f-22,,,scheduled,,195,18
+e-312,11,15:30,17:26,screening,Every Kind of Weather,v-etown,f-29,,,scheduled,,175,11
+e-209,11,17:45,19:43,screening,Heirloom,v-muenzinger,f-06,,,scheduled,,312,20
+e-178,11,18:00,19:07,screening,Nitrate Kisses,v-boulder-theater,f-96,,,scheduled,,748,102
+e-215,11,18:00,19:30,screening,Saltwater Hymns,v-roe-green,f-08,,,scheduled,,257,21
+e-298,11,18:00,19:53,screening,Dear Tomorrow,v-dairy,f-26,,,scheduled,Gordon Gamm Theater,159,12
+e-317,11,18:00,19:34,screening,Desert Bloom,v-bhs,f-30,,,scheduled,,807,45
+e-340,11,18:00,19:56,screening,Seven Ways to Disappear,v-macky,f-35,,,scheduled,,1649,102
+e-303,11,18:15,19:48,screening,A Map of Nowhere,v-cinemark,f-27,,,scheduled,Auditorium 1,156,11
+e-268,11,18:30,20:21,screening,Signal Fire,v-etown,f-19,,,scheduled,,194,11
+e-284,11,18:30,19:58,screening,Kingdom of Small Things,v-casey,f-23,,,scheduled,,311,18
+e-376,11,18:30,20:00,screening,Undertow,v-chautauqua,f-44,,,scheduled,,1179,65

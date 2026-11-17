@@ -12,17 +12,16 @@ Schedule changes are relayed by hand across spreadsheets, emails and group chats
 
 ## Tutorial: a festival day in ten minutes
 
-1. **Open the site** and press **Try the live demo**. On the welcome screen choose **Or try a sample festival** (Harbor Lights, April 15 to 17, 2027: 40 films, 4 venues, 162 people).
+1. **Open the site** and press **Try the live demo**. On the welcome screen choose **Or try a sample festival**: the **Sundance Film Festival 2027** in Boulder, Colorado, January 21 to 31, 2027 (11 days, 13 real venues, 100 films, 559 events, 386 made-up people). The venues, dates, buses and rules are the festival's public plan; see [`data/sundance-2027/`](data/sundance-2027/README.md).
 2. **Sign in.** Pick a profile: Organizer, Staff, Guest, Attendee or Vendor. Type any access code and press **Open my profile** (in the demo any code works; real codes are on the **Access codes** page). You can also ask for a code by email.
-3. **Overview (organizer).** The banner shows the festival; the calendar below shows each venue's day. Switch days with the small **Day 1 / 2 / 3** tabs.
-4. **Bring in the problems.** Press **Bring on the problems** at the bottom left. Three alerts appear and the banner reads "3 problems need you":
-   - Pavel Kettering is running late for his 4:00 panel.
-   - Thunderstorms from 3:00 to 6:00 pm on Day 1.
-   - Snow from 1:00 to 7:00 pm on Day 2.
-5. **Open a recommendation.** Press **Agent's recommendation** on an alert. The calendar previews the new plan: moved events slide to their new time (old time crossed out), and a swapped guest shows as avatars changing places. The recommendation sits on the left: one sentence on what happened, then a checklist. Untick anything you don't want; **Approve** appears once the preview has played.
+3. **Overview (organizer).** Pick a day from the strip of date cards (the demo opens on Friday, January 22). The **Calendar | Map** switch shows the day as a venue calendar or as the venues on a street map of Boulder; click a venue on the map for its agenda. **Light** in the top bar switches the tool to light mode.
+4. **Bring in the problems.** Press **Bring on the problems** at the bottom left. Two alerts appear:
+   - **Day 2, Fri Jan 22:** producer Dana Whitfield can't make it (her flight from New York is cancelled by a nor'easter); she was due at a 2:00 pm talk and her film's 6:00 pm premiere.
+   - **Day 3, Sat Jan 23:** snow from 1:00 to 7:00 pm, 6 to 9 inches of upslope snow.
+5. **Open a recommendation.** Press **Agent's recommendation** on an alert. The calendar previews the new plan: moved events slide to their new time (old time crossed out), a stand-in shows as avatars changing places, a video guest as a camera, and released seats lift off the card. On the **Map**, every venue with a change opens its own small window on the map, joined to its pin, playing the same moves. The checklist sits on the left (on a computer it is always open). Untick anything you don't want; **Approve** appears once the preview has played.
 6. **Approve.** The events move, the right people are messaged, and the alert clears. **Original plan** above the calendar shows the schedule as it was. With two or more problems open, **Fix them all** gives one combined recommendation.
-7. **See it from the other side.** On **Access codes**, view the festival as any person, or sign in as an Attendee (the sample attendee is Mira Galloway). **Plan** lists the day one row per event: moved times show the old time crossed out, the walk between venues says when to leave, an overlap asks which one to keep, a cancellation offers a swap, and a storm on the way asks whether to keep the next screening or stay put. **Map** shows the route, **Updates** holds only messages about your plan, and the initials at the top open the pass. On a shared festival the alerts and the approved plan reach every phone.
-8. **Who's here.** Each venue is drawn as a small building whose floors light up as expected people are scanned in. Late guests show on their venue. Click a venue to filter the list; use **Scan people in** at the door and **Download list** for the day.
+7. **See it from the other side.** On **Access codes**, view the festival as any person, or sign in as an Attendee (the sample attendee is Jane: Dana's talk and premiere on Friday, a trip across town in Saturday's snow). **Plan** lists the day one row per event: moved times show the old time crossed out, the walk between venues says when to leave, an overlap asks which one to keep, a cancellation offers a swap, and a storm on the way asks whether to keep the next screening or stay put. **Map** shows the route, **Updates** holds only messages about your plan, and the initials at the top open the pass. On a shared festival the alerts and the approved plan reach every phone.
+8. **Live phones.** Press **Show phone** in the top bar: an attendee's (Jane) or a volunteer's (Tova Jessop) phone sits beside the dashboard. Approve a recommendation and it reaches that phone at once: a push banner, the latest update on top of the Plan, and the changed rows (new times, "Ravi Castellanos replaces Dana"). The **Light** switch changes every screen together.
 9. **Approvals.** Anything waiting for a person (messages to attendees, guests or partners, public listings) and every flag (guest clashes, double-booked rooms, uncovered shifts) is here.
 10. **Start again.** Settings (gear, top right) → **Reset demo**.
 
@@ -32,10 +31,9 @@ Everyone except the organizer uses Usher on a phone; on a computer their app ope
 
 | Page | What it's for |
 |---|---|
-| Overview | Problems the agent has raised, their recommendations, and the venue calendar |
+| Overview | The day in numbers (tickets, screenings, check-ins, guests on stage), problems and their recommendations, and the venues as a calendar or a map. Click an event for its details: who is on stage and whether they're here, seats, plans, crew, and edits (time, venue, guests, cancel) that run the agent |
 | Approvals | Flags and anything waiting for approval |
-| Who's here | Arrivals by venue, door scanning, the day's list |
-| Schedule | Edit times, venues and guests like the sheet; saving runs the agent and shows recent changes |
+| Log | Everything the agent did, live: what it saw, worked out, decided, did or asked, and who approved; plus every message sent |
 | Ask | Questions answered from the festival's own documents, or "I don't know" |
 | Volunteer briefs | Each volunteer's live brief, rebuilt from the current schedule |
 | Live feeds | Weather, guest flights, print deliveries and vendor feeds |
@@ -59,7 +57,7 @@ Every run: **trigger** (schedule edit, feed alert, scan, question) → **underst
 
 - A fixed rule (`src/agent/approvals.ts`), not the model, decides what needs a person: messages to attendees, guests or partners, public listings and announcements always wait for approval; internal briefs and staff heads-ups go straight out.
 - Recommendations are computed from the schedule, travel times, passes and each person's plan. The language model only rephrases messages, and a rewrite is discarded if it changes any time, title or number.
-- The sample festival uses made-up people (`@example.test`).
+- The sample festival is Sundance 2027's public plan with made-up people (`@example.test`) and made-up film titles (the line-up is announced in December), except the 8 announced Legacy titles. A small fixed festival (Harbor Lights, `src/data/seed.ts`) is kept for the unit tests and the evaluation.
 
 ## Run it
 
@@ -101,11 +99,12 @@ Weather uses Open-Meteo and needs no key. Never commit keys.
 
 ```
 app/            the site (/), onboarding, the app (/app) and API routes (/app/api)
-app/ui/         screens: Overview, recommendations, calendar, Who's here, people's apps
+app/ui/         screens: Overview (numbers, calendar, map, event details), recommendations, Log, people's apps, live push
 src/agent/      the agent: propagation, recommendations, weather, clashes, briefs, approvals, log
 src/access/     profiles and access codes
 src/rules/      pass and badge rules, QR codes
-src/data/       the sample festival and Google Sheet reading
+src/data/       the Sundance 2027 demo (sundance2027.ts facts, sundance.ts generator, boulder-map.ts streets from OpenStreetMap), the test festival, Google Sheet reading
+data/sundance-2027/  the public research with sources, and the demo as CSVs
 src/onboard/    reading uploaded files and sheets
 src/server/     shared storage, sessions, email, SMS and push
 tests/          unit tests and evaluation scenarios

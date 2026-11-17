@@ -5,13 +5,13 @@
 // checklist while the calendar previews the moves; one approval makes it
 // the new plan, and the plan before stays one tap away.
 //
-// The same goes for a key guest running late (the mock festival's Pavel
-// Kettering, due on the "Selling at Markets" panel): the agent recommends
-// opening with a backup who is already at the venue.
+// The same goes for a key guest who can't make it (the Sundance sample's
+// producer, whose flight is cancelled on Day 2): the agent recommends a
+// stand-in already in town, a video link for her Q&A, and releasing her seats.
 //
-// For demos the alerts come from scripted feeds: Day 1 thunderstorms,
-// Pavel running late, and Day 2 snow are raised on first open, and the
-// demo toolbar can raise any of them.
+// For demos the alerts come from scripted feeds (src/data/sundance2027.ts,
+// SCENARIOS): the producer on Day 2 and an upslope snowstorm on Day 3,
+// brought in with the button at the bottom left.
 //
 // Everything here comes from the agent's own rules (src/agent/weather.ts):
 // the same risk windows, staff heads-ups, volunteer briefs and personal
@@ -26,6 +26,7 @@ import type { DayNumber, FestivalEvent } from '../../src/core/types';
 import { addMinutes, clock as fmt, overlaps, toMinutes } from '../../src/core/time';
 import { Icon } from './icons';
 import { boardChanged } from './localkeys';
+import { SCENARIOS } from '../../src/data/sundance2027';
 
 export type WxKind = 'storm' | 'snow' | 'heat';
 const KINDS: { k: WxKind; label: string; icon: 'cloud' | 'alert' | 'clock' }[] = [
@@ -106,11 +107,10 @@ export type AlertKind = WxKind | 'guest';
 export interface WxAlert { id: string; kind: AlertKind; day: DayNumber; status: 'open' | 'done' }
 const ALERTS_KEY = 'usher-alerts-v3';
 const EVENT = 'usher-alerts';
-/** The demo's three problems, brought in from the hidden button on Overview. */
+/** The demo's two problems, brought in from the button on Overview: a producer who can't come, and snow. */
 const DEMO_ALERTS: WxAlert[] = [
-  { id: 'guest-d1', kind: 'guest', day: 1 as DayNumber, status: 'open' },
-  { id: 'storm-d1', kind: 'storm', day: 1 as DayNumber, status: 'open' },
-  { id: 'snow-d2', kind: 'snow', day: 2 as DayNumber, status: 'open' },
+  { id: `guest-d${SCENARIOS.producer.day}`, kind: 'guest', day: SCENARIOS.producer.day as DayNumber, status: 'open' },
+  { id: `snow-d${SCENARIOS.snow.day}`, kind: 'snow', day: SCENARIOS.snow.day as DayNumber, status: 'open' },
 ];
 /** All quiet until someone brings the problems in. */
 export function readAlerts(): WxAlert[] {
@@ -137,12 +137,12 @@ export function bringProblems() { broughtOn = true; writeAlerts(DEMO_ALERTS.map(
  * Demo control: a small button that shows only when the pointer reaches the
  * bottom-left corner. It brings the three problems in, or calms things down.
  */
-export function ProblemTrigger() {
+export function ProblemTrigger({ s }: { s: AgentStore }) {
   const [alerts] = useAlerts();
   const live = alerts.some(a => a.status === 'open');
   return (
     <div className="problem-trigger" data-lve-skip>
-      <button onClick={() => (live ? resetAlerts() : bringProblems())}>
+      <button onClick={() => { if (live) resetAlerts(); else { bringProblems(); logProblems(s); } }}>
         <Icon name={live ? 'check' : 'bolt'} size={14} /> {live ? 'Calm things down' : 'Bring on the problems'}
       </button>
     </div>
@@ -161,7 +161,8 @@ export function useAlerts(): [WxAlert[], (list: WxAlert[]) => void] {
 }
 
 // ------------------------------------------------------------------ one recommendation, whatever raised it
-export interface Preview { events: FestivalEvent[]; moved: string[]; notes?: Record<string, string> }
+/** marks: how a change that doesn't move an event is animated, e.g. 'video' or 'seats:4'. */
+export interface Preview { events: FestivalEvent[]; moved: string[]; notes?: Record<string, string>; marks?: Record<string, string> }
 interface Rec {
   title: string;
   sub: string;
@@ -201,11 +202,13 @@ function weatherRec(s: AgentStore, kind: WxKind, day: DayNumber): Rec | null {
   const items = [
     ...(plan.moved.length ? [{ key: 'shift', text: `Start ${plural(plan.moved.length, 'event')} ${plan.delay} min later` }] : []),
     ...(plan.people ? [{ key: 'people', text: `Send ${plural(plan.people, 'person', 'people')} their new time` }] : []),
+    ...(kind === 'snow' ? [{ key: 'shuttle', text: SCENARIOS.snow.shuttle }] : []),
+    ...(kind === 'snow' && s.agent.f.venues.some(v => v.id === 'v-chautauqua') && plan.after.some(e => e.day === day && e.venueId === 'v-chautauqua') ? [{ key: 'doors', text: SCENARIOS.snow.chautauqua }] : []),
     { key: 'team', text: `Brief ${plural(plan.staff, 'staff member')}${plan.volunteers ? ` and ${plural(plan.volunteers, 'volunteer')}` : ''}` },
   ];
   return {
     title: `${NAME[kind]} ${fmt(plan.risk.from)} to ${fmt(plan.risk.to)}`,
-    sub: `Day ${day} · ${dayName(s, day)} · from the forecast`,
+    sub: `Day ${day} · ${dayName(s, day)} · ${kind === 'snow' && hasDemoProblems(s) && day === SCENARIOS.snow.day ? SCENARIOS.snow.detail : 'from the forecast'}`,
     what: `${plan.starting ? `${plural(plan.starting, 'event')} start${plan.starting === 1 ? 's' : ''} in the ${kind === 'heat' ? 'heat' : kind === 'snow' ? 'snow' : 'storm'}` : 'Nothing starts in this window'}`
       + `${plan.people ? `, with ${plural(plan.people, 'person', 'people')} on the way` : ''}. Starting later ${WHY[kind].replace(/^so /, 'means ')}.`,
     items,
@@ -218,61 +221,122 @@ function weatherRec(s: AgentStore, kind: WxKind, day: DayNumber): Rec | null {
         (x.kind === 'notify_staff' || x.kind === 'update_brief') ? want('team')
           : x.kind === 'notify_people' ? want('people') && !moving : false);
       for (const act of notes) send(s, act.id, act.kind, act.title, act.messages ?? [], by);
+      if (kind === 'snow' && want('shuttle')) {
+        const ops = s.agent.f.people.filter(p => p.role === 'festival_staff' && /operations|transport/.test(p.staffRole ?? ''));
+        send(s, 'snow-shuttle', 'notify_staff', 'Shuttle runs more often through the snow', ops.map(p => ({ personId: p.id, channel: 'app_push', subject: SCENARIOS.snow.shuttle,
+          body: `${NAME[kind]} ${fmt(plan.risk.from)} to ${fmt(plan.risk.to)}. ${SCENARIOS.snow.shuttleBody}` })), by);
+      }
+      if (kind === 'snow' && want('doors')) {
+        const house = s.agent.f.people.filter(p => p.role === 'festival_staff' && /house_manager|operations/.test(p.staffRole ?? ''));
+        send(s, 'snow-doors', 'notify_staff', 'Chautauqua opens its doors early', house.map(p => ({ personId: p.id, channel: 'app_push', subject: 'Chautauqua: doors 15 min early',
+          body: `${NAME[kind]} ${fmt(plan.risk.from)} to ${fmt(plan.risk.to)}. Chautauqua's line is outdoors with no indoor waiting: open the house 15 minutes earlier than usual for each screening in the window and keep the steps salted.` })), by);
+      }
       return { before: moving ? before : null };
     },
   };
 }
 
-/** The mock festival's classic: Pavel Kettering, due on "Selling at Markets", is running late. */
-function guestRec(s: AgentStore, day: DayNumber): Rec | null {
+/**
+ * The sample's people problem: a key producer can't make it at all. Her flight is
+ * cancelled, so the agent recommends a stand-in already in town for her talk,
+ * bringing her into the premiere Q&A by video, releasing her held seats, and
+ * telling everyone on stage and behind it.
+ */
+function absentRec(s: AgentStore, day: DayNumber): Rec | null {
   const f = s.agent.f;
-  const person = (name: string) => f.people.find(p => p.name === name);
-  const lateId = lateGuestId(s);
-  const pavel = f.people.find(p => p.id === lateId);
-  if (!pavel) return null;
-  const ev = f.events.find(e => e.day === day && e.status === 'scheduled' && e.guestIds.includes(pavel.id) && e.kind === 'panel')
-    ?? f.events.find(e => e.day === day && e.status === 'scheduled' && e.guestIds.includes(pavel.id));
-  if (!ev) return null;
-  const venue = f.venues.find(v => v.id === ev.venueId)?.name ?? 'the venue';
-  // The backup: a guest already at that venue earlier the same day, not on this panel.
-  const backup = [person('Yara Hollis'), ...f.people.filter(p => p.role === 'guest')]
-    .find(p => p && p.id !== pavel.id && !ev.guestIds.includes(p.id) && f.events.some(e => e.day === day && e.venueId === ev.venueId && e.guestIds.includes(p.id) && toMinutes(e.end) <= toMinutes(ev.start)));
-  const eta = addMinutes(ev.start, 20);
-  const others = ev.guestIds.filter(id => id !== pavel.id).map(id => f.people.find(p => p.id === id)).filter(Boolean) as typeof f.people;
+  const sc = SCENARIOS.producer;
+  const prod = f.people.find(p => p.id === lateGuestId(s));
+  if (!prod) return null;
+  const first = prod.name.split(' ')[0];
+  const mine = f.events.filter(e => e.day === day && e.status === 'scheduled' && e.guestIds.includes(prod.id)).sort((a, b) => a.start.localeCompare(b.start));
+  if (!mine.length) return null;
+  const talk = mine.find(e => e.kind === 'panel');
+  const qa = mine.find(e => e.kind === 'qa');
+  const premiere = qa ? f.events.find(e => e.kind === 'screening' && e.filmId === qa.filmId && e.end === qa.start) : mine.find(e => e.kind === 'screening');
+  const venue = (e?: FestivalEvent) => f.venues.find(v => v.id === e?.venueId)?.name ?? 'the venue';
+  // The stand-in: the named co-producer if in town, otherwise a guest already on the programme that day.
+  const inTown = (p?: { id: string }) => !!p && f.events.some(e => e.day === day && e.guestIds.includes(p.id));
+  const named = f.people.find(p => p.name === sc.backup);
+  const backup = talk ? [named, ...f.people.filter(p => p.role === 'guest')]
+    .find(p => p && p.id !== prod.id && !talk.guestIds.includes(p.id) && inTown(p)) : undefined;
+  const held = premiere?.seatsHeld ? Math.min(4, premiere.seatsHeld) : 4;
+  const others = talk ? talk.guestIds.filter(id => id !== prod.id).map(id => f.people.find(p => p.id === id)).filter(Boolean) as typeof f.people : [];
   const staff = f.people.filter(p => p.role === 'festival_staff');
-  const after = f.events.map(e => (e.id === ev.id && backup ? { ...e, guestIds: [backup.id, ...e.guestIds] } : { ...e }));
+  // Everyone with her talk, premiere or Q&A on their plan (tickets and saved events), and the volunteers working them.
+  const hers = [talk, premiere, qa].filter(Boolean) as FestivalEvent[];
+  const audience = [...new Set([...f.tickets, ...f.bookings].filter(b => hers.some(e => e.id === b.eventId)).map(b => b.personId))]
+    .map(id => f.people.find(p => p.id === id)).filter(p => p && (p.role === 'attendee' || p.role === 'industry' || p.role === 'press')) as typeof f.people;
+  const crew = [...new Set(f.shifts.filter(x => hers.some(e => e.venueId === x.venueId && overlaps(x.start, x.end, e.start, e.end))).map(x => x.personId))];
   const items = [
-    ...(backup ? [{ key: 'open', text: `Open with ${backup.name}, already at ${venue}` }] : []),
-    { key: 'guest', text: `Tell ${pavel.name.split(' ')[0]} to go straight to the stage` },
-    { key: 'team', text: `Tell ${others.length ? `${plural(others.length, 'panelist')} and ` : ''}${plural(staff.length, 'staff member')}` },
+    ...(talk && backup ? [{ key: 'swap', text: `${backup.name} takes ${first}'s seat at "${talk.title}"` }] : []),
+    ...(qa ? [{ key: 'video', text: `${first} joins the ${fmt(qa.start)} Q&A by video` }] : []),
+    ...(premiere ? [{ key: 'seats', text: `Release her ${held} held seats to the waitlist` }] : []),
+    ...(audience.length ? [{ key: 'people', text: `Tell ${plural(audience.length, 'person', 'people')} with her talk or premiere in their plan` }] : []),
+    { key: 'team', text: `Tell ${others.length ? `${plural(others.length, 'panelist')}, ` : ''}the moderator, ${plural(staff.length, 'staff member')}${crew.length ? ` and ${plural(crew.length, 'volunteer')}` : ''}` },
   ];
+  const plan = (off: Set<string>) => {
+    const after = f.events.map(e => ({ ...e, guestIds: [...e.guestIds] }));
+    const notes: Record<string, string> = {};
+    const marks: Record<string, string> = {};
+    const moved: string[] = [];
+    const ev = (id?: string) => after.find(e => e.id === id);
+    if (talk && backup && !off.has('swap')) {
+      const t = ev(talk.id)!;
+      t.guestIds = [backup.id, ...t.guestIds.filter(g => g !== prod.id)];
+      notes[talk.id] = `${backup.name} replaces ${first}`; moved.push(talk.id);
+    }
+    if (qa && !off.has('video')) { notes[qa.id] = `${first} joins by video`; marks[qa.id] = 'video'; moved.push(qa.id); }
+    if (premiere && !off.has('seats')) {
+      const p = ev(premiere.id)!;
+      p.seatsHeld = Math.max(0, (p.seatsHeld ?? held) - held);
+      notes[premiere.id] = `${held} held seats to the waitlist`; marks[premiere.id] = `seats:${held}`; moved.push(premiere.id);
+    }
+    return { after, notes, marks, moved };
+  };
   return {
-    title: `${pavel.name} is running late`,
-    sub: `${ev.title} · Day ${day}, ${fmt(ev.start)} · ${venue}`,
-    what: `Stuck on the harbor bridge; he now reaches ${venue} at ${fmt(eta)}, 20 min after the start.`,
+    title: `${prod.name} can't make it`,
+    sub: `${sc.cause} · Day ${day} · ${dayName(s, day)}`,
+    what: `${first} produced "${f.films.find(x => x.id === (qa ?? premiere)?.filmId)?.title ?? 'her film'}". ${sc.why}`,
     items,
-    preview: off => (backup && !off.has('open') ? { events: after, moved: [ev.id], notes: { [ev.id]: `${backup.name} opens · ${pavel.name.split(' ')[0]} joins ${fmt(eta)}` } } : null),
+    preview: off => { const p = plan(off); return p.moved.length ? { events: p.after, moved: p.moved, notes: p.notes, marks: p.marks } : null; },
     apply: async (want, by) => {
-      const before = f.events.map(e => ({ ...e }));
-      const opening = want('open') && !!backup;
-      if (opening) await regrid(s, after, by, false);
-      if (opening && backup) send(s, 'late-backup', 'notify_people', `${backup.name} asked to open "${ev.title}"`, [{ personId: backup.id, channel: channelFor(backup), subject: `Could you open "${ev.title}" at ${fmt(ev.start)}?`,
-        body: `${pavel.name} is running late and expects to arrive about ${fmt(eta)}. Could you open "${ev.title}" at ${fmt(ev.start)} in ${venue}? He will join on stage when he arrives.` }], by);
-      if (want('guest')) send(s, 'late-guest', 'notify_people', `${pavel.name} told to join on arrival`, [{ personId: pavel.id, channel: channelFor(pavel), subject: `Come straight to the stage at ${venue}`,
-        body: `No rush and no need to check in first. ${opening && backup ? `${backup.name} will open "${ev.title}" at ${fmt(ev.start)}. ` : ''}Come straight to the stage at ${venue} when you arrive, about ${fmt(eta)}.` }], by);
-      if (want('team')) {
-        send(s, 'late-panel', 'notify_people', `Panelists told about ${pavel.name}`, others.map(p => ({ personId: p.id, channel: channelFor(p), subject: `${pavel.name} joins "${ev.title}" late`,
-          body: `${pavel.name} expects to arrive about ${fmt(eta)}.${opening && backup ? ` ${backup.name} opens with you at ${fmt(ev.start)}.` : ''}` })), by);
-        send(s, 'late-staff', 'notify_staff', `Staff told about ${pavel.name}`, staff.map(p => ({ personId: p.id, channel: 'app_push', subject: `${pavel.name} late for ${ev.title}`,
-          body: `${pavel.name} arrives about ${fmt(eta)}. ${opening && backup ? `${backup.name} opens at ${fmt(ev.start)}. ` : ''}Walk him straight to the stage at ${venue}.` })), by);
+      const before = f.events.map(e => ({ ...e, guestIds: [...e.guestIds] }));
+      const off = new Set(items.map(i => i.key).filter(k => !want(k)));
+      const p = plan(off);
+      const swapping = want('swap') && !!talk && !!backup;
+      if (swapping || want('seats')) await regrid(s, p.after, by, false);
+      const lands = fmt(sc.lands);
+      if (swapping && backup && talk) send(s, 'absent-backup', 'notify_people', `${backup.name} asked to take ${first}'s seat`, [{ personId: backup.id, channel: channelFor(backup), subject: `Could you join "${talk.title}" at ${fmt(talk.start)}?`,
+        body: `${prod.name} can't reach Boulder today (${sc.cause.toLowerCase()}). Could you take her seat at "${talk.title}", ${fmt(talk.start)} at ${venue(talk)}? Guest relations will meet you at the stage door 20 minutes before.` }], by);
+      send(s, 'absent-guest', 'notify_people', `${prod.name} told the new plan`, [{ personId: prod.id, channel: channelFor(prod), subject: 'We have today covered',
+        body: `Sorry about the flight. ${swapping && backup && talk ? `${backup.name} takes your seat at "${talk.title}". ` : ''}${qa && want('video') ? `We'll bring you into the ${fmt(qa.start)} Q&A at ${venue(qa)} by video; the AV team will send a link and test it at ${fmt(addMinutes(qa.start, -60))}. ` : ''}Your car is moved to meet the ${lands} arrival at DEN.` }], by);
+      if (want('people')) {
+        send(s, 'absent-people', 'notify_people', `${audience.length} people told about ${prod.name}`, audience.map(p => {
+          const mineHere = hers.filter(e => [...f.tickets, ...f.bookings].some(b => b.personId === p.id && b.eventId === e.id));
+          const lines = mineHere.map(e => e.kind === 'panel'
+            ? (swapping && backup ? `"${e.title}" at ${fmt(e.start)} goes ahead with ${backup.name} in her seat.` : `"${e.title}" at ${fmt(e.start)} goes ahead without her.`)
+            : e.kind === 'qa' || e === premiere ? (want('video') ? `The ${fmt((qa ?? e).start)} Q&A after "${f.films.find(x => x.id === e.filmId)?.title ?? e.title}" goes ahead; she joins by video from New York.` : `"${e.title}" goes ahead as planned.`) : '');
+          // One line says it all (who, which event, when, where); the details are in the message.
+          const firstHere = mineHere.sort((a, b) => a.start.localeCompare(b.start))[0];
+          return { personId: p.id, channel: channelFor(p), subject: `${prod.name} can't make it to ${venue(firstHere)} at ${fmt(firstHere.start)}`,
+            body: `${prod.name}'s flight from New York was cancelled. ${[...new Set(lines)].filter(Boolean).join(' ')} Nothing else in your plan changes.` };
+        }), by);
       }
-      return { before: opening ? before : null };
+      if (want('team')) {
+        if (crew.length) send(s, 'absent-brief', 'update_brief', `Briefs updated for ${crew.length} volunteers`, crew.map(id => ({ personId: id, channel: 'volunteer_brief' as const, subject: `${prod.name} not in Boulder today`,
+          body: `${talk && swapping && backup ? `"${talk.title}" (${fmt(talk.start)}): ${backup.name} replaces ${prod.name}. ` : ''}${premiere && want('seats') ? `${fmt(premiere.start)} premiere: ${held} more seats go to the e-Waitlist line at start time. ` : ''}${qa && want('video') ? `${fmt(qa.start)} Q&A: ${first} joins on screen by video; keep the house lights at half.` : ''}` })), by);
+        if (talk) send(s, 'absent-panel', 'notify_people', `Panelists told about ${prod.name}`, others.map(p => ({ personId: p.id, channel: channelFor(p), subject: `${prod.name} can't make "${talk.title}"`,
+          body: `${prod.name}'s flight was cancelled.${swapping && backup ? ` ${backup.name} joins you on stage at ${fmt(talk.start)}.` : ''}` })), by);
+        send(s, 'absent-staff', 'notify_staff', `Staff told about ${prod.name}`, staff.map(p => ({ personId: p.id, channel: 'app_push', subject: `${prod.name} not in Boulder today`,
+          body: `${sc.cause}. ${swapping && backup && talk ? `${backup.name} takes her seat at "${talk.title}" (${fmt(talk.start)}, ${venue(talk)}). ` : ''}${qa && want('video') ? `Video link for the ${fmt(qa.start)} Q&A at ${venue(qa)}: AV test at ${fmt(addMinutes(qa.start, -60))}. ` : ''}${premiere && want('seats') ? `${held} held seats at ${fmt(premiere.start)} go to the waitlist. ` : ''}Driver moved to the ${lands} DEN arrival.` })), by);
+      }
+      return { before: swapping || want('seats') ? before : null };
     },
   };
 }
 
 function recFor(s: AgentStore, al: WxAlert): Rec | null {
-  return al.kind === 'guest' ? guestRec(s, al.day) : weatherRec(s, al.kind, al.day);
+  return al.kind === 'guest' ? absentRec(s, al.day) : weatherRec(s, al.kind, al.day);
 }
 
 /**
@@ -290,8 +354,18 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
   const [openId, setOpenId] = useState<string | null>(null);
   const [off, setOff] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
-  // The checklist stays folded behind "View changes" so opening a fix barely changes the page.
+  // On a computer the checklist is always shown, with no way to hide it. On a phone it stays
+  // folded behind "View changes" so opening a fix barely moves the page.
   const [listOpen, setListOpen] = useState(false);
+  const [phone, setPhone] = useState(false);
+  useEffect(() => {
+    const m = matchMedia('(max-width: 760px)');
+    const on = () => setPhone(m.matches);
+    on();
+    m.addEventListener('change', on);
+    return () => m.removeEventListener('change', on);
+  }, []);
+  const listShown = !phone || listOpen;
   // Approve shows once the calendar has finished moving, so the change is seen first.
   const [ready, setReady] = useState(false);
   useEffect(() => {
@@ -314,7 +388,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
     preview: off => {
       const cur = s.agent.f.events;
       const merged = new Map(cur.map(e => [e.id, { ...e }]));
-      const moved = new Set<string>(); const notes: Record<string, string> = {};
+      const moved = new Set<string>(); const notes: Record<string, string> = {}; const marks: Record<string, string> = {};
       for (const { al, rec } of shown) {
         const p = rec.preview(subOff(off, al.id));
         if (!p) continue;
@@ -326,9 +400,9 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
           if (nxt.guestIds.join() !== base.guestIds.join()) m.guestIds = nxt.guestIds;
           moved.add(id);
         }
-        Object.assign(notes, p.notes ?? {});
+        Object.assign(notes, p.notes ?? {}); Object.assign(marks, p.marks ?? {});
       }
-      return moved.size ? { events: [...merged.values()], moved: [...moved], notes } : null;
+      return moved.size ? { events: [...merged.values()], moved: [...moved], notes, marks } : null;
     },
     apply: async () => ({ before: null }),
   } : null;
@@ -368,6 +442,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
     } else {
       before = (await open.rec.apply(k => chosen.has(k), user || 'Organizer')).before;
     }
+    s.agent.log.add(`approved-${open.al.id}-${Date.now()}`, 'approval', `${user || 'Organizer'} approved "${open.rec.title}": ${chosen.size} of ${open.rec.items.length} changes (${open.rec.items.filter(i => chosen.has(i.key)).map(i => i.text).join('; ')})`);
     s.commit();
     setBusy(false);
     setOpenId(null);
@@ -407,8 +482,9 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
       {open && (() => {
         const count = open.rec.items.filter(i => !off.has(i.key)).length;
         return (
-          <aside className={`rec-float${listOpen ? ' list-open' : ''}`} aria-label="Agent's recommendation">
-            {listOpen && (
+          <aside className={`rec-float${listShown ? ' list-open' : ''}${phone ? '' : ' desk'}`} aria-label="Agent's recommendation">
+            {!phone && <div className="rec-head"><Icon name="sparkle" size={14} /> {plural(open.rec.items.length, 'change')}</div>}
+            {listShown && (
               <ul className="wx-list" id="rec-changes">
                 {open.rec.items.map(i => (
                   <li key={i.key}><label>
@@ -419,9 +495,11 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
               </ul>
             )}
             <div className="rec-bar">
-              <button className="rec-view ghost small" aria-expanded={listOpen} aria-controls="rec-changes" onClick={() => setListOpen(!listOpen)}>
-                <Icon name="sparkle" size={14} /> {listOpen ? 'Hide changes' : 'View changes'}
-              </button>
+              {phone && (
+                <button className="rec-view ghost small" aria-expanded={listOpen} aria-controls="rec-changes" onClick={() => setListOpen(!listOpen)}>
+                  <Icon name="sparkle" size={14} /> {listOpen ? 'Hide changes' : 'View changes'}
+                </button>
+              )}
               <button className={`primary small rec-approve${ready ? ' ready' : ''}`} disabled={!count || busy || !ready} onClick={approve}>{busy ? 'Working…' : `Approve ${count}`}</button>
             </div>
           </aside>
@@ -431,11 +509,34 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
   );
 }
 
+/** What the agent saw and worked out for the scripted problems, in its log (the Log page shows it live). */
+function logProblems(s: AgentStore) {
+  const log = s.agent.log;
+  for (const al of DEMO_ALERTS) {
+    const rec = recFor(s, al);
+    if (!rec) continue;
+    const run = `scripted-${al.id}-${Date.now()}`;
+    if (al.kind === 'guest') {
+      log.add(run, 'trigger', `Flight feed: ${SCENARIOS.producer.flight.replace(/ \(.*\)$/, '')} is cancelled. On board: ${SCENARIOS.producer.name}, producer`);
+      log.add(run, 'understand', `${rec.title}. ${SCENARIOS.producer.why}`);
+    } else {
+      const plan = planFor(s, al.kind as WxKind, al.day);
+      log.add(run, 'trigger', `Weather forecast for Boulder: ${rec.title.toLowerCase()} on ${dayName(s, al.day)}${al.kind === 'snow' ? `, ${SCENARIOS.snow.detail.replace(/, from the forecast$/, '')}` : ''}`);
+      if (plan) log.add(run, 'understand', `${plan.starting} events start in the ${al.kind}; ${plan.people} people have plans then; ${plan.volunteers} volunteers are on shift`);
+    }
+    log.add(run, 'decide', `Recommendation ready: ${rec.items.map(i => i.text).join('; ')}`);
+    log.add(run, 'ask', `Waiting for the organizer to approve the recommendation for "${rec.title}"`);
+  }
+  s.commit();
+}
+
 /** Guests the agent has flagged as running late (still late after the plan is approved, until a reset). */
 export function lateGuestId(s: AgentStore): string | null {
   const f = s.agent.f;
-  return (f.people.find(p => p.name === 'Pavel Kettering') ?? f.people.find(p => p.role === 'guest'))?.id ?? null;
+  return (f.people.find(p => p.name === SCENARIOS.producer.name) ?? f.people.find(p => p.role === 'guest'))?.id ?? null;
 }
+/** The scripted problems belong to the sample festival only. */
+export const hasDemoProblems = (s: AgentStore) => s.agent.f.people.some(p => p.name === SCENARIOS.producer.name);
 export function useLateGuests(s: AgentStore): Set<string> {
   const [alerts] = useAlerts();
   const id = alerts.some(a => a.kind === 'guest') ? lateGuestId(s) : null;

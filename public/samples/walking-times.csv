@@ -1,5 +1,14 @@
-From / To,Harbor Theater,Canal Street Cinema,Pier 9 Hall,Riverside Studio
-Harbor Theater,0,20,10,30
-Canal Street Cinema,20,0,25,15
-Pier 9 Hall,10,25,0,35
-Riverside Studio,30,15,35,0
+From / To,Macky Auditorium,Chautauqua Auditorium,Boulder Theater,Boulder High School Auditorium,Roe Green Theatre,Muenzinger Auditorium,Casey Middle School Auditorium,Dairy Arts Center,eTown Hall,Cinemark Century Boulder,Canyon Theater,Old Main,The Rink · Festival HQ
+Macky Auditorium,0,15,15,10,5,10,15,15,15,15,15,5,10
+Chautauqua Auditorium,15,0,20,20,15,15,20,20,20,25,20,15,20
+Boulder Theater,15,20,0,10,15,15,10,15,5,20,10,15,10
+Boulder High School Auditorium,10,20,10,0,10,15,15,15,15,15,15,10,5
+Roe Green Theatre,5,15,15,10,0,10,15,15,15,20,15,5,15
+Muenzinger Auditorium,10,15,15,15,10,0,20,15,15,15,15,10,15
+Casey Middle School Auditorium,15,20,10,15,15,20,0,15,10,20,15,15,15
+Dairy Arts Center,15,20,15,15,15,15,15,0,15,10,20,15,15
+eTown Hall,15,20,5,15,15,15,10,15,0,15,15,15,10
+Cinemark Century Boulder,15,25,20,15,20,15,20,10,15,0,20,20,20
+Canyon Theater,15,20,10,15,15,15,15,20,15,20,0,15,10
+Old Main,5,15,15,10,5,10,15,15,15,20,15,0,15
+The Rink · Festival HQ,10,20,10,5,15,15,15,15,10,20,10,15,0
