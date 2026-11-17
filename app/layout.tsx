@@ -18,6 +18,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
+        {/* Must run before the app: gives each presentation frame its own storage space. */}
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="/space.js" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}

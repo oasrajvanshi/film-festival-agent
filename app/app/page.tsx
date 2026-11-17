@@ -140,8 +140,10 @@ function AppInner({ demo }: { demo: Demo | null }) {
   };
   useEffect(() => {
     if (!ready) return;
+    // Demo frames set up the sample themselves (demoSignIn); everyone else without a festival goes to onboarding.
+    if (demo?.framed) return;
     if (s.shared ? !s.fid : !readSetup()) { location.replace('/onboarding'); return; }
-  }, [ready, s.shared, s.fid]);
+  }, [ready, s.shared, s.fid]); // eslint-disable-line react-hooks/exhaustive-deps
   // The organizer's name as the festival has it now (a saved sign-in may predate a renamed demo).
   useEffect(() => { if (who?.kind === 'organizer') setUser(f.people.find(p => p.id === who.id)?.name ?? who.name); }, [who, f]);
   useEffect(() => {

@@ -430,6 +430,7 @@ export function useAgent() {
       ?? directory(agentRef.current!.f).find(w => w.kind === 'organizer');
     if (modeRef.current !== 'shared') {
       if (sheetRef.current.source !== 'built-in') return false;
+      if (!readSetup()) writeSetup({ festivalName: FESTIVAL_NAME, city: 'Boulder', approver: 'Operations lead', channels: ['push', 'email'], onboardedAt: new Date().toISOString() });
       const w = tom();
       if (w) { setWho({ ...w, code: '' }); bump(); }
       return !!w;
