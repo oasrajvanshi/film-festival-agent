@@ -428,6 +428,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
   const approve = async () => {
     if (!open) return;
     setBusy(true);
+    const t0 = Date.now();
     const chosen = new Set(open.rec.items.filter(i => !off.has(i.key)).map(i => i.key));
     const notes = open.rec.preview(off)?.notes ?? {};
     let before: FestivalEvent[] | null = null;
@@ -445,6 +446,8 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
       before = (await open.rec.apply(k => chosen.has(k), user || 'Organizer')).before;
     }
     });
+    // Give the agent a visible moment of work (3.5 s) before the changes land everywhere at once.
+    await new Promise(r => setTimeout(r, Math.max(0, 3500 - (Date.now() - t0))));
     s.agent.log.add(`approved-${open.al.id}-${Date.now()}`, 'approval', `${user || 'Organizer'} approved "${open.rec.title}": ${chosen.size} of ${open.rec.items.length} changes (${open.rec.items.filter(i => chosen.has(i.key)).map(i => i.text).join('; ')})`);
     s.commit();
     setBusy(false);
