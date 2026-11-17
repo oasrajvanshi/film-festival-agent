@@ -139,10 +139,17 @@ export function bringProblems() { broughtOn = true; writeAlerts(DEMO_ALERTS.map(
  */
 export function ProblemTrigger({ s }: { s: AgentStore }) {
   const [alerts] = useAlerts();
+  const [busy, setBusy] = useState(false);
   const live = alerts.some(a => a.status === 'open');
   return (
     <div className="problem-trigger" data-lve-skip>
-      <button onClick={() => { if (live) resetAlerts(); else { bringProblems(); logProblems(s); } }}>
+      <button disabled={busy} onClick={async () => {
+        if (live) { resetAlerts(); return; }
+        // Every run starts from the untouched schedule, so a rehearsal never leaves the real demo half-applied.
+        setBusy(true);
+        try { await s.reset(); } finally { setBusy(false); }
+        bringProblems(); logProblems(s); s.commit();
+      }}>
         <Icon name={live ? 'check' : 'bolt'} size={14} /> {live ? 'Calm things down' : 'Bring on the problems'}
       </button>
     </div>
