@@ -36,6 +36,9 @@
   .lead { font-size: 26px; line-height: 1.4; color: var(--text); margin: 24px 0 0; max-width: 30ch; text-wrap: pretty; }
   .word { font-family: var(--f-word); font-weight: 400; color: #f1ece2; line-height: .9; }
 
+  .slide { isolation: isolate; }
+  .bgimg { position: absolute; inset: 0; z-index: -1; background: center / cover no-repeat; opacity: .25; filter: sepia(.25) saturate(.85); pointer-events: none; }
+  .bgimg::after { content: ""; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 40%, rgba(18, 11, 9, 0) 0%, rgba(18, 11, 9, .55) 100%); }
   .label-top { font-family: var(--f-mono); font-size: 24px; letter-spacing: .02em; color: var(--amber-2); margin: 0; }
 
   /* Film strip edges, like the landing hero. */
@@ -53,18 +56,39 @@
   .s-open .tag { font-family: var(--f-display); font-weight: 700; font-size: 40px; color: rgba(241, 236, 226, .86); margin-top: 22px; line-height: 1.2; }
   .s-open .where { font-family: var(--f-mono); font-size: 24px; color: var(--amber-2); margin-top: 48px; }
 
-  /* 2 · problem: three levels, from what attendees feel to the root cause */
-  .chain { flex: 1; display: grid; grid-template-columns: 1fr 96px 1fr 96px 1fr; align-items: center; margin-top: 34px; }
-  .pcard { border: 1px solid var(--line-2); border-radius: 26px; padding: 36px 34px 40px; background: linear-gradient(160deg, rgba(40, 27, 21, .65), rgba(20, 13, 10, .7)); height: 400px; display: flex; flex-direction: column; justify-content: space-between; }
-  .pcard.mid { border-color: rgba(227, 183, 132, .45); }
-  .pcard.root { border-color: rgba(196, 56, 47, .7); background: linear-gradient(160deg, rgba(120, 30, 24, .34), rgba(30, 12, 10, .72)); }
-  .pcard .who { font-family: var(--f-mono); font-size: 21px; color: var(--muted); }
-  .pcard.mid .who { color: var(--amber-2); }
-  .pcard.root .who { color: #f0938a; }
-  .pcard b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 38px; line-height: 1.08; color: var(--cream); }
-  .pcard p { margin: 14px 0 0; font-size: 22px; line-height: 1.42; color: var(--text); }
-  .because { display: grid; justify-items: center; gap: 8px; font-family: var(--f-mono); font-size: 18px; color: var(--amber-2); text-align: center; }
-  .because svg { width: 64px; height: 30px; }
+  /* 2 · problem: three levels. Label, then a sticker standing on the card's top edge, then a card that hugs its text. */
+  .prob { flex: 1; display: grid; grid-template-columns: 1fr 104px 1fr 104px 1fr; grid-template-rows: auto 1fr auto; column-gap: 0; margin-top: 26px; }
+  .prob .lbl { grid-row: 1; font-family: var(--f-mono); font-size: 22px; color: var(--muted); }
+  .prob .lbl.mid { color: var(--amber-2); } .prob .lbl.root { color: #f0938a; }
+  .prob .stk { grid-row: 2; position: relative; display: flex; align-items: flex-end; justify-content: center; min-height: 0; }
+  .prob .stk img { display: block; max-height: 300px; max-width: 100%; filter: drop-shadow(0 18px 28px rgba(0, 0, 0, .5)); }
+  .prob .card { grid-row: 3; border: 1px solid var(--line-2); border-radius: 22px; padding: 24px 26px 26px; background: linear-gradient(160deg, rgba(40, 27, 21, .82), rgba(20, 13, 10, .86)); }
+  .prob .card.mid { border-color: rgba(227, 183, 132, .45); }
+  .prob .card.root { border-color: rgba(196, 56, 47, .7); background: linear-gradient(160deg, rgba(120, 30, 24, .4), rgba(30, 12, 10, .85)); }
+  .prob .card b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 34px; line-height: 1.08; color: var(--cream); }
+  .prob .card p { margin: 10px 0 0; font-size: 21px; line-height: 1.42; color: var(--text); }
+  .prob .by { grid-row: 3; align-self: center; display: grid; justify-items: center; gap: 6px; font-family: var(--f-mono); font-size: 18px; color: var(--amber-2); }
+  .prob .by svg { width: 60px; height: 24px; }
+  .prob .fig { position: relative; display: inline-block; }
+  .prob .fig img { margin-bottom: -6px; }
+  .bub { position: absolute; transform: translateX(-50%); font: 700 18px/1 var(--f-mono); font-style: normal; color: #1b120e; background: #f4f1ec; padding: 7px 10px; border-radius: 12px; box-shadow: 0 6px 14px rgba(0, 0, 0, .35); }
+  .bub::after { content: ""; position: absolute; left: 50%; bottom: -6px; width: 12px; height: 12px; background: inherit; transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
+  .bub.q { font-family: var(--f-display); font-weight: 800; font-size: 34px; padding: 4px 12px 6px; color: #a3221d; }
+  .bub.q.sm { font-size: 24px; }
+  /* Root cause: four app stickers, different sizes, gathered loosely. */
+  .apps { position: relative; width: 100%; height: 270px; }
+  .app { position: absolute; background: #fff; color: #1f1f1f; border-radius: 14px; padding: 12px 14px 14px; box-shadow: 0 0 0 5px #fff, 0 18px 30px rgba(0, 0, 0, .45); font: 500 15px/1.3 'Archivo', Arial, sans-serif; }
+  .app .hd { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+  .app .ic { width: 22px; height: 22px; border-radius: 5px; display: grid; place-items: center; font: 800 13px/1 Arial, sans-serif; color: #fff; flex: none; }
+  .app.sheets { left: 2%; bottom: 112px; width: 230px; transform: rotate(-5deg); } .app.sheets .ic { background: #188038; }
+  .app.gmail { right: 0; bottom: 150px; width: 200px; transform: rotate(4deg); } .app.gmail .ic { background: #fff; color: #ea4335; box-shadow: inset 0 0 0 1px #ddd; }
+  .app.word { left: 10%; bottom: 14px; width: 170px; transform: rotate(3deg); } .app.word .ic { background: #185abd; }
+  .app.wa { right: 4%; bottom: 20px; width: 210px; transform: rotate(-3deg); } .app.wa .ic { background: #25d366; border-radius: 50%; }
+  .app .grid { display: grid; grid-template-columns: 52px 1fr; font-size: 13px; border-top: 1px solid #e5e5e5; }
+  .app .grid span { padding: 4px 6px; border-bottom: 1px solid #e5e5e5; }
+  .app .grid .bad { background: #fde3e1; color: #b3261e; }
+  .app s { color: #9a9a9a; }
+  .app .wa-msg { background: #dcf8c6; border-radius: 10px; padding: 7px 10px; font-size: 14px; }
 
   /* 3 · personas: two big figures growing up from the bottom edge, names beside them */
   .s-per { padding: 96px 120px 0; }
@@ -85,6 +109,8 @@
   .sd-word.small { font-size: 22px; padding: 11px 15px 12px; border-radius: 10px; }
   .s-sun { flex-direction: row; gap: 44px; align-items: stretch; padding: 70px 90px 70px 110px; }
   .s-sun .left { width: 520px; display: flex; flex-direction: column; gap: 26px; }
+  .sd-logo { display: block; width: 300px; height: auto; }
+  .sd-logo.small { width: 150px; }
   .s-sun .move { font-family: var(--f-display); font-weight: 800; font-size: 40px; line-height: 1.1; color: var(--cream); margin: 4px 0 0; }
   .s-sun .move em { font-style: normal; color: var(--amber-2); }
   .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: auto; }
@@ -211,28 +237,36 @@
 
   <!-- 2 · Problem · David -->
   <section class="slide" data-title="Problem">
+    <div class="bgimg" style="background-image:url(/hl/ev/f-24.jpg)"></div>
     <p class="kicker rise">The problem</p>
     <h2 class="rise" style="--d:1">A bad festival day starts backstage.</h2>
-    <div class="chain">
-      <div class="pcard rise" style="--d:2">
-        <span class="who">What attendees feel</span>
-        <div><b>A messy festival</b><p>Late, wrong or missing updates. Empty seats, missed talks.</p></div>
+    <div class="prob">
+      <span class="lbl rise" style="grid-column:1;--d:2">What attendees feel</span>
+      <span class="lbl mid rise" style="grid-column:3;--d:4">What organizers do</span>
+      <span class="lbl root rise" style="grid-column:5;--d:6">The root cause</span>
+
+      <div class="stk rise" style="grid-column:1;--d:2"><div class="fig"><img src="sticker-confused.png" alt="An attendee confused by her phone" /><i class="bub q" style="left:72%;top:6%">?</i><i class="bub q sm" style="left:84%;top:24%">?</i></div></div>
+      <div class="stk rise" style="grid-column:3;--d:4"><div class="fig"><img src="sticker-team.png" alt="An organizer team out of step" /><i class="bub" style="left:9%;top:-4%">3:00</i><i class="bub" style="left:33%;top:-10%">3:15</i><i class="bub" style="left:56%;top:-14%">3:30</i><i class="bub" style="left:80%;top:-8%">?</i></div></div>
+      <div class="stk rise" style="grid-column:5;--d:6">
+        <div class="apps">
+          <div class="app sheets"><div class="hd"><i class="ic">▦</i>Google Sheets</div><div class="grid"><span>3:00</span><span>Low Sun</span><span>4:00</span><span class="bad">Dana Whitfield</span></div></div>
+          <div class="app gmail"><div class="hd"><i class="ic">M</i>Gmail</div>Re: Fwd: schedule v7 FINAL</div>
+          <div class="app word"><div class="hd"><i class="ic">W</i>Word</div>Doors <s>2:45</s> 3:00</div>
+          <div class="app wa"><div class="hd"><i class="ic">✆</i>WhatsApp</div><div class="wa-msg">Sheet says 3:00, email says 3:15?</div></div>
+        </div>
       </div>
-      <div class="because rise" style="--d:3"><svg viewBox="0 0 64 30" aria-hidden="true"><path d="M60 15H6M18 4 6 15l12 11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>because</div>
-      <div class="pcard mid rise" style="--d:4">
-        <span class="who">What organizers do</span>
-        <div><b>Out of step</b><p>Every team hears about a change at a different time.</p></div>
-      </div>
-      <div class="because rise" style="--d:5"><svg viewBox="0 0 64 30" aria-hidden="true"><path d="M60 15H6M18 4 6 15l12 11" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>because</div>
-      <div class="pcard root rise" style="--d:6">
-        <span class="who">The root cause</span>
-        <div><b>Changes run by hand</b><p>Schedule, email, chat and briefs live in four places.</p></div>
-      </div>
+
+      <div class="card rise" style="grid-column:1;--d:3"><b>A messy festival</b><p>Late, wrong or missing updates.</p></div>
+      <div class="by rise" style="grid-column:2;--d:3"><svg viewBox="0 0 60 24" aria-hidden="true"><path d="M4 12h48M42 3l10 9-10 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>caused by</div>
+      <div class="card mid rise" style="grid-column:3;--d:5"><b>Out of step</b><p>Every team hears about a change at a different time.</p></div>
+      <div class="by rise" style="grid-column:4;--d:5"><svg viewBox="0 0 60 24" aria-hidden="true"><path d="M4 12h48M42 3l10 9-10 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>caused by</div>
+      <div class="card root rise" style="grid-column:5;--d:7"><b>Changes run by hand</b><p>Spread across four tools.</p></div>
     </div>
   </section>
 
   <!-- 3 · Two personas · David -->
   <section class="slide s-per" data-title="Two personas">
+    <div class="bgimg" style="background-image:url(/hl/ev/f-02.jpg)"></div>
     <div class="floor"></div>
     <h2 class="rise" style="--d:1">Meet Jane and Tom.</h2>
     <span class="both rise" style="--d:1">Both at Sundance 2027</span>
@@ -249,8 +283,7 @@
   <!-- 4 · Sundance · David -->
   <section class="slide s-sun" data-title="Sundance">
     <div class="left">
-      <p class="label-top rise">Sundance Film Festival</p>
-      <div class="rise" style="--d:1"><span class="sd-word">Sundance<br />Film Festival<br />2027</span></div>
+      <div class="rise" style="--d:1"><img class="sd-logo" src="sundance-logo.svg" alt="Sundance Film Festival 2027" /></div>
       <p class="move rise" style="--d:2">The biggest independent film festival, <em>now in Boulder.</em></p>
       <div class="tiles">
         <div class="tile r rise" style="--d:3"><b>11</b><span>days · Jan 21–31</span></div>
@@ -309,6 +342,7 @@
 
   <!-- 8 · Flow · Oas -->
   <section class="slide" data-title="How it works">
+    <div class="bgimg" style="background-image:url(/hl/ev/f-19.jpg)"></div>
     <p class="label-top rise">How the agent works</p>
     <div class="flow rise" style="--d:1">
       <svg viewBox="0 0 1460 540" role="img" aria-label="Usher reads every feed, spots the change, flags it, recommends a plan, you approve, and it acts on your behalf, then keeps watching.">
@@ -344,6 +378,7 @@
 
   <!-- 9 · API · Oas -->
   <section class="slide s-api" data-title="Fits in">
+    <div class="bgimg" style="background-image:url(/hl/ev/talk-stage.jpg)"></div>
     <div class="left">
       <p class="kicker rise">A standing agent</p>
       <h2 class="rise" style="--d:1;font-size:52px">Plugs into the software festivals already use.</h2>
@@ -376,7 +411,7 @@
   <section class="slide" data-title="Evaluation">
     <div class="ev-head">
       <p class="label-top rise">Evaluation</p>
-      <span class="sd-word small rise" style="--d:1">Sundance<br />Film Festival<br />2027</span>
+      <img class="sd-logo small rise" style="--d:1" src="sundance-logo.svg" alt="Sundance Film Festival 2027" />
     </div>
     <p class="ev-on rise" style="--d:1">Every test runs on <b>the Sundance 2027 plan</b>: 11 days, 13 venues, 559 events.</p>
     <div class="steps">
