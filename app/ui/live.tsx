@@ -16,8 +16,8 @@ type Msg = AgentStore['agent']['outbox'][number];
  */
 export const updateKind = (m: Pick<Msg, 'subject'>): 'change' | 'news' =>
   /now starts|cancelled|moved to|Schedule change| \+ \d+ more$/i.test(m.subject) ? 'change' : 'news';
-export const UPDATE_ICON = { change: 'calendar', news: 'bell' } as const;
-export const UPDATE_LABEL = { change: 'Plan changed', news: 'For you' } as const;
+export const UPDATE_ICON = { change: 'calendar', news: 'bell', risk: 'alert' } as const;
+export const UPDATE_LABEL = { change: 'Plan changed', news: 'For you', risk: 'Heads-up' } as const;
 
 /** Light or dark, remembered on this device and the same in every open Usher screen. */
 export function useTheme(): ['dark' | 'light', (t: 'dark' | 'light') => void] {
@@ -52,14 +52,19 @@ export function useArrivals(inbox: Msg[]) {
       const added = inbox.slice(base.current);
       base.current = inbox.length;
       setFresh(f => [...f, ...added]);
-      try { navigator.vibrate?.(60); } catch { /* not supported */ }
+      // Phones buzz; browsers only allow it after the person has tapped the page.
+      try { if ((navigator as Navigator & { userActivation?: { hasBeenActive: boolean } }).userActivation?.hasBeenActive) navigator.vibrate?.(60); } catch { /* not supported */ }
     } else if (inbox.length < base.current) base.current = inbox.length; // a demo reset
   }, [inbox.length]); // eslint-disable-line react-hooks/exhaustive-deps
   return [fresh, () => setFresh([])] as const;
 }
 
 /** The phone's push banner: slides down from the top, stays a few seconds, tap to open. */
-export function PushBanner({ msgs, onOpen, onDone }: { msgs: Msg[]; onOpen: () => void; onDone: () => void }) {
+export function PushBanner({ msgs, onOpen, onDone, kind }: {
+  msgs: Pick<Msg, 'subject' | 'body' | 'actionId'>[]; onOpen: () => void; onDone: () => void;
+  /** 'risk': a problem the festival team is still working on (no change to the plan yet). */
+  kind?: 'risk';
+}) {
   const last = msgs[msgs.length - 1];
   useEffect(() => {
     if (!last) return;
@@ -67,11 +72,12 @@ export function PushBanner({ msgs, onOpen, onDone }: { msgs: Msg[]; onOpen: () =
     return () => clearTimeout(t);
   }, [last]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!last) return null;
+  const k = kind ?? updateKind(last);
   return (
     <button key={`${last.actionId}-${msgs.length}`} className="push" onClick={() => { onOpen(); onDone(); }} aria-live="polite">
-      <span className={`push-ic k-${updateKind(last)}`}><Icon name={UPDATE_ICON[updateKind(last)]} size={15} /></span>
+      <span className={`push-ic k-${k}`}><Icon name={UPDATE_ICON[k]} size={15} /></span>
       <span className="push-tx">
-        <span className="push-top"><b>Usher · {UPDATE_LABEL[updateKind(last)]}</b><em>now{msgs.length > 1 ? ` · ${msgs.length} updates` : ''}</em></span>
+        <span className="push-top"><b>Usher · {UPDATE_LABEL[k]}</b><em>now{msgs.length > 1 ? ` · ${msgs.length} ${kind ? 'alerts' : 'updates'}` : ''}</em></span>
         <b className="push-s">{last.subject}</b>
         <span className="push-b">{last.body}</span>
       </span>

@@ -174,7 +174,8 @@ export function useAgent() {
       if (fid) {
         const p = await api<PublicInfo>('GET', { action: 'public', f: fid });
         if (p.ok) setPub(p.body);
-        else if (p.status === 404) { ls.set(FID_KEY, null); writeWho(null); fidRef.current = null; }
+        // Gone (e.g. expired). The deck's phone frame leaves the shared sign-in to the organizer frame.
+        else if (p.status === 404) { if (!follower) { ls.set(FID_KEY, null); writeWho(null); } fidRef.current = null; }
       }
       const w = fidRef.current && ls.get<string>(TOKEN_KEY) ? readWho() : null;
       whoRef.current = w; setWhoState(w);
@@ -460,7 +461,8 @@ export function useAgent() {
       // Wait (up to 20 s) for the organizer frame to make the deck's copy and sign in.
       for (let i = 0; i < 40; i++) {
         const fid = ls.get<string>(DECK_FID_KEY);
-        if (fid && ls.get<string>(TOKEN_KEY) && readWho() && readFid() === fid) return join(fid);
+        // A copy that no longer exists fails to join: keep waiting for the organizer frame's new one.
+        if (fid && ls.get<string>(TOKEN_KEY) && readWho() && readFid() === fid && await join(fid)) return true;
         await new Promise(r => setTimeout(r, 500));
       }
       return false;

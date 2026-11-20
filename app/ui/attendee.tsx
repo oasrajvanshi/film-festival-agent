@@ -8,7 +8,7 @@
 //   Ask      questions about the festival.
 // Your pass sits under your initials, top right.
 
-import { useEffect, useMemo, useState, type ReactElement } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactElement } from 'react';
 import qrcode from 'qrcode-generator';
 import type { AgentStore } from './useAgent';
 import type { Who } from '../../src/access/profiles';
@@ -22,6 +22,7 @@ import { Icon } from './icons';
 import { Ask } from './panels';
 import { MyArrival } from './presence';
 import { useAlerts } from './weatherplan';
+import { SCENARIOS } from '../../src/data/sundance2027';
 import { CityBase, DayStrip, frameFor, usePlaced } from './venuemap';
 import { PushBanner, UPDATE_ICON, UPDATE_LABEL, updateKind, useArrivals, useTheme } from './live';
 
@@ -62,6 +63,31 @@ function usePlan(s: AgentStore, who: Who, v: number) {
   }, [f, who.id, s.version, v]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
+/**
+ * Problems the festival team knows about but hasn't fixed yet (no plan approved), when they touch
+ * this person's plan: a guest who may not make it, or weather on a day they have plans. Shown as a
+ * heads-up so people hear about the risk early; the approved change replaces it.
+ */
+interface OpenRisk { id: string; day: DayNumber; line: string }
+function useOpenRisks(s: AgentStore, plans: Plan[]): OpenRisk[] {
+  const [alerts] = useAlerts();
+  const f = s.agent.f;
+  return useMemo(() => alerts.filter(a => a.status === 'open').flatMap((a): OpenRisk[] => {
+    const mine = plans.filter(p => p.e.day === a.day && p.e.status === 'scheduled').sort((x, y) => x.e.start.localeCompare(y.e.start));
+    if (a.kind === 'guest') {
+      const guest = f.people.find(p => p.name === SCENARIOS.producer.name);
+      const hit = guest && mine.find(p => p.e.guestIds.includes(guest.id));
+      return guest && hit ? [{ id: a.id, day: a.day, line: `${guest.name} may not make it to ${venueName(f, hit.e.venueId)} at ${fmt(hit.e.start)}` }] : [];
+    }
+    if (!mine.length) return [];
+    const risk = assessWeather(scenarioHours(f.dates[a.day], a.kind as 'storm' | 'snow' | 'heat'))[0];
+    if (!risk) return [];
+    const what = a.kind === 'snow' ? 'Snow' : a.kind === 'storm' ? 'Thunderstorms' : 'Heat';
+    const when = new Date(`${f.dates[a.day]}T12:00:00`).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    return [{ id: a.id, day: a.day, line: `${what} forecast ${when}, ${fmt(risk.from)} to ${fmt(risk.to)}` }];
+  }), [alerts, plans, f]); // eslint-disable-line react-hooks/exhaustive-deps
+}
+
 export function AttendeeApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who; onOut: () => void; viewAs?: boolean }) {
   const [tab, setTab] = useState<Tab>('plan');
   const [me, setMe] = useState(false);
@@ -82,6 +108,26 @@ export function AttendeeApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who
   const [latestOpen, setLatestOpen] = useState(true);
   const latest = inbox[inbox.length - 1];
   const [theme, setTheme] = useTheme();
+  // Open problems the team is still working on: a card each on the Plan, and a push when one appears.
+  const risks = useOpenRisks(s, plans);
+  const [hidden, setHidden] = useState<string[]>([]);
+  const [riskPush, setRiskPush] = useState<{ subject: string; body: string; actionId: string }[]>([]);
+  const knownRisks = useRef<Set<string> | null>(null);
+  const openedAt = useRef(Date.now());
+  useEffect(() => {
+    const ids = new Set(risks.map(r => r.id));
+    // What is already open as the app loads (alerts arrive a moment after) is shown, not pushed.
+    if (knownRisks.current === null || Date.now() - openedAt.current < 4000) { knownRisks.current = ids; return; }
+    const fresh = risks.filter(r => !knownRisks.current!.has(r.id));
+    knownRisks.current = ids;
+    if (fresh.length) {
+      setHidden(h => h.filter(id => !fresh.some(r => r.id === id)));
+      // The banner headlines the last one: a person (who may not make it) reads stronger than weather.
+      const order = [...fresh].sort((a, b) => Number(a.id.startsWith('guest')) - Number(b.id.startsWith('guest')));
+      setRiskPush(order.map(r => ({ subject: r.line, body: 'The festival team is on it and will update you as soon as possible.', actionId: `risk-${r.id}` })));
+      try { if ((navigator as Navigator & { userActivation?: { hasBeenActive: boolean } }).userActivation?.hasBeenActive) navigator.vibrate?.(60); } catch { /* not supported */ }
+    }
+  }, [risks.map(r => r.id).join('|')]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Change the plan here at once; on a shared festival the server keeps it (only your own plan).
   const change = (add: string | null, remove: string | null) => {
@@ -94,6 +140,7 @@ export function AttendeeApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who
   return (
     <div className={`at at-on-${tab}${theme === 'light' ? ' light' : ''}`}>
       <PushBanner msgs={pushes} onOpen={() => go('updates')} onDone={() => setPushes([])} />
+      {!pushes.length && <PushBanner kind="risk" msgs={riskPush} onOpen={() => { go('plan'); const r = risks.find(x => riskPush.some(m => m.actionId === `risk-${x.id}`)); if (r) setDay(r.day); }} onDone={() => setRiskPush([])} />}
       {/* The whole app sits on a cinema photo, darkened so the cards read on top. */}
       <div className="at-photo" aria-hidden="true" style={{ backgroundImage: 'url(/hl/audience.jpg)' }} />
       {viewAs && <div className="viewas-bar"><Icon name="eye" size={16} /> Viewing as {who.name}. <button className="small" onClick={onOut}>Back to organizer</button></div>}
@@ -114,6 +161,17 @@ export function AttendeeApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who
       )}
 
       <main className="at-body">
+        {tab === 'plan' && risks.filter(r => !hidden.includes(r.id)).map(r => (
+          <div key={r.id} className="at-latest one risk">
+            <span className="at-latest-ic k-risk"><Icon name={UPDATE_ICON.risk} size={14} /></span>
+            {/* Not solved yet: say so, and that the team is on it. Tap to see that day. */}
+            <button className="at-latest-line" onClick={() => setDay(r.day)}>
+              <b>{r.line}</b>
+              <small>The festival team is on it · update coming asap</small>
+            </button>
+            <button className="at-latest-x" aria-label="Dismiss" onClick={() => setHidden(h => [...h, r.id])}><Icon name="x" size={14} /></button>
+          </div>
+        ))}
         {tab === 'plan' && latest && latestOpen && (
           <div className="at-latest one">
             <span className={`at-latest-ic k-${updateKind(latest)}`}><Icon name={UPDATE_ICON[updateKind(latest)]} size={14} /></span>

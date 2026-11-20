@@ -36,6 +36,5 @@
       Spaced.prototype = B.prototype;
       window.BroadcastChannel = Spaced;
     }
-    document.documentElement.setAttribute('data-usher-space', sp);
   } catch (e) { /* storage blocked: the app falls back as usual */ }
 })();

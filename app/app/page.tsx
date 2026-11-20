@@ -153,7 +153,8 @@ function AppInner({ demo }: { demo: Demo | null }) {
     const fromHash = () => { const h = location.hash.slice(1); if (PAGES.some(p => p.id === h)) setPageState(h as PageId); };
     fromHash();
     window.addEventListener('hashchange', fromHash);
-    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
+    // Not inside the deck's demo frames: they need no push service.
+    if ('serviceWorker' in navigator && !new URLSearchParams(location.search).has('demoframe')) navigator.serviceWorker.register('/sw.js').catch(() => {});
     return () => window.removeEventListener('hashchange', fromHash);
   }, []);
 

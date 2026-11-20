@@ -104,3 +104,11 @@
 .push-ic.k-change, .at-latest-ic.k-change, .at-alert-ic.k-change { background: var(--accent); color: #1b120e; }
 .at.light .at-latest-ic.k-change, .at.light .at-alert-ic.k-change { background: #141111; color: #fff; }
 .light .push-ic.k-change { background: #141111; color: #fff; }
+
+/* Heads-up: a problem the festival team is still working on (amber, not yet a change to the plan). */
+.push-ic.k-risk, .at-latest-ic.k-risk { background: #d9922b; color: #1b120e; }
+.at-latest.risk { border-color: rgba(217, 146, 43, .5); }
+.at-latest.risk .at-latest-line small { color: #e0a54f; }
+.at.light .at-latest.risk { background: #fdf4e6; border-color: rgba(196, 122, 20, .45); }
+.at.light .at-latest.risk .at-latest-line small { color: #a2620c; }
+.light .push-ic.k-risk { background: #c47a14; color: #fff; }
