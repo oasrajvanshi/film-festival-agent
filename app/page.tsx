@@ -10,7 +10,6 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollSmoother } from 'gsap/ScrollSmoother';
 import { useEffect, useRef, type MouseEvent } from 'react';
 import { Bell } from './hl/icons';
-import { PHOTOS } from './ui/photos';
 import { PlanDemo } from './sitedemo';
 import { Mascot, type Pose } from './ui/mascot';
 
@@ -354,7 +353,7 @@ export default function Site() {
 
       {/* hero */}
       <header className="s-hero">
-        <div className="s-hero-bg" data-hero-bg style={{ backgroundImage: `url(${PHOTOS.hero.src})` }} />
+        <div className="s-hero-bg" data-hero-bg style={{ backgroundImage: 'url(/hl/paint/hero.webp)' }} />
         {/* One film strip runs above the headline on the first screen; it leaves as the quote arrives. */}
         <div className="s-film s-film-top" data-film="top" aria-hidden="true" data-lve-skip>
           <div className="s-film-track">
@@ -413,7 +412,7 @@ export default function Site() {
         </div>
         <div className="s-prob-row s-risk-cards">
           <article className="s-prob-item s-risk-card">
-            <div className="s-risk-pic"><div className="s-risk-img" style={{ backgroundImage: 'url(/hl/snow.jpg)' }} /></div>
+            <div className="s-risk-pic"><div className="s-risk-img" style={{ backgroundImage: 'url(/hl/paint/snow.webp)' }} /></div>
             <p className="s-risk-k"><i className="ap wx">❄</i>Weather · Saturday</p>
             <h3>Snow from 1:00 to 7:00 pm</h3>
             <ul>
@@ -423,7 +422,7 @@ export default function Site() {
             </ul>
           </article>
           <article className="s-prob-item s-risk-card">
-            <div className="s-risk-pic"><div className="s-risk-img" style={{ backgroundImage: 'url(/hl/hall.jpg)' }} /></div>
+            <div className="s-risk-pic"><div className="s-risk-img" style={{ backgroundImage: 'url(/hl/paint/flight.webp)' }} /></div>
             <p className="s-risk-k"><i className="ap late">!</i>Flight cancelled · 7:10 am</p>
             <h3>Dana Whitfield&apos;s flight is cancelled</h3>
             <ul>
