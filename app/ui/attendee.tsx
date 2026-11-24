@@ -45,7 +45,7 @@ let sheetOpenedAt = 0;
 const opened = () => { sheetOpenedAt = Date.now(); };
 const settled = (close: () => void) => () => { if (Date.now() - sheetOpenedAt > 400) close(); };
 
-const VENUE_TONES = ['#d49a5c', '#8fa0c4', '#93b27e', '#c97b9a', '#b9a36b', '#7fb0b5'];
+const VENUE_TONES = ['#a3221d', '#2a55b8', '#c9524c', '#5b82d1', '#7d1914', '#1f4699']; // red and blue only
 const venueTone = (f: AgentStore['agent']['f'], id: string) => VENUE_TONES[Math.max(0, f.venues.findIndex(v => v.id === id)) % VENUE_TONES.length];
 
 function MapIcon() {

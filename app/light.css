@@ -16,13 +16,14 @@
   --accent-soft: #fbeeed;
   --accent-ink: #ffffff;
   --chip: #f2f0ef;
-  --gold: #b8860b;
-  --ok: #4f6b2f;
-  --ok-bg: #e5edd8;
-  --bad: #b8392c;
-  --bad-bg: #f8e1dc;
-  --warn: #a7731a;
-  --warn-bg: #f7ebd2;
+  /* three colours only: red leads (brand, selection, problems, changes), blue is people, orange is Usher */
+  --gold: #a3221d;
+  --ok: #2a55b8;
+  --ok-bg: #e9effc;
+  --bad: #a3221d;
+  --bad-bg: #fbeeed;
+  --warn: #a3221d;
+  --warn-bg: #fbeeed;
   --info: #2b2626;
   --info-bg: #f6f5f4;
   --side: #faf9f9;
@@ -57,11 +58,13 @@ html.org-light body::after { opacity: .035; }
 /* Day strip and the Calendar | Map switch. */
 .shell.light .day-strip button { background: var(--panel); border-color: var(--line); }
 .shell.light .day-strip button:hover { background: var(--panel-2); border-color: var(--line-2); }
-.shell.light .day-strip button.on { background: #141111; border-color: #141111; color: #b9b3b0; }
+.shell.light .day-strip button.on, .at.light .day-strip button.on { background: var(--accent); border-color: var(--accent); color: rgba(255, 255, 255, .78); }
+.at.light .day-strip button.on b { color: #fff; }
+.at.light .day-strip button.on i { background: #fff; }
 .shell.light .day-strip button.on b { color: #ffffff; }
-.shell.light .day-strip button.on i { background: var(--accent); }
+.shell.light .day-strip button.on i { background: #fff; }
 .shell.light .cal-view { background: var(--panel-2); border-color: var(--line-2); }
-.shell.light .cal-view-thumb { background: #141111; box-shadow: 0 2px 8px rgba(20, 15, 15, .25); }
+.shell.light .cal-view-thumb { background: var(--accent); box-shadow: 0 2px 8px rgba(163, 34, 29, .28); }
 .shell.light .cal-view button { color: var(--muted); }
 .shell.light .cal-view button.on, .shell.light .cal-view button.on:hover { color: #ffffff; }
 
@@ -96,9 +99,9 @@ html.org-light body::after { opacity: .035; }
 /* The map: a clean white street plan. */
 .shell.light .vmap-map { background: #f8f8f7; border-color: var(--line-2); }
 .shell.light .m-bg { fill: #f8f8f7; }
-.shell.light .m-park { fill: rgba(120, 150, 110, .13); }
+.shell.light .m-park { fill: rgba(40, 35, 35, .045); }
 .shell.light .m-campus { fill: rgba(163, 34, 29, .08); stroke: rgba(163, 34, 29, .2); }
-.shell.light .m-water { stroke: #a9c7d6; opacity: .9; }
+.shell.light .m-water { stroke: #bccbea; opacity: .9; }
 .shell.light .m-res { stroke: rgba(40, 35, 35, .1); }
 .shell.light .m-minor { stroke: rgba(40, 35, 35, .2); }
 .shell.light .m-major { stroke: rgba(40, 35, 35, .34); }
@@ -106,14 +109,14 @@ html.org-light body::after { opacity: .035; }
 .shell.light .m-ped { stroke: rgba(163, 34, 29, .7); }
 .shell.light .m-label { fill: rgba(40, 35, 35, .45); }
 .shell.light .m-note { fill: rgba(40, 35, 35, .38); }
-.shell.light .m-note.water { fill: rgba(70, 120, 145, .75); }
+.shell.light .m-note.water { fill: rgba(42, 85, 184, .6); }
 .shell.light .m-note.area { fill: rgba(163, 34, 29, .45); }
-.shell.light .m-loop { stroke: rgba(80, 100, 175, .6); }
+.shell.light .m-loop { stroke: rgba(42, 85, 184, .55); }
 .shell.light .m-pin .m-dot { fill: #ffffff; stroke: var(--accent); }
 .shell.light .m-pin .m-num { fill: var(--accent-2); }
 .shell.light .m-pin .m-name { fill: var(--ink); stroke: #f8f8f7; }
 .shell.light .m-pin.quiet .m-dot { stroke: rgba(40, 35, 35, .35); }
-.shell.light .m-pin.on .m-dot { fill: #141111; stroke: #141111; }
+.shell.light .m-pin.on .m-dot { fill: var(--accent); stroke: var(--accent); }
 .shell.light .m-pin.on .m-num { fill: #ffffff; }
 .shell.light .m-pin.changed .m-dot { fill: var(--accent); stroke: var(--accent-2); }
 .shell.light .m-pin.changed .m-num { fill: #fff; }
@@ -139,13 +142,13 @@ html.org-light body::after { opacity: .035; }
 .shell.light table th { color: var(--muted); }
 .shell.light .dcal-now i { color: #fff; }
 .shell.light .pill-toggle button { border-color: var(--line-2); color: var(--ink); }
-.shell.light .pill-toggle button.on { background: #141111; color: #ffffff; border-color: #141111; }
+.shell.light .pill-toggle button.on { background: var(--accent); color: #ffffff; border-color: var(--accent); }
 .shell.light .hero h2, .shell.light .hero p { color: #ffffff; }
 
 /* Light-mode details that carry the brand: black caps for headings, a red curtain line under the top bar. */
 .shell.light .topbar { box-shadow: inset 0 -2px 0 var(--accent); border-bottom-color: transparent; }
 .shell.light .brand-mark { background: var(--accent); color: #fff; }
-.shell.light .nav-item.on { background: #f3efee; color: var(--ink); box-shadow: inset 3px 0 0 var(--accent); }
+.shell.light .nav-item.on { background: var(--accent-soft); color: var(--accent-2); box-shadow: inset 3px 0 0 var(--accent); }
 .shell.light .wx-alert-row button.primary { background: var(--ink); border-color: var(--ink); color: #fff; }
 .shell.light .wx-alert-row button.primary:hover { background: var(--accent); border-color: var(--accent); }
 .shell.light .rec-float .rec-approve, .shell.light button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
@@ -157,8 +160,9 @@ html.org-light body::after { opacity: .035; }
 .shell.light .m-pin.changed .m-num { fill: #fff; }
 .shell.light .m-ring { stroke: var(--accent); }
 .shell.light .m-loop { stroke: rgba(40, 35, 35, .45); }
-.shell.light .day-strip button.on i { background: var(--accent); }
+.shell.light .day-strip button.on i { background: #fff; }
 .shell.light .vb-late b { box-shadow: 0 0 0 2px #fff; }
 .shell.light .wh-chip { background: #fff; border-color: var(--line-2); color: var(--ink); }
-.shell.light .wh-chip.on { background: #141111; border-color: #141111; color: #fff; }
+.shell.light .wh-chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 .shell.light .wh-chip small { color: inherit; opacity: .7; }
+.shell.light .dcal-ev.hot { background: #fcecea; }

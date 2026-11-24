@@ -655,9 +655,9 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
 /* Event pictures and guest avatars, the same in every profile. */
 .ev-thumb { display: block; border-radius: 10px; object-fit: cover; flex: none; background: var(--panel-2); }
 .faces { display: inline-flex; align-items: center; padding-left: 4px; }
-.faces i { width: var(--face, 22px); height: var(--face, 22px); margin-left: -5px; border-radius: 50%; display: inline-grid; place-items: center; font-style: normal; font-size: calc(var(--face, 22px) * .4); font-weight: 700; letter-spacing: .02em; color: #1b120e; border: 1.5px solid #1d1411; flex: none; }
+.faces i { width: var(--face, 22px); height: var(--face, 22px); margin-left: -5px; border-radius: 50%; display: inline-grid; place-items: center; font-style: normal; font-size: calc(var(--face, 22px) * .4); font-weight: 700; letter-spacing: .02em; color: #fff; border: 1.5px solid #1d1411; flex: none; }
 .faces i.more { background: rgba(246, 236, 220, .14); color: var(--ink); font-weight: 600; }
-.faces i.late { box-shadow: 0 0 0 2px #e8684b; position: relative; z-index: 1; }
+.faces i.late { box-shadow: 0 0 0 2px var(--bad); position: relative; z-index: 1; }
 .faces i.late::after { content: ""; position: absolute; right: -2px; top: -2px; width: 7px; height: 7px; border-radius: 50%; background: #e8684b; border: 1.5px solid #1d1411; }
 /* Rows in the personal apps: picture on the left, guests under the title. */
 .item .ev-thumb { width: 44px; height: 44px; }
@@ -686,7 +686,7 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
 .ocal-tick { position: absolute; top: 0; bottom: 0; width: 1px; background: rgba(246, 236, 220, .06); }
 .ocal-ev { position: absolute; top: 1px; bottom: 1px; border-radius: 3px; padding: 0 4px; font-size: 9.5px; line-height: 16px; color: #1b120e; background: #c39367; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ocal-ev.k-panel, .ocal-ev.k-qa { background: #8fa0c4; }
-.ocal-ev.k-market, .ocal-ev.k-activity { background: #93B27E; }
+.ocal-ev.k-market, .ocal-ev.k-activity { background: #5b82d1; }
 .ocal-ev.off { opacity: .35; text-decoration: line-through; }
 .ob-stats { margin-top: 0; }
 /* The problem button is always shown in the bottom-left corner; the recommendation sits above it. */
@@ -733,7 +733,7 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
 .wh-row { display: flex; gap: 12px; align-items: center; padding: 10px 2px; border-top: 1px solid var(--line); }
 .wh-row.late { background: rgba(232, 104, 75, .07); }
 .wh-av { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; flex: none; font-size: 12px; font-weight: 700; color: #1b120e; background: #a4744e; }
-.wh-av.k-guest { background: #c39367; } .wh-av.k-staff { background: #93B27E; } .wh-av.k-vendor { background: #8fa0c4; }
+.wh-av.k-guest { background: #2a55b8; } .wh-av.k-staff { background: #a3221d; } .wh-av.k-vendor { background: #8a9bc4; }
 .wh-row.late .wh-av { box-shadow: 0 0 0 2px #E8684B; }
 .wh-who { min-width: 0; flex: 1; display: grid; }
 .wh-who b { color: var(--ink); font-size: 14.5px; }
@@ -1195,7 +1195,7 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
    The same chip and colors on every screen. */
 :root { --agent: #e0a95a; --agent-soft: rgba(224, 169, 90, .13); --agent-line: rgba(224, 169, 90, .42);
   --human: #8fb0f2; --human-soft: rgba(143, 176, 242, .13); --human-line: rgba(143, 176, 242, .45); --human-ink: #0e1730; }
-.shell.light, .at.light, .me.light { --agent: #a5620c; --agent-soft: #fbf1e2; --agent-line: rgba(165, 98, 12, .38);
+.shell.light, .at.light, .me.light { --agent: #c2550c; --agent-soft: #fdf1e7; --agent-line: rgba(194, 85, 12, .38);
   --human: #2a55b8; --human-soft: #e9effc; --human-line: rgba(42, 85, 184, .38); --human-ink: #fff; }
 .actor { display: inline-flex; align-items: center; gap: 4px; padding: 0 7px 0 5px; border-radius: 999px; border: 1px solid transparent;
   font-size: 11px; font-weight: 600; line-height: 17px; letter-spacing: 0; text-transform: none; white-space: nowrap; vertical-align: middle; }
@@ -1346,3 +1346,13 @@ button.primary.agent-btn { background: var(--agent); border-color: var(--agent);
 .rec-sug { font-style: normal; font-size: 11.5px; font-weight: 600; color: var(--agent); }
 .by-human-t { color: var(--human); }
 .by-agent-t { color: var(--agent); }
+
+/* A guest's name on a brief is a person: the people blue. */
+.chip.person { background: var(--human-soft); color: var(--human); }
+/* Usher's own buttons stay orange, but as an outline: orange is the 10% accent, never a big block of colour. */
+.shell.light .wx-alert-row button.primary.agent-btn, .shell.light button.primary.agent-btn { background: #fff; border: 1.5px solid var(--agent); color: var(--agent); }
+.shell.light .wx-alert-row button.primary.agent-btn:hover, .shell.light button.primary.agent-btn:hover { background: var(--agent-soft); border-color: var(--agent); color: var(--agent); }
+/* Orange stays small: the "Flagged by Usher" heading and the log's step names are plain grey; only Usher's
+   buttons, its icons and its recommendation heading carry the orange. */
+.shell.light .wx-group { color: var(--muted); }
+.shell.light .lg-runs .lg-run li.by-agent .lg-k { color: var(--muted); }

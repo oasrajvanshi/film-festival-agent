@@ -16,7 +16,7 @@ type Patch = Partial<Pick<FestivalEvent, 'start' | 'end' | 'venueId' | 'guestIds
 
 const KIND: Record<FestivalEvent['kind'], string> = { screening: 'Screening', qa: 'Q&A', panel: 'Talk', market: 'Industry', activity: 'Event' };
 const ROLE: Record<string, string> = { director: 'Director', producer: 'Producer', panelist: 'Panelist', moderator: 'Moderator' };
-const TONES = ['#b9825a', '#8f6a4f', '#a4744e', '#7d5b46', '#c39367', '#6f5a4e'];
+const TONES = ['#2a55b8', '#3a63c2', '#1f4699', '#4b74cc', '#2c4f9e', '#5a80d0']; // people are blue
 const ini = (n: string) => n.split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 const tone = (n: string) => TONES[[...n].reduce((h, c) => h + c.charCodeAt(0), 0) % TONES.length];
 

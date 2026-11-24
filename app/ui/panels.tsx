@@ -595,7 +595,7 @@ export function BriefView({ s, personId }: { s: AgentStore; personId: string }) 
         <div className="brief-ev" key={event.id}>
           <span className="brief-time">{fmt(event.start)}</span>
           <div style={{ minWidth: 0 }}>
-            <div className="t">{event.title}{note && <span className="chip warn" style={{ marginLeft: 6 }}>{note}</span>}</div>
+            <div className="t">{event.title}{note && <span className={`chip ${note.startsWith('Guests') ? 'person' : 'warn'}`} style={{ marginLeft: 6 }}>{note}</span>}</div>
             {admits.length > 0 && <div className="d">{admits.length >= allPasses ? 'Admits every pass and badge' : `Admits: ${admits.join(', ')}`}</div>}
           </div>
         </div>
