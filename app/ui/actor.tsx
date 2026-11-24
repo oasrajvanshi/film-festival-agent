@@ -24,15 +24,3 @@ export function ActorLegend() {
     </span>
   );
 }
-
-/**
- * A small hand-drawn figure for a moment worth a smile (a recommendation, all done, nothing to do).
- * Line art on a transparent background, tinted to the theme; hidden if the picture is missing.
- */
-export function Doodle({ name, className, alt = '' }: { name: string; className?: string; alt?: string }) {
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img className={`doodle${className ? ` ${className}` : ''}`} src={`/doodles/${name}.png`} alt={alt} aria-hidden={alt ? undefined : true}
-      onError={e => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }} />
-  );
-}

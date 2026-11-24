@@ -23,7 +23,8 @@ import { Ask } from './panels';
 import { MyArrival } from './presence';
 import { useAlerts } from './weatherplan';
 import { SCENARIOS } from '../../src/data/sundance2027';
-import { Actor, Doodle } from './actor';
+import { Actor } from './actor';
+import { Motif } from './motif';
 import { CityBase, DayStrip, frameFor, usePlaced } from './venuemap';
 import { PushBanner, UPDATE_ICON, UPDATE_LABEL, updateKind, useArrivals, useTheme } from './live';
 
@@ -430,7 +431,7 @@ function Updates({ s, who }: { s: AgentStore; who: Who }) {
     <div className="at-updates">
       <h1 className="at-h1">Updates</h1>
       <p className="at-lede">Only about your plan.</p>
-      {inbox.length === 0 && <div className="at-empty"><Doodle name="headsup" className="at-doodle" />Nothing yet. If a change affects your plan, it shows up here.</div>}
+      {inbox.length === 0 && <div className="at-empty"><Motif name="headsup" className="at-doodle" />Nothing yet. If a change affects your plan, it shows up here.</div>}
       {inbox.map((m, i) => (
         <div className="at-msg" key={i}>
           <span className={`at-alert-ic k-${updateKind(m)}`} title={UPDATE_LABEL[updateKind(m)]}><Icon name={UPDATE_ICON[updateKind(m)]} size={16} /></span>

@@ -18,7 +18,8 @@ import { runAll, type SuiteResult } from '../../src/eval/scenarios';
 import { evalRandomFestivals } from '../../src/eval/fuzz';
 import type { Recommendation } from '../../src/agent/recommend';
 import { Icon } from './icons';
-import { Actor, ActorLegend, Doodle } from './actor';
+import { Actor, ActorLegend } from './actor';
+import { Motif } from './motif';
 import { buildBrief } from '../../src/agent/briefs';
 import { PhotoBand } from './photos';
 
@@ -481,7 +482,7 @@ export function Approvals({ s, user, go }: P) {
       </div>
       <div className="card">
         <h2>Waiting for approval ({pending.length})</h2>
-        {pending.length === 0 && <div className="empty-doodle"><Doodle name="relax" /><p className="muted">Nothing waiting. Usher will ask here when something needs you.</p></div>}
+        {pending.length === 0 && <div className="empty-doodle"><Motif name="relax" /><p className="muted">Nothing waiting. Usher will ask here when something needs you.</p></div>}
         {pending.map(q => {
           const msgs = q.action.messages ?? [];
           const shown = open[q.action.id] ? msgs : msgs.slice(0, 2);
@@ -645,7 +646,7 @@ export function Ask({ s }: P) {
         <input style={{ flex: 1, minWidth: 220 }} aria-label="Your question" value={q} onChange={e => setQ(e.target.value)} onKeyDown={e => e.key === 'Enter' && ask()} />
         <button className="primary" disabled={busy} onClick={ask}>{busy ? 'Thinking…' : 'Ask'}</button>
       </div>
-      {history.length === 0 && <div className="empty-doodle"><Doodle name="ask" /></div>}
+      {history.length === 0 && <div className="empty-doodle"><Motif name="ask" /></div>}
       {history.map((h, i) => (
         <div className="msg" key={i}>
           <div className="who"><Actor kind="human" label="Question" /> {h.q}</div>

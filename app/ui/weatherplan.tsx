@@ -25,7 +25,8 @@ import type { Action, OutboundMessage } from '../../src/agent/approvals';
 import type { DayNumber, FestivalEvent } from '../../src/core/types';
 import { addMinutes, clock as fmt, overlaps, toMinutes } from '../../src/core/time';
 import { Icon } from './icons';
-import { Actor, Doodle } from './actor';
+import { Actor } from './actor';
+import { Motif } from './motif';
 import { boardChanged } from './localkeys';
 import { SCENARIOS } from '../../src/data/sundance2027';
 
@@ -500,7 +501,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
   const all = items.length > 0 && count === items.length;
   const doneNote = done && (
     <aside className="rec-done" role="status">
-      <Doodle name="done" className="rec-done-doodle" />
+      <Motif name="done" className="rec-done-doodle" />
       <div><b>All set.</b>
         <span><Actor kind="human" label={`You approved ${done.changes}`} /> <Actor kind="agent" label={`Usher sent ${done.sent.toLocaleString('en-US')} messages`} /></span></div>
     </aside>
@@ -574,7 +575,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
           <div className="rec-head"><Actor kind="agent" label="Usher's recommendation" /></div>
           {!allPicked ? (
             <div className="rec-ways">
-              <Doodle name="options" className="rec-doodle" />
+              <Motif name="options" className="rec-doodle" />
               <p className="rec-q">{problems.length > 1 ? 'Pick a way for each problem.' : 'Two ways to handle this. Pick one:'}</p>
               {problems.map(({ al, options }) => (
                 <div key={al.id} className="rec-prob">
