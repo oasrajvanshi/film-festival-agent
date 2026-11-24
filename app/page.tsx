@@ -390,9 +390,9 @@ export default function Site() {
           <div className="s-says" data-says>{CAST.map(c => <span key={c.pose} className={`s-say s-say-${c.pose}`} data-bubble><span className="s-bubble">{c.say}</span></span>)}</div>
         </div>
         <div className="s-hero-copy">
-          <h1 className="s-h1 s-h1-hero" aria-label="Usher, the best film festival change management agent">
+          <h1 className="s-h1 s-h1-hero" aria-label="Usher, an agentic AI change management team for your film festival">
             <span className="s-wordmark" data-split>Usher</span>
-            <span className="s-h1-sub" data-split>{'The best film festival\nchange management agent.'}</span>
+            <span className="s-h1-sub" data-split>{'An agentic AI change management\nteam for your film festival.'}</span>
           </h1>
           {/* Usher, talking: a problem comes in, it types, it answers with what it does and who it tells. */}
           <div className="s-chat" data-hero-fade data-lve-skip><UsherChat /></div>
