@@ -13,6 +13,7 @@ import { Bell } from './hl/icons';
 import { PlanDemo } from './sitedemo';
 import { Mascot, type Pose } from './ui/mascot';
 import { filmReel } from './reel';
+import { UsherChat } from './usherchat';
 
 // ---------------------------------------------------------------- the calendar (1 pm to 7 pm, four venues)
 
@@ -55,15 +56,6 @@ const CAST: { pose: Pose; say: string; s: number; side: 1 | -1; gap: number; dep
   { pose: 'working', say: 'Moving 3 screenings\u2026', s: 0.58, side: 1, gap: 4, depth: 0.6 },
   { pose: 'done', say: 'Done! Everyone\u2019s been told.', s: 0.66, side: -1, gap: 6, depth: 0.8, sp: 0.9, sideP: 1 },
   { pose: 'relax', say: 'All calm. Coffee time.', s: 0.8, side: -1, gap: 4, depth: 0.5 },
-];
-
-/** What Usher says it will do, typed out one line at a time under the hero quote. */
-const PROMISES = [
-  'Speaker running late? I\u2019ll find a stand-in.',
-  'Snow from 1 pm? I\u2019ll push three screenings.',
-  'Print arrives late? I\u2019ll swap the order.',
-  'Flight cancelled? I\u2019ll move the Q&A to video.',
-  'Shuttle running late? I\u2019ll tell people to leave early.',
 ];
 
 /** `rich`: the app's own calendar look, with each event's picture and its guests' avatars. */
@@ -316,7 +308,6 @@ export default function Site() {
     }, root);
 
     const stopTalk = reduce ? () => {} : castTalk(root.current!, 3.4);
-    const stopType = reduce ? () => {} : typer(root.current!.querySelector<HTMLElement>('[data-typer]'), PROMISES);
 
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener('load', refresh);
@@ -324,7 +315,7 @@ export default function Site() {
     return () => {
       window.removeEventListener('load', refresh);
       stopSnow();
-      stopTalk(); stopType(); stopLean?.(); stopLean = null; reel?.stop();
+      stopTalk(); stopLean?.(); stopLean = null; reel?.stop();
       ctx.revert();
       glide?.kill(); smootherRef = null;
       if (releasePlan) { window.removeEventListener('pd-done', releasePlan); releasePlan(); releasePlan = null; }
@@ -386,11 +377,8 @@ export default function Site() {
             <span className="s-wordmark" data-split>Usher</span>
             <span className="s-h1-sub" data-split>{'The best film festival\nchange management agent.'}</span>
           </h1>
-          <p className="s-lead" data-hero-fade>
-            <span className="s-says"><Mascot pose="ask" className="s-mascot" /><q className="s-quote">Don&apos;t worry. I&apos;ll take care of everything.</q></span>
-            <span className="s-typer" data-typer>{PROMISES[0]}</span>
-            I watch your festival&apos;s schedule all day. When something changes, I work out what it touches and tell everyone affected what to do next.
-          </p>
+          {/* Usher, talking: a problem comes in, it types, it answers with what it does and who it tells. */}
+          <div className="s-chat" data-hero-fade data-lve-skip><UsherChat /></div>
           <div className="s-ctas" data-hero-fade>
             <a className="btn" href="#story" onClick={go('#story')}>See how I work</a>
           </div>
@@ -581,23 +569,6 @@ function castTalk(root: HTMLElement, startAfter: number) {
   return () => { clearTimeout(begin); clearInterval(timer); pars.forEach(p => p.removeEventListener('pointerenter', onEnter)); };
 }
 
-/** Types Usher's promises out one at a time: hold, erase, type the next, hold. */
-function typer(el: HTMLElement | null, lines: string[]) {
-  if (!el) return () => {};
-  let alive = true, t = 0, i = 0;
-  const wait = (ms: number) => new Promise<void>(r => { t = window.setTimeout(r, ms); });
-  (async () => {
-    await wait(3000);
-    while (alive) {
-      let text = el.textContent ?? '';
-      while (alive && text.length) { text = text.slice(0, -1); el.textContent = text; await wait(12); }
-      i = (i + 1) % lines.length;
-      for (let k = 1; alive && k <= lines[i].length; k++) { el.textContent = lines[i].slice(0, k); await wait(28 + Math.random() * 34); }
-      await wait(2600);
-    }
-  })();
-  return () => { alive = false; clearTimeout(t); };
-}
 
 let smootherRef: ScrollSmoother | null = null;
 let releasePlan: (() => void) | null = null;

@@ -950,13 +950,6 @@
 .s-flo-done { --h: 138px; --bob: 4.2s; --bob-d: -.8s; }
 .s-flo-relax { --h: 96px; --bob: 6.4s; --bob-d: -2.4s; }
 
-/* the hero quote, said by the waving figure, then the promise being typed */
-.s-says { display: flex; align-items: flex-end; gap: 14px; margin-bottom: 10px; }
-.s-says .s-quote { margin-bottom: 4px; }
-.s-says .s-mascot { height: 92px; }
-.s-typer { display: block; min-height: 2.9em; margin: 2px 0 12px; font-family: var(--f-time); font-size: .92em; line-height: 1.45; color: var(--cream); }
-.s-typer::after { content: ""; display: inline-block; width: .5em; height: 1.05em; margin-left: 3px; vertical-align: -.16em; background: var(--amber-2); animation: s-caret 1s steps(1) infinite; }
-@keyframes s-caret { 50% { opacity: 0; } }
 
 /* one figure per scene further down */
 .s-node-guy { position: absolute; left: 50%; bottom: calc(100% - 14px); translate: -50% 0; line-height: 0; }
@@ -968,8 +961,8 @@
 .s-cta-guy { position: relative; display: inline-block; line-height: 0; margin-left: 10px; }
 .s-cta-guy .mascot { height: 104px; }
 /* a hop when you point at any of them */
-.s-node-guy .mascot, .s-plan-mascot .mascot, .s-cta-guy .mascot, .s-says .mascot { pointer-events: auto; transition: translate .25s cubic-bezier(.34, 1.7, .5, 1); }
-.s-node-guy .mascot:hover, .s-plan-mascot .mascot:hover, .s-cta-guy .mascot:hover, .s-says .mascot:hover { translate: 0 -10px; }
+.s-node-guy .mascot, .s-plan-mascot .mascot, .s-cta-guy .mascot { pointer-events: auto; transition: translate .25s cubic-bezier(.34, 1.7, .5, 1); }
+.s-node-guy .mascot:hover, .s-plan-mascot .mascot:hover, .s-cta-guy .mascot:hover { translate: 0 -10px; }
 
 @media (max-width: 900px) {
   .s-node-guy { left: calc(100% + 10px); bottom: 4px; translate: 0 0; }
@@ -979,9 +972,6 @@
   .s-bubble { font-size: 12px; padding: 6px 10px; }
   .s-flo-options, .s-flo-relax, .s-flo-working { display: none; }
   .s-flo-ask { --h: 92px; } .s-flo-headsup { --h: 76px; } .s-flo-working { --h: 70px; } .s-flo-done { --h: 82px; }
-  .s-says { gap: 10px; }
-  .s-says .s-mascot { height: 68px; }
-  .s-says .s-quote { white-space: normal; }
   .s-plan-head { gap: 12px; }
   .s-plan-mascot .mascot { height: 84px; }
   .s-cta-guy .mascot { height: 84px; }
@@ -997,3 +987,44 @@
 @media (max-width: 760px) {
   .s-hero .s-h1.s-h1-hero { padding: 12svh 0 72svh; }
 }
+
+/* ---------------------------------------------------------------- the hero conversation (app/usherchat.tsx)
+   One typeface besides the wordmark: the subtitle, the messages and the button are all the UI sans.
+   Usher's messages are cream bubbles beside its face; what comes in from the festival is a dark glass
+   bubble on the right with a red dot. Bubbles spring out of their tail; Usher's words pop in one by one. */
+.s-hero .s-h1-sub { font-family: var(--f-ui); font-weight: 500; letter-spacing: 0; }
+.s-chat { margin-top: 18px; }
+.uc { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: end; gap: 6px; width: min(560px, 100%); }
+.uc-face { width: 96px; height: 112px; display: grid; place-items: end center; line-height: 0; }
+.uc-face .mascot { height: 104px; }
+.uc-thread { height: 212px; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; overflow: hidden; padding: 6px 4px 4px;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 34%); mask-image: linear-gradient(180deg, transparent, #000 34%); }
+.uc-row { display: flex; flex: none; animation: uc-row .5s cubic-bezier(.3, 1.3, .5, 1) both; }
+.uc-row.issue { justify-content: flex-end; }
+@keyframes uc-row { from { max-height: 0; opacity: 0; } 40% { opacity: 1; } to { max-height: 140px; opacity: 1; } }
+.uc-bub { max-width: 34ch; padding: 10px 15px; font: 500 15.5px/1.42 var(--f-ui); border-radius: 18px; text-wrap: pretty; }
+.uc-usher, .uc-typing { background: var(--cream); color: var(--amber-ink); border-bottom-left-radius: 6px; transform-origin: 0 100%;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .35); animation: uc-pop .55s cubic-bezier(.34, 1.7, .5, 1) both; }
+.uc-issue { display: flex; align-items: baseline; gap: 9px; background: rgba(239, 229, 211, .08); color: var(--cream); border: 1px solid rgba(239, 229, 211, .16);
+  border-bottom-right-radius: 6px; transform-origin: 100% 100%; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  animation: uc-pop .55s cubic-bezier(.34, 1.7, .5, 1) both, uc-nudge .5s .45s ease-in-out both; }
+@keyframes uc-pop { from { transform: translateY(10px) scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes uc-nudge { 0%, 100% { translate: 0 0; } 25% { translate: -4px 0; } 50% { translate: 3px 0; } 75% { translate: -2px 0; } }
+.uc-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #E8684B; translate: 0 -1px; box-shadow: 0 0 0 0 rgba(232, 104, 75, .6); animation: uc-ping 1.6s ease-out infinite; }
+@keyframes uc-ping { 70% { box-shadow: 0 0 0 7px rgba(232, 104, 75, 0); } 100% { box-shadow: 0 0 0 0 rgba(232, 104, 75, 0); } }
+.uc-typing { display: inline-flex; gap: 5px; padding: 14px 16px; }
+.uc-typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--amber-ink); opacity: .35; animation: uc-dots 1s ease-in-out infinite; }
+.uc-typing i:nth-child(2) { animation-delay: .15s; } .uc-typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes uc-dots { 0%, 60%, 100% { transform: translateY(0); opacity: .35; } 30% { transform: translateY(-4px); opacity: .9; } }
+.uc-w { display: inline-block; animation: uc-word .42s cubic-bezier(.3, 1.4, .5, 1) both; }
+@keyframes uc-word { from { opacity: 0; transform: translateY(6px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+.uc-b { font-weight: 700; color: var(--velvet-red, #a3221d); }
+/* older messages fade as they rise */
+.uc-thread .uc-row:not(:nth-last-child(-n + 2)) .uc-bub { opacity: .55; transition: opacity .4s ease; }
+@media (max-width: 760px) {
+  .s-chat { margin-top: 10px; }
+  .uc-face { width: 70px; height: 86px; } .uc-face .mascot { height: 80px; }
+  .uc-thread { height: 230px; }
+  .uc-bub { font-size: 14.5px; padding: 9px 13px; }
+}
+@media (prefers-reduced-motion: reduce) { .uc-row, .uc-bub, .uc-w, .uc-dot, .uc-typing i { animation: none !important; } }
