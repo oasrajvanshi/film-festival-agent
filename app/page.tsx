@@ -49,10 +49,10 @@ const tone = (n: string) => TONES[[...n].reduce((h, c) => h + c.charCodeAt(0), 0
  *  and together their lines tell the whole story in miniature: a problem, the work, done, calm again. `at`: floating at a point inside the coil (x, y, z); `s`: standing on the film at that
  *  angle of the coil; `depth`: how much it leans after the pointer. `atp` / `sp` are for phones. */
 const CAST: { pose: Pose; say: string; at?: string; atp?: string; s?: number; sp?: number; sink?: number; depth: number }[] = [
-  { pose: 'headsup', say: 'Snow at 1 pm. Heads-up!', at: '6,-52,0', depth: 0.4 },
-  { pose: 'working', say: 'Moving 3 screenings\u2026', s: 750, sp: 404, sink: 0.22, depth: 0.2 },
-  { pose: 'done', say: 'Done! Everyone\u2019s been told.', s: 780, sp: 690, sink: 0.04, depth: 0.5 },
-  { pose: 'relax', say: 'All calm. Coffee time.', at: '6,206,0', atp: '-66,206,0', depth: 0.35 },
+  { pose: 'headsup', say: 'Snow at 1 pm. Heads-up!', at: '6,98,0', atp: '40,22,0', depth: 0.4 },
+  { pose: 'working', say: 'Moving 3 screenings\u2026', s: 387, sp: 363, sink: 0.2, depth: 0.2 },
+  { pose: 'done', say: 'Done! Everyone\u2019s been told.', s: 402.5, sp: 377, sink: 0.12, depth: 0.3 },
+  { pose: 'relax', say: 'All calm. Coffee time.', s: 413, sp: 388, sink: 0.2, depth: 0.2 },
 ];
 
 /** `rich`: the app's own calendar look, with each event's picture and its guests' avatars. */

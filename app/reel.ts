@@ -21,7 +21,7 @@ export interface ReelState { /** 0 rolled up, 1 unrolled */ reveal: number; /** 
 const smooth = (a: number, b: number, x: number) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
 const RAD = Math.PI / 180;
 const N = 560;                                   // steps along the strip
-const PSI0 = -96, PSI1 = 720 + 104;              // the coil, in degrees: front at 0, 360 and 720
+const PSI0 = -100, PSI1 = 360 + 106;             // one loop, in degrees: the front of it at 0 and again at 360
 const PHI = 24 * RAD;                            // how far the coil leans towards you
 const CAM = 1500;                                // distance of the eye, in px
 
@@ -40,7 +40,7 @@ const FRAG = `#version 300 es
 precision highp float; precision highp sampler2DArray;
 in vec3 vP, vN, vW; in vec2 vSV; out vec4 o;
 uniform sampler2DArray uPics;
-uniform float uCam, uShadow, uHalf, uPitch, uLen, uAcross, uFlow, uEnd, uCount, uHover, uHoverK, uAlpha, uK;
+uniform float uCam, uShadow, uHalf, uPitch, uLen, uAcross, uFlow, uEnd, uTotal, uCount, uHover, uHoverK, uAlpha, uK;
 uniform vec3 uKey;
 float box(vec2 p, vec2 b, float r) { vec2 d = abs(p) - b + r; return length(max(d, 0.)) + min(max(d.x, d.y), 0.) - r; }
 float cover(float d) { float w = max(length(vec2(dFdx(d), dFdy(d))), 1e-4) * .85; return smoothstep(w, -w, d); }
@@ -54,7 +54,7 @@ void main() {
   }
   float al = s - uFlow, k = floor(al / uPitch), fu = al - (k + .5) * uPitch, y = v * uHalf;
   // punched holes
-  float hp = uPitch / 7., hu = mod(al, hp) - hp * .5, edge = (uHalf - uAcross * .5) * .5;
+  float hp = uPitch / 6., hu = mod(al, hp) - hp * .5, edge = (uHalf - uAcross * .5) * .5;
   float hole = cover(box(vec2(hu, abs(y) - (uHalf - edge)), vec2(hp * .27, edge * .36), 1.6 * uK));
   float a = (1. - hole) * uAlpha;
   if (a < .01) discard;
@@ -77,9 +77,11 @@ void main() {
     vec2 uv = vec2(.5 - fu / uLen, .5 - y / uAcross);
     vec3 pic = texture(uPics, vec3(uv, mod(mod(k, uCount) + uCount, uCount))).rgb;
     float lum = dot(pic, vec3(.3, .59, .11));
-    vec3 quiet = mix(vec3(lum) * vec3(1.06, .95, .78), pic, .58);       // the same warm grade for every picture
+    vec3 quiet = mix(vec3(.05, .035, .03), vec3(.98, .84, .62), smoothstep(0., .82, lum));
+    quiet = mix(quiet, pic, .12);                                       // one amber print: every picture the same two tones
+    float at = s / uTotal, show = smoothstep(.06, .3, at) * (1. - smoothstep(.52, .8, at));
     float hov = uHoverK * (1. - smoothstep(.35, .65, abs(k - uHover)));
-    vec3 lit = quiet * (.26 + .8 * d1 * mix(vec3(1.), warm, .5) + .16 * d2 * cool);
+    vec3 lit = quiet * (.2 + .78 * d1 * mix(vec3(1.), warm, .5)) * mix(.34, 1.12, show);
     if (!front) lit = mix(lit * .62, base * 1.6, .3);
     lit = mix(lit, pic * 1.22 + .04, hov);
     col = mix(col, lit, win);
@@ -129,7 +131,7 @@ function painter(canvas: HTMLCanvasElement, count: number): Draw | null {
       if (!n) return;
       gl.useProgram(prog); gl.bindTexture(gl.TEXTURE_2D_ARRAY, tex);
       gl.uniform2f(U('uRes'), u.W, u.H); gl.uniform2f(U('uCtr'), ctr[0], ctr[1]); gl.uniform3f(U('uKey'), key[0], key[1], key[2]);
-      for (const k of ['uCam', 'uHalf', 'uPitch', 'uLen', 'uAcross', 'uFlow', 'uEnd', 'uCount', 'uHover', 'uHoverK', 'uAlpha', 'uK']) gl.uniform1f(U(k), u[k]);
+      for (const k of ['uCam', 'uHalf', 'uPitch', 'uLen', 'uAcross', 'uFlow', 'uEnd', 'uTotal', 'uCount', 'uHover', 'uHoverK', 'uAlpha', 'uK']) gl.uniform1f(U(k), u[k]);
       for (const [pass, buf, data] of [[1, shade, shadow], [0, film, verts]] as const) {
         gl.uniform1f(U('uShadow'), pass);
         gl.bindVertexArray(buf.vao); gl.bindBuffer(gl.ARRAY_BUFFER, buf.vb); gl.bufferData(gl.ARRAY_BUFFER, data, gl.DYNAMIC_DRAW);
@@ -179,20 +181,21 @@ export function filmReel(wrap: HTMLElement, frames: string[], opts: { phone: boo
     W = r.width || 1; H = r.height || 1;
     const dpr = Math.min(window.devicePixelRatio || 1, opts.phone ? 2 : W > 1700 ? 1.5 : 2);
     back?.size(W, H, dpr); front?.size(W, H, dpr);
-    if (opts.phone) { K = Math.min(W / 390 * 0.66, H / 470 * 0.7); CX = W * 0.55; CY = H * 0.5; }
+    if (opts.phone) { K = Math.min(W / 390 * 0.6, H / 470 * 0.66); CX = W * 0.54; CY = H * 0.5; }
     else if (W < H) { K = Math.min(H / 1500, W / 900); CX = W * 0.6; CY = H * 0.68; }             // tablets held upright
     else { K = Math.min(H / 900, W / 1440) * 1.02; CX = W * 0.755; CY = H * 0.47; }
     wrap.style.setProperty('--k', String(opts.phone ? 1 : K));
-    half = 45 * K; pitch = 104 * K;
+    half = 48 * K; pitch = 124 * K;
     let x0 = 0, y0 = 0, z0 = 0;
     for (let i = 0; i < N; i++) {
       const psi = PSI0 + (PSI1 - PSI0) * (i / (N - 1));
-      const head = Math.max(0, -psi) / 60, tail = Math.max(0, psi - 700) / 60;
-      let R = 204 + 46 * smooth(-40, 760, psi);
+      const head = Math.max(0, -psi) / 60, tail = Math.max(0, psi - 335) / 60;
+      let R = 236 + 34 * smooth(-40, 400, psi);
       R += R * (head * head * 0.95 + tail * tail * 1.15);
       const a = psi * RAD;
       const x = -R * Math.sin(a) * K, z = R * Math.cos(a) * (1 - 0.35 * smooth(0, 1.2, tail)) * K;
-      const y = (-286 + 250 * (psi / 360) - head * head * 112 - tail * tail * 22) * K;
+      const drop = Math.pow(Math.max(0, psi) / 360, 1.55);                     // slow at the top, so the far side shows above the near side
+      const y = (-262 + 392 * drop - head * head * 104 - tail * tail * 30) * K;
       // lean towards the viewer
       const yy = y * Math.cos(PHI) + z * Math.sin(PHI), zz = z * Math.cos(PHI) - y * Math.sin(PHI);
       B[i * 3] = x; B[i * 3 + 1] = yy; B[i * 3 + 2] = zz; Q[i] = psi;
@@ -241,7 +244,7 @@ export function filmReel(wrap: HTMLElement, frames: string[], opts: { phone: boo
       const a = Math.max(0, i - 1) * 3, b = Math.min(N - 1, i + 1) * 3, j = i * 3;
       let tx = P[b] - P[a], ty = P[b + 1] - P[a + 1], tz = P[b + 2] - P[a + 2]; const tm = Math.hypot(tx, ty, tz) || 1; tx /= tm; ty /= tm; tz /= tm;
       // towards both ends the film rolls a little, so it doesn't leave the frame dead flat
-      const roll = 0.45 * smooth(700, 824, Q[i]) - 0.35 * smooth(-30, -95, Q[i]);
+      const roll = 0.4 * smooth(340, 466, Q[i]) - 0.35 * smooth(-30, -95, Q[i]);
       const d = ax[0] * tx + ax[1] * ty + ax[2] * tz;
       let wx = ax[0] - d * tx, wy = ax[1] - d * ty, wz = ax[2] - d * tz; const wm = Math.hypot(wx, wy, wz) || 1; wx /= wm; wy /= wm; wz /= wm;
       let nx = ty * wz - tz * wy, ny = tz * wx - tx * wz, nz = tx * wy - ty * wx;
@@ -269,7 +272,7 @@ export function filmReel(wrap: HTMLElement, frames: string[], opts: { phone: boo
     const put = (arr: Uint16Array, n: number, i: number) => { const a = i * 2; arr[n] = a; arr[n + 1] = a + 1; arr[n + 2] = a + 2; arr[n + 3] = a + 1; arr[n + 4] = a + 3; arr[n + 5] = a + 2; return n + 6; };
     const lap = 14 * K;
     for (const i of idx) { const z = P[i * 3 + 2]; if (z < lap) nb = put(orderB, nb, i); if (z > -lap) nf = put(orderF, nf, i); }
-    const u = { W, H, uCam: CAM, uHalf: half, uPitch: pitch, uLen: pitch - 10 * K, uAcross: half * 2 - 26 * K, uFlow: flow, uEnd: state.reveal * total, uCount: frames.length, uHover: hover, uHoverK: hoverK, uAlpha: 1, uK: K };
+    const u = { W, H, uCam: CAM, uHalf: half, uPitch: pitch, uLen: pitch - 10 * K, uAcross: half * 2 - 26 * K, uFlow: flow, uEnd: state.reveal * total, uTotal: total, uCount: frames.length, uHover: hover, uHoverK: hoverK, uAlpha: 1, uK: K };
     const key: [number, number, number] = [-620 * K, -90 * K, 520 * K];
     back.render(verts, shadow, orderB, nb, u, [CX, CY], key);
     front.render(verts, shadow, orderF, nf, u, [CX, CY], key);

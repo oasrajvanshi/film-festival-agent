@@ -738,6 +738,10 @@
 .s-reel { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 .s-reel-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: auto; touch-action: pan-y; }
 .s-reel-canvas.front { pointer-events: none; z-index: 2; }
+/* one soft pool of light behind the loop */
+.s-reel::before { content: ""; position: absolute; left: 75.5%; top: 52%; width: 64vmin; height: 64vmin; transform: translate(-50%, -50%); background: radial-gradient(closest-side, rgba(150, 40, 28, .34), rgba(150, 40, 28, .12) 55%, transparent); opacity: 0; transition: opacity .8s ease; }
+.s-hero.lit .s-reel::before { opacity: 1; }
+@media (max-width: 760px) { .s-reel::before { left: 54%; top: 52%; width: 96vw; height: 96vw; } }
 @media (max-width: 760px) {
   .s-reel { top: 34svh; bottom: auto; height: 68svh; }
   .s-reel-canvas { pointer-events: none; }
@@ -945,10 +949,10 @@
 .s-flo-bob { position: relative; animation: s-bob var(--bob, 5.2s) ease-in-out var(--bob-d, 0s) infinite; }
 .s-flo .mascot { height: calc(var(--h, 130px) * var(--k, 1)); }
 @keyframes s-bob { 0%, 100% { transform: translateY(0) rotate(-2.5deg); } 50% { transform: translateY(-12px) rotate(2.5deg); } }
-.s-flo-headsup { --h: 192px; --bob: 5s; --bob-d: -3s; }
-.s-flo-working { --h: 116px; --bob: 5.8s; --bob-d: -1.8s; }
-.s-flo-done { --h: 138px; --bob: 4.2s; --bob-d: -.8s; }
-.s-flo-relax { --h: 132px; --bob: 6.4s; --bob-d: -2.4s; }
+.s-flo-headsup { --h: 252px; --bob: 5s; --bob-d: -3s; }
+.s-flo-working { --h: 112px; --bob: 5.8s; --bob-d: -1.8s; }
+.s-flo-done { --h: 118px; --bob: 4.2s; --bob-d: -.8s; }
+.s-flo-relax { --h: 104px; --bob: 6.4s; --bob-d: -2.4s; }
 
 
 /* what they say sits above the film, so the film never covers it */
@@ -977,7 +981,7 @@
 }
 @media (max-width: 760px) {
   .s-bubble { font-size: 12px; padding: 6px 10px; }
-  .s-flo-headsup { --h: 96px; } .s-flo-working { --h: 58px; } .s-flo-done { --h: 78px; } .s-flo-relax { --h: 72px; }
+  .s-flo-headsup { --h: 122px; } .s-flo-working { --h: 58px; } .s-flo-done { --h: 60px; } .s-flo-relax { --h: 54px; }
   .s-plan-head { gap: 12px; }
   .s-plan-mascot .mascot { height: 84px; }
   .s-cta-guy .mascot { height: 84px; }
@@ -994,8 +998,8 @@
    title is cream, which is also how it looks with reduced motion or no script. */
 .s-hero { --bw: max(114vw, calc(118svh * 16 / 9)); --bx: 8vw; --by: -7svh; }
 .s-hero-bg { inset: auto; left: calc(var(--bx) - var(--bw) * .1695); top: var(--by); width: var(--bw); height: calc(var(--bw) * 9 / 16); background: none; opacity: 1; }
-.s-hero-paint { position: absolute; inset: 0; background: center / 100% 100% no-repeat; transform: scaleX(-1); filter: brightness(.56) contrast(1.12) saturate(1.12); -webkit-mask-image: linear-gradient(#000 72%, transparent 100%); mask-image: linear-gradient(#000 72%, transparent 100%); }
-.s-hero-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 46%, rgba(10, 9, 9, .62) 64%), linear-gradient(rgba(12, 9, 8, .5), transparent 22%); }
+.s-hero-paint { position: absolute; inset: 0; background: center / 100% 100% no-repeat; transform: scaleX(-1); filter: brightness(.5) contrast(1.14) saturate(1.05); -webkit-mask-image: linear-gradient(#000 72%, transparent 100%); mask-image: linear-gradient(#000 72%, transparent 100%); }
+.s-hero-bg::after { content: ""; position: absolute; inset: 0; background: radial-gradient(34% 46% at 32% 41%, transparent 58%, rgba(11, 7, 6, .82) 100%), linear-gradient(transparent 50%, rgba(11, 7, 6, .7) 74%), linear-gradient(90deg, transparent 42%, rgba(11, 7, 6, .97) 54%); }
 .s-hero-screen, .s-hero-glow { z-index: 1; }
 .s-hero-glow, .s-hero-screen::before { opacity: 0; transition: opacity .5s ease; }
 .s-hero-screen { position: absolute; left: 16.95%; width: 29.76%; top: 25.33%; height: 29.26%; clip-path: polygon(0 0, 100% 8.2%, 100% 100%, 0 99.4%); overflow: hidden; background: #16211f; animation: s-flick 5.2s steps(1) infinite; }
@@ -1013,7 +1017,7 @@
 .s-hero.lit .s-wordmark { color: #1c0f0a; }
 .s-hero.lit .s-h1-sub { color: rgba(24, 12, 8, .94); }
 /* Tablets held upright: the screen across the top, the film underneath. */
-@media (min-width: 761px) and (max-aspect-ratio: 1/1) { .s-hero { --bw: 300vw; --bx: 5.5vw; --by: calc(110px - 42.7vw); } .s-hero-bg::after { background: linear-gradient(transparent 58%, rgba(12, 9, 8, .5)); } }
+@media (min-width: 761px) and (max-aspect-ratio: 1/1) { .s-reel::before { left: 60%; top: 70%; } .s-hero { --bw: 300vw; --bx: 5.5vw; --by: calc(110px - 42.7vw); } .s-hero-bg::after { background: linear-gradient(transparent 58%, rgba(12, 9, 8, .5)); } }
 /* On phones the screen is at the top with the title on it, and the film runs underneath. */
 @media (max-width: 760px) {
   .s-hero { --bw: 306vw; --bx: 4.5vw; --by: calc(84px - var(--bw) * .1425); }
@@ -1062,3 +1066,7 @@
   .uc-bub { font-size: 14.5px; padding: 9px 13px; }
 }
 @media (prefers-reduced-motion: reduce) { .uc-row, .uc-bub, .uc-w, .uc-dot, .uc-typing i { animation: none !important; } }
+
+/* The nav floats on the page: no bar and no line, only a fade to dark behind it. */
+.s-nav, .s-root .s-nav { background: none; border-bottom: 0; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.s-nav::before { content: ""; position: absolute; inset: 0 0 -34px; z-index: -1; pointer-events: none; background: linear-gradient(rgba(11, 7, 6, .94) 45%, rgba(11, 7, 6, .7) 66%, transparent); }
