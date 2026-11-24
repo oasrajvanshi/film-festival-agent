@@ -1189,3 +1189,94 @@ input, select, textarea { background: rgba(12, 7, 6, .55); border-color: var(--l
 .rec-head { display: flex; align-items: center; gap: 6px; padding: 2px 4px 6px; color: var(--accent); font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
 .rec-float.desk .wx-list { margin: 0 4px 10px; }
 .rec-float.desk .rec-bar .rec-approve { flex: 1; min-height: 38px; font-size: 13.5px; }
+
+/* ---------------------------------------------------------------- who did it
+   The agent (Usher) is amber with a sparkle; a person (the festival team) is blue with a person icon.
+   The same chip and colors on every screen. */
+:root { --agent: #e0a95a; --agent-soft: rgba(224, 169, 90, .13); --agent-line: rgba(224, 169, 90, .42);
+  --human: #8fb0f2; --human-soft: rgba(143, 176, 242, .13); --human-line: rgba(143, 176, 242, .45); --human-ink: #0e1730; }
+.shell.light, .at.light, .me.light { --agent: #a5620c; --agent-soft: #fbf1e2; --agent-line: rgba(165, 98, 12, .38);
+  --human: #2a55b8; --human-soft: #e9effc; --human-line: rgba(42, 85, 184, .38); --human-ink: #fff; }
+.actor { display: inline-flex; align-items: center; gap: 4px; padding: 0 7px 0 5px; border-radius: 999px; border: 1px solid transparent;
+  font-size: 11px; font-weight: 600; line-height: 17px; letter-spacing: 0; text-transform: none; white-space: nowrap; vertical-align: middle; }
+.actor svg { flex: none; }
+.actor { font-family: var(--sans, inherit); font-style: normal; }
+.actor.agent { color: var(--agent); background: var(--agent-soft); border-color: var(--agent-line); }
+.actor.human { color: var(--human); background: var(--human-soft); border-color: var(--human-line); }
+.actor-legend { display: inline-flex; gap: 6px; align-items: center; }
+/* A person's decision button is blue; the agent's buttons stay amber. */
+.shell .rec-float .rec-approve.human-btn, .shell.light .rec-float .rec-approve.human-btn, button.human-btn {
+  background: var(--human); border-color: var(--human); color: var(--human-ink); display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.shell .rec-float .rec-approve.human-btn:disabled { opacity: .45; }
+
+/* Doodles: small line figures, tinted to the theme (cream lines on dark, ink on light). */
+.doodle { display: block; pointer-events: none; user-select: none; filter: invert(1) sepia(.35) brightness(.95); opacity: .92; }
+.shell.light .doodle, .at.light .doodle, .me.light .doodle { filter: none; opacity: 1; }
+@keyframes doodle-in { from { opacity: 0; transform: translateY(6px) rotate(-3deg); } to { opacity: .92; transform: none; } }
+.doodle { animation: doodle-in .5s cubic-bezier(.2, .8, .2, 1) both; }
+
+/* The recommendation, step 1: the ways, in plain words. Step 2: the checklist for the way picked. */
+.rec-head { text-transform: none; letter-spacing: 0; padding: 2px 2px 8px; }
+.rec-ways { position: relative; display: grid; gap: 8px; }
+.rec-doodle { position: absolute; right: 0; top: -6px; width: 58px; height: auto; }
+.rec-q { margin: 0 2px; min-height: 40px; font-size: 13px; line-height: 1.35; color: var(--ink); font-weight: 600; padding-right: 62px; }
+.rec-prob { display: grid; gap: 6px; }
+.rec-prob-t { font-size: 12px; color: var(--muted); margin: 4px 2px 0; }
+.rec-opt { display: grid; gap: 4px; text-align: left; width: 100%; min-height: 0; padding: 9px 10px; border-radius: 11px; border: 1px solid var(--line-2);
+  background: rgba(246, 236, 220, .03); color: var(--ink); cursor: pointer; transition: border-color .2s, background .2s; }
+.rec-opt:hover { border-color: var(--agent-line); background: var(--agent-soft); }
+.rec-opt.on { border-color: var(--human); background: var(--human-soft); }
+.rec-opt-name { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 700; line-height: 1.3; }
+.rec-opt-plain { font-size: 12.5px; line-height: 1.4; color: var(--ink-2); font-weight: 400; }
+.rec-back { min-height: 0; padding: 2px 4px; font-size: 12px; color: var(--muted); justify-self: start; }
+.rec-picked { display: grid; gap: 2px; margin: 4px 4px 6px; }
+.rec-picked b { font-size: 13.5px; line-height: 1.3; color: var(--ink); }
+.rec-all { display: flex; align-items: center; gap: 10px; margin: 0 4px; padding: 8px 0; border-top: 1px solid var(--line); font-size: 12.5px; font-weight: 600; color: var(--ink); cursor: pointer; }
+.rec-all input { width: 17px; height: 17px; margin: 0; accent-color: var(--human); flex: none; }
+.rec-float .wx-list input { accent-color: var(--human); }
+.rec-who { display: flex; flex-wrap: wrap; gap: 5px; margin: 8px 2px 0; }
+.shell.light .rec-opt { background: #fff; border-color: var(--line-2); }
+.shell.light .rec-opt.on { background: var(--human-soft); border-color: var(--human); }
+@media (max-width: 760px) { .rec-doodle { display: none; } .rec-q { padding-right: 0; } }
+
+/* Who did it, on the Log, Approvals, event details and people's phones. */
+.topbar-key { margin-right: 6px; }
+@media (max-width: 760px) { .topbar-key { display: none; } }
+.lg-runs .lg-run li.by-agent .lg-ic { color: var(--agent); background: var(--agent-soft); }
+.lg-runs .lg-run li.by-human .lg-ic { color: var(--human); background: var(--human-soft); }
+.lg-runs .lg-run li.by-human .lg-k { color: var(--human); }
+.lg-runs .lg-run li.by-agent .lg-k { color: var(--agent); }
+.lg-runs .lg-run li.k-error .lg-ic { color: var(--bad); background: var(--bad-bg); }
+.dstat.by-agent b { color: var(--agent); }
+.dstat.by-human b { color: var(--human); }
+.dstat small .actor { font-size: 10.5px; }
+.lg-by { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 5px; }
+.lg-by em { font-size: 11px; font-style: normal; color: var(--muted); }
+.lg-bar .actor-legend { margin-right: 4px; }
+.evd-note .actor { margin-right: 4px; }
+.evd-col h4 .actor { margin-left: 6px; vertical-align: 1px; }
+.at-by { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 6px; }
+.at-latest-line small .actor { margin-right: 3px; vertical-align: -1px; }
+.wx-alert-text span .actor { margin-right: 4px; }
+button.primary.agent-btn { background: var(--agent); border-color: var(--agent); color: #1b120e; }
+.shell.light button.primary.agent-btn { background: var(--agent); border-color: var(--agent); color: #fff; }
+
+/* Doodles in empty states and the "all set" note after approving. */
+.empty-doodle { display: flex; align-items: center; gap: 14px; }
+.empty-doodle .doodle { width: 92px; height: auto; flex: none; }
+.empty-doodle p { margin: 0; }
+.at-empty .at-doodle { width: 96px; height: auto; margin: 0 auto 10px; }
+.rec-done { position: fixed; left: 12px; bottom: 66px; z-index: 41; width: 252px; display: flex; gap: 10px; align-items: center;
+  padding: 10px 12px; border-radius: 14px; background: var(--panel); border: 1px solid var(--human-line); box-shadow: 0 18px 40px rgba(0, 0, 0, .45);
+  animation: rec-in .35s cubic-bezier(.2, .8, .2, 1), rec-fade .6s ease 4.4s forwards; }
+.rec-done-doodle { width: 64px; height: auto; flex: none; }
+.rec-done b { display: block; font-size: 15px; color: var(--ink); margin-bottom: 4px; }
+.rec-done div > span { display: flex; flex-wrap: wrap; gap: 4px; }
+.shell.light .rec-done { background: #fff; box-shadow: 0 18px 40px rgba(20, 15, 15, .16); }
+@keyframes rec-fade { to { opacity: 0; transform: translateY(6px); } }
+@media (max-width: 760px) { .rec-done { left: 8px; right: 8px; width: auto; bottom: calc(128px + env(safe-area-inset-bottom)); } }
+/* Approve always in view: the footer sticks to the bottom of the panel while the checklist scrolls. */
+.rec-foot { position: sticky; bottom: -10px; margin: 0 -10px -10px; padding: 8px 10px 10px; background: var(--panel); border-top: 1px solid var(--line); z-index: 1; }
+.shell.light .rec-foot { background: var(--panel); }
+.rec-float.desk .wx-list label { padding: 7px 0; font-size: 12.5px; }
+@media (max-width: 760px) { .rec-foot { position: static; margin: 0; padding: 6px 0 0; border-top: 0; } }

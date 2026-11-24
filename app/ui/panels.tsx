@@ -18,6 +18,7 @@ import { runAll, type SuiteResult } from '../../src/eval/scenarios';
 import { evalRandomFestivals } from '../../src/eval/fuzz';
 import type { Recommendation } from '../../src/agent/recommend';
 import { Icon } from './icons';
+import { Actor, ActorLegend, Doodle } from './actor';
 import { buildBrief } from '../../src/agent/briefs';
 import { PhotoBand } from './photos';
 
@@ -474,13 +475,13 @@ export function Approvals({ s, user, go }: P) {
   return (
     <div className="stack">
       <div className="card">
-        <h2>Needs attention ({s.agent.flags.length})</h2>
+        <h2>Needs attention ({s.agent.flags.length}) <Actor kind="agent" label="Flagged by Usher" /></h2>
         {s.agent.flags.length === 0 && <p className="muted">Nothing flagged.</p>}
         <FlagList s={s} user={user} go={go} />
       </div>
       <div className="card">
         <h2>Waiting for approval ({pending.length})</h2>
-        {pending.length === 0 && <p className="muted">Nothing waiting.</p>}
+        {pending.length === 0 && <div className="empty-doodle"><Doodle name="relax" /><p className="muted">Nothing waiting. Usher will ask here when something needs you.</p></div>}
         {pending.map(q => {
           const msgs = q.action.messages ?? [];
           const shown = open[q.action.id] ? msgs : msgs.slice(0, 2);
@@ -488,7 +489,7 @@ export function Approvals({ s, user, go }: P) {
             <div key={q.action.id} className="card" style={{ marginBottom: 10 }}>
               <div className="row" style={{ justifyContent: 'space-between' }}>
                 <strong>{q.action.title}</strong>
-                <span className="chip">{q.action.kind.replace('_', ' ')}</span>
+                <span className="row" style={{ gap: 6 }}><Actor kind="agent" label="Drafted by Usher" /><span className="chip">{q.action.kind.replace('_', ' ')}</span></span>
               </div>
               <p className="muted">{q.action.rationale}</p>
               {memo(q)}
@@ -505,7 +506,7 @@ export function Approvals({ s, user, go }: P) {
               {msgs.length > 2 && <button className="small" onClick={() => setOpen({ ...open, [q.action.id]: !open[q.action.id] })}>{open[q.action.id] ? 'Show fewer' : `Show all ${msgs.length}`}</button>}
               <input placeholder="Note for next time (optional)" value={notes[q.action.id] ?? ''} onChange={e => setNotes({ ...notes, [q.action.id]: e.target.value })} style={{ marginTop: 8, width: '100%' }} />
               <div className="row approve-row" style={{ marginTop: 8 }}>
-                <button className="primary" onClick={() => act(q.action.id, true)}>Approve and send{msgs.length > 1 ? ` (${msgs.length})` : ''}</button>
+                <button className="human-btn" onClick={() => act(q.action.id, true)}><Icon name="person" size={14} /> Approve and send{msgs.length > 1 ? ` (${msgs.length})` : ''}</button>
                 <button onClick={() => act(q.action.id, false)}>Reject</button>
               </div>
             </div>
@@ -518,7 +519,7 @@ export function Approvals({ s, user, go }: P) {
         {done.map(q => (
           <div className="msg" key={q.action.id}>
             <span className={`chip ${q.status === 'rejected' ? 'bad' : 'ok'}`}>{q.status === 'rejected' ? 'rejected' : 'sent'}</span> {q.action.title}
-            <div className="who">by {q.decidedBy} at {q.decidedAt && fmt(q.decidedAt)}</div>
+            <div className="who"><Actor kind="agent" label="Drafted by Usher" /> <Actor kind="human" label={`${q.status === 'rejected' ? 'Rejected' : 'Approved'} by ${q.decidedBy ?? 'the team'}`} /> {q.decidedAt && fmt(q.decidedAt)}</div>
           </div>
         ))}
       </div>
@@ -638,16 +639,17 @@ export function Ask({ s }: P) {
   };
   return (
     <div className="card stack">
-      <h2>Ask the agent</h2>
+      <h2>Ask the agent <Actor kind="agent" label="Usher answers" /></h2>
       <p className="muted">Answers come only from the festival's official documents and schedule, with the source cited, or "I don't know".</p>
       <div className="row ask-row">
         <input style={{ flex: 1, minWidth: 220 }} aria-label="Your question" value={q} onChange={e => setQ(e.target.value)} onKeyDown={e => e.key === 'Enter' && ask()} />
         <button className="primary" disabled={busy} onClick={ask}>{busy ? 'Thinking…' : 'Ask'}</button>
       </div>
+      {history.length === 0 && <div className="empty-doodle"><Doodle name="ask" /></div>}
       {history.map((h, i) => (
         <div className="msg" key={i}>
-          <div className="who">{h.q}</div>
-          <div>{h.a.text}</div>
+          <div className="who"><Actor kind="human" label="Question" /> {h.q}</div>
+          <div><Actor kind="agent" label="Usher" /> {h.a.text}</div>
           {h.a.known && <div className="who">Source: {[...new Set(h.a.citations.map(c => citeLabel(s.agent.f, c)))].join(' · ')}</div>}
         </div>
       ))}
@@ -722,7 +724,7 @@ export function Feeds({ s, go, user }: P) {
 // ------------------------------------------------------------------ Outbox & log
 const STEP: Record<string, { label: string; icon: string }> = {
   trigger: { label: 'Saw', icon: 'bolt' }, understand: { label: 'Worked out', icon: 'eye' }, decide: { label: 'Decided', icon: 'sparkle' },
-  act: { label: 'Did', icon: 'check' }, ask: { label: 'Asked you', icon: 'inbox' }, approval: { label: 'Approved', icon: 'users' },
+  act: { label: 'Did', icon: 'check' }, ask: { label: 'Asked you', icon: 'inbox' }, approval: { label: 'Approved', icon: 'person' },
   tool: { label: 'Tool', icon: 'gear' }, error: { label: 'Blocked', icon: 'alert' },
 };
 type LogFilter = 'all' | 'decisions' | 'messages' | 'scans' | 'questions';
@@ -759,9 +761,9 @@ export function Log({ s, go }: P) {
       <DayStats s={s} day={today} events={s.agent.f.events} go={go} />
       <h3 className="lg-h">The agent</h3>
       <section className="dstats lg-stats">
-        <div className="dstat"><small>Agent runs</small><b>{new Set(entries.map(e => e.runId)).size}</b><span><i className="lg-live" /> Live</span></div>
-        <div className="dstat"><small>Decisions</small><b>{count('decide')}</b><span>{count('ask')} waited for a person</span></div>
-        <div className="dstat"><small>Approvals</small><b>{count('approval')}</b><span>by the team</span></div>
+        <div className="dstat by-agent"><small><Actor kind="agent" label="Agent runs" /></small><b>{new Set(entries.map(e => e.runId)).size}</b><span><i className="lg-live" /> Live</span></div>
+        <div className="dstat by-agent"><small><Actor kind="agent" label="Decisions" /></small><b>{count('decide')}</b><span>{count('ask')} waited for a person</span></div>
+        <div className="dstat by-human"><small><Actor kind="human" label="Approvals" /></small><b>{count('approval')}</b><span>by the team</span></div>
         <div className="dstat"><small>Messages delivered</small><b>{s.agent.outbox.length.toLocaleString('en-US')}</b><span>to phones, email and briefs</span></div>
       </section>
       <div className="card">
@@ -770,6 +772,7 @@ export function Log({ s, go }: P) {
             <button className={tab === 'log' ? 'on' : ''} onClick={() => setTab('log')}>What the agent did</button>
             <button className={tab === 'outbox' ? 'on' : ''} onClick={() => setTab('outbox')}>Messages sent</button>
           </div>
+          <ActorLegend />
           {tab === 'log' && <div className="wh-chips">{chip('all', 'Everything')}{chip('decisions', 'Decisions')}{chip('messages', 'Actions')}{chip('scans', 'Door scans')}{chip('questions', 'Questions')}</div>}
           <span style={{ flex: 1 }} />
           <input className="wh-find" placeholder="Search the log" value={q} onChange={e => setQ(e.target.value)} />
@@ -783,10 +786,12 @@ export function Log({ s, go }: P) {
                 <ol>
                   {[...r.items].reverse().map(e => {
                     const st = STEP[e.kind] ?? STEP.tool;
+                    // Approvals are a person's; everything else here is the agent's.
+                    const by = e.kind === 'approval' ? 'human' : 'agent';
                     return (
-                      <li key={e.seq} className={`k-${e.kind}`}>
+                      <li key={e.seq} className={`k-${e.kind} by-${by}`} title={by === 'agent' ? 'Usher (agent)' : 'A person'}>
                         <i className="lg-ic"><Icon name={st.icon} size={13} /></i>
-                        <span className="lg-k">{st.label}</span>
+                        <span className="lg-k">{e.kind === 'approval' && /^Rejected/.test(e.summary) ? 'Rejected' : st.label}</span>
                         <span className="lg-s">{e.summary}</span>
                         <time>{fmt(e.at.includes('T') ? e.at : `2000-01-01T${e.at.slice(11, 16) || '00:00'}`)}</time>
                       </li>
@@ -798,12 +803,16 @@ export function Log({ s, go }: P) {
           </div>
         ) : (
           <div className="lg-out">
-            {[...s.agent.outbox].reverse().filter(d => !q || `${d.subject} ${d.body}`.toLowerCase().includes(q.toLowerCase())).slice(0, 200).map((d, i) => (
+            {[...s.agent.outbox].reverse().filter(d => !q || `${d.subject} ${d.body}`.toLowerCase().includes(q.toLowerCase())).slice(0, 200).map((d, i) => {
+              const okBy = s.agent.queue.find(x => x.action.id === d.actionId)?.decidedBy;
+              return (
               <div className="lg-msg" key={i}>
-                <span className="lg-to"><b>{person(d.personId)?.name ?? d.personId}</b><small>{(person(d.personId)?.role ?? '').replace('_', ' ')} · {d.channel.replace(/_/g, ' ')} · {when(d.at)}</small></span>
+                <span className="lg-to"><b>{person(d.personId)?.name ?? d.personId}</b><small>{(person(d.personId)?.role ?? '').replace('_', ' ')} · {d.channel.replace(/_/g, ' ')} · {when(d.at)}</small>
+                  <span className="lg-by"><Actor kind="agent" label="Sent by Usher" />{okBy ? <Actor kind="human" label={`approved by ${okBy}`} /> : <em>on its own</em>}</span></span>
                 <span className="lg-body"><b>{d.subject}</b><span>{d.body}</span></span>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

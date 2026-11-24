@@ -10,6 +10,7 @@ import type { FestivalEvent } from '../../src/core/types';
 import { addMinutes, clock as fmt, overlaps, toMinutes } from '../../src/core/time';
 import { EventThumb } from './media';
 import { Icon } from './icons';
+import { Actor } from './actor';
 import { useLateGuests } from './weatherplan';
 
 type Patch = Partial<Pick<FestivalEvent, 'start' | 'end' | 'venueId' | 'guestIds' | 'status'>>;
@@ -94,7 +95,7 @@ export function EventDetail({ s, id, events, was, notes, user, onClose }: {
           <p>
             {was[e.id] && <s>{fmt(was[e.id])}</s>} {date} · {fmt(cur.start)} to {fmt(cur.end)} · {f.venues.find(v => v.id === cur.venueId)?.name}{e.room ? `, ${e.room}` : ''}
           </p>
-          {notes[e.id] && notes[e.id] !== 'Changed' && <p className="evd-note"><Icon name="sparkle" size={13} /> {notes[e.id]}</p>}
+          {notes[e.id] && notes[e.id] !== 'Changed' && <p className="evd-note"><Actor kind="agent" label="Usher" /> {notes[e.id]}</p>}
         </div>
         <button className="ghost small evd-x" aria-label="Close details" onClick={onClose}><Icon name="x" size={16} /></button>
       </div>
@@ -137,7 +138,7 @@ export function EventDetail({ s, id, events, was, notes, user, onClose }: {
         </div>
 
         <div className="evd-col evd-edit">
-          <h4>Change it</h4>
+          <h4>Change it <Actor kind="human" label="You" /></h4>
           <label>Start <input type="time" value={cur.start.slice(11)} onChange={x => x.target.value && patch({ start: `${e.start.slice(0, 11)}${x.target.value}` })} /></label>
           <label>Venue <select value={cur.venueId} onChange={x => patch({ venueId: x.target.value })}>{f.venues.map(v => <option key={v.id} value={v.id}>{v.name}</option>)}</select></label>
           <div className="evd-guests">
@@ -151,7 +152,7 @@ export function EventDetail({ s, id, events, was, notes, user, onClose }: {
           <div className="evd-actions">
             <button className="small" onClick={() => patch({ status: cur.status === 'cancelled' ? 'scheduled' : 'cancelled' })}>{cur.status === 'cancelled' ? 'Restore event' : 'Cancel event'}</button>
             {dirty && <button className="small ghost" onClick={() => setDraft({})}>Discard</button>}
-            <button className="small primary" disabled={!dirty || busy} onClick={save}>{busy ? 'Agent working…' : 'Save and let the agent plan'}</button>
+            <button className="small human-btn" disabled={!dirty || busy} onClick={save}><Icon name="person" size={13} /> {busy ? 'Usher is working…' : 'Save and let Usher plan'}</button>
           </div>
           {result && <p className="evd-result">{result}</p>}
         </div>

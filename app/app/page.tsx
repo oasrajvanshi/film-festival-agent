@@ -6,6 +6,7 @@ import { clearFestivalLocal } from '../ui/localkeys';
 import { Approvals, Ask, Briefs, Data, Feeds, Log, Overview, Scan } from '../ui/panels';
 import { DemoShell, backToOrganizer, demoPerson, useDemo, type Demo } from '../ui/demo';
 import { Icon } from '../ui/icons';
+import { ActorLegend } from '../ui/actor';
 import '../mobile.css';
 import '../light.css';
 import '../live.css';
@@ -236,6 +237,8 @@ function AppInner({ demo }: { demo: Demo | null }) {
         <header className="topbar">
           <h1>{current.label}</h1>
           <div className="spacer" />
+          {/* The color key, once at the top: amber is the agent, blue is a person. */}
+          <span className="topbar-key"><ActorLegend /></span>
           <button className="ghost small theme-btn" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} title={theme === 'light' ? 'Dark mode' : 'Light mode'} aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}>
             <Icon name={theme === 'light' ? 'moon' : 'sun'} size={15} /> {theme === 'light' ? 'Dark' : 'Light'}
           </button>
