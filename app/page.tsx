@@ -12,6 +12,7 @@ import { useEffect, useRef, type MouseEvent } from 'react';
 import { Bell } from './hl/icons';
 import { PHOTOS } from './ui/photos';
 import { PlanDemo } from './sitedemo';
+import { Mascot } from './ui/mascot';
 
 // ---------------------------------------------------------------- the calendar (1 pm to 7 pm, four venues)
 
@@ -321,7 +322,7 @@ export default function Site() {
             <span className="s-wordmark" data-split>Usher</span>
             <span className="s-h1-sub" data-split>{'The best film festival\nchange management agent.'}</span>
           </h1>
-          <p className="s-lead" data-hero-fade><q className="s-quote">Don&apos;t worry. I&apos;ll take care of everything.</q> That&apos;s what Usher says when a print arrives late, a guest misses their flight or snow slows the city down. It tracks your schedule and tells everyone affected by a change what to do next.</p>
+          <p className="s-lead" data-hero-fade><span className="s-says"><Mascot pose="ask" className="s-mascot" /><q className="s-quote">Don&apos;t worry. I&apos;ll take care of everything.</q></span> That&apos;s what Usher says when a print arrives late, a guest misses their flight or snow slows the city down. It tracks your schedule and tells everyone affected by a change what to do next.</p>
           <div className="s-ctas" data-hero-fade>
             <a className="btn" href="#story" onClick={go('#story')}>See how it works</a>
           </div>
@@ -449,7 +450,7 @@ export default function Site() {
                 {[50, 150, 250].map(y => <path key={`i${y}`} data-feed="in" d={`M0 ${y} C 60 ${y}, 60 150, 100 150`} />)}
                 {[38, 113, 188, 263].map(y => <path key={`o${y}`} data-feed="out" className="out" d={`M100 150 C 140 150, 140 ${y}, 200 ${y}`} />)}
               </svg>
-              <div className="s-flow-node" data-node><b>Usher</b><small>checks 559 events, 1,107 plans, 595 shifts</small></div>
+              <div className="s-flow-node" data-node><Mascot pose="headsup" className="s-node-mascot" /><b>Usher</b><small>checks 559 events, 1,107 plans, 595 shifts</small></div>
             </div>
             <div className="s-flow-col">
               {[['3 screenings move to 3:15 pm', 'Low Sun, Soft Animals, Night Swimmers'], ['21 attendees get their new time', 'Seats held, leave 15 min early'], ['Ravi Castellanos takes Dana’s seat', 'She joins the Q&A by video'], ['3 door teams briefed', 'Hold doors until 3:20 pm']].map(([b2, sm]) => (
@@ -463,10 +464,13 @@ export default function Site() {
 
       {/* 3. the new plan, shown as the product itself */}
       <section className="s-plan" id="plan" data-section>
-        <div className="s-plan-copy" data-reveal>
-          <p className="s-mono">The new plan</p>
-          <h2 className="s-h2">It suggests a new plan, and you decide.</h2>
-          <p className="s-lead">Usher shows every change on the calendar before anything is sent. One approval makes it the plan, and everyone affected hears straight away.</p>
+        <div className="s-plan-head">
+          <div className="s-plan-copy" data-reveal>
+            <p className="s-mono">The new plan</p>
+            <h2 className="s-h2">It suggests a new plan, and you decide.</h2>
+            <p className="s-lead">Usher shows every change on the calendar before anything is sent. One approval makes it the plan, and everyone affected hears straight away.</p>
+          </div>
+          <span className="s-plan-mascot" data-reveal><Mascot pose="options" /></span>
         </div>
         <PlanDemo />
       </section>
@@ -477,6 +481,7 @@ export default function Site() {
         <h2 className="s-h1" data-split-scroll>See how Usher handles a snow day at Sundance in Boulder.</h2>
         <div className="s-roles" data-reveal>
           <a className="btn primary" href="/onboarding">Try the live demo</a>
+          <Mascot pose="done" className="s-cta-mascot" />
         </div>
       </footer>
       </div></div>

@@ -932,3 +932,26 @@
 .s-flow-feed, .s-flow-out { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(26, 17, 14, .94); }
 #smooth-content { will-change: transform; }
 @media (min-width: 761px) { .pd-phone { bottom: auto; top: calc(100% + 76px); } .s-plan { padding-bottom: 230px; } }
+
+/* ---------------------------------------------------------------- the mascot on the home page
+   One small figure per scene: it says the hero quote, calls out from the Usher hub, weighs the
+   new plan and jumps beside the last button. Never inside a button or an icon. */
+.s-says { display: flex; align-items: flex-end; gap: 14px; margin-bottom: 10px; }
+.s-says .s-quote { margin-bottom: 4px; }
+.s-says .s-mascot { height: 92px; }
+.s-node-mascot.mascot { position: absolute; left: 50%; bottom: calc(100% - 14px); height: 92px; translate: -50% 0; }
+.s-plan-head { display: flex; align-items: flex-end; gap: clamp(24px, 4vw, 64px); }
+.s-plan-mascot { flex: none; line-height: 0; }
+.s-plan-mascot .mascot { height: clamp(110px, 12vw, 170px); }
+.s-roles { align-items: center; }
+.s-cta-mascot.mascot { height: 104px; margin-left: 10px; }
+@media (max-width: 900px) {
+  .s-node-mascot.mascot { height: 70px; left: calc(100% + 10px); bottom: 4px; translate: 0 0; }
+}
+@media (max-width: 760px) {
+  .s-says { gap: 10px; }
+  .s-says .s-mascot { height: 68px; }
+  .s-plan-head { gap: 12px; }
+  .s-plan-mascot .mascot { height: 84px; }
+  .s-cta-mascot.mascot { height: 84px; }
+}

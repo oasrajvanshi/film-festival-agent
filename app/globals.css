@@ -1277,7 +1277,7 @@ button.primary.agent-btn { background: var(--agent); border-color: var(--agent);
 @media (max-width: 760px) { .rec-foot { position: static; margin: 0; padding: 6px 0 0; border-top: 0; } }
 
 /* ---------------------------------------------------------------- the mascot
-   3D renders (public/mascot) with motion layered on in CSS. Amber light = Usher, blue = a person. */
+   3D renders (public/mascot) with motion layered on in CSS. Its small accents are amber, Usher's color. */
 .mascot { --ms-ground: rgba(0, 0, 0, .55); position: relative; display: inline-block; height: 64px; flex: none; line-height: 0;
   pointer-events: none; user-select: none; isolation: isolate; animation: ms-in .6s cubic-bezier(.2, .9, .3, 1.25) both; }
 .shell.light .mascot, .at.light .mascot, .me.light .mascot { --ms-ground: rgba(28, 21, 19, .22); }
@@ -1306,12 +1306,9 @@ button.primary.agent-btn { background: var(--agent); border-color: var(--agent);
 /* Light accents. */
 .ms-lamp { width: 26%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; opacity: 0; mix-blend-mode: screen; animation: ms-lamp 4.4s ease-in-out infinite; }
 .ms-lamp.ms-amber { background: radial-gradient(closest-side, rgba(240, 170, 70, .75), transparent); }
-.ms-lamp.ms-blue { background: radial-gradient(closest-side, rgba(130, 170, 245, .8), transparent); animation-delay: 2.2s; }
 .shell.light .ms-lamp, .at.light .ms-lamp { mix-blend-mode: multiply; }
-.ms-pop, .ms-spark { width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: var(--agent); opacity: 0; }
+.ms-pop { width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: var(--agent); opacity: 0; }
 .ms-pop { animation: ms-pop 1.35s ease-out infinite; }
-.ms-spark { animation: ms-spark 1.25s ease-out infinite; }
-.ms-spark.ms-blue { background: var(--human); }
 .ms-arc { width: 14%; aspect-ratio: 1 / 1.8; transform: translate(-50%, -50%); border: 2px solid transparent; border-right-color: var(--agent); border-radius: 50%; opacity: 0; animation: ms-arc 1.4s ease-out infinite; }
 .ms-type { width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: var(--agent); animation: ms-type 1.1s ease-in-out infinite; }
 .ms-warm { left: 50%; top: 52%; width: 92%; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; z-index: -2;
@@ -1329,7 +1326,6 @@ button.primary.agent-btn { background: var(--agent); border-color: var(--agent);
 @keyframes ms-hello { 0%, 100% { transform: rotate(0) translateY(0); } 20% { transform: rotate(-2deg) translateY(-1%); } 40% { transform: rotate(1.2deg); } 60% { transform: rotate(-1.4deg) translateY(-.6%); } 80% { transform: rotate(.4deg); } }
 @keyframes ms-lamp { 0%, 8%, 50%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(.7); } 20%, 38% { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
 @keyframes ms-pop { 0% { opacity: 0; transform: translate(0, 0) scale(.4); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(6px, -12px) scale(1); } }
-@keyframes ms-spark { 0%, 15% { opacity: 0; transform: scale(.2); } 40% { opacity: 1; transform: scale(1.3); } 100% { opacity: 0; transform: scale(.4); } }
 @keyframes ms-arc { 0% { opacity: 0; transform: translate(-80%, -50%) scale(.5); } 30% { opacity: 1; } 100% { opacity: 0; transform: translate(10%, -50%) scale(1.35); } }
 @keyframes ms-type { 0%, 60%, 100% { transform: translateY(0); opacity: .45; } 30% { transform: translateY(-3px); opacity: 1; } }
 @keyframes ms-warm { 0%, 100% { opacity: .7; transform: translate(-50%, -50%) scale(.94); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.04); } }
