@@ -357,7 +357,7 @@
 
 /* ---------------------------------------------------------------- the Log */
 .lg { display: grid; gap: 16px; }
-.lg-live { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); margin-right: 4px; animation: live-dot 1.6s ease-in-out infinite; }
+.lg-live { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #3fb950; box-shadow: 0 0 0 3px rgba(63, 185, 80, .2); margin-right: 4px; animation: live-dot 1.6s ease-in-out infinite; }
 .lg-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 12px; }
 .lg-tabs { display: inline-flex; }
 .lg-tabs .cal-view-thumb { display: none; }
@@ -387,7 +387,7 @@
 .lg-body b { font-size: 13.5px; }
 @media (max-width: 760px) { .lg-run li { grid-template-columns: 22px 1fr auto; } .lg-k { display: none; } .lg-msg { grid-template-columns: 1fr; gap: 4px; } }
 .shell.light .lg-run header { background: #faf9f9; }
-.shell.light .lg-tabs button.on { background: var(--accent); color: #fff; }
+.shell.light .lg-tabs button.on { background: #141111; color: #fff; }
 
 /* Log: the day's numbers above the agent's own. */
 .lg-h { margin: 4px 2px -6px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }

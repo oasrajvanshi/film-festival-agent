@@ -23,7 +23,6 @@ import { Ask } from './panels';
 import { MyArrival } from './presence';
 import { useAlerts } from './weatherplan';
 import { SCENARIOS } from '../../src/data/sundance2027';
-import { Mascot } from './mascot';
 import { CityBase, DayStrip, frameFor, usePlaced } from './venuemap';
 import { PushBanner, UPDATE_ICON, UPDATE_LABEL, updateKind, useArrivals, useTheme } from './live';
 
@@ -45,7 +44,7 @@ let sheetOpenedAt = 0;
 const opened = () => { sheetOpenedAt = Date.now(); };
 const settled = (close: () => void) => () => { if (Date.now() - sheetOpenedAt > 400) close(); };
 
-const VENUE_TONES = ['#a3221d', '#2a55b8', '#c9524c', '#5b82d1', '#7d1914', '#1f4699']; // red and blue only
+const VENUE_TONES = ['#d49a5c', '#8fa0c4', '#93b27e', '#c97b9a', '#b9a36b', '#7fb0b5'];
 const venueTone = (f: AgentStore['agent']['f'], id: string) => VENUE_TONES[Math.max(0, f.venues.findIndex(v => v.id === id)) % VENUE_TONES.length];
 
 function MapIcon() {
@@ -430,12 +429,11 @@ function Updates({ s, who }: { s: AgentStore; who: Who }) {
     <div className="at-updates">
       <h1 className="at-h1">Updates</h1>
       <p className="at-lede">Only about your plan.</p>
-      {inbox.length === 0 && <div className="at-empty"><Mascot pose="headsup" className="at-doodle" />Nothing yet. If a change affects your plan, it shows up here.</div>}
+      {inbox.length === 0 && <div className="at-empty">Nothing yet. If a change affects your plan, it shows up here.</div>}
       {inbox.map((m, i) => (
         <div className="at-msg" key={i}>
           <span className={`at-alert-ic k-${updateKind(m)}`} title={UPDATE_LABEL[updateKind(m)]}><Icon name={UPDATE_ICON[updateKind(m)]} size={16} /></span>
-          <div><b>{m.subject}</b><small>{fmt(m.at)}</small><p>{m.body}</p>
-</div>
+          <div><b>{m.subject}</b><small>{fmt(m.at)}</small><p>{m.body}</p></div>
         </div>
       ))}
     </div>

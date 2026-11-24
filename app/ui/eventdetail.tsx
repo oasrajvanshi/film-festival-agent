@@ -16,7 +16,7 @@ type Patch = Partial<Pick<FestivalEvent, 'start' | 'end' | 'venueId' | 'guestIds
 
 const KIND: Record<FestivalEvent['kind'], string> = { screening: 'Screening', qa: 'Q&A', panel: 'Talk', market: 'Industry', activity: 'Event' };
 const ROLE: Record<string, string> = { director: 'Director', producer: 'Producer', panelist: 'Panelist', moderator: 'Moderator' };
-const TONES = ['#2a55b8', '#3a63c2', '#1f4699', '#4b74cc', '#2c4f9e', '#5a80d0']; // people are blue
+const TONES = ['#b9825a', '#8f6a4f', '#a4744e', '#7d5b46', '#c39367', '#6f5a4e'];
 const ini = (n: string) => n.split(/\s+/).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 const tone = (n: string) => TONES[[...n].reduce((h, c) => h + c.charCodeAt(0), 0) % TONES.length];
 
@@ -151,7 +151,7 @@ export function EventDetail({ s, id, events, was, notes, user, onClose }: {
           <div className="evd-actions">
             <button className="small" onClick={() => patch({ status: cur.status === 'cancelled' ? 'scheduled' : 'cancelled' })}>{cur.status === 'cancelled' ? 'Restore event' : 'Cancel event'}</button>
             {dirty && <button className="small ghost" onClick={() => setDraft({})}>Discard</button>}
-            <button className="small human-btn" disabled={!dirty || busy} onClick={save}>{busy ? 'Usher is working…' : 'Save and let Usher plan'}</button>
+            <button className="small primary" disabled={!dirty || busy} onClick={save}>{busy ? 'Agent working…' : 'Save and let the agent plan'}</button>
           </div>
           {result && <p className="evd-result">{result}</p>}
         </div>

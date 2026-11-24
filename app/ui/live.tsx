@@ -19,14 +19,13 @@ export const updateKind = (m: Pick<Msg, 'subject'>): 'change' | 'news' =>
 export const UPDATE_ICON = { change: 'calendar', news: 'bell', risk: 'alert' } as const;
 export const UPDATE_LABEL = { change: 'Plan changed', news: 'For you', risk: 'Heads-up' } as const;
 
-/** Light or dark, remembered on this device and the same in every open Usher screen. Light is the default. */
-const THEME_KEY = 'usher-theme-v2';
+/** Light or dark, remembered on this device and the same in every open Usher screen. */
 export function useTheme(): ['dark' | 'light', (t: 'dark' | 'light') => void] {
-  const [theme, setTheme] = useState<'dark' | 'light'>('light');
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
   useEffect(() => {
-    const read = () => { try { setTheme(localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'); } catch { /* private mode */ } };
+    const read = () => { try { setTheme(localStorage.getItem('usher-theme') === 'light' ? 'light' : 'dark'); } catch { /* private mode */ } };
     read();
-    const on = (e: StorageEvent) => { if (e.key === THEME_KEY) read(); };
+    const on = (e: StorageEvent) => { if (e.key === 'usher-theme') read(); };
     const local = () => read();
     window.addEventListener('storage', on);
     window.addEventListener('usher-theme', local);
@@ -34,7 +33,7 @@ export function useTheme(): ['dark' | 'light', (t: 'dark' | 'light') => void] {
   }, []);
   const set = (t: 'dark' | 'light') => {
     setTheme(t);
-    try { localStorage.setItem(THEME_KEY, t); } catch { /* private mode */ }
+    try { localStorage.setItem('usher-theme', t); } catch { /* private mode */ }
     window.dispatchEvent(new Event('usher-theme'));
   };
   return [theme, set];
