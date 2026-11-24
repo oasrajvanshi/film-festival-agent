@@ -45,17 +45,17 @@ const TONES = ['#b9825a', '#8f6a4f', '#a4744e', '#7d5b46', '#c39367', '#6f5a4e']
 const initials = (n: string) => n.split(' ').map(w => w[0]).join('');
 const tone = (n: string) => TONES[[...n].reduce((h, c) => h + c.charCodeAt(0), 0) % TONES.length];
 
-/** The cover's cast: Usher in six moods riding beside the film ribbon. They take turns to speak, and
- *  together their lines tell the whole story in miniature: hello, a problem, two ways out, the work,
- *  done, calm again. `s`: where along the ribbon (0 top, 1 bottom); `side`: which side of it;
- *  `gap`: how far off it; `depth`: how much it leans after the pointer. */
-const CAST: { pose: Pose; say: string; s: number; side: 1 | -1; gap: number; depth: number; sp?: number; sideP?: 1 | -1 }[] = [
-  { pose: 'ask', say: 'Hi, I\u2019m Usher!', s: 0.3, side: -1, gap: 8, depth: 1, sp: 0.45, sideP: -1 },
-  { pose: 'headsup', say: 'Snow at 1 pm. Heads-up!', s: 0.13, side: -1, gap: 6, depth: 0.7, sp: 0.2, sideP: 1 },
-  { pose: 'options', say: 'Two ways to fix it. You pick.', s: 0.45, side: 1, gap: 4, depth: 0.9 },
-  { pose: 'working', say: 'Moving 3 screenings\u2026', s: 0.58, side: 1, gap: 4, depth: 0.6 },
-  { pose: 'done', say: 'Done! Everyone\u2019s been told.', s: 0.66, side: -1, gap: 6, depth: 0.8, sp: 0.9, sideP: 1 },
-  { pose: 'relax', say: 'All calm. Coffee time.', s: 0.8, side: -1, gap: 4, depth: 0.5 },
+/** The cover's cast: Usher in six moods, riding and floating in the coil of film. They take turns to speak,
+ *  and together their lines tell the whole story in miniature: hello, a problem, two ways out, the work,
+ *  done, calm again. `at`: floating at a point inside the coil (x, y, z); `s`: standing on the film at that
+ *  angle of the coil; `depth`: how much it leans after the pointer. `atp` / `sp` are for phones. */
+const CAST: { pose: Pose; say: string; at?: string; atp?: string; s?: number; sp?: number; sink?: number; depth: number }[] = [
+  { pose: 'ask', say: 'Hi, I\u2019m Usher!', at: '10,-50,0', depth: 0.4 },
+  { pose: 'headsup', say: 'Snow at 1 pm. Heads-up!', at: '-74,206,0', depth: 0.35 },
+  { pose: 'options', say: 'Two ways to fix it. You pick.', s: 754, sp: 694, sink: 0.26, depth: 0.2 },
+  { pose: 'working', say: 'Moving 3 screenings\u2026', s: 402, sink: 0.2, depth: 0.15 },
+  { pose: 'done', say: 'Done! Everyone\u2019s been told.', s: 779, sp: 690, sink: 0.04, depth: 0.5 },
+  { pose: 'relax', say: 'All calm. Coffee time.', s: 688, sink: 0.18, depth: 0.15 },
 ];
 
 /** `rich`: the app's own calendar look, with each event's picture and its guests' avatars. */
@@ -119,9 +119,8 @@ export default function Site() {
     let stopLean: (() => void) | null = null;
     gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
     const reelWrap = root.current!.querySelector<HTMLElement>('[data-reel]');
-    const reelCanvas = root.current!.querySelector<HTMLCanvasElement>('[data-reel-canvas]');
-    const reel = reelWrap && reelCanvas && !reduce
-      ? filmReel(reelWrap, reelCanvas, FILM_FRAMES.map(id => `/hl/ev/${id}.jpg`), { phone: matchMedia('(max-width: 760px)').matches, reduce })
+    const reel = reelWrap && !reduce
+      ? filmReel(reelWrap, FILM_FRAMES.map(id => `/hl/ev/${id}.jpg`), { phone: matchMedia('(max-width: 760px)').matches, reduce, onFrame: k => showFrame(root.current!, k) })
       : null;
     // Development only: lets a test browser run the timelines at real speed in a background tab.
     if (process.env.NODE_ENV !== 'production') (window as unknown as { __gsap?: typeof gsap }).__gsap = gsap;
@@ -171,6 +170,9 @@ export default function Site() {
       // and nothing is pinned or scrubbed; each part fades up once as it comes into view.
       if (phone) ScrollTrigger.config({ ignoreMobileResize: true });
       gsap.set(q('[data-cal="hero"]'), { rotateX: phone ? 0 : 24, rotateZ: phone ? 0 : -6 });
+      // the projector comes on: the painted screen lights up, then the title appears on it
+      let started = false;
+      intro.call(() => { started = true; if (window.scrollY < innerHeight * 0.08) hero.classList.add('lit'); }, [], seen ? 0.05 : 1.6);
       intro.fromTo(q('.s-hero .split-word'), { yPercent: 110 }, { yPercent: 0, duration: 1.05, stagger: 0.05, ease: 'power4.out' }, seen ? 0.1 : 1.75);
       // The film unrolls down the right after the headline; each figure pops up as the film reaches it.
       if (reel) intro.fromTo(reel.state, { reveal: 0 }, { reveal: 1, duration: 1.9, ease: 'power2.inOut' }, (seen ? 0.1 : 1.75) + 0.35);
@@ -188,14 +190,24 @@ export default function Site() {
       gsap.set(q('.s-hero-stage'), { autoAlpha: 0, y: phone ? 30 : 60 });
       gsap.set(q('[data-hero-float]'), { autoAlpha: 0, y: 18 });
       if (!phone) {
-        // The title starts on the left, alone and a little larger, at the middle of the screen; the film is on the right.
-        const r0 = h1.getBoundingClientRect();
-        const toCentre = { x: 0, y: innerHeight / 2 - (r0.top + r0.height / 2) };
-        gsap.set(h1, { x: toCentre.x, y: toCentre.y, scale: 1.12, transformOrigin: '0% 50%', force3D: true });
-        const settle = gsap.timeline({ defaults: { ease: 'power2.out' }, scrollTrigger: { trigger: hero, start: 'top top', end: '+=80%', scrub: true, pin: true, anticipatePin: 1 } })
-          .to(h1, { x: 0, y: 0, scale: 1, duration: 1, ease: 'power2.inOut' }, 0)
+        // The title starts on the painted cinema screen, like a film's title card; one scroll brings it into
+        // place while the projector goes off and the film leaves.
+        const screen = q('[data-hero-screen]')[0] as HTMLElement, copy = q('.s-hero-copy')[0] as HTMLElement, bgEl = q('[data-hero-bg]')[0] as HTMLElement;
+        const onScreen = () => {
+          const words = [...h1.querySelectorAll<HTMLElement>('.split-mask')];
+          const w = Math.max(1, ...words.map(e => e.offsetLeft + e.offsetWidth)) - Math.min(...words.map(e => e.offsetLeft));
+          const sw = screen.offsetWidth, sh = screen.offsetHeight, scale = Math.min(innerWidth < innerHeight ? 2 : 1.2, (sw * 0.8) / w, (sh * 0.72) / h1.offsetHeight);
+          const left = bgEl.offsetLeft + screen.offsetLeft + (sw - w * scale) / 2, mid = bgEl.offsetTop + screen.offsetTop + sh * 0.52;
+          return { x: left - copy.offsetLeft - h1.offsetLeft, y: mid - (copy.offsetTop + h1.offsetTop + h1.offsetHeight / 2), scale };
+        };
+        const p0 = onScreen();
+        gsap.set(h1, { ...p0, transformOrigin: '0% 50%', force3D: true });
+        const settle = gsap.timeline({ defaults: { ease: 'power2.out' }, scrollTrigger: { trigger: hero, start: 'top top', end: '+=80%', scrub: true, pin: true, anticipatePin: 1, onUpdate: s => { if (started) hero.classList.toggle('lit', s.progress < 0.09); } } })
+          .fromTo(h1, p0, { x: 0, y: 0, scale: 1, duration: 1, ease: 'power2.inOut' }, 0)
           .to(q('.s-scrollcue'), { autoAlpha: 0, duration: 0.2 }, 0)
-          .to(q('[data-reel-canvas]'), { autoAlpha: 0, xPercent: 18, rotation: 4, duration: 0.6, ease: 'power2.in' }, 0.08);
+          .to(q('[data-says]'), { autoAlpha: 0, duration: 0.1 }, 0)
+          .to(q('[data-reel-canvas]'), { autoAlpha: 0, duration: 0.4, ease: 'power1.in' }, 0.3);
+        if (reel) settle.fromTo(reel.state, { out: 0 }, { out: 1, duration: 0.7, ease: 'power2.in' }, 0.02);
         flo.forEach((el, i) => settle.to(el, { ...apart(el), duration: 0.55, ease: 'power2.in' }, 0.04 + i * 0.03));
         settle
           .to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.08 }, 0.7)
@@ -210,8 +222,9 @@ export default function Site() {
           .to(q('[data-hero-float]'), { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.1 }, 0.2);
         intro.call(() => { settle.play(); }, [], (seen ? 0.1 : 1.75) + 1.4);
         // The film and the cast leave as the page starts to move (decoration only).
-        gsap.to(q('[data-reel-canvas]'), { yPercent: -20, autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: '+=40%', scrub: 0.6 } });
-        flo.forEach(el => gsap.to(el, { ...apart(el), ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: '+=40%', scrub: 0.6 } }));
+        gsap.to(q('[data-reel-canvas]'), { autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top -22%', end: '+=50%', scrub: 0.6 } });
+        gsap.to(q('[data-says]'), { autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: '+=12%', scrub: true } });
+        flo.forEach(el => gsap.to(el, { ...apart(el), ease: 'none', scrollTrigger: { trigger: hero, start: 'top -22%', end: '+=50%', scrub: 0.6 } }));
       }
       // Computers: the cast leans after the pointer a little, the nearer ones more.
       if (!phone) {
@@ -352,18 +365,23 @@ export default function Site() {
 
       {/* hero */}
       <header className="s-hero">
-        <div className="s-hero-bg" data-hero-bg style={{ backgroundImage: 'url(/hl/paint/hero.webp)' }} />
-        {/* The film ribbon down the right, folding over twice, with the cast riding beside it.
+        {/* The painted cinema, mirrored so its lit screen is on the left: the title is on that screen.
+            Pointing at a picture on the film puts that picture on the screen. */}
+        <div className="s-hero-bg" data-hero-bg>
+          <div className="s-hero-paint" style={{ backgroundImage: 'url(/hl/paint/hero.webp)' }} />
+          <div className="s-hero-glow" />
+          <div className="s-hero-screen" data-hero-screen><img data-hero-pic alt="" /></div>
+        </div>
+        {/* The film, coiling down the right in 3D with the cast in it (app/reel.ts).
             Point at it, drag it, or scroll: the film runs. Hover a figure to hear it. */}
         <div className="s-reel" data-reel aria-hidden="true" data-lve-skip>
-          <canvas className="s-reel-canvas" data-reel-canvas />
+          <canvas className="s-reel-canvas" data-reel-canvas data-reel-back />
           <div className="s-cast" data-cast>
             {CAST.map(c => (
-              <div key={c.pose} className={`s-flo s-flo-${c.pose} s-flo-wait`} data-flo data-s={c.s} data-side={c.side} data-gap={c.gap} data-sp={c.sp} data-sidep={c.sideP}>
+              <div key={c.pose} className={`s-flo s-flo-${c.pose} s-flo-wait`} data-flo data-at={c.at} data-atp={c.atp} data-s={c.s} data-sp={c.sp} data-sink={c.sink}>
                 <div className="s-flo-par" data-flo-par data-depth={c.depth}>
                   <div className="s-flo-pop">
                     <div className="s-flo-bob">
-                      <span className="s-bubble" data-bubble>{c.say}</span>
                       <Mascot pose={c.pose} />
                     </div>
                   </div>
@@ -371,6 +389,8 @@ export default function Site() {
               </div>
             ))}
           </div>
+          <canvas className="s-reel-canvas front" data-reel-canvas data-reel-front />
+          <div className="s-says" data-says>{CAST.map(c => <span key={c.pose} className={`s-say s-say-${c.pose}`} data-bubble><span className="s-bubble">{c.say}</span></span>)}</div>
         </div>
         <div className="s-hero-copy">
           <h1 className="s-h1 s-h1-hero" aria-label="Usher, the best film festival change management agent">
@@ -547,11 +567,20 @@ export default function Site() {
 
 // ---------------------------------------------------------------- helpers
 
+/** The painted screen shows the film's picture under the pointer, like a projector catching one frame. */
+function showFrame(root: HTMLElement, k: number | null) {
+  const pic = root.querySelector<HTMLImageElement>('[data-hero-pic]');
+  if (!pic) return;
+  if (k === null) { pic.classList.remove('on'); return; }
+  pic.src = `/hl/ev/${FILM_FRAMES[k]}.jpg`; pic.classList.add('on');
+}
+
 /** The cast takes turns to speak, one bubble at a time; hovering one makes it speak (and hop) now. */
 function castTalk(root: HTMLElement, startAfter: number) {
   const pars = [...root.querySelectorAll<HTMLElement>('[data-flo-par]')];
+  const says = [...root.querySelectorAll<HTMLElement>('[data-bubble]')];
   let now = -1, timer = 0, quietUntil = 0;
-  const speak = (k: number) => { pars.forEach((p, j) => p.querySelector('[data-bubble]')?.classList.toggle('on', j === k)); now = k; };
+  const speak = (k: number) => { says.forEach((b, j) => b.classList.toggle('on', j === k)); now = k; };
   const seen = (p: HTMLElement) => p.offsetParent !== null && getComputedStyle(p).visibility !== 'hidden';
   const next = () => {
     if (Date.now() < quietUntil) return;
