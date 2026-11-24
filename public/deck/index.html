@@ -483,9 +483,9 @@
   // Slide 6 (onboarding showcase) starts empty every time the deck opens (and the old slide-7 space is cleared); slide 7 keeps its own space.
   try { Object.keys(localStorage).filter(k => k.startsWith('onboard:') || k.startsWith('live:')).forEach(k => localStorage.removeItem(k)); } catch {}
   // The status bar follows the phone app's light / dark theme.
-  const phoneTheme = () => { let t = 'dark'; try { t = localStorage.getItem('show:usher-theme') || 'dark'; } catch {} document.querySelectorAll('.phone .screen').forEach(s => s.classList.toggle('light', t === 'light')); };
+  const phoneTheme = () => { let t = 'light'; try { t = localStorage.getItem('show:usher-theme-v2') || 'light'; } catch {} document.querySelectorAll('.phone .screen').forEach(s => s.classList.toggle('light', t === 'light')); };
   phoneTheme();
-  window.addEventListener('storage', e => { if (e.key === 'show:usher-theme') phoneTheme(); });
+  window.addEventListener('storage', e => { if (e.key === 'show:usher-theme-v2') phoneTheme(); });
   setInterval(phoneTheme, 1000);
   const scaleFrames = () => document.querySelectorAll('.mac iframe[data-src]').forEach(f => {
     const box = f.parentElement; const w = Number(f.dataset.w);
