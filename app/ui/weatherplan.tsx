@@ -26,7 +26,7 @@ import type { DayNumber, FestivalEvent } from '../../src/core/types';
 import { addMinutes, clock as fmt, overlaps, toMinutes } from '../../src/core/time';
 import { Icon } from './icons';
 import { Actor } from './actor';
-import { Motif } from './motif';
+import { Mascot } from './mascot';
 import { boardChanged } from './localkeys';
 import { SCENARIOS } from '../../src/data/sundance2027';
 
@@ -501,7 +501,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
   const all = items.length > 0 && count === items.length;
   const doneNote = done && (
     <aside className="rec-done" role="status">
-      <Motif name="done" className="rec-done-doodle" />
+      <Mascot pose="done" className="rec-done-doodle" />
       <div><b>All set.</b>
         <span><Actor kind="human" label={`You approved ${done.changes}`} /> <Actor kind="agent" label={`Usher sent ${done.sent.toLocaleString('en-US')} messages`} /></span></div>
     </aside>
@@ -575,7 +575,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
           <div className="rec-head"><Actor kind="agent" label="Usher's recommendation" /></div>
           {!allPicked ? (
             <div className="rec-ways">
-              <Motif name="options" className="rec-doodle" />
+              <Mascot pose="options" className="rec-doodle" />
               <p className="rec-q">{problems.length > 1 ? 'Pick a way for each problem.' : 'Two ways to handle this. Pick one:'}</p>
               {problems.map(({ al, options }) => (
                 <div key={al.id} className="rec-prob">
@@ -621,7 +621,9 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
                   <Icon name="person" size={14} /> {busy ? 'Usher is working…' : count ? `Approve ${count}` : 'Approve'}
                 </button>
               </div>
-              <p className="rec-who"><Actor kind="human" label="You decide" /> <Actor kind="agent" label="Usher does the rest" /></p>
+              {busy
+                ? <p className="rec-working"><Mascot pose="working" /> Usher is on it…</p>
+                : <p className="rec-who"><Actor kind="human" label="You decide" /> <Actor kind="agent" label="Usher does the rest" /></p>}
               </div>
             </>
           )}
