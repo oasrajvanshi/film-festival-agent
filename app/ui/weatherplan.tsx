@@ -25,7 +25,6 @@ import type { Action, OutboundMessage } from '../../src/agent/approvals';
 import type { DayNumber, FestivalEvent } from '../../src/core/types';
 import { addMinutes, clock as fmt, overlaps, toMinutes } from '../../src/core/time';
 import { Icon } from './icons';
-import { Actor } from './actor';
 import { Mascot } from './mascot';
 import { boardChanged } from './localkeys';
 import { SCENARIOS } from '../../src/data/sundance2027';
@@ -503,7 +502,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
     <aside className="rec-done" role="status">
       <Mascot pose="done" className="rec-done-doodle" />
       <div><b>All set.</b>
-        <span><Actor kind="human" label={`You approved ${done.changes}`} /> <Actor kind="agent" label={`Usher sent ${done.sent.toLocaleString('en-US')} messages`} /></span></div>
+        <span>{done.changes} {done.changes === 1 ? 'change' : 'changes'} approved · {done.sent.toLocaleString('en-US')} messages sent</span></div>
     </aside>
   );
   if (!shown.length || !problemsBroughtOn()) return doneNote || null;
@@ -546,6 +545,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
       {doneNote}
       {/* Each problem on its own; with two or more, one button under them all handles them together. */}
       <div className={`wx-alerts${openId === 'all' ? ' all-open' : ''}`}>
+        <p className="wx-group">Flagged by Usher</p>
         {shown.map(({ al, options }) => {
           const isOpen = openId === al.id || openId === 'all';
           const rec = options[0].rec;
@@ -553,7 +553,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
             <div key={al.id} className={`wx-alert k-${al.kind}${isOpen ? ' open' : ''}`}>
               <div className="wx-alert-row">
                 <span className="wx-alert-ic"><Icon name={al.kind === 'guest' ? 'clock' : 'alert'} size={18} /></span>
-                <div className="wx-alert-text"><b>{rec.title}</b><span><Actor kind="agent" label="Flagged by Usher" /> {rec.sub}</span></div>
+                <div className="wx-alert-text"><b>{rec.title}</b><span>{rec.sub}</span></div>
                 <button className={openId === al.id ? '' : 'primary agent-btn'} onClick={() => show(openId === al.id ? null : al.id)}>
                   {openId === al.id ? 'Close' : <><Icon name="sparkle" size={15} /> <span className="lbl-long">Agent&apos;s recommendation</span><span className="lbl-short">Fix it</span></>}
                 </button>
@@ -572,7 +572,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
 
       {problems.length > 0 && (
         <aside className={`rec-float${listShown ? ' list-open' : ''}${phone ? '' : ' desk'}${allPicked ? ' step-list' : ' step-ways'}`} aria-label="Agent's recommendation">
-          <div className="rec-head"><Actor kind="agent" label="Usher's recommendation" /></div>
+          <div className="rec-head">Usher&apos;s recommendation</div>
           {!allPicked ? (
             <div className="rec-ways">
               <Mascot pose="options" className="rec-doodle" />
@@ -582,7 +582,7 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
                   {problems.length > 1 && <b className="rec-prob-t">{options[0].rec.title}</b>}
                   {options.map(o => (
                     <button key={o.key} className={`rec-opt${choice[al.id] === o.key ? ' on' : ''}`} onClick={() => pick(al.id, o.key)}>
-                      <span className="rec-opt-name">{o.name}{o.suggested && <Actor kind="agent" label="Suggested" />}</span>
+                      <span className="rec-opt-name">{o.name}{o.suggested && <em className="rec-sug">Suggested</em>}</span>
                       <span className="rec-opt-plain">{o.plain}</span>
                     </button>
                   ))}
@@ -618,12 +618,12 @@ export function WeatherAlerts({ s, user, onOpen, onPreview, onApplied }: {
                   </button>
                 )}
                 <button className={`small rec-approve human-btn${count ? ' ready' : ''}`} disabled={!count || busy} onClick={approve}>
-                  <Icon name="person" size={14} /> {busy ? 'Usher is working…' : count ? `Approve ${count}` : 'Approve'}
+                  {busy ? 'Usher is working…' : count ? `Approve ${count}` : 'Approve'}
                 </button>
               </div>
               {busy
                 ? <p className="rec-working"><Mascot pose="working" /> Usher is on it…</p>
-                : <p className="rec-who"><Actor kind="human" label="You decide" /> <Actor kind="agent" label="Usher does the rest" /></p>}
+                : null}
               </div>
             </>
           )}

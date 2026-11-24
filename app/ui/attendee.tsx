@@ -23,7 +23,6 @@ import { Ask } from './panels';
 import { MyArrival } from './presence';
 import { useAlerts } from './weatherplan';
 import { SCENARIOS } from '../../src/data/sundance2027';
-import { Actor } from './actor';
 import { Mascot } from './mascot';
 import { CityBase, DayStrip, frameFor, usePlaced } from './venuemap';
 import { PushBanner, UPDATE_ICON, UPDATE_LABEL, updateKind, useArrivals, useTheme } from './live';
@@ -169,7 +168,7 @@ export function AttendeeApp({ s, who, onOut, viewAs }: { s: AgentStore; who: Who
             {/* Not solved yet: say so, and that the team is on it. Tap to see that day. */}
             <button className="at-latest-line" onClick={() => setDay(r.day)}>
               <b>{r.line}</b>
-              <small><Actor kind="human" label="Festival team" /> is on it · update coming asap</small>
+              <small>The festival team is on it · update coming asap</small>
             </button>
             <button className="at-latest-x" aria-label="Dismiss" onClick={() => setHidden(h => [...h, r.id])}><Icon name="x" size={14} /></button>
           </div>
@@ -436,8 +435,7 @@ function Updates({ s, who }: { s: AgentStore; who: Who }) {
         <div className="at-msg" key={i}>
           <span className={`at-alert-ic k-${updateKind(m)}`} title={UPDATE_LABEL[updateKind(m)]}><Icon name={UPDATE_ICON[updateKind(m)]} size={16} /></span>
           <div><b>{m.subject}</b><small>{fmt(m.at)}</small><p>{m.body}</p>
-            {/* Written and sent by the agent; a person on the festival team approved it (or it was routine). */}
-            <span className="at-by"><Actor kind="agent" label="Usher" />{s.agent.queue.find(x => x.action.id === m.actionId)?.decidedBy ? <Actor kind="human" label="approved by the festival team" /> : null}</span></div>
+</div>
         </div>
       ))}
     </div>
