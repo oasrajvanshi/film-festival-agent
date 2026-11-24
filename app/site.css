@@ -945,12 +945,10 @@
 .s-flo-bob { position: relative; animation: s-bob var(--bob, 5.2s) ease-in-out var(--bob-d, 0s) infinite; }
 .s-flo .mascot { height: calc(var(--h, 130px) * var(--k, 1)); }
 @keyframes s-bob { 0%, 100% { transform: translateY(0) rotate(-2.5deg); } 50% { transform: translateY(-12px) rotate(2.5deg); } }
-.s-flo-ask { --h: 196px; --bob: 5.6s; }
-.s-flo-headsup { --h: 126px; --bob: 5s; --bob-d: -3s; }
-.s-flo-options { --h: 118px; --bob: 4.6s; --bob-d: -1.2s; }
-.s-flo-working { --h: 92px; --bob: 5.8s; --bob-d: -1.8s; }
-.s-flo-done { --h: 128px; --bob: 4.2s; --bob-d: -.8s; }
-.s-flo-relax { --h: 96px; --bob: 6.4s; --bob-d: -2.4s; }
+.s-flo-headsup { --h: 192px; --bob: 5s; --bob-d: -3s; }
+.s-flo-working { --h: 116px; --bob: 5.8s; --bob-d: -1.8s; }
+.s-flo-done { --h: 138px; --bob: 4.2s; --bob-d: -.8s; }
+.s-flo-relax { --h: 132px; --bob: 6.4s; --bob-d: -2.4s; }
 
 
 /* what they say sits above the film, so the film never covers it */
@@ -979,8 +977,7 @@
 }
 @media (max-width: 760px) {
   .s-bubble { font-size: 12px; padding: 6px 10px; }
-  .s-flo-options, .s-flo-relax, .s-flo-working, .s-say-options, .s-say-relax, .s-say-working { display: none; }
-  .s-flo-ask { --h: 92px; } .s-flo-headsup { --h: 76px; } .s-flo-working { --h: 70px; } .s-flo-done { --h: 82px; }
+  .s-flo-headsup { --h: 96px; } .s-flo-working { --h: 58px; } .s-flo-done { --h: 78px; } .s-flo-relax { --h: 72px; }
   .s-plan-head { gap: 12px; }
   .s-plan-mascot .mascot { height: 84px; }
   .s-cta-guy .mascot { height: 84px; }

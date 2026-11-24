@@ -1,7 +1,7 @@
 'use client';
 // The hero's conversation: Usher talking, as a chat. A problem comes in from the festival; Usher
 // shows it is typing, then answers with what it will do and who it tells. The mascot beside the
-// chat is Usher's face and changes with the moment: a wave to say hello, the megaphone when a
+// chat is Usher's face and changes with the moment: a jump to say hello, the megaphone when a
 // problem lands, writing while it types, a jump when it's done. Plays only while it is on screen.
 
 import { useEffect, useRef, useState } from 'react';
@@ -32,7 +32,7 @@ export function UsherChat() {
   const box = useRef<HTMLDivElement>(null);
   const reduce = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const [msgs, setMsgs] = useState<Msg[]>(() => [{ id: 0, who: 'usher', text: HELLO }]);
-  const [pose, setPose] = useState<Pose>('ask');
+  const [pose, setPose] = useState<Pose>('done');
 
   useEffect(() => {
     if (reduce) { setMsgs([{ id: 0, who: 'usher', text: HELLO }, { id: 1, who: 'issue', text: SCRIPT[0][0] }, { id: 2, who: 'usher', text: SCRIPT[0][1] }]); return; }
@@ -55,7 +55,7 @@ export function UsherChat() {
       while (alive && !shown()) await sleep(300);
       // say hello again now that someone is looking
       setMsgs([]); await sleep(120); if (!alive) return;
-      setPose('ask'); push({ who: 'usher', text: HELLO });
+      setPose('done'); push({ who: 'usher', text: HELLO });
       await wait(2800);
       for (let k = 0; alive; k = (k + 1) % SCRIPT.length) {
         const [issue, reply] = SCRIPT[k];

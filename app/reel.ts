@@ -293,14 +293,14 @@ export function filmReel(wrap: HTMLElement, frames: string[], opts: { phone: boo
   function placeCast(t: number) {
     cast.forEach((el, n) => {
       const h = Number(el.dataset.h), w = Number(el.dataset.w);
-      const pos = (opts.phone && el.dataset.atp) || el.dataset.at;
+      const pos = ((opts.phone || W < H) && el.dataset.atp) || el.dataset.at;
       let x: number, y: number, z: number, need: number;
       if (pos) {
         const [a, b, c] = pos.split(',').map(Number);
         turn(a * K, b * K, c * K, tmp, 0); z = tmp[2];
         const s = CAM / (CAM - z); x = CX + tmp[0] * s - w / 2; y = CY + tmp[1] * s - h / 2; need = 0.5;
       } else {
-        const ang = Number((opts.phone && el.dataset.sp) || el.dataset.s) + 2 * Math.sin(t * 0.45 + el.offsetHeight), i = Math.min(N - 1, Math.max(0, Math.round((ang - PSI0) / (PSI1 - PSI0) * (N - 1)))), j = i * 3;
+        const ang = Number(((opts.phone || W < H) && el.dataset.sp) || el.dataset.s) + 2 * Math.sin(t * 0.45 + el.offsetHeight), i = Math.min(N - 1, Math.max(0, Math.round((ang - PSI0) / (PSI1 - PSI0) * (N - 1)))), j = i * 3;
         const s = SC[i], lift = half;
         x = SX[i] + WV[j] * lift * s - w / 2; y = SY[i] + WV[j + 1] * lift * s - h * (1 - Number(el.dataset.sink || 0)); z = P[j + 2]; need = L[i] / total;
       }

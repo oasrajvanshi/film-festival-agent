@@ -45,17 +45,14 @@ const TONES = ['#b9825a', '#8f6a4f', '#a4744e', '#7d5b46', '#c39367', '#6f5a4e']
 const initials = (n: string) => n.split(' ').map(w => w[0]).join('');
 const tone = (n: string) => TONES[[...n].reduce((h, c) => h + c.charCodeAt(0), 0) % TONES.length];
 
-/** The cover's cast: Usher in six moods, riding and floating in the coil of film. They take turns to speak,
- *  and together their lines tell the whole story in miniature: hello, a problem, two ways out, the work,
- *  done, calm again. `at`: floating at a point inside the coil (x, y, z); `s`: standing on the film at that
+/** The cover's cast: Usher in four moods, riding and floating in the coil of film. They take turns to speak,
+ *  and together their lines tell the whole story in miniature: a problem, the work, done, calm again. `at`: floating at a point inside the coil (x, y, z); `s`: standing on the film at that
  *  angle of the coil; `depth`: how much it leans after the pointer. `atp` / `sp` are for phones. */
 const CAST: { pose: Pose; say: string; at?: string; atp?: string; s?: number; sp?: number; sink?: number; depth: number }[] = [
-  { pose: 'ask', say: 'Hi, I\u2019m Usher!', at: '10,-50,0', depth: 0.4 },
-  { pose: 'headsup', say: 'Snow at 1 pm. Heads-up!', at: '-74,206,0', depth: 0.35 },
-  { pose: 'options', say: 'Two ways to fix it. You pick.', s: 754, sp: 694, sink: 0.26, depth: 0.2 },
-  { pose: 'working', say: 'Moving 3 screenings\u2026', s: 402, sink: 0.2, depth: 0.15 },
-  { pose: 'done', say: 'Done! Everyone\u2019s been told.', s: 779, sp: 690, sink: 0.04, depth: 0.5 },
-  { pose: 'relax', say: 'All calm. Coffee time.', s: 688, sink: 0.18, depth: 0.15 },
+  { pose: 'headsup', say: 'Snow at 1 pm. Heads-up!', at: '6,-52,0', depth: 0.4 },
+  { pose: 'working', say: 'Moving 3 screenings\u2026', s: 750, sp: 404, sink: 0.22, depth: 0.2 },
+  { pose: 'done', say: 'Done! Everyone\u2019s been told.', s: 780, sp: 690, sink: 0.04, depth: 0.5 },
+  { pose: 'relax', say: 'All calm. Coffee time.', at: '6,206,0', atp: '-66,206,0', depth: 0.35 },
 ];
 
 /** `rich`: the app's own calendar look, with each event's picture and its guests' avatars. */
@@ -557,7 +554,7 @@ export default function Site() {
         <h2 className="s-h1" data-split-scroll>Come and watch me handle a snow day at Sundance in Boulder.</h2>
         <div className="s-roles" data-reveal>
           <a className="btn primary" href="/onboarding">Try the live demo</a>
-          <span className="s-cta-guy"><span className="s-bubble still">Let&apos;s go!</span><Mascot pose="done" /></span>
+          <span className="s-cta-guy"><span className="s-bubble l still">Let&apos;s go!</span><Mascot pose="ask" /></span>
         </div>
       </footer>
       </div></div>
