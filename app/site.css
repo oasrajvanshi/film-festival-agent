@@ -994,16 +994,16 @@
    title is cream, which is also how it looks with reduced motion or no script. */
 .s-hero { --bw: max(114vw, calc(118svh * 16 / 9)); --bx: 8vw; --by: -7svh; }
 .s-hero-bg { inset: auto; left: calc(var(--bx) - var(--bw) * .1695); top: var(--by); width: var(--bw); height: calc(var(--bw) * 9 / 16); background: none; opacity: 1; }
-.s-hero-paint { position: absolute; inset: 0; background: center / 100% 100% no-repeat; transform: scaleX(-1); -webkit-mask-image: linear-gradient(#000 72%, transparent 100%); mask-image: linear-gradient(#000 72%, transparent 100%); }
+.s-hero-paint { position: absolute; inset: 0; background: center / 100% 100% no-repeat; transform: scaleX(-1); filter: brightness(.56) contrast(1.12) saturate(1.12); -webkit-mask-image: linear-gradient(#000 72%, transparent 100%); mask-image: linear-gradient(#000 72%, transparent 100%); }
 .s-hero-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 46%, rgba(10, 9, 9, .62) 64%), linear-gradient(rgba(12, 9, 8, .5), transparent 22%); }
 .s-hero-screen, .s-hero-glow { z-index: 1; }
 .s-hero-glow, .s-hero-screen::before { opacity: 0; transition: opacity .5s ease; }
 .s-hero-screen { position: absolute; left: 16.95%; width: 29.76%; top: 25.33%; height: 29.26%; clip-path: polygon(0 0, 100% 8.2%, 100% 100%, 0 99.4%); overflow: hidden; background: #16211f; animation: s-flick 5.2s steps(1) infinite; }
-.s-hero-screen::before { content: ""; position: absolute; inset: 0; background: radial-gradient(75% 85% at 50% 48%, #fff4d2, #fae9bb 55%, #e8d09a); }
+.s-hero-screen::before { content: ""; position: absolute; inset: 0; background: radial-gradient(80% 95% at 50% 46%, #e6cf98, #cfb077 52%, #a17c4a); }
 .s-hero-screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; filter: sepia(.5) contrast(.8) brightness(1.25); opacity: 0; transition: opacity .45s ease; }
 .s-hero.lit .s-hero-screen img.on { opacity: .34; }
 .s-hero .s-scrollcue { bottom: 10px; gap: 5px; } .s-hero .s-scrollcue i { height: 22px; }
-.s-hero-glow { position: absolute; left: 2%; width: 60%; top: 2%; height: 86%; background: radial-gradient(closest-side, rgba(255, 232, 172, .26), transparent); mix-blend-mode: screen; }
+.s-hero-glow { position: absolute; left: 2%; width: 60%; top: 2%; height: 86%; background: radial-gradient(closest-side, rgba(255, 214, 140, .09), transparent); mix-blend-mode: screen; }
 .s-hero.lit .s-hero-screen::before, .s-hero.lit .s-hero-glow { opacity: 1; }
 @keyframes s-flick { 0%, 100% { filter: none; } 31% { filter: brightness(.965); } 33% { filter: none; } 58% { filter: brightness(.98); } 60% { filter: brightness(.95); } 62% { filter: none; } 84% { filter: brightness(.975); } 86% { filter: none; } }
 /* the room with the lights down, for the conversation that follows */
@@ -1011,7 +1011,7 @@
 .s-hero.lit::after { opacity: 0; }
 .s-hero .s-wordmark, .s-hero .s-h1-sub { transition: color .35s ease; }
 .s-hero.lit .s-wordmark { color: #1c0f0a; }
-.s-hero.lit .s-h1-sub { color: rgba(28, 15, 10, .82); }
+.s-hero.lit .s-h1-sub { color: rgba(24, 12, 8, .94); }
 /* Tablets held upright: the screen across the top, the film underneath. */
 @media (min-width: 761px) and (max-aspect-ratio: 1/1) { .s-hero { --bw: 300vw; --bx: 5.5vw; --by: calc(110px - 42.7vw); } .s-hero-bg::after { background: linear-gradient(transparent 58%, rgba(12, 9, 8, .5)); } }
 /* On phones the screen is at the top with the title on it, and the film runs underneath. */
