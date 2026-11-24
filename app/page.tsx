@@ -12,6 +12,7 @@ import { useEffect, useRef, type MouseEvent } from 'react';
 import { Bell } from './hl/icons';
 import { PlanDemo } from './sitedemo';
 import { Mascot, type Pose } from './ui/mascot';
+import { filmReel } from './reel';
 
 // ---------------------------------------------------------------- the calendar (1 pm to 7 pm, four venues)
 
@@ -43,16 +44,17 @@ const TONES = ['#b9825a', '#8f6a4f', '#a4744e', '#7d5b46', '#c39367', '#6f5a4e']
 const initials = (n: string) => n.split(' ').map(w => w[0]).join('');
 const tone = (n: string) => TONES[[...n].reduce((h, c) => h + c.charCodeAt(0), 0) % TONES.length];
 
-/** The cover's cast: Usher in six moods. They take turns to speak, and together their lines tell
- *  the whole story in miniature: hello, a problem, two ways out, the work, done, calm again.
- *  `l`: the speech bubble opens to the left. `depth`: how far it follows the pointer. */
-const CAST: { pose: Pose; say: string; l?: boolean; depth: number }[] = [
-  { pose: 'ask', say: 'Hi, I\u2019m Usher!', l: true, depth: 1 },
-  { pose: 'headsup', say: 'Snow at 1 pm. Heads-up!', l: true, depth: 0.7 },
-  { pose: 'options', say: 'Two ways to fix it. You pick.', depth: 0.9 },
-  { pose: 'working', say: 'Moving 3 screenings\u2026', l: true, depth: 0.6 },
-  { pose: 'done', say: 'Done! Everyone\u2019s been told.', l: true, depth: 0.8 },
-  { pose: 'relax', say: 'All calm. Coffee time.', depth: 0.5 },
+/** The cover's cast: Usher in six moods riding beside the film ribbon. They take turns to speak, and
+ *  together their lines tell the whole story in miniature: hello, a problem, two ways out, the work,
+ *  done, calm again. `s`: where along the ribbon (0 top, 1 bottom); `side`: which side of it;
+ *  `gap`: how far off it; `depth`: how much it leans after the pointer. */
+const CAST: { pose: Pose; say: string; s: number; side: 1 | -1; gap: number; depth: number; sp?: number; sideP?: 1 | -1 }[] = [
+  { pose: 'ask', say: 'Hi, I\u2019m Usher!', s: 0.3, side: -1, gap: 8, depth: 1, sp: 0.45, sideP: -1 },
+  { pose: 'headsup', say: 'Snow at 1 pm. Heads-up!', s: 0.13, side: -1, gap: 6, depth: 0.7, sp: 0.2, sideP: 1 },
+  { pose: 'options', say: 'Two ways to fix it. You pick.', s: 0.45, side: 1, gap: 4, depth: 0.9 },
+  { pose: 'working', say: 'Moving 3 screenings\u2026', s: 0.58, side: 1, gap: 4, depth: 0.6 },
+  { pose: 'done', say: 'Done! Everyone\u2019s been told.', s: 0.66, side: -1, gap: 6, depth: 0.8, sp: 0.9, sideP: 1 },
+  { pose: 'relax', say: 'All calm. Coffee time.', s: 0.8, side: -1, gap: 4, depth: 0.5 },
 ];
 
 /** What Usher says it will do, typed out one line at a time under the hero quote. */
@@ -124,6 +126,11 @@ export default function Site() {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let stopLean: (() => void) | null = null;
     gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
+    const reelWrap = root.current!.querySelector<HTMLElement>('[data-reel]');
+    const reelCanvas = root.current!.querySelector<HTMLCanvasElement>('[data-reel-canvas]');
+    const reel = reelWrap && reelCanvas && !reduce
+      ? filmReel(reelWrap, reelCanvas, FILM_FRAMES.map(id => `/hl/ev/${id}.jpg`), { phone: matchMedia('(max-width: 760px)').matches, reduce })
+      : null;
     // Development only: lets a test browser run the timelines at real speed in a background tab.
     if (process.env.NODE_ENV !== 'production') (window as unknown as { __gsap?: typeof gsap }).__gsap = gsap;
     const stopSnow = snowfield(root.current!.querySelector<HTMLCanvasElement>('[data-snowfield]'), reduce);
@@ -136,7 +143,7 @@ export default function Site() {
     smootherRef = glide;
     const ctx = gsap.context(() => {
       const q = gsap.utils.selector(root);
-      if (reduce) { finalStates(q); q('[data-leader]').forEach(e => e.remove()); q('[data-cast]').forEach(e => e.remove()); root.current?.classList.add('ready'); return; }
+      if (reduce) { finalStates(q); q('[data-leader]').forEach(e => e.remove()); q('[data-reel]').forEach(e => e.remove()); root.current?.classList.add('ready'); return; }
 
       const phone = matchMedia('(max-width: 760px)').matches;
       // Phones: the four tools are a swipeable row; the dots follow the swipe.
@@ -173,8 +180,8 @@ export default function Site() {
       if (phone) ScrollTrigger.config({ ignoreMobileResize: true });
       gsap.set(q('[data-cal="hero"]'), { rotateX: phone ? 0 : 24, rotateZ: phone ? 0 : -6 });
       intro.fromTo(q('.s-hero .split-word'), { yPercent: 110 }, { yPercent: 0, duration: 1.05, stagger: 0.05, ease: 'power4.out' }, seen ? 0.1 : 1.75);
-      // The cast pops in around the headline, one after another, with a little bounce.
-      intro.fromTo(q('[data-flo-par]'), { scale: 0, autoAlpha: 0, rotation: -14 }, { scale: 1, autoAlpha: 1, rotation: 0, duration: 0.8, stagger: 0.1, ease: 'back.out(2.2)' }, (seen ? 0.1 : 1.75) + 0.5);
+      // The film unrolls down the right after the headline; each figure pops up as the film reaches it.
+      if (reel) intro.fromTo(reel.state, { reveal: 0 }, { reveal: 1, duration: 1.9, ease: 'power2.inOut' }, (seen ? 0.1 : 1.75) + 0.35);
       // Scrolling on, they fly apart outwards (each away from the centre) and the page moves on.
       const flo = q('[data-flo]') as HTMLElement[];
       const apart = (el: HTMLElement) => {
@@ -189,13 +196,14 @@ export default function Site() {
       gsap.set(q('.s-hero-stage'), { autoAlpha: 0, y: phone ? 30 : 60 });
       gsap.set(q('[data-hero-float]'), { autoAlpha: 0, y: 18 });
       if (!phone) {
+        // The title starts on the left, alone and a little larger, at the middle of the screen; the film is on the right.
         const r0 = h1.getBoundingClientRect();
-        const toCentre = { x: innerWidth / 2 - (r0.left + r0.width / 2), y: innerHeight / 2 - (r0.top + r0.height / 2) };
-        gsap.set(h1, { x: toCentre.x, y: toCentre.y, scale: 1.25, transformOrigin: '50% 50%', force3D: true });
+        const toCentre = { x: 0, y: innerHeight / 2 - (r0.top + r0.height / 2) };
+        gsap.set(h1, { x: toCentre.x, y: toCentre.y, scale: 1.12, transformOrigin: '0% 50%', force3D: true });
         const settle = gsap.timeline({ defaults: { ease: 'power2.out' }, scrollTrigger: { trigger: hero, start: 'top top', end: '+=80%', scrub: true, pin: true, anticipatePin: 1 } })
           .to(h1, { x: 0, y: 0, scale: 1, duration: 1, ease: 'power2.inOut' }, 0)
           .to(q('.s-scrollcue'), { autoAlpha: 0, duration: 0.2 }, 0)
-          .to(q('[data-film="top"]'), { yPercent: -80, autoAlpha: 0, duration: 0.6, ease: 'power2.in' }, 0.1);
+          .to(q('[data-reel-canvas]'), { autoAlpha: 0, xPercent: 18, rotation: 4, duration: 0.6, ease: 'power2.in' }, 0.08);
         flo.forEach((el, i) => settle.to(el, { ...apart(el), duration: 0.55, ease: 'power2.in' }, 0.04 + i * 0.03));
         settle
           .to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.08 }, 0.7)
@@ -209,8 +217,8 @@ export default function Site() {
           .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.8 }, 0.1)
           .to(q('[data-hero-float]'), { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.1 }, 0.2);
         intro.call(() => { settle.play(); }, [], (seen ? 0.1 : 1.75) + 1.4);
-        // The film strip and the cast leave as the page starts to move (decoration only).
-        gsap.to(q('[data-film="top"]'), { yPercent: -60, autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: '+=40%', scrub: 0.6 } });
+        // The film and the cast leave as the page starts to move (decoration only).
+        gsap.to(q('[data-reel-canvas]'), { yPercent: -20, autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: '+=40%', scrub: 0.6 } });
         flo.forEach(el => gsap.to(el, { ...apart(el), ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: '+=40%', scrub: 0.6 } }));
       }
       // Computers: the cast leans after the pointer a little, the nearer ones more.
@@ -316,7 +324,7 @@ export default function Site() {
     return () => {
       window.removeEventListener('load', refresh);
       stopSnow();
-      stopTalk(); stopType(); stopLean?.(); stopLean = null;
+      stopTalk(); stopType(); stopLean?.(); stopLean = null; reel?.stop();
       ctx.revert();
       glide?.kill(); smootherRef = null;
       if (releasePlan) { window.removeEventListener('pd-done', releasePlan); releasePlan(); releasePlan = null; }
@@ -354,24 +362,24 @@ export default function Site() {
       {/* hero */}
       <header className="s-hero">
         <div className="s-hero-bg" data-hero-bg style={{ backgroundImage: 'url(/hl/paint/hero.webp)' }} />
-        {/* One film strip runs above the headline on the first screen; it leaves as the quote arrives. */}
-        <div className="s-film s-film-top" data-film="top" aria-hidden="true" data-lve-skip>
-          <div className="s-film-track">
-            {[...FILM_FRAMES, ...FILM_FRAMES].map((id, i) => <span key={i} className="s-film-frame" style={{ backgroundImage: `url(/hl/ev/${id}.jpg)` }} />)}
-          </div>
-        </div>
-        {/* The cast floats around the headline and takes turns to speak (hover one to hear it). */}
-        <div className="s-cast" data-cast aria-hidden="true" data-lve-skip>
-          {CAST.map(c => (
-            <div key={c.pose} className={`s-flo s-flo-${c.pose}`} data-flo>
-              <div className="s-flo-par" data-flo-par data-depth={c.depth}>
-                <div className="s-flo-bob">
-                  <span className={`s-bubble${c.l ? ' l' : ''}`} data-bubble>{c.say}</span>
-                  <Mascot pose={c.pose} />
+        {/* The film ribbon down the right, folding over twice, with the cast riding beside it.
+            Point at it, drag it, or scroll: the film runs. Hover a figure to hear it. */}
+        <div className="s-reel" data-reel aria-hidden="true" data-lve-skip>
+          <canvas className="s-reel-canvas" data-reel-canvas />
+          <div className="s-cast" data-cast>
+            {CAST.map(c => (
+              <div key={c.pose} className={`s-flo s-flo-${c.pose} s-flo-wait`} data-flo data-s={c.s} data-side={c.side} data-gap={c.gap} data-sp={c.sp} data-sidep={c.sideP}>
+                <div className="s-flo-par" data-flo-par data-depth={c.depth}>
+                  <div className="s-flo-pop">
+                    <div className="s-flo-bob">
+                      <span className="s-bubble" data-bubble>{c.say}</span>
+                      <Mascot pose={c.pose} />
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
         <div className="s-hero-copy">
           <h1 className="s-h1 s-h1-hero" aria-label="Usher, the best film festival change management agent">

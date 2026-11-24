@@ -732,28 +732,16 @@
   .s-hero .s-h1.s-h1-hero { display: block; min-height: 0; padding: calc(50svh - 150px) 0 calc(50svh - 150px); white-space: normal; overflow-wrap: break-word; }
 }
 
-/* ---------------------------------------------------------------- film strips framing the headline */
-.s-film { position: absolute; left: -4%; right: -4%; z-index: 1; height: 72px; background: #0a0605; overflow: hidden; pointer-events: none;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, .5);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
-.s-film::before, .s-film::after { content: ""; position: absolute; left: 0; right: 0; height: 9px; z-index: 1;
-  background: repeating-linear-gradient(90deg, transparent 0 7px, rgba(239, 229, 211, .78) 7px 16px, transparent 16px 24px); background-size: 24px 6px; background-repeat: repeat-x; background-position: 0 50%; }
-.s-film::before { top: 3px; } .s-film::after { bottom: 3px; }
-.s-film-top { top: 11vh; transform: rotate(-3deg); }
-.s-film-track { display: flex; gap: 6px; height: 100%; padding: 14px 0; width: max-content; animation: s-film-run 46s linear infinite; }
-.s-film-frame { width: 72px; height: 100%; border-radius: 3px; background: center / cover no-repeat; filter: sepia(.35) saturate(.85) brightness(.75); flex: none; }
-@keyframes s-film-run { to { transform: translateX(-50%); } }
-@media (prefers-reduced-motion: reduce) { .s-film-track { animation: none; } }
+/* ---------------------------------------------------------------- the film ribbon down the right of the cover
+   Drawn on a canvas (app/reel.ts); the cast rides beside it, placed by the same script. */
+.s-reel { position: absolute; top: 0; right: 0; bottom: 0; width: 56%; z-index: 2; pointer-events: none; }
+.s-reel-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: auto; touch-action: pan-y; }
 @media (max-width: 760px) {
-  .s-film { height: 54px; }
-  .s-film-top { top: calc(50svh - 236px); }
-  .s-film-track { padding: 11px 0; gap: 5px; }
-  .s-film-frame { width: 54px; }
-  .s-film::before, .s-film::after { height: 7px; background-size: 18px 5px; background: repeating-linear-gradient(90deg, transparent 0 5px, rgba(239, 229, 211, .78) 5px 12px, transparent 12px 18px); }
-  /* the first screen is the headline and the strips alone */
-  .s-hero .s-h1.s-h1-hero { padding: calc(50svh - 120px) 0 calc(50svh - 40px); }
+  .s-reel { top: 46svh; bottom: auto; height: 56svh; left: 0; width: 100%; }
+  .s-reel-canvas { pointer-events: none; }
 }
-.s-root:not(.ready) .s-film, .s-root:not(.ready) .s-cast { visibility: hidden; animation: s-show 0s 3s forwards; }
+@media (prefers-reduced-motion: reduce) { .s-reel { display: none; } }
+.s-root:not(.ready) .s-reel { visibility: hidden; animation: s-show 0s 3s forwards; }
 
 /* ---------------------------------------------------------------- hero: the Usher wordmark, the line under it */
 .s-hero .s-h1.s-h1-hero { white-space: normal; display: grid; gap: 14px; }
@@ -945,20 +933,22 @@
 .s-bubble.still { opacity: 1; transform: none; animation: s-talk 3.4s ease-in-out infinite; }
 @keyframes s-talk { 0%, 78%, 100% { transform: scale(1) rotate(0); } 84% { transform: scale(1.08) rotate(-2deg); } 90% { transform: scale(.97) rotate(1deg); } }
 
-/* the cast on the cover */
-.s-cast { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
-.s-flo { position: absolute; }
+/* the cast on the cover: some big, some small, each pinned beside the ribbon by the script */
+.s-cast { position: absolute; inset: 0; pointer-events: none; }
+.s-flo { position: absolute; left: 0; top: 0; }
 .s-flo-par { display: inline-block; position: relative; pointer-events: auto; line-height: 0; }
+/* each figure pops up when the unrolling film reaches it (this wrapper is CSS-only; GSAP never touches it) */
+.s-flo-pop { transition: transform .7s cubic-bezier(.34, 1.7, .5, 1), opacity .25s ease; }
+.s-flo-wait .s-flo-pop { transform: scale(0) rotate(-16deg); opacity: 0; }
 .s-flo-bob { position: relative; animation: s-bob var(--bob, 5.2s) ease-in-out var(--bob-d, 0s) infinite; }
 .s-flo .mascot { height: var(--h, 130px); }
-@keyframes s-bob { 0%, 100% { transform: translateY(0) rotate(-2.5deg); } 50% { transform: translateY(-16px) rotate(2.5deg); } }
-.s-flo-ask { left: 7%; top: 42%; --h: 172px; --bob: 5.6s; }
-.s-flo-options { left: 19%; top: 22%; --h: 118px; --bob: 4.6s; --bob-d: -1.2s; }
-.s-flo-relax { left: 17%; top: 68%; --h: 116px; --bob: 6.4s; --bob-d: -2.4s; }
-.s-flo-done { left: 70%; top: 19%; --h: 124px; --bob: 4.2s; --bob-d: -.8s; }
-.s-flo-headsup { left: 82%; top: 40%; --h: 150px; --bob: 5s; --bob-d: -3s; }
-.s-flo-working { left: 69%; top: 67%; --h: 124px; --bob: 5.8s; --bob-d: -1.8s; }
-@media (prefers-reduced-motion: reduce) { .s-cast { display: none; } }
+@keyframes s-bob { 0%, 100% { transform: translateY(0) rotate(-2.5deg); } 50% { transform: translateY(-12px) rotate(2.5deg); } }
+.s-flo-ask { --h: 176px; --bob: 5.6s; }
+.s-flo-headsup { --h: 128px; --bob: 5s; --bob-d: -3s; }
+.s-flo-options { --h: 150px; --bob: 4.6s; --bob-d: -1.2s; }
+.s-flo-working { --h: 104px; --bob: 5.8s; --bob-d: -1.8s; }
+.s-flo-done { --h: 138px; --bob: 4.2s; --bob-d: -.8s; }
+.s-flo-relax { --h: 96px; --bob: 6.4s; --bob-d: -2.4s; }
 
 /* the hero quote, said by the waving figure, then the promise being typed */
 .s-says { display: flex; align-items: flex-end; gap: 14px; margin-bottom: 10px; }
@@ -987,15 +977,11 @@
 }
 @media (max-width: 760px) {
   .s-bubble { font-size: 12px; padding: 6px 10px; }
-  .s-flo-options, .s-flo-relax { display: none; }
-  .s-flo-headsup { left: auto; right: 4%; top: calc(50svh - 150px); --h: 86px; }
-  .s-flo-ask { left: 4%; top: calc(50svh + 150px); --h: 100px; }
-  .s-flo-working { left: 40%; top: calc(50svh + 190px); --h: 86px; }
-  .s-flo-done { left: auto; right: 6%; top: calc(50svh + 140px); --h: 92px; }
+  .s-flo-options, .s-flo-relax, .s-flo-working { display: none; }
+  .s-flo-ask { --h: 92px; } .s-flo-headsup { --h: 76px; } .s-flo-working { --h: 70px; } .s-flo-done { --h: 82px; }
   .s-says { gap: 10px; }
   .s-says .s-mascot { height: 68px; }
   .s-says .s-quote { white-space: normal; }
-  .s-flo-ask .s-bubble.l { left: 50%; right: auto; bottom: calc(100% + 4px); border-radius: 14px 14px 14px 4px; transform-origin: 0 100%; }
   .s-plan-head { gap: 12px; }
   .s-plan-mascot .mascot { height: 84px; }
   .s-cta-guy .mascot { height: 84px; }
@@ -1006,3 +992,8 @@
    shown as painted: no sepia or desaturation on top. */
 .s-hero-bg { opacity: .72; }
 .s-prob .s-risk-pic .s-risk-img, .s-risk-img { filter: none; }
+
+/* Cover layout: the title on the left; on phones it sits at the top and the film runs underneath. */
+@media (max-width: 760px) {
+  .s-hero .s-h1.s-h1-hero { padding: 12svh 0 72svh; }
+}
