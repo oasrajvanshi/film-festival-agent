@@ -732,30 +732,27 @@
 }
 
 /* ---------------------------------------------------------------- film strips framing the headline */
-.s-film { position: absolute; left: -4%; right: -4%; z-index: 1; height: 104px; background: #0a0605; overflow: hidden; pointer-events: none;
+.s-film { position: absolute; left: -4%; right: -4%; z-index: 1; height: 72px; background: #0a0605; overflow: hidden; pointer-events: none;
   box-shadow: 0 18px 40px rgba(0, 0, 0, .5);
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
-.s-film::before, .s-film::after { content: ""; position: absolute; left: 0; right: 0; height: 12px; z-index: 1;
-  background: repeating-linear-gradient(90deg, transparent 0 10px, rgba(239, 229, 211, .78) 10px 22px, transparent 22px 32px); background-size: 32px 8px; background-repeat: repeat-x; background-position: 0 50%; }
-.s-film::before { top: 4px; } .s-film::after { bottom: 4px; }
-.s-film-top { top: 13vh; transform: rotate(-3deg); }
-.s-film-bottom { bottom: 12vh; transform: rotate(2deg); }
-.s-film-track { display: flex; gap: 8px; height: 100%; padding: 20px 0; width: max-content; animation: s-film-run 46s linear infinite; }
-.s-film-bottom .s-film-track { animation-direction: reverse; animation-duration: 52s; }
-.s-film-frame { width: 104px; height: 100%; border-radius: 3px; background: center / cover no-repeat; filter: sepia(.35) saturate(.85) brightness(.75); flex: none; }
+.s-film::before, .s-film::after { content: ""; position: absolute; left: 0; right: 0; height: 9px; z-index: 1;
+  background: repeating-linear-gradient(90deg, transparent 0 7px, rgba(239, 229, 211, .78) 7px 16px, transparent 16px 24px); background-size: 24px 6px; background-repeat: repeat-x; background-position: 0 50%; }
+.s-film::before { top: 3px; } .s-film::after { bottom: 3px; }
+.s-film-top { top: 11vh; transform: rotate(-3deg); }
+.s-film-track { display: flex; gap: 6px; height: 100%; padding: 14px 0; width: max-content; animation: s-film-run 46s linear infinite; }
+.s-film-frame { width: 72px; height: 100%; border-radius: 3px; background: center / cover no-repeat; filter: sepia(.35) saturate(.85) brightness(.75); flex: none; }
 @keyframes s-film-run { to { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) { .s-film-track { animation: none; } }
 @media (max-width: 760px) {
-  .s-film { height: 74px; }
-  .s-film-top { top: calc(50svh - 230px); }
-  .s-film-bottom { top: calc(50svh + 110px); bottom: auto; }
-  .s-film-track { padding: 15px 0; gap: 6px; }
-  .s-film-frame { width: 76px; }
-  .s-film::before, .s-film::after { height: 9px; background-size: 24px 6px; background: repeating-linear-gradient(90deg, transparent 0 7px, rgba(239, 229, 211, .78) 7px 16px, transparent 16px 24px); }
+  .s-film { height: 54px; }
+  .s-film-top { top: calc(50svh - 236px); }
+  .s-film-track { padding: 11px 0; gap: 5px; }
+  .s-film-frame { width: 54px; }
+  .s-film::before, .s-film::after { height: 7px; background-size: 18px 5px; background: repeating-linear-gradient(90deg, transparent 0 5px, rgba(239, 229, 211, .78) 5px 12px, transparent 12px 18px); }
   /* the first screen is the headline and the strips alone */
   .s-hero .s-h1.s-h1-hero { padding: calc(50svh - 120px) 0 calc(50svh - 40px); }
 }
-.s-root:not(.ready) .s-film { visibility: hidden; animation: s-show 0s 3s forwards; }
+.s-root:not(.ready) .s-film, .s-root:not(.ready) .s-cast { visibility: hidden; animation: s-show 0s 3s forwards; }
 
 /* ---------------------------------------------------------------- hero: the Usher wordmark, the line under it */
 .s-hero .s-h1.s-h1-hero { white-space: normal; display: grid; gap: 14px; }
@@ -934,24 +931,71 @@
 @media (min-width: 761px) { .pd-phone { bottom: auto; top: calc(100% + 76px); } .s-plan { padding-bottom: 230px; } }
 
 /* ---------------------------------------------------------------- the mascot on the home page
-   One small figure per scene: it says the hero quote, calls out from the Usher hub, weighs the
-   new plan and jumps beside the last button. Never inside a button or an icon. */
+   The cover is the cast: Usher in six moods floating around the headline, taking turns to speak.
+   Further down, one figure per scene with one line. Never inside a button or an icon. */
+
+/* speech bubbles: one short line, cream on the dark page, opening to the right (or left with .l) */
+.s-bubble { position: absolute; bottom: calc(100% - 4px); left: 50%; z-index: 3; white-space: nowrap; pointer-events: none;
+  padding: 7px 12px; border-radius: 14px 14px 14px 4px; background: var(--cream); color: var(--amber-ink);
+  font: 600 13.5px/1.2 var(--f-ui); letter-spacing: 0; text-transform: none; box-shadow: 0 10px 26px rgba(0, 0, 0, .38);
+  transform-origin: 0 100%; transform: scale(.4); opacity: 0; transition: opacity .18s ease, transform .5s cubic-bezier(.34, 1.7, .5, 1); }
+.s-bubble.l { left: auto; right: 50%; border-radius: 14px 14px 4px 14px; transform-origin: 100% 100%; }
+.s-bubble.on { opacity: 1; transform: scale(1); }
+.s-bubble.still { opacity: 1; transform: none; animation: s-talk 3.4s ease-in-out infinite; }
+@keyframes s-talk { 0%, 78%, 100% { transform: scale(1) rotate(0); } 84% { transform: scale(1.08) rotate(-2deg); } 90% { transform: scale(.97) rotate(1deg); } }
+
+/* the cast on the cover */
+.s-cast { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.s-flo { position: absolute; }
+.s-flo-par { display: inline-block; position: relative; pointer-events: auto; line-height: 0; }
+.s-flo-bob { position: relative; animation: s-bob var(--bob, 5.2s) ease-in-out var(--bob-d, 0s) infinite; }
+.s-flo .mascot { height: var(--h, 130px); }
+@keyframes s-bob { 0%, 100% { transform: translateY(0) rotate(-2.5deg); } 50% { transform: translateY(-16px) rotate(2.5deg); } }
+.s-flo-ask { left: 7%; top: 42%; --h: 172px; --bob: 5.6s; }
+.s-flo-options { left: 19%; top: 22%; --h: 118px; --bob: 4.6s; --bob-d: -1.2s; }
+.s-flo-relax { left: 17%; top: 68%; --h: 116px; --bob: 6.4s; --bob-d: -2.4s; }
+.s-flo-done { left: 70%; top: 19%; --h: 124px; --bob: 4.2s; --bob-d: -.8s; }
+.s-flo-headsup { left: 82%; top: 40%; --h: 150px; --bob: 5s; --bob-d: -3s; }
+.s-flo-working { left: 69%; top: 67%; --h: 124px; --bob: 5.8s; --bob-d: -1.8s; }
+@media (prefers-reduced-motion: reduce) { .s-cast { display: none; } }
+
+/* the hero quote, said by the waving figure, then the promise being typed */
 .s-says { display: flex; align-items: flex-end; gap: 14px; margin-bottom: 10px; }
 .s-says .s-quote { margin-bottom: 4px; }
 .s-says .s-mascot { height: 92px; }
-.s-node-mascot.mascot { position: absolute; left: 50%; bottom: calc(100% - 14px); height: 92px; translate: -50% 0; }
+.s-typer { display: block; min-height: 2.9em; margin: 2px 0 12px; font-family: var(--f-time); font-size: .92em; line-height: 1.45; color: var(--cream); }
+.s-typer::after { content: ""; display: inline-block; width: .5em; height: 1.05em; margin-left: 3px; vertical-align: -.16em; background: var(--amber-2); animation: s-caret 1s steps(1) infinite; }
+@keyframes s-caret { 50% { opacity: 0; } }
+
+/* one figure per scene further down */
+.s-node-guy { position: absolute; left: 50%; bottom: calc(100% - 14px); translate: -50% 0; line-height: 0; }
+.s-node-guy .mascot { height: 92px; }
 .s-plan-head { display: flex; align-items: flex-end; gap: clamp(24px, 4vw, 64px); }
-.s-plan-mascot { flex: none; line-height: 0; }
+.s-plan-mascot { position: relative; flex: none; line-height: 0; }
 .s-plan-mascot .mascot { height: clamp(110px, 12vw, 170px); }
 .s-roles { align-items: center; }
-.s-cta-mascot.mascot { height: 104px; margin-left: 10px; }
+.s-cta-guy { position: relative; display: inline-block; line-height: 0; margin-left: 10px; }
+.s-cta-guy .mascot { height: 104px; }
+/* a hop when you point at any of them */
+.s-node-guy .mascot, .s-plan-mascot .mascot, .s-cta-guy .mascot, .s-says .mascot { pointer-events: auto; transition: translate .25s cubic-bezier(.34, 1.7, .5, 1); }
+.s-node-guy .mascot:hover, .s-plan-mascot .mascot:hover, .s-cta-guy .mascot:hover, .s-says .mascot:hover { translate: 0 -10px; }
+
 @media (max-width: 900px) {
-  .s-node-mascot.mascot { height: 70px; left: calc(100% + 10px); bottom: 4px; translate: 0 0; }
+  .s-node-guy { left: calc(100% + 10px); bottom: 4px; translate: 0 0; }
+  .s-node-guy .mascot { height: 70px; }
 }
 @media (max-width: 760px) {
+  .s-bubble { font-size: 12px; padding: 6px 10px; }
+  .s-flo-options, .s-flo-relax { display: none; }
+  .s-flo-headsup { left: auto; right: 4%; top: calc(50svh - 150px); --h: 86px; }
+  .s-flo-ask { left: 4%; top: calc(50svh + 150px); --h: 100px; }
+  .s-flo-working { left: 40%; top: calc(50svh + 190px); --h: 86px; }
+  .s-flo-done { left: auto; right: 6%; top: calc(50svh + 140px); --h: 92px; }
   .s-says { gap: 10px; }
   .s-says .s-mascot { height: 68px; }
+  .s-says .s-quote { white-space: normal; }
+  .s-flo-ask .s-bubble.l { left: 50%; right: auto; bottom: calc(100% + 4px); border-radius: 14px 14px 14px 4px; transform-origin: 0 100%; }
   .s-plan-head { gap: 12px; }
   .s-plan-mascot .mascot { height: 84px; }
-  .s-cta-mascot.mascot { height: 84px; }
+  .s-cta-guy .mascot { height: 84px; }
 }

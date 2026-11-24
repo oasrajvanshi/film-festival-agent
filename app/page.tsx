@@ -12,7 +12,7 @@ import { useEffect, useRef, type MouseEvent } from 'react';
 import { Bell } from './hl/icons';
 import { PHOTOS } from './ui/photos';
 import { PlanDemo } from './sitedemo';
-import { Mascot } from './ui/mascot';
+import { Mascot, type Pose } from './ui/mascot';
 
 // ---------------------------------------------------------------- the calendar (1 pm to 7 pm, four venues)
 
@@ -43,6 +43,27 @@ const EVENTS: Ev[] = [
 const TONES = ['#b9825a', '#8f6a4f', '#a4744e', '#7d5b46', '#c39367', '#6f5a4e'];
 const initials = (n: string) => n.split(' ').map(w => w[0]).join('');
 const tone = (n: string) => TONES[[...n].reduce((h, c) => h + c.charCodeAt(0), 0) % TONES.length];
+
+/** The cover's cast: Usher in six moods. They take turns to speak, and together their lines tell
+ *  the whole story in miniature: hello, a problem, two ways out, the work, done, calm again.
+ *  `l`: the speech bubble opens to the left. `depth`: how far it follows the pointer. */
+const CAST: { pose: Pose; say: string; l?: boolean; depth: number }[] = [
+  { pose: 'ask', say: 'Hi, I\u2019m Usher!', l: true, depth: 1 },
+  { pose: 'headsup', say: 'Snow at 1 pm. Heads-up!', l: true, depth: 0.7 },
+  { pose: 'options', say: 'Two ways to fix it. You pick.', depth: 0.9 },
+  { pose: 'working', say: 'Moving 3 screenings\u2026', l: true, depth: 0.6 },
+  { pose: 'done', say: 'Done! Everyone\u2019s been told.', l: true, depth: 0.8 },
+  { pose: 'relax', say: 'All calm. Coffee time.', depth: 0.5 },
+];
+
+/** What Usher says it will do, typed out one line at a time under the hero quote. */
+const PROMISES = [
+  'Speaker running late? I\u2019ll find a stand-in.',
+  'Snow from 1 pm? I\u2019ll push three screenings.',
+  'Print arrives late? I\u2019ll swap the order.',
+  'Flight cancelled? I\u2019ll move the Q&A to video.',
+  'Shuttle running late? I\u2019ll tell people to leave early.',
+];
 
 /** `rich`: the app's own calendar look, with each event's picture and its guests' avatars. */
 const FILM_FRAMES = ['f-02', 'f-13', 'f-19', 'f-24', 'f-30', 'f-07', 'f-36', 'f-08', 'f-11', 'f-27'];
@@ -102,6 +123,7 @@ export default function Site() {
 
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let stopLean: (() => void) | null = null;
     gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
     // Development only: lets a test browser run the timelines at real speed in a background tab.
     if (process.env.NODE_ENV !== 'production') (window as unknown as { __gsap?: typeof gsap }).__gsap = gsap;
@@ -115,7 +137,7 @@ export default function Site() {
     smootherRef = glide;
     const ctx = gsap.context(() => {
       const q = gsap.utils.selector(root);
-      if (reduce) { finalStates(q); q('[data-leader]').forEach(e => e.remove()); root.current?.classList.add('ready'); return; }
+      if (reduce) { finalStates(q); q('[data-leader]').forEach(e => e.remove()); q('[data-cast]').forEach(e => e.remove()); root.current?.classList.add('ready'); return; }
 
       const phone = matchMedia('(max-width: 760px)').matches;
       // Phones: the four tools are a swipeable row; the dots follow the swipe.
@@ -152,6 +174,15 @@ export default function Site() {
       if (phone) ScrollTrigger.config({ ignoreMobileResize: true });
       gsap.set(q('[data-cal="hero"]'), { rotateX: phone ? 0 : 24, rotateZ: phone ? 0 : -6 });
       intro.fromTo(q('.s-hero .split-word'), { yPercent: 110 }, { yPercent: 0, duration: 1.05, stagger: 0.05, ease: 'power4.out' }, seen ? 0.1 : 1.75);
+      // The cast pops in around the headline, one after another, with a little bounce.
+      intro.fromTo(q('[data-flo-par]'), { scale: 0, autoAlpha: 0, rotation: -14 }, { scale: 1, autoAlpha: 1, rotation: 0, duration: 0.8, stagger: 0.1, ease: 'back.out(2.2)' }, (seen ? 0.1 : 1.75) + 0.5);
+      // Scrolling on, they fly apart outwards (each away from the centre) and the page moves on.
+      const flo = q('[data-flo]') as HTMLElement[];
+      const apart = (el: HTMLElement) => {
+        const r = el.getBoundingClientRect();
+        const dx = (r.left + r.width / 2 - innerWidth / 2) / (innerWidth / 2), dy = (r.top + r.height / 2 - innerHeight / 2) / (innerHeight / 2);
+        return { x: dx * innerWidth * 0.3, y: dy * innerHeight * 0.3 - 40, rotation: dx * 20, scale: 0.55, autoAlpha: 0 };
+      };
       // The hero: the headline first, alone and centred. One scroll settles it into place while the
       // page holds still; everything else arrives in that same scroll, then the page rests a moment
       // before it moves on. Phones: no holding; the rest arrives on its own after the headline.
@@ -162,11 +193,12 @@ export default function Site() {
         const r0 = h1.getBoundingClientRect();
         const toCentre = { x: innerWidth / 2 - (r0.left + r0.width / 2), y: innerHeight / 2 - (r0.top + r0.height / 2) };
         gsap.set(h1, { x: toCentre.x, y: toCentre.y, scale: 1.25, transformOrigin: '50% 50%', force3D: true });
-        gsap.timeline({ defaults: { ease: 'power2.out' }, scrollTrigger: { trigger: hero, start: 'top top', end: '+=80%', scrub: true, pin: true, anticipatePin: 1 } })
+        const settle = gsap.timeline({ defaults: { ease: 'power2.out' }, scrollTrigger: { trigger: hero, start: 'top top', end: '+=80%', scrub: true, pin: true, anticipatePin: 1 } })
           .to(h1, { x: 0, y: 0, scale: 1, duration: 1, ease: 'power2.inOut' }, 0)
           .to(q('.s-scrollcue'), { autoAlpha: 0, duration: 0.2 }, 0)
-          .to(q('[data-film="top"]'), { yPercent: -80, autoAlpha: 0, duration: 0.6, ease: 'power2.in' }, 0.1)
-          .to(q('[data-film="bottom"]'), { yPercent: 80, autoAlpha: 0, duration: 0.6, ease: 'power2.in' }, 0.1)
+          .to(q('[data-film="top"]'), { yPercent: -80, autoAlpha: 0, duration: 0.6, ease: 'power2.in' }, 0.1);
+        flo.forEach((el, i) => settle.to(el, { ...apart(el), duration: 0.55, ease: 'power2.in' }, 0.04 + i * 0.03));
+        settle
           .to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.08 }, 0.7)
           .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.5 }, 0.75)
           .to(q('[data-hero-float]'), { autoAlpha: 1, y: 0, duration: 0.4, stagger: 0.08 }, 0.9)
@@ -178,9 +210,19 @@ export default function Site() {
           .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.8 }, 0.1)
           .to(q('[data-hero-float]'), { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.1 }, 0.2);
         intro.call(() => { settle.play(); }, [], (seen ? 0.1 : 1.75) + 1.4);
-        // The film strips part as the page starts to move (decoration only).
+        // The film strip and the cast leave as the page starts to move (decoration only).
         gsap.to(q('[data-film="top"]'), { yPercent: -60, autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: '+=40%', scrub: 0.6 } });
-        gsap.to(q('[data-film="bottom"]'), { yPercent: 60, autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: '+=40%', scrub: 0.6 } });
+        flo.forEach(el => gsap.to(el, { ...apart(el), ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: '+=40%', scrub: 0.6 } }));
+      }
+      // Computers: the cast leans after the pointer a little, the nearer ones more.
+      if (!phone) {
+        const lean = (q('[data-flo-par]') as HTMLElement[]).map(el => ({ d: Number(el.dataset.depth) || 0.5, x: gsap.quickTo(el, 'x', { duration: 0.9, ease: 'power3.out' }), y: gsap.quickTo(el, 'y', { duration: 0.9, ease: 'power3.out' }) }));
+        const onMove = (e: PointerEvent) => {
+          const dx = e.clientX / innerWidth - 0.5, dy = e.clientY / innerHeight - 0.5;
+          lean.forEach(l => { l.x(dx * 46 * l.d); l.y(dy * 30 * l.d); });
+        };
+        window.addEventListener('pointermove', onMove, { passive: true });
+        stopLean = () => window.removeEventListener('pointermove', onMove);
       }
       // Every starting state is set: now the hero may be seen (it was hidden so the finished layout never flashes first).
       root.current?.classList.add('ready');
@@ -266,12 +308,16 @@ export default function Site() {
       gsap.fromTo(q('[data-footer-bg]'), { yPercent: -10, scale: 1.1 }, { yPercent: 0, scale: 1, ease: 'none', scrollTrigger: { trigger: q('.s-footer')[0], start: 'top bottom', end: 'bottom bottom', scrub: true } });
     }, root);
 
+    const stopTalk = reduce ? () => {} : castTalk(root.current!, 3.4);
+    const stopType = reduce ? () => {} : typer(root.current!.querySelector<HTMLElement>('[data-typer]'), PROMISES);
+
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener('load', refresh);
     document.fonts?.ready.then(refresh);
     return () => {
       window.removeEventListener('load', refresh);
       stopSnow();
+      stopTalk(); stopType(); stopLean?.(); stopLean = null;
       ctx.revert();
       glide?.kill(); smootherRef = null;
       if (releasePlan) { window.removeEventListener('pd-done', releasePlan); releasePlan(); releasePlan = null; }
@@ -309,22 +355,37 @@ export default function Site() {
       {/* hero */}
       <header className="s-hero">
         <div className="s-hero-bg" data-hero-bg style={{ backgroundImage: `url(${PHOTOS.hero.src})` }} />
-        {/* Two film strips frame the headline on the first screen; they leave as the quote arrives. */}
-        {['top', 'bottom'].map(side => (
-          <div key={side} className={`s-film s-film-${side}`} data-film={side} aria-hidden="true" data-lve-skip>
-            <div className="s-film-track">
-              {[...FILM_FRAMES, ...FILM_FRAMES].map((id, i) => <span key={i} className="s-film-frame" style={{ backgroundImage: `url(/hl/ev/${id}.jpg)` }} />)}
-            </div>
+        {/* One film strip runs above the headline on the first screen; it leaves as the quote arrives. */}
+        <div className="s-film s-film-top" data-film="top" aria-hidden="true" data-lve-skip>
+          <div className="s-film-track">
+            {[...FILM_FRAMES, ...FILM_FRAMES].map((id, i) => <span key={i} className="s-film-frame" style={{ backgroundImage: `url(/hl/ev/${id}.jpg)` }} />)}
           </div>
-        ))}
+        </div>
+        {/* The cast floats around the headline and takes turns to speak (hover one to hear it). */}
+        <div className="s-cast" data-cast aria-hidden="true" data-lve-skip>
+          {CAST.map(c => (
+            <div key={c.pose} className={`s-flo s-flo-${c.pose}`} data-flo>
+              <div className="s-flo-par" data-flo-par data-depth={c.depth}>
+                <div className="s-flo-bob">
+                  <span className={`s-bubble${c.l ? ' l' : ''}`} data-bubble>{c.say}</span>
+                  <Mascot pose={c.pose} />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
         <div className="s-hero-copy">
           <h1 className="s-h1 s-h1-hero" aria-label="Usher, the best film festival change management agent">
             <span className="s-wordmark" data-split>Usher</span>
             <span className="s-h1-sub" data-split>{'The best film festival\nchange management agent.'}</span>
           </h1>
-          <p className="s-lead" data-hero-fade><span className="s-says"><Mascot pose="ask" className="s-mascot" /><q className="s-quote">Don&apos;t worry. I&apos;ll take care of everything.</q></span> That&apos;s what Usher says when a print arrives late, a guest misses their flight or snow slows the city down. It tracks your schedule and tells everyone affected by a change what to do next.</p>
+          <p className="s-lead" data-hero-fade>
+            <span className="s-says"><Mascot pose="ask" className="s-mascot" /><q className="s-quote">Don&apos;t worry. I&apos;ll take care of everything.</q></span>
+            <span className="s-typer" data-typer>{PROMISES[0]}</span>
+            I watch your festival&apos;s schedule all day. When something changes, I work out what it touches and tell everyone affected what to do next.
+          </p>
           <div className="s-ctas" data-hero-fade>
-            <a className="btn" href="#story" onClick={go('#story')}>See how it works</a>
+            <a className="btn" href="#story" onClick={go('#story')}>See how I work</a>
           </div>
         </div>
         <div className="s-hero-stage" data-lve-skip aria-hidden="true">
@@ -347,8 +408,8 @@ export default function Site() {
       <div className="s-prob s-risk">
         <div className="s-prob-copy">
           <p className="s-mono">Problem 1</p>
-          <h2 className="s-h2">Anything can go wrong at a film festival.</h2>
-          <p className="s-lead">One change moves screenings, people and volunteer shifts within minutes.</p>
+          <h2 className="s-h2">Anything can go wrong at a film festival. Trust me, I&apos;ve seen it.</h2>
+          <p className="s-lead">One change moves screenings, people and volunteer shifts within minutes. Here are two from a single Saturday.</p>
         </div>
         <div className="s-prob-row s-risk-cards">
           <article className="s-prob-item s-risk-card">
@@ -377,8 +438,8 @@ export default function Site() {
       <div className="s-prob s-problem">
           <div className="s-prob-copy">
             <p className="s-mono">Problem 2</p>
-            <h2 className="s-h2">Decision-making tools and documents are scattered.</h2>
-            <p className="s-lead">The schedule is in a spreadsheet, updates go out by email, volunteers read a Word brief and the team decides in a group chat. Each person ends up with a different version of the day.</p>
+            <h2 className="s-h2">Your team works from four versions of the same day.</h2>
+            <p className="s-lead">The schedule is in a spreadsheet, updates go out by email, volunteers read a Word brief and decisions happen in a group chat. By lunch, no two people have the same plan. That&apos;s where I come in.</p>
           </div>
           <div className="s-prob-row s-tools" data-tools data-lve-skip aria-hidden="true">
             <figure className="s-prob-item s-tool t-sheets" data-tool>
@@ -436,8 +497,8 @@ export default function Site() {
           <canvas className="s-snowfield" data-snowfield aria-hidden="true" />
           <div className="s-trigger-copy" data-trigger-copy>
             <span className="s-clock">Saturday · 12:40 pm</span>
-            <h2 className="s-h2 s-watch-h">{'Usher keeps an eye on\neverything that could go wrong.'}</h2>
-            <p className="s-lead" style={{ textAlign: 'center' }}>It follows the weather, flight arrivals and shuttle times all day. When one of them affects your programme, it shows you exactly what it touches.</p>
+            <h2 className="s-h2 s-watch-h">{'I keep an eye on\neverything that could go wrong.'}</h2>
+            <p className="s-lead" style={{ textAlign: 'center' }}>I follow the weather, flight arrivals and shuttle times all day. When one of them touches your programme, I show you exactly what it changes.</p>
           </div>
           <div className="s-flow" data-feeds data-lve-skip>
             <div className="s-flow-col">
@@ -450,7 +511,7 @@ export default function Site() {
                 {[50, 150, 250].map(y => <path key={`i${y}`} data-feed="in" d={`M0 ${y} C 60 ${y}, 60 150, 100 150`} />)}
                 {[38, 113, 188, 263].map(y => <path key={`o${y}`} data-feed="out" className="out" d={`M100 150 C 140 150, 140 ${y}, 200 ${y}`} />)}
               </svg>
-              <div className="s-flow-node" data-node><Mascot pose="headsup" className="s-node-mascot" /><b>Usher</b><small>checks 559 events, 1,107 plans, 595 shifts</small></div>
+              <div className="s-flow-node" data-node><span className="s-node-guy"><span className="s-bubble l still">Heads-up!</span><Mascot pose="headsup" /></span><b>Usher</b><small>checks 559 events, 1,107 plans, 595 shifts</small></div>
             </div>
             <div className="s-flow-col">
               {[['3 screenings move to 3:15 pm', 'Low Sun, Soft Animals, Night Swimmers'], ['21 attendees get their new time', 'Seats held, leave 15 min early'], ['Ravi Castellanos takes Dana’s seat', 'She joins the Q&A by video'], ['3 door teams briefed', 'Hold doors until 3:20 pm']].map(([b2, sm]) => (
@@ -467,10 +528,10 @@ export default function Site() {
         <div className="s-plan-head">
           <div className="s-plan-copy" data-reveal>
             <p className="s-mono">The new plan</p>
-            <h2 className="s-h2">It suggests a new plan, and you decide.</h2>
-            <p className="s-lead">Usher shows every change on the calendar before anything is sent. One approval makes it the plan, and everyone affected hears straight away.</p>
+            <h2 className="s-h2">I suggest a new plan. You decide.</h2>
+            <p className="s-lead">I put every change on the calendar before anything is sent. You approve once, and I tell everyone affected straight away.</p>
           </div>
-          <span className="s-plan-mascot" data-reveal><Mascot pose="options" /></span>
+          <span className="s-plan-mascot" data-reveal><span className="s-bubble l still">Your call!</span><Mascot pose="options" /></span>
         </div>
         <PlanDemo />
       </section>
@@ -478,10 +539,10 @@ export default function Site() {
       {/* call to action */}
       <footer className="s-footer">
         <div className="s-footer-bg" data-footer-bg />
-        <h2 className="s-h1" data-split-scroll>See how Usher handles a snow day at Sundance in Boulder.</h2>
+        <h2 className="s-h1" data-split-scroll>Come and watch me handle a snow day at Sundance in Boulder.</h2>
         <div className="s-roles" data-reveal>
           <a className="btn primary" href="/onboarding">Try the live demo</a>
-          <Mascot pose="done" className="s-cta-mascot" />
+          <span className="s-cta-guy"><span className="s-bubble still">Let&apos;s go!</span><Mascot pose="done" /></span>
         </div>
       </footer>
       </div></div>
@@ -490,6 +551,46 @@ export default function Site() {
 }
 
 // ---------------------------------------------------------------- helpers
+
+/** The cast takes turns to speak, one bubble at a time; hovering one makes it speak (and hop) now. */
+function castTalk(root: HTMLElement, startAfter: number) {
+  const pars = [...root.querySelectorAll<HTMLElement>('[data-flo-par]')];
+  let now = -1, timer = 0, quietUntil = 0;
+  const speak = (k: number) => { pars.forEach((p, j) => p.querySelector('[data-bubble]')?.classList.toggle('on', j === k)); now = k; };
+  const seen = (p: HTMLElement) => p.offsetParent !== null && getComputedStyle(p).visibility !== 'hidden';
+  const next = () => {
+    if (Date.now() < quietUntil) return;
+    const order = pars.map((p, j) => j).filter(j => seen(pars[j]));
+    if (!order.length) { speak(-1); return; }
+    speak(order[(order.indexOf(now) + 1) % order.length]);
+  };
+  const begin = window.setTimeout(() => { next(); timer = window.setInterval(next, 2600); }, startAfter * 1000);
+  const onEnter = (e: Event) => {
+    const p = e.currentTarget as HTMLElement;
+    speak(pars.indexOf(p)); quietUntil = Date.now() + 3200;
+    gsap.fromTo(p, { yPercent: 0 }, { yPercent: -12, duration: 0.18, ease: 'power2.out', yoyo: true, repeat: 1, overwrite: 'auto' });
+  };
+  pars.forEach(p => p.addEventListener('pointerenter', onEnter));
+  return () => { clearTimeout(begin); clearInterval(timer); pars.forEach(p => p.removeEventListener('pointerenter', onEnter)); };
+}
+
+/** Types Usher's promises out one at a time: hold, erase, type the next, hold. */
+function typer(el: HTMLElement | null, lines: string[]) {
+  if (!el) return () => {};
+  let alive = true, t = 0, i = 0;
+  const wait = (ms: number) => new Promise<void>(r => { t = window.setTimeout(r, ms); });
+  (async () => {
+    await wait(3000);
+    while (alive) {
+      let text = el.textContent ?? '';
+      while (alive && text.length) { text = text.slice(0, -1); el.textContent = text; await wait(12); }
+      i = (i + 1) % lines.length;
+      for (let k = 1; alive && k <= lines[i].length; k++) { el.textContent = lines[i].slice(0, k); await wait(28 + Math.random() * 34); }
+      await wait(2600);
+    }
+  })();
+  return () => { alive = false; clearTimeout(t); };
+}
 
 let smootherRef: ScrollSmoother | null = null;
 let releasePlan: (() => void) | null = null;
