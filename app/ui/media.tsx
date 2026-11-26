@@ -33,7 +33,7 @@ export function EventThumb({ e, size = 44 }: { e: Pick<FestivalEvent, 'kind' | '
   );
 }
 
-const TONES = ['#b9825a', '#8f6a4f', '#a4744e', '#7d5b46', '#c39367', '#6f5a4e'];
+const TONES = ['#2a55b8', '#3a63c2', '#1f4699', '#4b74cc', '#2c4f9e', '#5a80d0']; // people are blue
 const initials = (name: string) => name.split(/\s+/).filter(Boolean).slice(0, 2).map(w => w[0]).join('').toUpperCase();
 
 /** Small round avatars for an event's guests; a late guest is highlighted. */

@@ -221,18 +221,13 @@
   /* 10 · evaluation: the four steps as Sundance-colour tiles, run on the Sundance 2027 plan */
   .ev-head { display: flex; align-items: center; justify-content: space-between; }
   .ev-mid { flex: 1; display: grid; grid-template-columns: 1fr 1.1fr; gap: 80px; align-items: center; }
-  .ev-flags { list-style: none; margin: 0; padding: 0; display: grid; gap: 34px; }
+  .ev-flags { list-style: none; margin: 0; padding: 0; display: grid; gap: 24px; }
   .ev-flags li { display: flex; align-items: center; gap: 22px; }
-  .ev-ic { width: 72px; height: 72px; border-radius: 18px; display: grid; place-items: center; flex: none; color: #fff; background: #d9452c; }
-  .ev-flags li:nth-child(2) .ev-ic { background: #2f6fd6; }
-  .ev-ic svg { width: 36px; height: 36px; }
-  .ev-flags b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 36px; line-height: 1.1; color: var(--cream); }
+  .ev-ic { width: 64px; height: 64px; border-radius: 17px; display: grid; place-items: center; flex: none; color: #fff; }
+  .ev-ic svg { width: 32px; height: 32px; }
+  .ev-flags b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 34px; line-height: 1.1; color: var(--cream); }
   .ev-flags em { display: block; font-style: normal; font-size: 21px; color: var(--muted); margin-top: 6px; }
   .ev-say { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 38px; line-height: 1.25; color: var(--cream); text-wrap: balance; }
-  .scores { margin-top: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .score { border-radius: 18px; border: 1px solid var(--line-2); padding: 20px 24px; background: rgba(40, 27, 21, .5); }
-  .score b { display: block; font-family: var(--f-display); font-weight: 800; font-size: 40px; color: var(--cream); line-height: 1; }
-  .score span { display: block; font-size: 18px; color: var(--muted); margin-top: 8px; line-height: 1.3; }
 
   /* 11 · thanks */
   .s-end { justify-content: center; align-items: center; text-align: center; padding: 0; }
@@ -453,16 +448,13 @@
     </div>
     <div class="ev-mid">
       <ul class="ev-flags">
-        <li class="rise" style="--d:2"><span class="ev-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z" fill="currentColor"/></svg></span><span><b>Medical emergencies</b><em>three different kinds</em></span></li>
-        <li class="rise" style="--d:3"><span class="ev-ic"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="7" width="15" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="12.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M17.5 10.5l4-2.5v9l-4-2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 21h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span><b>AV failures</b><em>a projector fails, flagged by IT staff</em></span></li>
+        <li class="rise" style="--d:2"><span class="ev-ic" style="background:#d9452c"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6v6h6v6h-6v6H9v-6H3V9h6z" fill="currentColor"/></svg></span><b>Medical emergencies</b></li>
+        <li class="rise" style="--d:3"><span class="ev-ic" style="background:#2f6fd6"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="7" width="15" height="11" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="8" cy="12.5" r="2.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M17.5 10.5l4-2.5v9l-4-2.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 21h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><b>AV failures</b></li>
+        <li class="rise" style="--d:4"><span class="ev-ic" style="background:#e0a21a"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 4 14h7l-1 8 9-12h-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M3 3l18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><b>Blackout</b></li>
+        <li class="rise" style="--d:5"><span class="ev-ic" style="background:#7c5cd6"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 21h8M12 17v4M9 8l2 3-2 3M14 8l-1.5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>Software glitch or hack</b></li>
+        <li class="rise" style="--d:6"><span class="ev-ic" style="background:#c2335a"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 4 5.5v6c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10v-6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 8v5M12 16.2v.1" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><b>Public-safety alert</b></li>
       </ul>
-      <p class="ev-say rise" style="--d:4">We invent simulated emergencies at Sundance, then make sure Usher reacts to every change perfectly.</p>
-    </div>
-    <div class="scores">
-      <div class="score rise" style="--d:5"><b>5 / 5</b><span>schedule changes reached the right people</span></div>
-      <div class="score rise" style="--d:6"><b>3 / 3</b><span>planted guest clashes flagged</span></div>
-      <div class="score rise" style="--d:7"><b>20 / 20</b><span>door scans across every pass</span></div>
-      <div class="score rise" style="--d:8"><b>10 / 10</b><span>questions answered from official documents</span></div>
+      <p class="ev-say rise" style="--d:7">We invent simulated emergencies at Sundance, then make sure Usher reacts to every change perfectly.</p>
     </div>
   </section>
 
@@ -491,9 +483,9 @@
   // Slide 6 (onboarding showcase) starts empty every time the deck opens (and the old slide-7 space is cleared); slide 7 keeps its own space.
   try { Object.keys(localStorage).filter(k => k.startsWith('onboard:') || k.startsWith('live:')).forEach(k => localStorage.removeItem(k)); } catch {}
   // The status bar follows the phone app's light / dark theme.
-  const phoneTheme = () => { let t = 'dark'; try { t = localStorage.getItem('show:usher-theme') || 'dark'; } catch {} document.querySelectorAll('.phone .screen').forEach(s => s.classList.toggle('light', t === 'light')); };
+  const phoneTheme = () => { let t = 'light'; try { t = localStorage.getItem('show:usher-theme-v2') || 'light'; } catch {} document.querySelectorAll('.phone .screen').forEach(s => s.classList.toggle('light', t === 'light')); };
   phoneTheme();
-  window.addEventListener('storage', e => { if (e.key === 'show:usher-theme') phoneTheme(); });
+  window.addEventListener('storage', e => { if (e.key === 'show:usher-theme-v2') phoneTheme(); });
   setInterval(phoneTheme, 1000);
   const scaleFrames = () => document.querySelectorAll('.mac iframe[data-src]').forEach(f => {
     const box = f.parentElement; const w = Number(f.dataset.w);

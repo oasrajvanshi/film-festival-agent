@@ -125,7 +125,7 @@
 /* trigger: the forecast changes, feeds converge */
 .s-trigger .s-sticky { grid-template-rows: auto 1fr; align-content: center; justify-items: center; text-align: center; gap: 10px; }
 .s-snowfield { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-.s-trigger .s-sticky::before { content: ""; position: absolute; inset: 0; background: url("https://images.unsplash.com/photo-1677253170860-b5f20dab49c3?w=1600&q=72&auto=format&fit=crop") center / cover; opacity: .22; z-index: 0; }
+.s-trigger .s-sticky::before { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(18, 11, 9, .55), rgba(18, 11, 9, .1) 40%, rgba(18, 11, 9, .35)), url(/hl/paint/watch.webp) center 60% / cover; opacity: .9; z-index: 0; }
 .s-trigger-copy { position: relative; z-index: 2; display: grid; gap: 8px; justify-items: center; }
 .s-clock { font-family: var(--f-time); color: var(--amber-2); font-size: clamp(16px, 1.6vw, 22px); }
 .s-feeds { position: relative; z-index: 2; width: min(1100px, 100%); }
@@ -215,9 +215,10 @@
 
 /* footer */
 .s-footer { position: relative; min-height: 100svh; display: grid; align-content: center; gap: 34px; padding: 120px max(28px, env(safe-area-inset-right, 0px)) 60px max(28px, env(safe-area-inset-left, 0px)); overflow: hidden; }
-.s-footer-bg { position: absolute; inset: 0; background: url(/hl/stairs.jpg) center / cover; opacity: .35; }
+.s-footer-bg { position: absolute; inset: 0; background: url(/hl/paint/footer.webp) center 40% / cover; opacity: .6; }
 .s-footer::after { content: ""; position: absolute; inset: 0; background: linear-gradient(180deg, var(--bg), rgba(18, 11, 9, .4) 40%, rgba(18, 11, 9, .9)); }
 .s-footer > * { position: relative; z-index: 1; }
+.s-footer > .s-footer-bg { position: absolute; z-index: 0; } /* the painting stays a full-bleed layer behind the overlay */
 .s-roles { display: flex; flex-wrap: wrap; gap: 10px; }
 .s-credit { color: var(--muted); font-size: 13px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; border-top: 1px solid var(--line); padding-top: 18px; }
 
@@ -731,31 +732,22 @@
   .s-hero .s-h1.s-h1-hero { display: block; min-height: 0; padding: calc(50svh - 150px) 0 calc(50svh - 150px); white-space: normal; overflow-wrap: break-word; }
 }
 
-/* ---------------------------------------------------------------- film strips framing the headline */
-.s-film { position: absolute; left: -4%; right: -4%; z-index: 1; height: 104px; background: #0a0605; overflow: hidden; pointer-events: none;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, .5);
-  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
-.s-film::before, .s-film::after { content: ""; position: absolute; left: 0; right: 0; height: 12px; z-index: 1;
-  background: repeating-linear-gradient(90deg, transparent 0 10px, rgba(239, 229, 211, .78) 10px 22px, transparent 22px 32px); background-size: 32px 8px; background-repeat: repeat-x; background-position: 0 50%; }
-.s-film::before { top: 4px; } .s-film::after { bottom: 4px; }
-.s-film-top { top: 13vh; transform: rotate(-3deg); }
-.s-film-bottom { bottom: 12vh; transform: rotate(2deg); }
-.s-film-track { display: flex; gap: 8px; height: 100%; padding: 20px 0; width: max-content; animation: s-film-run 46s linear infinite; }
-.s-film-bottom .s-film-track { animation-direction: reverse; animation-duration: 52s; }
-.s-film-frame { width: 104px; height: 100%; border-radius: 3px; background: center / cover no-repeat; filter: sepia(.35) saturate(.85) brightness(.75); flex: none; }
-@keyframes s-film-run { to { transform: translateX(-50%); } }
-@media (prefers-reduced-motion: reduce) { .s-film-track { animation: none; } }
+/* ---------------------------------------------------------------- the film on the cover
+   Real 3D, drawn by app/reel.ts on two canvases: the far half of the coil under the cast, the near half
+   over it. The same script places the cast. */
+.s-reel { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.s-reel-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: auto; touch-action: pan-y; }
+.s-reel-canvas.front { pointer-events: none; z-index: 2; }
+/* one soft pool of light behind the loop */
+.s-reel::before { content: ""; position: absolute; left: 75.5%; top: 52%; width: 64vmin; height: 64vmin; transform: translate(-50%, -50%); background: radial-gradient(closest-side, rgba(150, 40, 28, .34), rgba(150, 40, 28, .12) 55%, transparent); opacity: 0; transition: opacity .8s ease; }
+.s-hero.lit .s-reel::before { opacity: 1; }
+@media (max-width: 760px) { .s-reel::before { left: 54%; top: 52%; width: 96vw; height: 96vw; } }
 @media (max-width: 760px) {
-  .s-film { height: 74px; }
-  .s-film-top { top: calc(50svh - 230px); }
-  .s-film-bottom { top: calc(50svh + 110px); bottom: auto; }
-  .s-film-track { padding: 15px 0; gap: 6px; }
-  .s-film-frame { width: 76px; }
-  .s-film::before, .s-film::after { height: 9px; background-size: 24px 6px; background: repeating-linear-gradient(90deg, transparent 0 7px, rgba(239, 229, 211, .78) 7px 16px, transparent 16px 24px); }
-  /* the first screen is the headline and the strips alone */
-  .s-hero .s-h1.s-h1-hero { padding: calc(50svh - 120px) 0 calc(50svh - 40px); }
+  .s-reel { top: 34svh; bottom: auto; height: 68svh; }
+  .s-reel-canvas { pointer-events: none; }
 }
-.s-root:not(.ready) .s-film { visibility: hidden; animation: s-show 0s 3s forwards; }
+@media (prefers-reduced-motion: reduce) { .s-reel { display: none; } }
+.s-root:not(.ready) .s-reel { visibility: hidden; animation: s-show 0s 3s forwards; }
 
 /* ---------------------------------------------------------------- hero: the Usher wordmark, the line under it */
 .s-hero .s-h1.s-h1-hero { white-space: normal; display: grid; gap: 14px; }
@@ -932,3 +924,149 @@
 .s-flow-feed, .s-flow-out { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(26, 17, 14, .94); }
 #smooth-content { will-change: transform; }
 @media (min-width: 761px) { .pd-phone { bottom: auto; top: calc(100% + 76px); } .s-plan { padding-bottom: 230px; } }
+
+/* ---------------------------------------------------------------- the mascot on the home page
+   The cover is the cast: Usher in six moods floating around the headline, taking turns to speak.
+   Further down, one figure per scene with one line. Never inside a button or an icon. */
+
+/* speech bubbles: one short line, cream on the dark page, opening to the right (or left with .l) */
+.s-bubble { position: absolute; bottom: calc(100% - 4px); left: 50%; z-index: 3; white-space: nowrap; pointer-events: none;
+  padding: 7px 12px; border-radius: 14px 14px 14px 4px; background: var(--cream); color: var(--amber-ink);
+  font: 600 13.5px/1.2 var(--f-ui); letter-spacing: 0; text-transform: none; box-shadow: 0 10px 26px rgba(0, 0, 0, .38);
+  transform-origin: 0 100%; transform: scale(.4); opacity: 0; transition: opacity .18s ease, transform .5s cubic-bezier(.34, 1.7, .5, 1); }
+.s-bubble.l { left: auto; right: 50%; border-radius: 14px 14px 4px 14px; transform-origin: 100% 100%; }
+.s-bubble.on { opacity: 1; transform: scale(1); }
+.s-bubble.still { opacity: 1; transform: none; animation: s-talk 3.4s ease-in-out infinite; }
+@keyframes s-talk { 0%, 78%, 100% { transform: scale(1) rotate(0); } 84% { transform: scale(1.08) rotate(-2deg); } 90% { transform: scale(.97) rotate(1deg); } }
+
+/* the cast on the cover: some big, some small, each pinned beside the ribbon by the script */
+.s-cast { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.s-flo { position: absolute; left: 0; top: 0; line-height: 0; }
+.s-flo-par { display: inline-block; position: relative; pointer-events: auto; line-height: 0; }
+/* each figure pops up when the unrolling film reaches it (this wrapper is CSS-only; GSAP never touches it) */
+.s-flo-pop { transition: transform .7s cubic-bezier(.34, 1.7, .5, 1), opacity .25s ease; }
+.s-flo-wait .s-flo-pop { transform: scale(0) rotate(-16deg); opacity: 0; }
+.s-flo-bob { position: relative; animation: s-bob var(--bob, 5.2s) ease-in-out var(--bob-d, 0s) infinite; }
+.s-flo .mascot { height: calc(var(--h, 130px) * var(--k, 1)); }
+@keyframes s-bob { 0%, 100% { transform: translateY(0) rotate(-2.5deg); } 50% { transform: translateY(-12px) rotate(2.5deg); } }
+.s-flo-headsup { --h: 252px; --bob: 5s; --bob-d: -3s; }
+.s-flo-working { --h: 112px; --bob: 5.8s; --bob-d: -1.8s; }
+.s-flo-done { --h: 118px; --bob: 4.2s; --bob-d: -.8s; }
+.s-flo-relax { --h: 104px; --bob: 6.4s; --bob-d: -2.4s; }
+
+
+/* what they say sits above the film, so the film never covers it */
+.s-says { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.s-say { position: absolute; width: 0; height: 0; }
+.s-say .s-bubble { left: 0; }
+.s-say.l .s-bubble { left: auto; right: 0; border-radius: 14px 14px 4px 14px; transform-origin: 100% 100%; }
+.s-say.on .s-bubble { opacity: 1; transform: scale(1); }
+
+/* one figure per scene further down */
+.s-node-guy { position: absolute; left: 50%; bottom: calc(100% - 14px); translate: -50% 0; line-height: 0; }
+.s-node-guy .mascot { height: 92px; }
+.s-plan-head { display: flex; align-items: flex-end; gap: clamp(24px, 4vw, 64px); }
+.s-plan-mascot { position: relative; flex: none; line-height: 0; }
+.s-plan-mascot .mascot { height: clamp(110px, 12vw, 170px); }
+.s-roles { align-items: center; }
+.s-cta-guy { position: relative; display: inline-block; line-height: 0; margin-left: 10px; }
+.s-cta-guy .mascot { height: 104px; }
+/* a hop when you point at any of them */
+.s-node-guy .mascot, .s-plan-mascot .mascot, .s-cta-guy .mascot { pointer-events: auto; transition: translate .25s cubic-bezier(.34, 1.7, .5, 1); }
+.s-node-guy .mascot:hover, .s-plan-mascot .mascot:hover, .s-cta-guy .mascot:hover { translate: 0 -10px; }
+
+@media (max-width: 900px) {
+  .s-node-guy { left: calc(100% + 10px); bottom: 4px; translate: 0 0; }
+  .s-node-guy .mascot { height: 70px; }
+}
+@media (max-width: 760px) {
+  .s-bubble { font-size: 12px; padding: 6px 10px; }
+  .s-flo-headsup { --h: 122px; } .s-flo-working { --h: 58px; } .s-flo-done { --h: 60px; } .s-flo-relax { --h: 54px; }
+  .s-plan-head { gap: 12px; }
+  .s-plan-mascot .mascot { height: 84px; }
+  .s-cta-guy .mascot { height: 84px; }
+}
+
+/* ---------------------------------------------------------------- painted scenes
+   The page's pictures are flat, mid-century style paintings (teal night, brick red, pale-yellow light),
+   shown as painted: no sepia or desaturation on top. */
+.s-prob .s-risk-pic .s-risk-img, .s-risk-img { filter: none; }
+
+/* Cover: the painted cinema, mirrored, so its lit screen is on the left. The picture is sized by the window
+   (never cropped from its left edge), so the screen's place is known and the title can sit on it.
+   `.lit` on the hero: the projector is on (bright screen, dark title). Without it the room is dark and the
+   title is cream, which is also how it looks with reduced motion or no script. */
+.s-hero { --bw: max(114vw, calc(118svh * 16 / 9)); --bx: 8vw; --by: -7svh; }
+.s-hero-bg { inset: auto; left: calc(var(--bx) - var(--bw) * .1695); top: var(--by); width: var(--bw); height: calc(var(--bw) * 9 / 16); background: none; opacity: 1; }
+.s-hero-paint { position: absolute; inset: 0; background: center / 100% 100% no-repeat; transform: scaleX(-1); filter: brightness(.5) contrast(1.14) saturate(1.05); -webkit-mask-image: linear-gradient(#000 72%, transparent 100%); mask-image: linear-gradient(#000 72%, transparent 100%); }
+.s-hero-bg::after { content: ""; position: absolute; inset: 0; background: radial-gradient(34% 46% at 32% 41%, transparent 58%, rgba(11, 7, 6, .82) 100%), linear-gradient(transparent 50%, rgba(11, 7, 6, .7) 74%), linear-gradient(90deg, transparent 42%, rgba(11, 7, 6, .97) 54%); }
+.s-hero-screen, .s-hero-glow { z-index: 1; }
+.s-hero-glow, .s-hero-screen::before { opacity: 0; transition: opacity .5s ease; }
+.s-hero-screen { position: absolute; left: 16.95%; width: 29.76%; top: 25.33%; height: 29.26%; clip-path: polygon(0 0, 100% 8.2%, 100% 100%, 0 99.4%); overflow: hidden; background: #16211f; animation: s-flick 5.2s steps(1) infinite; }
+.s-hero-screen::before { content: ""; position: absolute; inset: 0; background: radial-gradient(80% 95% at 50% 46%, #e6cf98, #cfb077 52%, #a17c4a); }
+.s-hero-screen img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; mix-blend-mode: multiply; filter: sepia(.5) contrast(.8) brightness(1.25); opacity: 0; transition: opacity .45s ease; }
+.s-hero.lit .s-hero-screen img.on { opacity: .34; }
+.s-hero .s-scrollcue { bottom: 10px; gap: 5px; } .s-hero .s-scrollcue i { height: 22px; }
+.s-hero-glow { position: absolute; left: 2%; width: 60%; top: 2%; height: 86%; background: radial-gradient(closest-side, rgba(255, 214, 140, .09), transparent); mix-blend-mode: screen; }
+.s-hero.lit .s-hero-screen::before, .s-hero.lit .s-hero-glow { opacity: 1; }
+@keyframes s-flick { 0%, 100% { filter: none; } 31% { filter: brightness(.965); } 33% { filter: none; } 58% { filter: brightness(.98); } 60% { filter: brightness(.95); } 62% { filter: none; } 84% { filter: brightness(.975); } 86% { filter: none; } }
+/* the room with the lights down, for the conversation that follows */
+.s-hero::after { background: linear-gradient(transparent 62%, var(--bg) 98%), linear-gradient(90deg, rgba(18, 11, 9, .93) 30%, rgba(18, 11, 9, .74)); opacity: 1; transition: opacity .55s ease; pointer-events: none; }
+.s-hero.lit::after { opacity: 0; }
+.s-hero .s-wordmark, .s-hero .s-h1-sub { transition: color .35s ease; }
+.s-hero.lit .s-wordmark { color: #1c0f0a; }
+.s-hero.lit .s-h1-sub { color: rgba(24, 12, 8, .94); }
+/* Tablets held upright: the screen across the top, the film underneath. */
+@media (min-width: 761px) and (max-aspect-ratio: 1/1) { .s-reel::before { left: 60%; top: 70%; } .s-hero { --bw: 300vw; --bx: 5.5vw; --by: calc(110px - 42.7vw); } .s-hero-bg::after { background: linear-gradient(transparent 58%, rgba(12, 9, 8, .5)); } }
+/* On phones the screen is at the top with the title on it, and the film runs underneath. */
+@media (max-width: 760px) {
+  .s-hero { --bw: 306vw; --bx: 4.5vw; --by: calc(84px - var(--bw) * .1425); }
+  .s-hero .s-h1.s-h1-hero { padding: calc(84px + var(--bw) * .028) 10px calc(100svh - 84px - var(--bw) * .02 - 150px); }
+  .s-hero-bg::after { background: linear-gradient(transparent 55%, rgba(14, 9, 8, .5)); }
+}
+@media (prefers-reduced-motion: reduce) { .s-hero-screen { animation: none; } }
+
+/* ---------------------------------------------------------------- the hero conversation (app/usherchat.tsx)
+   One typeface besides the wordmark: the subtitle, the messages and the button are all the UI sans.
+   Usher's messages are cream bubbles beside its face; what comes in from the festival is a dark glass
+   bubble on the right with a red dot. Bubbles spring out of their tail; Usher's words pop in one by one. */
+.s-hero .s-h1-sub { font-family: var(--f-ui); font-weight: 500; letter-spacing: 0; }
+.s-chat { margin-top: 18px; }
+.uc { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: end; gap: 6px; width: min(560px, 100%); }
+.uc-face { width: 96px; height: 112px; display: grid; place-items: end center; line-height: 0; }
+.uc-face .mascot { height: 104px; }
+.uc-thread { height: 212px; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; overflow: hidden; padding: 6px 4px 4px;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 34%); mask-image: linear-gradient(180deg, transparent, #000 34%); }
+.uc-row { display: flex; flex: none; animation: uc-row .5s cubic-bezier(.3, 1.3, .5, 1) both; }
+.uc-row.issue { justify-content: flex-end; }
+@keyframes uc-row { from { max-height: 0; opacity: 0; } 40% { opacity: 1; } to { max-height: 140px; opacity: 1; } }
+.uc-bub { max-width: 34ch; padding: 10px 15px; font: 500 15.5px/1.42 var(--f-ui); border-radius: 18px; text-wrap: pretty; }
+.uc-usher, .uc-typing { background: var(--cream); color: var(--amber-ink); border-bottom-left-radius: 6px; transform-origin: 0 100%;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, .35); animation: uc-pop .55s cubic-bezier(.34, 1.7, .5, 1) both; }
+.uc-issue { display: flex; align-items: baseline; gap: 9px; background: rgba(239, 229, 211, .08); color: var(--cream); border: 1px solid rgba(239, 229, 211, .16);
+  border-bottom-right-radius: 6px; transform-origin: 100% 100%; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  animation: uc-pop .55s cubic-bezier(.34, 1.7, .5, 1) both, uc-nudge .5s .45s ease-in-out both; }
+@keyframes uc-pop { from { transform: translateY(10px) scale(.4); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes uc-nudge { 0%, 100% { translate: 0 0; } 25% { translate: -4px 0; } 50% { translate: 3px 0; } 75% { translate: -2px 0; } }
+.uc-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: #E8684B; translate: 0 -1px; box-shadow: 0 0 0 0 rgba(232, 104, 75, .6); animation: uc-ping 1.6s ease-out infinite; }
+@keyframes uc-ping { 70% { box-shadow: 0 0 0 7px rgba(232, 104, 75, 0); } 100% { box-shadow: 0 0 0 0 rgba(232, 104, 75, 0); } }
+.uc-typing { display: inline-flex; gap: 5px; padding: 14px 16px; }
+.uc-typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--amber-ink); opacity: .35; animation: uc-dots 1s ease-in-out infinite; }
+.uc-typing i:nth-child(2) { animation-delay: .15s; } .uc-typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes uc-dots { 0%, 60%, 100% { transform: translateY(0); opacity: .35; } 30% { transform: translateY(-4px); opacity: .9; } }
+.uc-w { display: inline-block; animation: uc-word .42s cubic-bezier(.3, 1.4, .5, 1) both; }
+@keyframes uc-word { from { opacity: 0; transform: translateY(6px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+.uc-b { font-weight: 700; color: var(--velvet-red, #a3221d); }
+/* older messages fade as they rise */
+.uc-thread .uc-row:not(:nth-last-child(-n + 2)) .uc-bub { opacity: .55; transition: opacity .4s ease; }
+@media (max-width: 760px) {
+  .s-chat { margin-top: 10px; }
+  .uc-face { width: 70px; height: 86px; } .uc-face .mascot { height: 80px; }
+  .uc-thread { height: 230px; }
+  .uc-bub { font-size: 14.5px; padding: 9px 13px; }
+}
+@media (prefers-reduced-motion: reduce) { .uc-row, .uc-bub, .uc-w, .uc-dot, .uc-typing i { animation: none !important; } }
+
+/* The nav floats on the page: no bar and no line, only a fade to dark behind it. */
+.s-nav, .s-root .s-nav { background: none; border-bottom: 0; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.s-nav::before { content: ""; position: absolute; inset: 0 0 -34px; z-index: -1; pointer-events: none; background: linear-gradient(rgba(11, 7, 6, .94) 45%, rgba(11, 7, 6, .7) 66%, transparent); }

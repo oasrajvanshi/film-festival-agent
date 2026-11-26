@@ -35,7 +35,7 @@
 .at.light .at-me, .at.light .at-theme { background: #fff; border-color: var(--line-2); color: var(--ink); backdrop-filter: none; }
 .at.light .at-days button { background: #fff; border-color: var(--line); backdrop-filter: none; color: var(--muted); }
 .at.light .at-days button b { color: var(--ink); }
-.at.light .at-days button.on { background: #141111; border-color: #141111; color: #b9b3b0; }
+.at.light .at-days button.on { background: #a3221d; border-color: #a3221d; color: rgba(255, 255, 255, .78); }
 .at.light .at-days button.on b { color: #fff; }
 .at.light .at-days button i { background: var(--accent); }
 .at.light .msch-ev { background: #fff; border-color: var(--line); backdrop-filter: none; }
@@ -54,7 +54,7 @@
 .at.light .at-decide i { background: var(--accent); }
 .at.light .at-nav { background: rgba(255, 255, 255, .92); border-color: var(--line); box-shadow: 0 10px 30px rgba(20, 15, 15, .12); }
 .at.light .at-nav button { color: var(--muted); }
-.at.light .at-nav button.on { background: #141111; color: #fff; }
+.at.light .at-nav button.on { background: #a3221d; color: #fff; }
 .at.light .at-badge { background: var(--accent); }
 .at.light .at-sheet { background: #fff; border-color: var(--line); }
 .at.light .at-sheet-wrap { background: rgba(20, 15, 15, .3); }
@@ -66,7 +66,7 @@
 .at.light .m-bg { fill: #f8f8f7; }
 .at.light .m-park { fill: rgba(120, 150, 110, .13); }
 .at.light .m-campus { fill: rgba(163, 34, 29, .05); stroke: rgba(163, 34, 29, .15); }
-.at.light .m-water { stroke: #a9c7d6; }
+.at.light .m-water { stroke: #bccbea; }
 .at.light .m-res { stroke: rgba(40, 35, 35, .1); }
 .at.light .m-minor { stroke: rgba(40, 35, 35, .2); }
 .at.light .m-major { stroke: rgba(40, 35, 35, .34); }
@@ -109,6 +109,7 @@
 .push-ic.k-risk, .at-latest-ic.k-risk { background: #d9922b; color: #1b120e; }
 .at-latest.risk { border-color: rgba(217, 146, 43, .5); }
 .at-latest.risk .at-latest-line small { color: #e0a54f; }
-.at.light .at-latest.risk { background: #fdf4e6; border-color: rgba(196, 122, 20, .45); }
-.at.light .at-latest.risk .at-latest-line small { color: #a2620c; }
+.at.light .at-latest.risk { background: #fbeeed; border-color: rgba(163, 34, 29, .35); }
+.at.light .at-latest.risk .at-latest-line small { color: #a3221d; }
+.at.light .at-latest-ic.k-risk, .light .push-ic.k-risk { background: #a3221d; color: #fff; }
 .light .push-ic.k-risk { background: #c47a14; color: #fff; }
