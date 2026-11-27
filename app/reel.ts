@@ -67,9 +67,9 @@ void main() {
   float sp1 = pow(max(dot(n, H1), 0.), 46.) + .22 * pow(max(dot(n, H1), 0.), 9.);
   float sp2 = pow(max(dot(n, H2), 0.), 60.);
   float fr = pow(1. - max(dot(n, V), 0.), 3.);
-  vec3 warm = vec3(1., .88, .62), cool = vec3(.46, .68, .68);
+  vec3 warm = vec3(1., .97, .93), cool = vec3(.46, .68, .68);
   float gloss = front ? 1. : .45;
-  vec3 base = front ? vec3(.052, .036, .03) : vec3(.105, .07, .05);
+  vec3 base = front ? vec3(.042, .041, .045) : vec3(.088, .086, .092);
   vec3 col = base * (.55 + 1.1 * d1 * warm + .5 * d2 * cool);
   // the picture
   float win = cover(box(vec2(fu, y), vec2(uLen, uAcross) * .5, 4. * uK));
@@ -77,8 +77,8 @@ void main() {
     vec2 uv = vec2(.5 - fu / uLen, .5 - y / uAcross);
     vec3 pic = texture(uPics, vec3(uv, mod(mod(k, uCount) + uCount, uCount))).rgb;
     float lum = dot(pic, vec3(.3, .59, .11));
-    vec3 quiet = mix(vec3(.05, .035, .03), vec3(.98, .84, .62), smoothstep(0., .82, lum));
-    quiet = mix(quiet, pic, .12);                                       // one amber print: every picture the same two tones
+    vec3 quiet = mix(vec3(.04, .04, .045), vec3(.93, .93, .95), smoothstep(0., .82, lum));
+    quiet = mix(quiet, pic, .12);                                       // one silver print: every picture the same two tones
     float at = s / uTotal, show = smoothstep(.06, .3, at) * (1. - smoothstep(.52, .8, at));
     float hov = uHoverK * (1. - smoothstep(.35, .65, abs(k - uHover)));
     vec3 lit = quiet * (.2 + .78 * d1 * mix(vec3(1.), warm, .5)) * mix(.34, 1.12, show);

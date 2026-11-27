@@ -8,12 +8,13 @@ import './site.css';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollSmoother } from 'gsap/ScrollSmoother';
-import { useEffect, useRef, type MouseEvent } from 'react';
+import { useEffect, useRef, type MouseEvent, type CSSProperties } from 'react';
 import { Bell } from './hl/icons';
 import { PlanDemo } from './sitedemo';
 import { Mascot, type Pose } from './ui/mascot';
 import { filmReel } from './reel';
 import { UsherChat } from './usherchat';
+import { CoverCal } from './covercal';
 
 // ---------------------------------------------------------------- the calendar (1 pm to 7 pm, four venues)
 
@@ -41,7 +42,7 @@ const EVENTS: Ev[] = [
   { col: 3, t: 'Copper Valley', s: '17:30', e: '18:57', who: 'Elif Galloway', img: 'f-08', faces: ['Elif Galloway'] },
 ];
 
-const TONES = ['#b9825a', '#8f6a4f', '#a4744e', '#7d5b46', '#c39367', '#6f5a4e'];
+const TONES = ['#8c8790', '#6d6872', '#9a9499', '#5f5a63', '#a7a1a6', '#55515a'];
 const initials = (n: string) => n.split(' ').map(w => w[0]).join('');
 const tone = (n: string) => TONES[[...n].reduce((h, c) => h + c.charCodeAt(0), 0) % TONES.length];
 
@@ -199,7 +200,7 @@ export default function Site() {
         };
         const p0 = onScreen();
         gsap.set(h1, { ...p0, transformOrigin: '0% 50%', force3D: true });
-        const settle = gsap.timeline({ defaults: { ease: 'power2.out' }, scrollTrigger: { trigger: hero, start: 'top top', end: '+=80%', scrub: true, pin: true, anticipatePin: 1, onUpdate: s => { if (started) hero.classList.toggle('lit', s.progress < 0.09); } } })
+        const settle = gsap.timeline({ defaults: { ease: 'power2.out' }, scrollTrigger: { trigger: hero, start: 'top top', end: '+=80%', scrub: true, pin: true, anticipatePin: 1, onUpdate: s => { if (started) hero.classList.toggle('lit', s.progress < 0.09); window.dispatchEvent(new CustomEvent('usher:cal', { detail: s.progress > 0.7 })); } } })
           .fromTo(h1, p0, { x: 0, y: 0, scale: 1, duration: 1, ease: 'power2.inOut' }, 0)
           .to(q('.s-scrollcue'), { autoAlpha: 0, duration: 0.2 }, 0)
           .to(q('[data-says]'), { autoAlpha: 0, duration: 0.1 }, 0)
@@ -217,7 +218,7 @@ export default function Site() {
           .to(q('[data-hero-fade]'), { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.08 }, 0)
           .to(q('.s-hero-stage'), { autoAlpha: 1, y: 0, duration: 0.8 }, 0.1)
           .to(q('[data-hero-float]'), { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.1 }, 0.2);
-        intro.call(() => { settle.play(); }, [], (seen ? 0.1 : 1.75) + 1.4);
+        intro.call(() => { settle.play(); window.dispatchEvent(new CustomEvent('usher:cal', { detail: true })); }, [], (seen ? 0.1 : 1.75) + 1.4);
         // The film and the cast leave as the page starts to move (decoration only).
         gsap.to(q('[data-reel-canvas]'), { autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top -22%', end: '+=50%', scrub: 0.6 } });
         gsap.to(q('[data-says]'), { autoAlpha: 0, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: '+=12%', scrub: true } });
@@ -236,19 +237,7 @@ export default function Site() {
       // Every starting state is set: now the hero may be seen (it was hidden so the finished layout never flashes first).
       root.current?.classList.add('ready');
 
-      // hero: the calendar keeps showing what the product does, on a loop
-      const heroCal = q('[data-cal="hero"]')[0];
-      const loop = gsap.timeline({ repeat: -1, repeatDelay: 1.5, delay: 3.4, defaults: { ease: 'power3.inOut' } });
-      loop.to(heroCal.querySelectorAll('[data-snowband]'), { opacity: 1, duration: 0.8 })
-        .to(heroCal.querySelectorAll('[data-ghost]'), { opacity: 1, duration: 0.4 }, '<0.4')
-        .add(moveBlocks(heroCal, 1), '<')
-        .call(() => heroCal.querySelectorAll('[data-move]').forEach(e => e.classList.add('hot')), [], '<')
-        .add(swapGuest(heroCal, true), '+=0.2')
-        .to({}, { duration: 1.5 })
-        // back to the original plan in one frame, so only the change forward is ever shown
-        .call(() => resetHero(heroCal));
       if (!phone) gsap.to(q('[data-hero-bg]'), { yPercent: 12, ease: 'none', scrollTrigger: { trigger: q('.s-hero')[0], start: 'top top', end: 'bottom top', scrub: true } });
-      gsap.to(q('[data-cal-wrap]'), { y: phone ? -8 : -14, rotateX: phone ? 0 : 3, duration: 3.2, ease: 'sine.inOut', yoyo: true, repeat: -1, delay: 2.4 });
 
       // The problems: each one plays in full where you can see it. The headline rises, the cards
       // follow one after another, their pictures settle, and the trouble in each one lights up.
@@ -401,16 +390,8 @@ export default function Site() {
           </div>
         </div>
         <div className="s-hero-stage" data-lve-skip aria-hidden="true">
-          <div className="s-hero-cal" data-cal-wrap>
-            <Cal id="hero" />
-          </div>
-          {/* The problems as the product raises them: alerts with the agent's recommendation. */}
-          <div className="s-float s-float-alert" data-hero-float>
-            <span className="ic">!</span><span><b>Snow 1:00 to 7:00 pm</b></span>
-          </div>
-          <div className="s-float s-float-alert late" data-hero-float>
-            <span className="ic"><Bell /></span><span><b>Dana Whitfield can't make it</b></span>
-          </div>
+          {/* The festival's Saturday: the cast pulls one screening later and pushes another next door. */}
+          <CoverCal />
         </div>
         <div className="s-scrollcue" aria-hidden="true">Scroll<i /></div>
       </header>
@@ -418,6 +399,7 @@ export default function Site() {
       {/* The two problems on one page, laid out the same way: label, headline, one line, then the facts. */}
       <section id="story" className="s-probs">
       <div className="s-prob s-risk">
+        <div className="s-bg" aria-hidden="true" style={{ '--img': 'url(/hl/bg/snow.webp)' } as CSSProperties} />
         <div className="s-prob-copy">
           <p className="s-mono">Problem 1</p>
           <h2 className="s-h2">Anything can go wrong at a film festival. Trust me, I&apos;ve seen it.</h2>
@@ -448,6 +430,7 @@ export default function Site() {
       </div>
 
       <div className="s-prob s-problem">
+        <div className="s-bg" aria-hidden="true" style={{ '--img': 'url(/hl/bg/office.webp)' } as CSSProperties} />
           <div className="s-prob-copy">
             <p className="s-mono">Problem 2</p>
             <h2 className="s-h2">Your team works from four versions of the same day.</h2>
@@ -537,6 +520,7 @@ export default function Site() {
 
       {/* 3. the new plan, shown as the product itself */}
       <section className="s-plan" id="plan" data-section>
+        <div className="s-bg" aria-hidden="true" style={{ '--img': 'url(/hl/bg/hall.webp)' } as CSSProperties} />
         <div className="s-plan-head">
           <div className="s-plan-copy" data-reveal>
             <p className="s-mono">The new plan</p>
@@ -705,7 +689,7 @@ function snowfield(canvas: HTMLCanvasElement | null, reduce: boolean) {
       f.y += f.s; f.d += 0.01; f.x += Math.sin(f.d) * 0.0004;
       if (f.y > 1.02) { f.y = -0.02; f.x = Math.random(); }
       c.beginPath(); c.arc(f.x * w, f.y * h, f.r, 0, Math.PI * 2);
-      c.fillStyle = `rgba(239, 229, 211, ${0.25 + f.r / 5})`; c.fill();
+      c.fillStyle = `rgba(246, 244, 243, ${0.25 + f.r / 5})`; c.fill();
     }
     if (visible) raf = requestAnimationFrame(frame);
   };
