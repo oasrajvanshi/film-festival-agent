@@ -316,6 +316,8 @@ const body = (t: Table) => t.slice(1).filter(r => r.some(c => (c ?? '').trim()))
 export function festivalDates(meta: FestivalMeta): string[] {
   const out: string[] = [];
   const d0 = new Date(`${meta.startDate}T12:00:00Z`);
+  // No dates yet (e.g. a Google Sheet connected before the dates were filled in): no festival days, not a crash.
+  if (Number.isNaN(d0.getTime())) return out;
   for (let i = 0; i < Math.min(31, Math.max(1, meta.days)); i++) out.push(new Date(d0.getTime() + i * 864e5).toISOString().slice(0, 10));
   return out;
 }

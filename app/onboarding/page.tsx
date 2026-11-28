@@ -97,6 +97,7 @@ export default function Onboarding() {
     await addFiles(files); setBusy('');
   };
   const useSheet = async () => {
+    if (!meta.name.trim()) { setError('Add the festival name first, then connect the sheet.'); return; }
     setBusy('Reading your Google Sheet…'); setError('');
     try {
       const r = await fetch(`/api/festival?sheet=${encodeURIComponent(sheetUrl)}`);
@@ -107,7 +108,12 @@ export default function Onboarding() {
       const tb = await t.json() as { tabs?: { name: string; table: string[][] }[]; error?: string };
       if (!t.ok || tb.error || !tb.tabs?.length) throw new Error(tb.error ?? b.error ?? 'The sheet has no tabs Usher can read.');
       setSheetFest(null); setFromSheet(true);
-      setUploads(tabsToUploads(tb.tabs));
+      const ups = tabsToUploads(tb.tabs);
+      // Fill in the dates from the schedule before the Check step reads them (the file route does this before Continue).
+      const span = scheduleDateRange(ups, meta.startDate.slice(0, 4) || undefined);
+      if (span && (!meta.startDate || span.first < meta.startDate || span.last > endDate(meta))) setMeta(m => ({ ...m, startDate: span.first, days: daysBetween(span.first, span.last) }));
+      setUploads(ups);
+      if (!span && !meta.startDate) { setBusy(''); setError('Usher couldn\'t find dates in that sheet. Add the first and last day above, then connect again.'); return; }
       setStep(1);
     } catch (e) { setError((e as Error).message); }
     setBusy('');
